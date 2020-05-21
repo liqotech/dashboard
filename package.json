@@ -1,0 +1,91 @@
+{
+  "private": true,
+  "scripts": {
+    "start": "webpack-dev-server --config webpack.config.js",
+    "build": "webpack -p --config webpack_docker.config.js --display-error-details",
+    "prettify-all": "node_modules/.bin/prettier --write **/*.{js,json,css}",
+    "lint-check": "node_modules/.bin/prettier --check **/*.{js,json,css}"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.7",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
+    "@babel/plugin-transform-react-jsx": "^7.3.0",
+    "@babel/plugin-transform-runtime": "^7.5.5",
+    "@babel/polyfill": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
+    "@babel/preset-react": "^7.8.3",
+    "@material-ui/core": "^4.9.13",
+    "@material-ui/icons": "^4.9.1",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-import": "^1.13.0",
+    "bootstrap": "^4.4.1",
+    "css-loader": "^3.5.3",
+    "file-loader": "^6.0.0",
+    "html-webpack-plugin": "^3.2.0",
+    "husky": "^4.2.3",
+    "less": "^3.11.1",
+    "less-loader": "^6.0.0",
+    "less-vars-to-js": "^1.3.0",
+    "lint-staged": "^10.1.1",
+    "material-icons-react": "^1.0.4",
+    "material-ui": "^0.20.2",
+    "material-ui-core": "^5.0.1",
+    "nested-menu": "0.0.1",
+    "prettier": "2.0.2",
+    "react": "^16.13.1",
+    "react-bootstrap": "^1.0.1",
+    "react-dom": "^16.13.0",
+    "react-graph-vis": "^1.0.5",
+    "react-inlinesvg": "^1.2.0",
+    "react-router-dom": "^5.1.2",
+    "react-scrolling-nav": "^1.1.5",
+    "robotstxt-webpack-plugin": "^7.0.0",
+    "style-loader": "^1.2.0",
+    "svg-inline-loader": "^0.8.2",
+    "svg-url-loader": "^5.0.0",
+    "toastr": "^2.1.4",
+    "url-loader": "^4.0.0",
+    "vis-network": "^7.6.2",
+    "webpack": "^4.42.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^4.1.0",
+    "@kubernetes/client-node": "file:./k8s_library/",
+    "@openapi-contrib/openapi-schema-to-json-schema": "^3.0.0",
+    "@rjsf/core": "^2.0.0",
+    "ace-builds": "^1.4.11",
+    "antd": "^4.1.5",
+    "bizcharts": "^4.0.2",
+    "lodash": "^4.17.15",
+    "oidc-client": "^1.10.1",
+    "react-ace": "^8.1.0",
+    "react-grid-layout": "^0.18.3",
+    "react-json-to-table": "^0.1.5",
+    "react-measure": "^2.3.0",
+    "theme": "^0.1.0",
+    "validate.js": "^0.13.1",
+    "yaml": "^1.9.2"
+  },
+  "lint-staged": {
+    "*.{js,json,css}": [
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "trailingComma": "none",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true,
+    "arrowParens": "avoid",
+    "endOfLine": "lf"
+  }
+}
