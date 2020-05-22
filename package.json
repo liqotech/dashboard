@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.1.0",
-    "@kubernetes/client-node": "file:./k8s_library/",
+    "@kubernetes/client-node": "LiqoTech/kubernetes-client-javascript#browser",
     "@openapi-contrib/openapi-schema-to-json-schema": "^3.0.0",
     "@rjsf/core": "^2.0.0",
     "ace-builds": "^1.4.11",
