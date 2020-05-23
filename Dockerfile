@@ -1,21 +1,29 @@
 # Docker Image which is used as foundation to create
-
 # builder image for the k8s_library js
+
+# This first stage downloads and installs the k8s_library from the LiqoTech repo and is necessary
+# because for some reasons just "npm install" do not properly install it from the repo
 FROM node:alpine as builder_k8s
-WORKDIR /k8s_library
-ADD ./k8s_library ./
-RUN npm install --silent --unsafe-perm
+# Download git to fetch the kubernetes repo
+RUN apk add --no-cache --update git openssh
+RUN git clone https://github.com/LiqoTech/kubernetes-client-javascript.git
+WORKDIR /kubernetes-client-javascript
+RUN npm install
+RUN npm run build
 
 # a custom Docker Image with this Dockerfile
 FROM node:alpine as build-deps
+# Download git to fetch the kubernetes repo
+RUN apk add --no-cache --update git openssh
 # A directory within the virtualized Docker environment
 # Becomes more relevant when using Docker Compose later
 WORKDIR /app
 # Copies package.json and package-lock.json to Docker environment
 COPY package*.json ./
-COPY --from=builder_k8s /k8s_library ./k8s_library
 # Installs all node packages
 RUN npm install --silent --unsafe-perm
+# Copy the dist folder from the previous k8s_library install in the node_modules
+COPY --from=builder_k8s /kubernetes-client-javascript/dist ./node_modules/@kubernetes/client-node/dist
 # Copies everything over to Docker environment
 COPY . ./
 RUN npm run build
