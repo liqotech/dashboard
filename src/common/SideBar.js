@@ -23,35 +23,37 @@ class SideBar extends Component {
   }
 
   loadCustomResources() {
-    let CRD = {
-      spec: {
-        group: 'crd-template.liqo.com',
-        version: 'v1',
-        names: {
-          plural: 'views'
+    if(this.props.api){
+      let CRD = {
+        spec: {
+          group: 'crd-template.liqo.com',
+          version: 'v1',
+          names: {
+            plural: 'views'
+          }
         }
       }
-    }
-    /** First get all the CR */
-    this.props.api.getCustomResourcesAllNamespaces(CRD)
-      .then((res) => {
-          this.setState({
-            customViews: res.body.items
-          });
+      /** First get all the CR */
+      this.props.api.getCustomResourcesAllNamespaces(CRD)
+        .then((res) => {
+            this.setState({
+              customViews: res.body.items
+            });
 
-          /** Then set up a watch to watch changes in the CR of the CRD */
-          this.setState({
-            controller: this.props.api.watchSingleCRD(
-              CRD.spec.group,
-              CRD.spec.version,
-              CRD.spec.names.plural,
-              this.notifyEvent),
-            isLoading: false
-          });
-        }
-      ).catch((error) => {
-      console.log(error);
-    })
+            /** Then set up a watch to watch changes in the CR of the CRD */
+            this.setState({
+              controller: this.props.api.watchSingleCRD(
+                CRD.spec.group,
+                CRD.spec.version,
+                CRD.spec.names.plural,
+                this.notifyEvent),
+              isLoading: false
+            });
+          }
+        ).catch((error) => {
+        console.log(error);
+      })
+    }
   }
 
   componentDidMount() {

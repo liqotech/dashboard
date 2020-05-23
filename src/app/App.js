@@ -3,7 +3,7 @@ import './App.css';
 import {
   Route,
   withRouter,
-  Switch
+  Switch, Redirect
 } from 'react-router-dom';
 import CRDList from '../CRD/CRDList';
 import AppHeader from '../common/AppHeader';
@@ -17,19 +17,32 @@ import UpdateCR from '../editors/UpdateCR';
 import ApiManager from '../services/ApiManager';
 import CRD from '../CRD/CRD';
 import DesignEditorCRD from '../editors/DesignEditorCRD';
+import Authenticator from '../services/Authenticator';
 
 const { Content } = Layout;
+
+function CallBackHandler(props) {
+  props.func();
+  return <div />;
+}
 
 class App extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      logged: false
+    }
     notification.config({
       placement: 'bottomLeft',
       bottom: 20,
       duration: 3,
     });
-    this.api = new ApiManager();
-    this.api.watcherSchedulerRR();
+    this.authManager = new Authenticator();
+    this.authManager.manager.events.addUserLoaded(user => {
+      this.state.logged = true;
+      this.api = new ApiManager(user);
+      this.api.watcherSchedulerRR();
+    });
   }
 
   render() {
@@ -43,20 +56,47 @@ class App extends Component {
               <Content>
                 <div className="container">
                   <Switch>
+                    <Route exact path="/login"
+                           render={() => {
+                             this.authManager.login();
+                           }}
+                    />
+                    <Route path="/callback"
+                           render={() => this.state.logged ? (
+                             <Redirect to="/" />
+                             ) : ( <CallBackHandler func={this.authManager.completeLogin} />)}
+                    />
                     <Route exact path="/"
-                           render={(props) => <DashboardGeneral {...props} api={this.api} />}/>
+                           render={(props) => this.state.logged ? (
+                             <DashboardGeneral {...props} api={this.api} />
+                           ): (<Redirect to = "/login"/>)}/>
                     <Route exact path="/customresources"
-                           render={(props) => <CRDList {...props} api={this.api} />}/>
+                           render={(props) => this.state.logged ? (
+                             <CRDList {...props} api={this.api} />
+                           ): (<Redirect to = "/login"/>)}/>
                     <Route exact path="/customresources/:crdName"
-                           component={(props) => <CRD {...props} api={this.api} />}/>
+                           component={(props) => this.state.logged ? (
+                             <CRD {...props} api={this.api} />
+                           ): (<Redirect to = "/login"/>)}/>
                     <Route exact path="/customresources/:crdName/create"
-                           render={(props) => <NewCR {...props} api={this.api} />}/>
+                           render={(props) => this.state.logged ? (
+                             <NewCR {...props} api={this.api} />
+                           ): (<Redirect to = "/login"/>)}/>
                     <Route exact path="/customresources/:crdName/representation_editor"
-                           render={(props) => <DesignEditorCRD {...props} api={this.api} />}/>
+                           render={(props) => this.state.logged ? (
+                             <DesignEditorCRD {...props} api={this.api} />
+                           ): (<Redirect to = "/login"/>)}/>
                     <Route exact path="/customresources/:crdName/:crName/update"
-                           render={(props) => <UpdateCR {...props} api={this.api} />}/>
+                           render={(props) => this.state.logged ? (
+                             <UpdateCR {...props} api={this.api} />
+                           ): (<Redirect to = "/login"/>)}/>
                     <Route exact path="/customview/:viewName/"
-                           component={(props) => <CustomView {...props} api={this.api} />}/>
+                           component={(props) => this.state.logged ? (
+                             <CustomView {...props} api={this.api} />
+                           ): (<Redirect to = "/login"/>)}/>
+                    <Route path="*">
+                      <Redirect to="/login" />
+                    </Route>
                   </Switch>
                 </div>
               </Content>

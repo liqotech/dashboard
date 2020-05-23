@@ -19,8 +19,10 @@ class AppHeader extends Component {
       this.state = {
         CRDs: []
       }
-      this.props.api.getCRDs();
-      this.props.api.autoCompleteCallback = this.autoCompleteSearch;
+      if(this.props.api){
+        this.props.api.getCRDs();
+        this.props.api.autoCompleteCallback = this.autoCompleteSearch;
+      }
       this.onSearch = this.onSearch.bind(this);
     }
 
