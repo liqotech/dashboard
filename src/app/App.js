@@ -49,7 +49,11 @@ class App extends Component {
 
     return (
         <Layout>
-          <AppHeader api={this.api} />
+          <AppHeader
+            api={this.api}
+            logout={this.authManager.logout}
+            logged={this.state.logged}
+          />
           <Layout className="app-content" style={{minHeight: '92vh'}}>
             <SideBar api={this.api} />
             <Layout style={{ marginLeft: 250 }}>

@@ -128,7 +128,7 @@ class SideBar extends Component {
           <Menu.Item key="1">
             <Link to="/">
               <DashboardOutlined style={{ fontSize: '20px' }} />
-              <span>Dashboard</span>
+              <span>Home Page</span>
             </Link>
           </Menu.Item>
           {cv}

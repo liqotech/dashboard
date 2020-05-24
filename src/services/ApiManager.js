@@ -64,7 +64,7 @@ export default class ApiManager {
   /** get the CRDs for the group crd-template.liqo.com */
   getTemplates() {
     return fetch(
-      API_BASE_URL +
+      window.APISERVER_URL +
       '/apis/' +
       TEMPLATE_GROUP
     ).then(item => item.json())
