@@ -22,26 +22,45 @@ import Authenticator from '../services/Authenticator';
 const { Content } = Layout;
 
 function CallBackHandler(props) {
-  props.func();
-  return <div />;
+  props.func()
+  return <div></div>
 }
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      logged: false
+      logged: false,
+      api: null
     }
     notification.config({
       placement: 'bottomLeft',
       bottom: 20,
       duration: 3,
     });
+    this.api = null;
+    /* Check if previously logged */
+    const retrievedSessionToken = JSON.parse(
+      sessionStorage.getItem(`oidc.user:${OIDC_PROVIDER_URL}:${OIDC_CLIENT_ID}`)
+    );
+    if (retrievedSessionToken) {
+      this.state = {
+        logged: true,
+        api: new ApiManager({ id_token: retrievedSessionToken.id_token,
+          token_type: retrievedSessionToken.token_type || 'Bearer'})
+      };
+    }
     this.authManager = new Authenticator();
     this.authManager.manager.events.addUserLoaded(user => {
-      this.state.logged = true;
-      this.api = new ApiManager(user);
-      this.api.watcherSchedulerRR();
+      // console.log(user);
+      this.setState({logged: true});
+      this.setState({api: new ApiManager(user)});
+      this.state.api.watcherSchedulerRR();
+    });
+    this.authManager.manager.events.addAccessTokenExpiring(() => {
+      this.authManager.manager.signinSilent().then(user => {
+        this.setState({logged: true});
+      });
     });
   }
 
@@ -50,12 +69,12 @@ class App extends Component {
     return (
         <Layout>
           <AppHeader
-            api={this.api}
+            api={this.state.api}
             logout={this.authManager.logout}
             logged={this.state.logged}
           />
           <Layout className="app-content" style={{minHeight: '92vh'}}>
-            <SideBar api={this.api} />
+            <SideBar api={this.state.api} />
             <Layout style={{ marginLeft: 250 }}>
               <Content>
                 <div className="container">
@@ -72,31 +91,31 @@ class App extends Component {
                     />
                     <Route exact path="/"
                            render={(props) => this.state.logged ? (
-                             <DashboardGeneral {...props} api={this.api} />
+                             <DashboardGeneral {...props} api={this.state.api} />
                            ): (<Redirect to = "/login"/>)}/>
                     <Route exact path="/customresources"
                            render={(props) => this.state.logged ? (
-                             <CRDList {...props} api={this.api} />
+                             <CRDList {...props} api={this.state.api} />
                            ): (<Redirect to = "/login"/>)}/>
                     <Route exact path="/customresources/:crdName"
                            component={(props) => this.state.logged ? (
-                             <CRD {...props} api={this.api} />
+                             <CRD {...props} api={this.state.api} />
                            ): (<Redirect to = "/login"/>)}/>
                     <Route exact path="/customresources/:crdName/create"
                            render={(props) => this.state.logged ? (
-                             <NewCR {...props} api={this.api} />
+                             <NewCR {...props} api={this.state.api} />
                            ): (<Redirect to = "/login"/>)}/>
                     <Route exact path="/customresources/:crdName/representation_editor"
                            render={(props) => this.state.logged ? (
-                             <DesignEditorCRD {...props} api={this.api} />
+                             <DesignEditorCRD {...props} api={this.state.api} />
                            ): (<Redirect to = "/login"/>)}/>
                     <Route exact path="/customresources/:crdName/:crName/update"
                            render={(props) => this.state.logged ? (
-                             <UpdateCR {...props} api={this.api} />
+                             <UpdateCR {...props} api={this.state.api} />
                            ): (<Redirect to = "/login"/>)}/>
                     <Route exact path="/customview/:viewName/"
                            component={(props) => this.state.logged ? (
-                             <CustomView {...props} api={this.api} />
+                             <CustomView {...props} api={this.state.api} />
                            ): (<Redirect to = "/login"/>)}/>
                     <Route path="*">
                       <Redirect to="/login" />

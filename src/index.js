@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './app/App';
-import registerServiceWorker from './registerServiceWorker';
+import registerServiceWorker, { unregister } from './registerServiceWorker';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 /*ReactDOM.render(
@@ -17,4 +17,4 @@ document.body.appendChild(main);
 main.setAttribute('id', 'main');
 ReactDOM.render(<Router><App /></Router>, main);
 
-registerServiceWorker();
+unregister();

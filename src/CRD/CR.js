@@ -8,6 +8,7 @@ import { APP_NAME } from '../constants';
 import PieChart from '../templates/piechart/PieChart';
 import HistoChart from '../templates/histogram/HistoChart';
 import { JsonToTable } from 'react-json-to-table';
+import ErrorBoundary from '../error-handles/ErrorBoundary';
 
 class CR extends Component {
   constructor(props) {
@@ -99,6 +100,11 @@ class CR extends Component {
 
   render() {
 
+    let CRdefault = [];
+    CRdefault.push(
+      <JsonToTable json={this.props.cr.spec} />
+    );
+
     return(
       <div className="crd-choices">
         { !this.state.deleted ? (
@@ -148,7 +154,9 @@ class CR extends Component {
             }
             {
               !this.state.showJSON && !this.props.template ? (
-                <JsonToTable json={this.props.cr.spec} />
+                <ErrorBoundary>
+                  <JsonToTable json={this.props.cr.spec} />
+                </ErrorBoundary>
               ) : null
             }
           </Card>
@@ -156,6 +164,7 @@ class CR extends Component {
       </div>
     );
   }
+
 
 }
 

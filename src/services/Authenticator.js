@@ -1,11 +1,14 @@
 import { UserManager } from 'oidc-client';
+import React from 'react';
 
 /**
  * Api class to manage authN
  */
 
 export default class Authenticator {
+
   constructor() {
+
     if (window.OIDC_CLIENT_ID === undefined) {
       window.OIDC_CLIENT_ID = OIDC_CLIENT_ID;
     }
@@ -45,7 +48,12 @@ export default class Authenticator {
    * @return {Promise<void>}
    */
   login() {
-    return this.manager.signinRedirect();
+    return this.manager.signinRedirect().catch(error => {
+      console.log('login', error);
+      return (
+        <div>ERROR</div>
+      )
+    });
   }
 
   /**
@@ -53,7 +61,12 @@ export default class Authenticator {
    * @return {Promise<User>}
    */
   completeLogin() {
-    return this.manager.signinRedirectCallback();
+    return this.manager.signinRedirectCallback().catch(error => {
+      console.log('completeLogin', error);
+      return (
+        <div>ERROR</div>
+      )
+    });
   }
 
   /**
