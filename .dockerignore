@@ -1,0 +1,10 @@
+./node_modules
+./package-lock.json
+./dist
+./k8s_library/node_modules
+./k8s_library/package-lock.json
+./k8s_library/dist
+./kubernetes-templates
+./Dockerfile
+./README.md
+./.dockerignore

@@ -1,0 +1,10 @@
+.no-crds-found {
+    font-size: 20px;
+    text-align: center;
+    padding: 20px;    
+}
+
+.crds-container {
+    max-width: 80%;
+    margin: 20px auto 0;
+}
