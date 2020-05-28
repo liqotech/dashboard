@@ -118,8 +118,6 @@ class CR extends Component {
       <JsonToTable json={this.props.cr.spec} />
     );
 
-    console.log(this.props.cr);
-
     return(
       <div className="crd-choices">
         { !this.state.deleted ? (

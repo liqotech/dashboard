@@ -45,7 +45,6 @@ class App extends Component {
       sessionStorage.getItem(`oidc.user:${OIDC_PROVIDER_URL}:${OIDC_CLIENT_ID}`)
     );
     if (retrievedSessionToken) {
-      console.log(retrievedSessionToken)
       this.state = {
         user: retrievedSessionToken.profile,
         logged: true,

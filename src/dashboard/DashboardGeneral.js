@@ -8,7 +8,6 @@ class DashboardGeneral extends Component {
   }
 
   render() {
-    // console.log(this.props.user);
     return (
       <div>
         {/** Maybe put something for the front page? */}
