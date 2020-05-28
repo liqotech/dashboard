@@ -13,6 +13,7 @@ RUN npm run build
 
 # a custom Docker Image with this Dockerfile
 FROM node:alpine as build-deps
+# Download git to fetch the kubernetes repo
 RUN apk add --no-cache --update git openssh
 # A directory within the virtualized Docker environment
 # Becomes more relevant when using Docker Compose later
@@ -21,6 +22,7 @@ WORKDIR /app
 COPY package*.json ./
 # Installs all node packages
 RUN npm install --silent --unsafe-perm
+# Copy the dist folder from the previous k8s_library install in the node_modules
 COPY --from=builder_k8s /kubernetes-client-javascript/dist ./node_modules/@kubernetes/client-node/dist
 # Copies everything over to Docker environment
 COPY . ./
