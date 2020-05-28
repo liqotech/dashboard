@@ -1,0 +1,26 @@
+.json-to-table td,
+.json-to-table th {
+    padding: 5px;
+    border: 1px solid #bebebe; }
+
+.json-to-table td {
+    text-align: left; }
+
+.json-to-table tr:nth-child(even) {
+    background-color: #eee; }
+
+.json-to-table th[scope="col"] {
+    background-color: #696969;
+    color: #fff; }
+
+.json-to-table th[scope="row"] {
+    background-color: #d7d9f2; }
+
+.json-to-table caption {
+    caption-side: bottom; }
+
+.json-to-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: sans-serif;
+    font-size: 0.8rem; }
