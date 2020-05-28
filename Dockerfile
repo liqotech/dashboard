@@ -1,5 +1,8 @@
 # Docker Image which is used as foundation to create
 # builder image for the k8s_library js
+
+# This first stage downloads and installs the k8s_library from the LiqoTech repo and is necessary
+# because for some reasons just "npm install" do not properly install it from the repo
 FROM node:alpine as builder_k8s
 # Download git to fetch the kubernetes repo
 RUN apk add --no-cache --update git openssh
