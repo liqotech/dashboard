@@ -31,7 +31,8 @@ class App extends Component {
     super(props);
     this.state = {
       logged: false,
-      api: null
+      api: null,
+      user: {}
     }
     notification.config({
       placement: 'bottomLeft',
@@ -44,7 +45,9 @@ class App extends Component {
       sessionStorage.getItem(`oidc.user:${OIDC_PROVIDER_URL}:${OIDC_CLIENT_ID}`)
     );
     if (retrievedSessionToken) {
+      console.log(retrievedSessionToken)
       this.state = {
+        user: retrievedSessionToken.profile,
         logged: true,
         api: new ApiManager({ id_token: retrievedSessionToken.id_token,
           token_type: retrievedSessionToken.token_type || 'Bearer'})
@@ -52,9 +55,11 @@ class App extends Component {
     }
     this.authManager = new Authenticator();
     this.authManager.manager.events.addUserLoaded(user => {
-      // console.log(user);
-      this.setState({logged: true});
-      this.setState({api: new ApiManager(user)});
+      this.setState({
+        logged: true,
+        api: new ApiManager(user),
+        user: user.profile
+      });
       this.state.api.watcherSchedulerRR();
     });
     this.authManager.manager.events.addAccessTokenExpiring(() => {
@@ -91,7 +96,7 @@ class App extends Component {
                     />
                     <Route exact path="/"
                            render={(props) => this.state.logged ? (
-                             <DashboardGeneral {...props} api={this.state.api} />
+                             <DashboardGeneral {...props} api={this.state.api} user={this.state.user}/>
                            ): (<Redirect to = "/login"/>)}/>
                     <Route exact path="/customresources"
                            render={(props) => this.state.logged ? (
