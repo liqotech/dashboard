@@ -13,7 +13,7 @@ module.exports = {
   },
   devServer: {
     host: '0.0.0.0',
-    port: 80,
+    port: 8000,
     historyApiFallback: {
       disableDotRule: true
     }
@@ -72,6 +72,13 @@ module.exports = {
         description: 'Liqo dashboard'
       },
       favicon: 'src/assets/k8s-2.png'
+    }),
+    new webpack.DefinePlugin({
+      OIDC_PROVIDER_URL: JSON.stringify(process.env.OIDC_PROVIDER_URL),
+      OIDC_CLIENT_ID: JSON.stringify(process.env.OIDC_CLIENT_ID),
+      APISERVER_URL: JSON.stringify(process.env.APISERVER_URL),
+      OIDC_REDIRECT_URI: JSON.stringify(process.env.OIDC_REDIRECT_URI),
+      OIDC_CLIENT_SECRET: JSON.stringify(process.env.OIDC_CLIENT_SECRET)
     }),
     new RobotstxtPlugin({
       'User-agent': '*',

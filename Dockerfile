@@ -8,7 +8,7 @@ FROM node:alpine as builder_k8s
 RUN apk add --no-cache --update git openssh
 RUN git clone https://github.com/LiqoTech/kubernetes-client-javascript.git
 WORKDIR /kubernetes-client-javascript
-RUN npm install
+RUN npm install --silent --unsafe-perm
 RUN npm run build
 
 # a custom Docker Image with this Dockerfile
@@ -29,6 +29,11 @@ COPY . ./
 RUN npm run build
 
 FROM nginx:alpine
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build-deps /app/dist /usr/share/nginx/html
-CMD ["nginx", "-g", "daemon off;"]
+COPY --chown=101:101 --from=build-deps /app/dist /usr/share/nginx/html
+COPY --chown=101:101 nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chown=101:101 docker-entrypoint.sh /
+COPY --chown=101:101 generate_config_js.sh /
+
+RUN chmod +x docker-entrypoint.sh generate_config_js.sh
+
+ENTRYPOINT ["/docker-entrypoint.sh"]

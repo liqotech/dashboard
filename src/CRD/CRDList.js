@@ -9,6 +9,7 @@ import 'react-resizable/css/styles.css';
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const { Title } = Typography;
 import { APP_NAME } from '../constants';
+import { Pagination } from 'antd';
 
 class CRDList extends Component {
   constructor(props) {
@@ -19,12 +20,14 @@ class CRDList extends Component {
      */
     this.state = {
       CRDs: [],
+      CRDshown: [],
       isLoading: false,
       layout: {lg: []},
     };
     this.loadCustomResourceDefinitions = this.loadCustomResourceDefinitions.bind(this);
     this.api = this.props.api;
     this.notifyEvent = this.notifyEvent.bind(this);
+    this.paginationChange = this.paginationChange.bind(this);
   }
 
   loadCustomResourceDefinitions() {
@@ -44,14 +47,14 @@ class CRDList extends Component {
     promise
       .then(response => {
         /** Once we have all CRDs, let's watch for changes */
+
         this.api.watchAllCRDs(this.notifyEvent);
 
         this.setState({
           CRDs: response,
           isLoading: false
         });
-
-        this.generateLayout();
+        this.generateLayout(response.slice(0, 10));
       })
       .catch(() => {
         this.setState({
@@ -64,12 +67,26 @@ class CRDList extends Component {
     this.loadCustomResourceDefinitions();
   }
 
-  generateLayout(){
+  /** When going to another page, change the CRDs shown */
+  paginationChange(current, size){
+    let CRDsubset = this.state.CRDs.slice(size*(current-1), size*current);
+    this.generateLayout(CRDsubset);
+  }
+
+  /**
+   * Given a set (or subset) of CRD it generates the layout
+   * @param CRDs a subset of the total of the CRDs
+   */
+  generateLayout(CRDs){
     let layout = [];
 
-    for(let i = 0; i < this.state.CRDs.length; i++) {
+    this.setState({
+      CRDshown: CRDs
+    });
+
+    for(let i = 0; i < CRDs.length; i++) {
       layout.push({
-        i: this.state.CRDs[i].metadata.name, x: i%2, y: Math.floor(i/2), w: 1, h: 1, static: true
+        i: CRDs[i].metadata.name, x: i%2, y: Math.floor(i/2), w: 1, h: 1, static: true
       });
     }
     this.setState({
@@ -124,12 +141,12 @@ class CRDList extends Component {
       CRDs: CRDs
     });
 
-    this.props.api.autoCompleteCallback(CRDs);
+    // this.props.api.autoCompleteCallback(CRDs);
   }
 
   render() {
     const CRDViews = [];
-    this.state.CRDs.forEach(CRD => {
+    this.state.CRDshown.forEach(CRD => {
       CRDViews.push(
         <div className="crd-content" key={CRD.metadata.name}>
           <div>
@@ -162,7 +179,7 @@ class CRDList extends Component {
               <Tabs defaultActiveKey="1">
                 <Tabs.TabPane tab="Description" key="1">
                   {
-                    CRD.metadata.annotations.description ? (
+                    CRD.metadata.annotations && CRD.metadata.annotations.description ? (
                       <div>{CRD.metadata.annotations.description}</div>
                       ) : <div>This CRD has no description</div>
                   }
@@ -182,12 +199,20 @@ class CRDList extends Component {
                               compactType={'horizontal'}>
           {CRDViews}
         </ResponsiveGridLayout>
+
         {!this.state.isLoading && CRDViews.length === 0 ? (
           <div className="no-crds-found">
             <span>No CRDs Found.</span>
           </div>
         ) : null}
         {this.state.isLoading ? <LoadingIndicator /> : null}
+        {!this.state.isLoading && CRDViews.length > 0 ? (
+          <div className="no-crds-found" style={{marginTop: 30}}>
+            <Pagination defaultCurrent={1} total={this.state.CRDs.length}
+                        onChange={this.paginationChange}
+                        showSizeChanger={false} />
+          </div>
+        ) : null}
       </div>
     );
   }

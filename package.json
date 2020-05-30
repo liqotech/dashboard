@@ -63,7 +63,6 @@
     "oidc-client": "^1.10.1",
     "react-ace": "^8.1.0",
     "react-grid-layout": "^0.18.3",
-    "react-json-to-table": "^0.1.5",
     "react-measure": "^2.3.0",
     "theme": "^0.1.0",
     "validate.js": "^0.13.1",

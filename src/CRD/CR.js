@@ -1,25 +1,31 @@
 import React, { Component } from 'react';
 import './CR.css';
-import { Breadcrumb, Button, Card, notification, Popconfirm, Popover } from 'antd';
+import { Breadcrumb, Button, Card, Menu, notification, Popconfirm, Popover } from 'antd';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 import { Link } from 'react-router-dom';
 import EditOutlined from '@ant-design/icons/lib/icons/EditOutlined';
 import { APP_NAME } from '../constants';
 import PieChart from '../templates/piechart/PieChart';
 import HistoChart from '../templates/histogram/HistoChart';
-import { JsonToTable } from 'react-json-to-table';
+import JsonToTable from '../editors/JsonToTable/JsonToTable';
+import ErrorBoundary from '../error-handles/ErrorBoundary';
+import UpOutlined from '@ant-design/icons/lib/icons/UpOutlined';
 
 class CR extends Component {
   constructor(props) {
     super(props);
     this.state = {
       showJSON: false,
-      deleted: false
+      deleted: false,
+      showStatus: true,
+      showSpec: false
     }
     this.handleClick_show = this.handleClick_show.bind(this);
     this.handleClick_delete = this.handleClick_delete.bind(this);
     this.abortWatchers = this.abortWatchers.bind(this);
     this.getChart = this.getChart.bind(this);
+    this.handleClick_Spec = this.handleClick_Spec.bind(this);
+    this.handleClick_Status = this.handleClick_Status.bind(this);
   }
 
   abortWatchers() {
@@ -70,6 +76,14 @@ class CR extends Component {
       });
   }
 
+  handleClick_Spec(){
+    this.setState({showSpec: !this.state.showSpec});
+  }
+
+  handleClick_Status(){
+    this.setState({showStatus: !this.state.showStatus});
+  }
+
   getChart() {
     return(
       <div className="rep-container">
@@ -98,6 +112,11 @@ class CR extends Component {
   }
 
   render() {
+
+    let CRdefault = [];
+    CRdefault.push(
+      <JsonToTable json={this.props.cr.spec} />
+    );
 
     return(
       <div className="crd-choices">
@@ -148,7 +167,42 @@ class CR extends Component {
             }
             {
               !this.state.showJSON && !this.props.template ? (
-                <JsonToTable json={this.props.cr.spec} />
+                <ErrorBoundary>
+                  {
+                    this.props.cr.status ? (
+                      <div onClick={this.handleClick_Status}>
+                      <div>
+                        <UpOutlined style={{marginRight: 10, marginBottom: 20}}
+                                    onClick={this.handleClick_Status}
+                                    rotate={this.state.showStatus ? 180 : 0}/>
+                        <a onClick={this.handleClick_Status}>Status</a>
+                      </div>
+                      {
+                        this.state.showStatus ? (
+                          <JsonToTable json={this.props.cr.status} />
+                        ) : null
+                      }
+                    </div>
+                    ) : null
+                  }
+                  {
+                    this.props.cr.spec ? (
+                      <div onClick={this.handleClick_Spec}>
+                        <div>
+                          <UpOutlined style={{marginRight: 10, marginBottom: 20, marginTop: 25}}
+                                      onClick={this.handleClick_Spec}
+                                      rotate={this.state.showSpec ? 180 : 0}/>
+                          <a onClick={this.handleClick_Spec}>Spec</a>
+                        </div>
+                        {
+                          this.state.showSpec ? (
+                            <JsonToTable json={this.props.cr.spec} />
+                          ) : null
+                        }
+                      </div>
+                    ) : null
+                  }
+                </ErrorBoundary>
               ) : null
             }
           </Card>
@@ -156,6 +210,7 @@ class CR extends Component {
       </div>
     );
   }
+
 
 }
 

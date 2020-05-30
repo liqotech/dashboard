@@ -1,5 +1,6 @@
 import { ApiextensionsV1beta1Api, Config, CoreV1Api, CustomObjectsApi, watch } from '@kubernetes/client-node';
 import { API_BASE_URL, TEMPLATE_GROUP } from '../constants';
+import Authenticator from './Authenticator';
 
 /**
  * Class to manage all the interaction with the cluster
@@ -13,8 +14,11 @@ export default class ApiManager {
    *
    *
    */
-  constructor() {
-    this.kcc = new Config(API_BASE_URL);
+  constructor(user) {
+    if (window.APISERVER_URL === undefined) {
+      window.APISERVER_URL = APISERVER_URL;
+    }
+    this.kcc = new Config(window.APISERVER_URL, user.id_token, user.token_type);
     this.apiExt = this.kcc.makeApiClient(ApiextensionsV1beta1Api);
     this.apiCRD = this.kcc.makeApiClient(CustomObjectsApi);
     this.apiCore = this.kcc.makeApiClient(CoreV1Api);
@@ -60,7 +64,7 @@ export default class ApiManager {
   /** get the CRDs for the group crd-template.liqo.com */
   getTemplates() {
     return fetch(
-      API_BASE_URL +
+      window.APISERVER_URL +
       '/apis/' +
       TEMPLATE_GROUP
     ).then(item => item.json())

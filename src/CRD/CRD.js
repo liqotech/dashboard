@@ -13,7 +13,7 @@ import {
   Popover,
   Row,
   Tooltip,
-  Col, Descriptions, Switch
+  Col, Descriptions, Switch, Pagination
 } from 'antd';
 import CR from './CR';
 import { Link } from 'react-router-dom';
@@ -58,7 +58,8 @@ class CRD extends Component {
       deleted: false,
       template: null,
       isDraggable: false,
-      isPinned: false
+      isPinned: false,
+      CRshown: []
     }
 
     /** In case we are not on a custom view */
@@ -82,12 +83,12 @@ class CRD extends Component {
 
     this.tempTemplate = null;
 
-    this.printRepresentation = this.printRepresentation.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.deleteCR = this.deleteCR.bind(this);
     this.abortWatchers = this.abortWatchers.bind(this);
     this.loadCustomResources = this.loadCustomResources.bind(this);
     this.changeTemplate = this.changeTemplate.bind(this);
+    this.paginationChange = this.paginationChange.bind(this);
   }
 
   loadCustomResources() {
@@ -100,7 +101,8 @@ class CRD extends Component {
     this.props.api.getCustomResourcesAllNamespaces(this.state.CRD)
       .then((res) => {
       this.setState({
-        custom_resources: res.body.items
+        custom_resources: res.body.items,
+        CRshown: res.body.items.slice(0, 10)
       });
 
       this.setState({isLoading: false});
@@ -269,7 +271,7 @@ class CRD extends Component {
         <Descriptions style={{marginTop: 20, marginLeft: 15}}>
           <Descriptions.Item>
             {
-              this.state.CRD.metadata.annotations.description ? (
+              this.state.CRD.metadata.annotations && this.state.CRD.metadata.annotations.description ? (
                 <div>{this.state.CRD.metadata.annotations.description}</div>
               ) : (
                 <div>No description for this CRD</div>
@@ -364,16 +366,12 @@ class CRD extends Component {
     })
   }
 
-  printRepresentation() {
-
-  }
-
   /**
    * Function that get the CR template for the current CRD
    * @param CRD: this CRD
    */
   findTemplate(CRD) {
-    if (CRD.metadata.annotations.template) {
+    if (CRD.metadata.annotations && CRD.metadata.annotations.template) {
       let CR = null;
       let array = CRD.metadata.annotations.template.split('/');
       this.props.api.getCustomResourcesAllNamespaces({
@@ -403,6 +401,13 @@ class CRD extends Component {
     }
   };
 
+  /** When going to another page, change the CRDs shown */
+  paginationChange(current, size){
+    this.setState({
+      CRshown: this.state.custom_resources.slice(size*(current-1), size*current)
+    });
+  }
+
   render() {
 
     if(this.state.isLoading){
@@ -414,7 +419,9 @@ class CRD extends Component {
     }
 
     const utils = new Utils();
-    const schema = utils.OAPIV3toJSONSchema(this.state.CRD.spec.validation.openAPIV3Schema);
+    let schema = null;
+    if(this.state.CRD.spec.validation)
+      schema = utils.OAPIV3toJSONSchema(this.state.CRD.spec.validation.openAPIV3Schema);
 
     /** array of CR components */
     const CRViews = [];
@@ -428,7 +435,7 @@ class CRD extends Component {
         />
       )
     } else {
-      this.state.custom_resources.forEach(item => {
+      this.state.CRshown.forEach(item => {
         CRViews.push(
           /**
            * @param api: this apiManager instance
@@ -449,7 +456,7 @@ class CRD extends Component {
       if(CRViews.length === 0) {
         CRViews.push(
           <Title key={'0'} level={4} style={{textAlign: 'center', marginTop: 40, marginBottom: 100}}>
-            No resources
+            No resources present
           </Title>
         )
       }
@@ -460,12 +467,14 @@ class CRD extends Component {
      * for now it shows annotations
      */
     const CRD_annotations = [];
-    for(let annotation of Object.entries(this.state.CRD.metadata.annotations)) {
-      CRD_annotations.push(
-        <Tag key={annotation}>
-          <pre>{JSON.stringify(annotation, null, 2)}</pre>
-        </Tag>
-      );
+    if(this.state.CRD.metadata.annotations){
+      for(let annotation of Object.entries(this.state.CRD.metadata.annotations)) {
+        CRD_annotations.push(
+          <Tag key={annotation}>
+            <pre>{JSON.stringify(annotation, null, 2)}</pre>
+          </Tag>
+        );
+      }
     }
 
     let width = '70%';
@@ -505,14 +514,35 @@ class CRD extends Component {
                           ) : null
                       }>
                         <Tabs.TabPane tab="Annotations" key="1">
-                          {CRD_annotations}
+                          {
+                            CRD_annotations.length > 0 ? (
+                              <div>{CRD_annotations}</div>
+                            ) : (
+                              <Title key={'0'} level={4} style={{textAlign: 'center', marginTop: 40, marginBottom: 100}}>
+                                No annotations
+                              </Title>
+                            )
+                          }
                         </Tabs.TabPane>
                         <Tabs.TabPane tab="Resources" key="2">
                           {CRViews}
+                          <div className="no-crds-found" style={{marginTop: 30}}>
+                            <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
+                                        onChange={this.paginationChange}
+                                        showSizeChanger={false} />
+                          </div>
                         </Tabs.TabPane>
                         {/** Show the JSON Schema of the CRD */}
                         <Tabs.TabPane tab="Schema" key="3">
-                          <pre>{JSON.stringify(schema.properties.spec, null, 2)}</pre>
+                          {
+                            schema ? (
+                              <pre>{JSON.stringify(schema.properties.spec, null, 2)}</pre>
+                              ) : (
+                                <Title key={'0'} level={4} style={{textAlign: 'center', marginTop: 40, marginBottom: 100}}>
+                                  No schema for this CRD
+                                </Title>
+                              )
+                          }
                         </Tabs.TabPane>
                       </Tabs>
                     </Layout>
