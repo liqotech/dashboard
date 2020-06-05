@@ -23,7 +23,6 @@ class GraphNet extends Component {
       },
       events: {
         selectNode: function(event){
-          console.log(_this);
           if(event.nodes.length === 1){
             /** If it's a cluster, open it on click */
             if(_this.state.network.isCluster(event.nodes[0]) === true){
@@ -99,6 +98,7 @@ class GraphNet extends Component {
     });
   };
 
+  /** Generate the graph layout */
   createNetwork(){
     const _this = this;
     const nodes = [];
@@ -167,6 +167,11 @@ class GraphNet extends Component {
     }
 
     this.setState({graph: graph});
+
+    if(this.state.network)
+      this.state.network.fit({
+        animation: true
+      });
   }
 
   componentDidMount() {
@@ -187,7 +192,7 @@ class GraphNet extends Component {
       <div>
         <div className="graph-network">
           <Graph
-            style={{height: 500}}
+            style={{height: '50vh'}}
             graph={this.state.graph}
             options={this.state.options}
             events={this.state.events}
