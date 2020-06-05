@@ -9,14 +9,81 @@ import JsonToTableAntd from '../../editors/JsonToTable/JsonToTableAntd';
 class GraphNet extends Component {
   constructor(props) {
     super(props);
+
+    let _this = this;
+
     this.state = {
       titleModal: '',
       showModal: false,
       contentModal: null,
+      isClustered: true,
+      graph: {
+        nodes: [],
+        edges: []
+      },
+      events: {
+        selectNode: function(event){
+          console.log(_this);
+          if(event.nodes.length === 1){
+            /** If it's a cluster, open it on click */
+            if(_this.state.network.isCluster(event.nodes[0]) === true){
+              _this.state.network.openCluster(event.nodes[0]);
+              _this.setState({ isClustered: false });
+            } else {
+              _this.setState({
+                titleModal: event.nodes[0],
+                showModal: true,
+                contentModal: (
+                  /** Just show the default information */
+                  <JsonToTableAntd
+                    json={ _this.props.custom_resources.find(item => {
+                      return item.metadata.name === event.nodes[0];
+                    }).spec }
+                  />
+                )
+              });
+            }
+          }
+          _this.state.network.unselectAll();
+        },
+        dragEnd: function(){
+          _this.state.network.unselectAll();
+        }
+      },
       network: null,
-      isClustered: true
+      options: {
+        autoResize: true,
+        nodes: {
+          borderWidth: 4,
+          shadow: true,
+          size: 30,
+          color: {
+            border: "#222222",
+            background: "#666666"
+          },
+          font: { color: "#222222" }
+        },
+        edges: {
+          color: "#222222",
+          shadow: true
+        },
+        physics: {
+          enabled: true,
+          barnesHut: {
+            springConstant: 0.2,
+            avoidOverlap: 0.5
+          }
+        },
+        layout: {
+          /** By default hierarchy is on with clustered nodes on top */
+          hierarchical: {
+            direction: 'UD'
+          }
+        }
+      }
     };
     this.utils = new Utils();
+    this.createNetwork = this.createNetwork.bind(this);
     this.onClick_clustered = this.onClick_clustered.bind(this);
   }
 
@@ -32,47 +99,16 @@ class GraphNet extends Component {
     });
   };
 
-  render() {
-
+  createNetwork(){
     const _this = this;
     const nodes = [];
     const edges = [];
-    const options = {
-      autoResize: true,
-      nodes: {
-        borderWidth: 4,
-        shadow: true,
-        size: 30,
-        color: {
-          border: "#222222",
-          background: "#666666"
-        },
-        font: { color: "#222222" }
-      },
-      edges: {
-        color: "#222222",
-        shadow: true
-      },
-      physics: {
-        enabled: true,
-        barnesHut: {
-          springConstant: 0.2,
-          avoidOverlap: 0.5
-        }
-      },
-      layout: {
-        /** By default hierarchy is on with clustered nodes on top */
-        hierarchical: {
-          direction: 'UD'
-        }
-      }
-    }
 
     /** If there are no clustered nodes, then do not use hierarchical mode
      *  Maybe later on just give a boolean hierarchical option in the template CRD
      */
     if(!this.props.template.spec.group.cluster){
-      delete options.layout.hierarchical;
+      delete this.state.options.layout.hierarchical;
     }
 
     /** Create nodes and edges from CR using paths from template CR */
@@ -112,37 +148,6 @@ class GraphNet extends Component {
       edges: edges
     }
 
-    const events = {
-      selectNode: function(event){
-        if(event.nodes.length === 1){
-          if(_this.state.network.isCluster(event.nodes[0]) === true){
-            _this.state.network.openCluster(event.nodes[0]);
-            _this.setState({ isClustered: false });
-          } else {
-            /*console.log('122', _this.props.custom_resources.find(item => {
-              return item.metadata.name === event.nodes[0];
-            }));*/
-            _this.setState({
-              titleModal: event.nodes[0],
-              showModal: true,
-              contentModal: (
-                /** Just show the default information */
-                <JsonToTableAntd
-                  json={ _this.props.custom_resources.find(item => {
-                    return item.metadata.name === event.nodes[0];
-                  }).spec }
-                />
-              )
-            });
-          }
-        }
-        _this.state.network.unselectAll();
-      },
-      dragEnd: function(){
-        _this.state.network.unselectAll();
-      }
-    };
-
     if(this.props.template.spec.group.cluster && this.state.network && this.state.isClustered) {
       this.state.network.setData(graph);
       let clusterOptionsByData = {
@@ -161,14 +166,31 @@ class GraphNet extends Component {
       this.state.network.cluster(clusterOptionsByData);
     }
 
+    this.setState({graph: graph});
+  }
+
+  componentDidMount() {
+    this.createNetwork();
+  }
+
+  /** We only want to re-render the network if there is actually a change */
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if(!prevState.network && this.state.network){
+      this.createNetwork();
+    }else if(prevState.isClustered !== this.state.isClustered){
+      this.createNetwork();
+    }
+  }
+
+  render() {
     return (
       <div>
         <div className="graph-network">
           <Graph
             style={{height: 500}}
-            graph={graph}
-            options={options}
-            events={events}
+            graph={this.state.graph}
+            options={this.state.options}
+            events={this.state.events}
             getNetwork={network => {
               this.setState({network: network});
             }}
