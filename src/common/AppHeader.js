@@ -21,6 +21,9 @@ class AppHeader extends Component {
         CRDs: []
       }
       this.onSearch = this.onSearch.bind(this);
+      if(this.props.api){
+        this.props.api.autoCompleteCallback = this.autoCompleteSearch;
+      }
     }
 
     autoCompleteSearch(CRDs){
@@ -49,12 +52,15 @@ class AppHeader extends Component {
       }
     }
 
-    render() {
-      if(this.props.api && this.state.CRDs.length === 0){
+    componentDidUpdate(prevProps, prevState, snapshot) {
+      if(!prevProps.api && this.props.api){
+        // console.log(this.props.api);
+        this.setState({CRDs: this.props.api.CRDs});
         this.props.api.autoCompleteCallback = this.autoCompleteSearch;
-        this.props.api.getCRDs();
       }
+    }
 
+  render() {
       const options = this.state.CRDs;
 
       let menuItems;

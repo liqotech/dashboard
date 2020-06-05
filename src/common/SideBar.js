@@ -7,6 +7,7 @@ import DashboardOutlined from '@ant-design/icons/lib/icons/DashboardOutlined';
 import SettingOutlined from '@ant-design/icons/lib/icons/SettingOutlined';
 import { APP_NAME } from '../constants';
 import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
+import StarOutlined from '@ant-design/icons/lib/icons/StarOutlined';
 const Sider = Layout.Sider;
 
 class SideBar extends Component {
@@ -15,15 +16,26 @@ class SideBar extends Component {
     this.notifyEvent = this.notifyEvent.bind(this);
 
     this.state = {
+      favourites: [],
       customViews: [],
-      isLoading: true
+      isLoading: true,
+      controller: null
     }
-
+    this.getFavourite = this.getFavourite.bind(this);
     this.loadCustomResources = this.loadCustomResources.bind(this);
+    if(this.props.api){
+      this.props.api.sidebarCallback = this.getFavourite;
+      this.state.favourites = this.props.api.CRDs.filter(item => {
+        return item.metadata.annotations && item.metadata.annotations.favourite;
+      })
+    }
   }
 
   loadCustomResources() {
     if(this.props.api){
+      this.setState({
+        isLoading: false
+      });
       let CRD = {
         spec: {
           group: 'crd-template.liqo.com',
@@ -46,8 +58,7 @@ class SideBar extends Component {
                 CRD.spec.group,
                 CRD.spec.version,
                 CRD.spec.names.plural,
-                this.notifyEvent),
-              isLoading: false
+                this.notifyEvent)
             });
           }
         ).catch((error) => {
@@ -60,6 +71,18 @@ class SideBar extends Component {
     this.loadCustomResources();
   }
 
+  /** Technically useless */
+  componentDidUpdate() {
+    if(this.props.api && this.state.isLoading){
+      this.loadCustomResources();
+    }
+  }
+
+  getFavourite(CRDs){
+    // console.log('76', CRDs);
+    this.setState({favourites: CRDs});
+  }
+
   notifyEvent(type, object) {
 
     let customViews = this.state.customViews;
@@ -68,38 +91,51 @@ class SideBar extends Component {
       return item.metadata.name === object.metadata.name;
     }));
 
+    //console.log('95', object)
+
     if ((type === 'ADDED' || type === 'MODIFIED')) {
       // Object creation succeeded
       if(index !== -1) {
-        customViews[index] = object;
+        if(object.metadata.resourceVersion !== customViews[index].metadata.resourceVersion){
+          customViews[index] = object;
+          notification.success({
+            message: APP_NAME,
+            description: 'CRD ' + object.metadata.name + ' modified'
+          });
+          this.setState({
+            customViews: customViews
+          });
+        }
       } else {
+        //console.log('ADDED')
         customViews.push(object);
-
         notification.success({
           message: APP_NAME,
           description: 'CRD ' + object.metadata.name + ' added'
+        });
+        this.setState({
+          customViews: customViews
         });
       }
     } else if (type === 'DELETED') {
       if(index !== -1) {
         customViews.splice(index, 1);
-
         notification.success({
           message: APP_NAME,
           description: 'CRD ' + object.metadata.name + ' deleted'
+        });
+        this.setState({
+          customViews: customViews
         });
       } else {
         return;
       }
     }
-
-    this.setState({
-      customViews: customViews
-    });
   }
 
   render() {
     let cv = [];
+    let fav = [];
 
     if (!this.state.isLoading) {
       /** If there are custom views, show them in the sider */
@@ -113,7 +149,31 @@ class SideBar extends Component {
                   view: item
                 }}}>
                 <LayoutOutlined style={{ fontSize: '20px' }} />
-                <span>{item.metadata.name}</span>
+                {
+                  item.spec.name ? (
+                    <span>{ item.spec.name }</span>
+                  ) : (
+                    <span>{ item.metadata.name }</span>
+                  )
+                }
+              </Link>
+            </Menu.Item>
+          )
+        });
+      }
+    }
+
+    if (!this.state.isLoading) {
+      /** If there are favourite CRDs, show them in the sider */
+      if(this.state.favourites.length !== 0) {
+        this.state.favourites.forEach(item => {
+          fav.push(
+            <Menu.Item key={item.metadata.name}>
+              <Link to={{
+                pathname: '/customresources/' +  item.metadata.name}}
+              >
+                <StarOutlined style={{ fontSize: '20px' }} />
+                {item.spec.names.kind}
               </Link>
             </Menu.Item>
           )
@@ -132,6 +192,7 @@ class SideBar extends Component {
             </Link>
           </Menu.Item>
           {cv}
+          {fav}
           <Menu.Item key="2">
             <Link to="/customresources">
               <DesktopOutlined style={{ fontSize: '20px' }} />

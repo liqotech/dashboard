@@ -14,7 +14,8 @@ class FormGenerator extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: '{\n' + '  "name": ""\n' + '}'
+      value: '{\n' + '  "name": "",\n' + '  "namespace": "",\n' + '}',
+      CRD: this.props.CRD
     };
     this.util = new Utils();
     this.value = '';

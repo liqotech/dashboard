@@ -13,7 +13,7 @@ import {
   Popover,
   Row,
   Tooltip,
-  Col, Descriptions, Switch, Pagination
+  Col, Descriptions, Switch, Pagination, Empty, Rate
 } from 'antd';
 import CR from './CR';
 import { Link } from 'react-router-dom';
@@ -31,25 +31,19 @@ const { Title } = Typography;
 class CRD extends Component {
   constructor(props) {
     super(props);
-    this.CRDnotifyEvent = this.CRDnotifyEvent.bind(this);
     this.CRnotifyEvent = this.CRnotifyEvent.bind(this);
 
-    /** If we are NOT on a custom view */
-    if(!this.props.onCustomView){
-      /** Kill all watchers, otherwise the requests get stuck in pending */
-      this.props.api.abortAllWatchers(true);
-    } else {
-      /** @NOT-NECESSARY Kill all watchers but the one that watch all the CRDs */
-      // this.props.api.abortAllWatchers();
-    }
-
     /**
-     * @param template: CR of the template (if there is a template selected for this CRD)
-     * @param custom_resources: CRs of this CRD (if there are any) 
-     * @param controller: used to kill the watch on this CRD
-     * @param deleted: boolean used to render out if the CRD has been deleted
-     * @param CRD: the CRD we are viewing
      * @param isLoading: boolean
+     * @param CRD: the CRD we are viewing
+     * @param deleted: boolean used to render out if the CRD has been deleted
+     * @param custom_resources: CRs of this CRD (if there are any)
+     * @param template: CR of the template (if there is a template selected for this CRD)
+     * @param isDraggable: if on a custom view, if the component is allowed to be dragged around
+     * @param isPinned: if on a custom view, if the component is set static
+     * @param isFavourite: if the CRD is pinned on the sidebar
+     * @param CRshown: actual custom resources shown in the page
+     * @param multi: if the template is a cluster of more custom resources
      */
     this.state = {
       isLoading: true,
@@ -59,17 +53,19 @@ class CRD extends Component {
       template: null,
       isDraggable: false,
       isPinned: false,
-      CRshown: []
+      isFavourite: false,
+      CRshown: [],
+      multi: false
     }
 
     /** In case we are not on a custom view */
     if(!this.props.onCustomView){
       /** If there is no CRD passed from a parent component, get it using the api */
       if(this.props.location.state === undefined){
-        this.props.api.getCRDfromName(this.props.match.params.crdName).then((res) => {
-          this.state.CRD = res;
+        this.state.CRD = this.props.api.getCRDfromName(this.props.match.params.crdName);
+        if(this.state.CRD){
           this.loadCustomResources();
-        });
+        }
       } else {
         this.state.CRD = this.props.location.state.CRD;
         this.loadCustomResources();
@@ -83,26 +79,43 @@ class CRD extends Component {
 
     this.tempTemplate = null;
 
+    this.reloadCRD = this.reloadCRD.bind(this);
+
     this.handleClick = this.handleClick.bind(this);
     this.deleteCR = this.deleteCR.bind(this);
     this.abortWatchers = this.abortWatchers.bind(this);
     this.loadCustomResources = this.loadCustomResources.bind(this);
     this.changeTemplate = this.changeTemplate.bind(this);
     this.paginationChange = this.paginationChange.bind(this);
+    this.handleClick_fav = this.handleClick_fav.bind(this);
+  }
+
+  /** Update state if a CRD is loaded or changed */
+  reloadCRD(CRDs){
+    if(CRDs){
+      let CRD;
+      if(this.props.onCustomView){
+        CRD = this.props.api.getCRDfromName(this.props.CRD.metadata.name);
+      } else {
+        CRD = this.props.api.getCRDfromName(this.props.match.params.crdName);
+      }
+      if(JSON.stringify(CRD) !== JSON.stringify(this.state.CRD)) {
+        this.setState({ CRD: CRD });
+      }
+    }
   }
 
   loadCustomResources() {
+    // console.log(this.state.CRD)
+    if(this.state.CRD.metadata.annotations && this.state.CRD.metadata.annotations.favourite)
+      this.state.isFavourite=true;
 
-    if(!this.props.onCustomView) {
-      /** Restart the watch on the CRDs so it can see the changes on this CRD */
-      this.props.api.watchAllCRDs(this.CRDnotifyEvent);
-    }
     /** First get all the CR */
     this.props.api.getCustomResourcesAllNamespaces(this.state.CRD)
       .then((res) => {
       this.setState({
         custom_resources: res.body.items,
-        CRshown: res.body.items.slice(0, 10)
+        CRshown: res.body.items.slice(0, 5)
       });
 
       this.setState({isLoading: false});
@@ -123,7 +136,10 @@ class CRD extends Component {
     })
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if(!prevState.CRD && this.state.CRD){
+      this.loadCustomResources();
+    }
     if(this.props.onCustomView) {
       if (this.props.CRD !== this.state.CRD) {
         this.setState({
@@ -132,6 +148,15 @@ class CRD extends Component {
         this.findTemplate(this.props.CRD);
       }
     }
+  }
+
+  componentDidMount() {
+    this.props.api.CRDArrayCallback.push(this.reloadCRD);
+  }
+
+  componentWillUnmount() {
+    this.props.api.abortAllWatchers(this.state.CRD.spec.names.plural);
+    this.props.api.CRDArrayCallback.filter(func => {return func !== this.reloadCRD});
   }
 
   /**
@@ -174,7 +199,27 @@ class CRD extends Component {
       });
   }
 
+  /** Update CRD with the 'favourite' annotation */
+  handleClick_fav(){
+    if(!this.state.isFavourite){
+      this.state.CRD.metadata.annotations.favourite = 'true';
+      this.props.api.updateCustomResourceDefinition(
+        this.state.CRD.metadata.name,
+        this.state.CRD
+      )
+    } else {
+      this.state.CRD.metadata.annotations.favourite = null;
+      this.props.api.updateCustomResourceDefinition(
+        this.state.CRD.metadata.name,
+        this.state.CRD
+      )
+    }
+    this.setState({
+      isFavourite: !this.state.isFavourite});
+  }
+
   header() {
+    //console.log('180', this.state.CRD.metadata);
     return (
       <div>
         <Row>
@@ -229,8 +274,12 @@ class CRD extends Component {
         </Row>
         <br />
         <Title level={4} >
-          <Badge color="#108ee9" />
+          <Badge color='#1890FF' />
           {this.state.CRD.spec.names.kind}
+          <Rate className="crd-fav" count={1} defaultValue={this.state.isFavourite ? 1 : 0}
+                onChange={this.handleClick_fav}
+                style={{marginLeft: 0}}
+          />
           <div style={{float: "right"}}>
             {/** Button to go to the choose design view
              *  @param CRD: is the CRD we are currently on
@@ -284,38 +333,6 @@ class CRD extends Component {
   }
 
   /**
-   * Callback for CRDs watcher trigger (if the CRD is changed)
-   * @param type: description of the trigger (modify/add/delete)
-   * @param object: object modified/added/deleted
-   */
-  CRDnotifyEvent(type, object) {
-
-    if ((type === 'ADDED' || type === 'MODIFIED')) {
-      // Object creation succeeded
-      if(object.metadata.name === this.state.CRD.metadata.name){
-        if(JSON.stringify(this.state.CRD) !== JSON.stringify(object)) {
-          notification.success({
-            message: APP_NAME,
-            description: 'CRD ' + object.metadata.name + ' modified'
-          });
-
-          this.setState({ CRD: object });
-
-          this.findTemplate(this.state.CRD);
-        }
-      }
-    } else if (type === 'DELETED') {
-      //TODO: return to the customresources page
-      if(object.metadata.name === this.state.CRD.metadata.name){
-        notification.success({
-          message: APP_NAME,
-          description: 'CRD ' + object.metadata.name + ' deleted'
-        });
-      }
-    }
-  }
-
-  /**
    * Callback for CRD watcher trigger (if a CR is changed/added/modified)
    * @param type: description of the trigger (modify/add/delete)
    * @param object: object modified/added/deleted
@@ -362,7 +379,8 @@ class CRD extends Component {
     }
 
     this.setState({
-      custom_resources: custom_resources
+      custom_resources: custom_resources,
+      CRshown: custom_resources.slice(0, 5)
     })
   }
 
@@ -428,6 +446,7 @@ class CRD extends Component {
 
     /** temp solution for graphs (in general for multi-item designs) */
     if(this.state.template && this.state.template.kind === 'Graph'){
+      this.state.multi = true;
       CRViews.push(
         <GraphNet key={'0'}
           custom_resources={this.state.custom_resources}
@@ -435,6 +454,7 @@ class CRD extends Component {
         />
       )
     } else {
+      this.state.multi = false;
       this.state.CRshown.forEach(item => {
         CRViews.push(
           /**
@@ -455,9 +475,7 @@ class CRD extends Component {
       })
       if(CRViews.length === 0) {
         CRViews.push(
-          <Title key={'0'} level={4} style={{textAlign: 'center', marginTop: 40, marginBottom: 100}}>
-            No resources present
-          </Title>
+          <Empty description={<strong>No resources present</strong>}/>
         )
       }
     }
@@ -518,19 +536,20 @@ class CRD extends Component {
                             CRD_annotations.length > 0 ? (
                               <div>{CRD_annotations}</div>
                             ) : (
-                              <Title key={'0'} level={4} style={{textAlign: 'center', marginTop: 40, marginBottom: 100}}>
-                                No annotations
-                              </Title>
+                              <Empty description={<strong>No annotations</strong>}/>
                             )
                           }
                         </Tabs.TabPane>
                         <Tabs.TabPane tab="Resources" key="2">
                           {CRViews}
-                          <div className="no-crds-found" style={{marginTop: 30}}>
-                            <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
-                                        onChange={this.paginationChange}
-                                        showSizeChanger={false} />
-                          </div>
+                          { !this.state.multi ? (
+                            <div className="no-crds-found" style={{marginTop: 30}}>
+                              <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
+                                          defaultPageSize={5}
+                                          onChange={this.paginationChange}
+                                          showSizeChanger={false} />
+                            </div>
+                          ) : null}
                         </Tabs.TabPane>
                         {/** Show the JSON Schema of the CRD */}
                         <Tabs.TabPane tab="Schema" key="3">
@@ -538,9 +557,7 @@ class CRD extends Component {
                             schema ? (
                               <pre>{JSON.stringify(schema.properties.spec, null, 2)}</pre>
                               ) : (
-                                <Title key={'0'} level={4} style={{textAlign: 'center', marginTop: 40, marginBottom: 100}}>
-                                  No schema for this CRD
-                                </Title>
+                              <Empty description={<strong>No schema for this CRD</strong>}/>
                               )
                           }
                         </Tabs.TabPane>

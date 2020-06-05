@@ -65,17 +65,12 @@ class DesignEditorCRD extends Component {
       this.setState({example_CR: this.props.location.state.CR});
     }
 
-    this.props.api.getTemplates()
-      .then(templates => {
-        this.setState({
-          templates: templates,
-          isLoading: false
-        });
-      })
-      .catch(error => {
-        console.log(error);
-        this.props.history.push("/customresources/" + this.props.match.params.crdName);
-      });
+    this.setState({
+      templates: this.props.api.getTemplates(),
+      isLoading: false
+    });
+
+    //console.log(this.props.api.getTemplates());
   }
 
   componentDidMount() {
@@ -85,8 +80,8 @@ class DesignEditorCRD extends Component {
   }
 
   submit(CR_template){
-    this.setState({CR_chosen_template: CR_template});
-    this.preview(CR_template);
+    this.setState({CR_chosen_template: CR_template},
+      () => {this.preview(CR_template)});
     this.setState({current: 2, save_enabled: true});
   }
 
@@ -185,13 +180,10 @@ class DesignEditorCRD extends Component {
   }
 
   onClick_design(value){
-    this.props.api.getCRDfromKind(value.key).then(
-      res => {
-        this.setState({chosen_template: res});
-        this.content();
-        this.setState({current: 1});
-      }
-    );
+    //console.log('183', this.props.api.getCRDfromKind(value.key))
+    this.setState({chosen_template: this.props.api.getCRDfromKind(value.key)},
+      () => {this.content()});
+    this.setState({current: 1});
   }
 
   // modify the CRD and add a CR of the template
@@ -201,10 +193,12 @@ class DesignEditorCRD extends Component {
       this.state.chosen_template.spec.names.plural + '/' +
       this.state.CR_chosen_template.metadata.name;
 
+    //console.log(this.state.CR_chosen_template);
+
     this.props.api.createCustomResource(
       this.state.chosen_template.spec.group,
       this.state.chosen_template.spec.version,
-      'default',
+      this.state.CR_chosen_template.metadata.namespace,
       this.state.chosen_template.spec.names.plural,
       this.state.CR_chosen_template).then(() => {
       // this.props.history.push("/customresources/" + this.props.match.params.crdName);

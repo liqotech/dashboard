@@ -29,6 +29,7 @@ function CallBackHandler(props) {
 class App extends Component {
   constructor(props) {
     super(props);
+    console.log('13:20');
     this.state = {
       logged: false,
       api: null,
@@ -39,97 +40,139 @@ class App extends Component {
       bottom: 20,
       duration: 3,
     });
-    this.api = null;
-    /* Check if previously logged */
+    /** Check if previously logged */
     const retrievedSessionToken = JSON.parse(
       sessionStorage.getItem(`oidc.user:${OIDC_PROVIDER_URL}:${OIDC_CLIENT_ID}`)
     );
     if (retrievedSessionToken) {
+      let api = new ApiManager({ id_token: retrievedSessionToken.id_token,
+        token_type: retrievedSessionToken.token_type || 'Bearer'});
       this.state = {
         user: retrievedSessionToken.profile,
         logged: true,
-        api: new ApiManager({ id_token: retrievedSessionToken.id_token,
-          token_type: retrievedSessionToken.token_type || 'Bearer'})
+        api: api
       };
+      /** Get the CRDs at the start of the app */
+      this.state.api.getCRDs().catch(error => {
+        console.log(error)
+      });
     }
     this.authManager = new Authenticator();
     this.authManager.manager.events.addUserLoaded(user => {
+      let api = new ApiManager(user);
       this.setState({
         logged: true,
-        api: new ApiManager(user),
+        api: api,
         user: user.profile
       });
-      this.state.api.watcherSchedulerRR();
+      /** Get the CRDs at the start of the app */
+      this.state.api.getCRDs().catch(error => {
+        console.log(error)
+      });
     });
     this.authManager.manager.events.addAccessTokenExpiring(() => {
+      console.log('74 silent sign in');
       this.authManager.manager.signinSilent().then(user => {
+        console.log('76 Silent OK');
+        this.state.api.refreshConfig(user);
         this.setState({logged: true});
+      }).catch((error) => {
+        console.log(error);
+        this.props.history.push("/logout");
       });
     });
   }
 
   render() {
+    const routes = [
+      <Route key={'login'}
+             exact path="/login"
+             render={() => {
+               this.authManager.login();
+             }}
+      />,
+      <Route key={'callback'}
+             path="/callback"
+             render={() => this.state.logged ? (
+               <Redirect to="/" />
+             ) : ( <CallBackHandler func={this.authManager.completeLogin} />)}
+      />,
+      <Route key={'logout'}
+             path="/logout">
+        <Redirect to="/login" />
+      </Route>
+    ]
+
+    if(this.state.api){
+      routes.push([
+        <Route key={'/'}
+               exact path="/"
+               render={(props) => this.state.logged ? (
+                 <DashboardGeneral {...props} api={this.state.api} user={this.state.user}/>
+               ): (<Redirect to = "/login"/>)}/>,
+        <Route key={'customresources'}
+               exact path="/customresources"
+               component={(props) => this.state.logged ? (
+                 <CRDList {...props} api={this.state.api} />
+               ): (<Redirect to = "/login"/>)}/>,
+        <Route key={'crd'}
+               exact path="/customresources/:crdName"
+               component={(props) => this.state.logged ? (
+                 <CRD {...props} api={this.state.api} />
+               ): (<Redirect to = "/login"/>)}/>,
+        <Route key={'crd_create'}
+               exact path="/customresources/:crdName/create"
+               render={(props) => this.state.logged ? (
+                 <NewCR {...props} api={this.state.api} />
+               ): (<Redirect to = "/login"/>)}/>,
+        <Route key={'crd_editor'}
+               exact path="/customresources/:crdName/representation_editor"
+               render={(props) => this.state.logged ? (
+                 <DesignEditorCRD {...props} api={this.state.api} />
+               ): (<Redirect to = "/login"/>)}/>,
+        <Route key={'crd_update'}
+               exact path="/customresources/:crdName/:crName/update"
+               render={(props) => this.state.logged ? (
+                 <UpdateCR {...props} api={this.state.api} />
+               ): (<Redirect to = "/login"/>)}/>,
+        <Route key={'customview'}
+               exact path="/customview/:viewName/"
+               component={(props) => this.state.logged ? (
+                 <CustomView {...props} api={this.state.api} />
+               ): (<Redirect to = "/login"/>)}/>
+      ])
+    } else {
+      routes.push([
+      <Route key={'*'}
+             path="*">
+        <Redirect to={'/login'} />
+      </Route>])
+    }
 
     return (
         <Layout>
-          <AppHeader
-            api={this.state.api}
-            logout={this.authManager.logout}
-            logged={this.state.logged}
-          />
-          <Layout className="app-content" style={{minHeight: '92vh'}}>
-            <SideBar api={this.state.api} />
-            <Layout style={{ marginLeft: 250 }}>
-              <Content>
-                <div className="container">
-                  <Switch>
-                    <Route exact path="/login"
-                           render={() => {
-                             this.authManager.login();
-                           }}
-                    />
-                    <Route path="/callback"
-                           render={() => this.state.logged ? (
-                             <Redirect to="/" />
-                             ) : ( <CallBackHandler func={this.authManager.completeLogin} />)}
-                    />
-                    <Route exact path="/"
-                           render={(props) => this.state.logged ? (
-                             <DashboardGeneral {...props} api={this.state.api} user={this.state.user}/>
-                           ): (<Redirect to = "/login"/>)}/>
-                    <Route exact path="/customresources"
-                           render={(props) => this.state.logged ? (
-                             <CRDList {...props} api={this.state.api} />
-                           ): (<Redirect to = "/login"/>)}/>
-                    <Route exact path="/customresources/:crdName"
-                           component={(props) => this.state.logged ? (
-                             <CRD {...props} api={this.state.api} />
-                           ): (<Redirect to = "/login"/>)}/>
-                    <Route exact path="/customresources/:crdName/create"
-                           render={(props) => this.state.logged ? (
-                             <NewCR {...props} api={this.state.api} />
-                           ): (<Redirect to = "/login"/>)}/>
-                    <Route exact path="/customresources/:crdName/representation_editor"
-                           render={(props) => this.state.logged ? (
-                             <DesignEditorCRD {...props} api={this.state.api} />
-                           ): (<Redirect to = "/login"/>)}/>
-                    <Route exact path="/customresources/:crdName/:crName/update"
-                           render={(props) => this.state.logged ? (
-                             <UpdateCR {...props} api={this.state.api} />
-                           ): (<Redirect to = "/login"/>)}/>
-                    <Route exact path="/customview/:viewName/"
-                           component={(props) => this.state.logged ? (
-                             <CustomView {...props} api={this.state.api} />
-                           ): (<Redirect to = "/login"/>)}/>
-                    <Route path="*">
-                      <Redirect to="/login" />
-                    </Route>
-                  </Switch>
-                </div>
-              </Content>
-              <AppFooter />
-            </Layout>
-          </Layout>
+            <div>
+              {this.state.api ? (
+              <AppHeader
+                api={this.state.api}
+                logout={this.authManager.logout}
+                logged={this.state.logged}
+              />) : null}
+              <Layout className="app-content" style={{minHeight: '92vh'}}>
+                {this.state.api ? (
+                <SideBar api={this.state.api} />) : null}
+                <Layout style={{ marginLeft: 250 }}>
+                  <Content>
+                    <div className="container">
+                      <Switch>
+                        {routes}
+                      </Switch>
+                    </div>
+                  </Content>
+                  <AppFooter />
+                </Layout>
+              </Layout>
+            </div>
         </Layout>
     );
   }

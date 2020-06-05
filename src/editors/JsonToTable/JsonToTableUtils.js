@@ -39,4 +39,46 @@ export default class JsonToTableUtils {
 
     return { labels, type: objectType };
   }
+
+  /**
+   * Find key in an object recursively
+   * @param object
+   * @param key
+   * @returns {*}
+   */
+  findVal(object, key, replacement) {
+    let utils = new JsonToTableUtils();
+    let value = undefined;
+    let total = {
+      value: value,
+      object: object
+    };
+    Object.keys(object).some(function(k) {
+      if (k === key) {
+        if(replacement) {
+          if(Object.keys(replacement).length === 0){
+            object[k] = {};
+          } else {
+            object[k] = JSON.parse(JSON.stringify(replacement));
+          }
+        } else {
+          value = object[k];
+        }
+        total = {
+          value: value,
+          object: object
+        }
+        return true;
+      }
+      if (object[k] && typeof object[k] === 'object') {
+        total = utils.findVal(object[k], key, replacement);
+        if(replacement) {
+          object[k] = total.object;
+          total.object = object;
+        }
+        return total.value !== undefined;
+      }
+    });
+    return total;
+  }
 }

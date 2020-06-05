@@ -1,6 +1,6 @@
 import { ApiextensionsV1beta1Api, Config, CoreV1Api, CustomObjectsApi, watch } from '@kubernetes/client-node';
-import { API_BASE_URL, TEMPLATE_GROUP } from '../constants';
-import Authenticator from './Authenticator';
+import { APP_NAME, TEMPLATE_GROUP } from '../constants';
+import { notification } from 'antd';
 
 /**
  * Class to manage all the interaction with the cluster
@@ -22,6 +22,7 @@ export default class ApiManager {
     this.apiExt = this.kcc.makeApiClient(ApiextensionsV1beta1Api);
     this.apiCRD = this.kcc.makeApiClient(CustomObjectsApi);
     this.apiCore = this.kcc.makeApiClient(CoreV1Api);
+    this.CRDs = [];
     this.watchers = [];
     /** used to change the content-type of a PATCH request */
     this.options = {
@@ -29,7 +30,19 @@ export default class ApiManager {
         "Content-Type": "application/merge-patch+json"
       }
     }
+    /** Callback for CRD list view */
+    this.CRDListCallback = null;
+    /** Callback for the autocomplete search bar */
     this.autoCompleteCallback = null;
+    /** Callback array for custom views */
+    this.CRDArrayCallback = [];
+    /** Callback for the favourites CRDs in the sidebar */
+    this.sidebarCallback = null;
+    this.CRDsNotifyEvent = this.CRDsNotifyEvent.bind(this);
+  }
+
+  refreshConfig(user){
+    this.kcc = new Config(window.APISERVER_URL, user.id_token, user.token_type);
   }
 
   /**
@@ -40,40 +53,37 @@ export default class ApiManager {
   async getCRDs() {
     let response_crd = await this.apiExt.listCustomResourceDefinition();
     let results_crd = await response_crd.body;
+    this.CRDs = results_crd.items;
 
-    this.autoCompleteCallback(results_crd.items);
+    /** update CRDs in the views */
+    this.manageCallback(this.CRDs);
+
+    this.watchAllCRDs();
 
     return results_crd.items;
   }
 
-  async getCRDfromKind(kind) {
-    let response_crd = await this.apiExt.listCustomResourceDefinition();
-
-    return response_crd.body.items.find((item) => {
+  getCRDfromKind(kind) {
+    return this.CRDs.find((item) => {
       return item.spec.names.kind === kind;
     });
   }
 
-  async getCRDfromName(name) {
-    let response_crd = await this.apiExt.listCustomResourceDefinition();
-    return response_crd.body.items.find((item) => {
+  getCRDfromName(name) {
+    return this.CRDs.find((item) => {
       return item.metadata.name === name;
     });
   }
 
   /** get the CRDs for the group crd-template.liqo.com */
   getTemplates() {
-    return fetch(
-      window.APISERVER_URL +
-      '/apis/' +
-      TEMPLATE_GROUP
-    ).then(item => item.json())
-     .then(data => {
-       return data.resources.filter(item => {
-           return item.singularName !== '';
-         }
-       );
-     });
+    let templates = [];
+    this.CRDs.forEach(CRD => {
+      if(CRD.spec.group === TEMPLATE_GROUP && CRD.spec.names.kind !== 'View'){
+        templates.push(CRD.spec.names);
+      }
+    });
+    return templates;
   }
 
   /**
@@ -207,7 +217,7 @@ export default class ApiManager {
   /** This watch only watches changes in the CRDs
    * (if a CRD has been added, deleted or modified)
    */
-  watchAllCRDs(func){
+  watchAllCRDs(){
     let path = '/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions';
 
     let controller = new AbortController();
@@ -218,6 +228,10 @@ export default class ApiManager {
       plural: 'customresourcedefinitions'
     });
 
+    let func = this.CRDsNotifyEvent;
+
+    let _this = this;
+
     watch(
       this.kcc,
       path,
@@ -225,7 +239,13 @@ export default class ApiManager {
       function(type, object) {
         func(type, object);
       },
-      function(error) {},
+      function(type) {
+        /** After 10 mins the watch stops */
+        if(!type){
+          _this.watchers = _this.watchers.filter(item => {return item.plural !== 'customresourcedefinitions'});
+          _this.watchAllCRDs();
+        }
+      },
       signal
     );
   }
@@ -235,9 +255,10 @@ export default class ApiManager {
    */
   watchSingleCRD(group, version, plural, func){
     /** We don't want two of the same watcher */
-    if(this.watchers.find(item => {return item.plural === plural})){
-      return;
-    }
+      if(this.watchers.find(item => {return item.plural === plural})){
+        //console.log('Cant watch any more ', plural);
+        return;
+      }
 
     let controller = new AbortController();
 
@@ -248,14 +269,23 @@ export default class ApiManager {
       plural: plural,
       callback: func
     });
+
+    this.triggerWatch(group, version, plural, controller, func);
+    return controller;
   }
 
   /** is the param is true, also kill the CRDs watcher */
-  abortAllWatchers(deleteAlsoCRDsWatcher, specificWatch) {
-    if(specificWatch && specificWatch !== 'views') {
-      this.watchers.find(item => {return item.plural === specificWatch}).controller.abort();
+  abortAllWatchers(specificWatch) {
+    // console.log('274 abortWatcher', specificWatch)
+    if(specificWatch && specificWatch !== 'views' && specificWatch !== 'customresourcedefinitions') {
+      let w = this.watchers.find(item => {return item.plural === specificWatch});
+      /** Here if the watcher has already been aborted (because we wanted to), don't restart it */
+      if(!w)
+        return false;
+      /** else, abort it and it will be restarted */
+      w.controller.abort();
       this.watchers = this.watchers.filter(item => {return item.plural !== specificWatch});
-      return;
+      return true;
     }
 
     let watchers = this.watchers;
@@ -266,17 +296,16 @@ export default class ApiManager {
         if(watcher.plural !== 'customresourcedefinitions'){
           watchers = watchers.filter(item => {return item !== watcher});
           watcher.controller.abort();
-        } else if(deleteAlsoCRDsWatcher) {
-          watchers = watchers.filter(item => {return item !== watcher});
-          watcher.controller.abort();
         }
       }
     });
 
     this.watchers = watchers;
+    return true;
   }
 
-  /** Scheduler Round Robin for the watchers:
+  /**
+   * @UNUSED_SINCE_HTTP2 Scheduler Round Robin for the watchers:
    * every 1 second open a watch for a single CRD to check for changes,
    * then close it and proceed to another watch
    */
@@ -324,6 +353,8 @@ export default class ApiManager {
 
     let signal = controller.signal;
 
+    let _this = this;
+
     watch(
       this.kcc,
       path,
@@ -331,8 +362,97 @@ export default class ApiManager {
       function(type, object) {
         func(type, object);
       },
-      function() {},
+      function(type) {
+        /** After 10 mins the watch stops */
+        if(!type){
+          if(_this.abortAllWatchers(plural)){
+            /**
+             * If it's the views watcher that stopped, we need to do an extra step
+             */
+            if(plural === 'views'){
+              //console.log('372')
+              _this.watchers = _this.watchers.filter(item => {return item.plural !== plural});
+              //console.log(_this.watchers);
+            }
+            _this.watchSingleCRD(group, version, plural, func);
+          }
+        }
+      },
       signal
     );
+  }
+
+  /**
+   * Callback used by the CRDs watcher trigger (if the CRD is changed)
+   * @param type: description of the trigger (modify/add/delete)
+   * @param object: object modified/added/deleted
+   */
+  CRDsNotifyEvent(type, object) {
+    let CRDs = JSON.parse(JSON.stringify(this.CRDs));
+
+    let index = CRDs.indexOf(CRDs.find((item) => {
+      return item.metadata.name === object.metadata.name;
+    }));
+
+    if ((type === 'ADDED' || type === 'MODIFIED')) {
+      // Object creation succeeded
+      if(index !== -1) {
+        if(CRDs[index].metadata.resourceVersion !== object.metadata.resourceVersion){
+          CRDs[index] = object;
+          //console.log(this.CRDs[index], object);
+          notification.success({
+            message: APP_NAME,
+            description: 'CRD ' + object.metadata.name + ' modified'
+          });
+        }
+      } else {
+        CRDs.push(object);
+        CRDs.sort((a, b) => a.spec.names.kind.localeCompare(b.spec.names.kind));
+        notification.success({
+          message: APP_NAME,
+          description: 'CRD ' + object.metadata.name + ' added'
+        });
+      }
+    } else if (type === 'DELETED') {
+      if(index !== -1) {
+        CRDs.splice(index, 1);
+
+        notification.success({
+          message: APP_NAME,
+          description: 'CRD ' + object.metadata.name + ' deleted'
+        });
+      } else {
+        return;
+      }
+    }
+
+    if(JSON.stringify(this.CRDs) !== JSON.stringify(CRDs)){
+      this.CRDs = CRDs;
+      /** update CRDs in the views */
+      this.manageCallback(CRDs);
+    }
+
+  }
+
+  manageCallback(CRDs){
+    /** update CRDs in the search bar */
+    if(this.autoCompleteCallback)
+      this.autoCompleteCallback(CRDs);
+
+    /** update CRDs in the CRD view*/
+    if(this.CRDListCallback)
+      this.CRDListCallback(CRDs);
+
+    /** update CRDs in the custom views */
+
+    this.CRDArrayCallback.forEach(func => {
+      func(CRDs);
+    })
+
+    /** update CRDs in the sidebar */
+    if(this.sidebarCallback)
+      this.sidebarCallback(CRDs.filter(item => {
+        return item.metadata.annotations && item.metadata.annotations.favourite;
+      }));
   }
 }

@@ -50,9 +50,7 @@ export default class Authenticator {
   login() {
     return this.manager.signinRedirect().catch(error => {
       console.log('login', error);
-      return (
-        <div>ERROR</div>
-      )
+      this.logout();
     });
   }
 
@@ -63,9 +61,7 @@ export default class Authenticator {
   completeLogin() {
     return this.manager.signinRedirectCallback().catch(error => {
       console.log('completeLogin', error);
-      return (
-        <div>ERROR</div>
-      )
+      this.logout();
     });
   }
 

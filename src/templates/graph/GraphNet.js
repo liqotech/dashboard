@@ -4,6 +4,7 @@ import './GraphNet.css';
 import image from '../../assets/database.png'
 import Utils from '../../services/Utils';
 import { Button, Modal } from 'antd';
+import JsonToTableAntd from '../../editors/JsonToTable/JsonToTableAntd';
 
 class GraphNet extends Component {
   constructor(props) {
@@ -11,7 +12,7 @@ class GraphNet extends Component {
     this.state = {
       titleModal: '',
       showModal: false,
-      content: null,
+      contentModal: null,
       network: null,
       isClustered: true
     };
@@ -55,7 +56,7 @@ class GraphNet extends Component {
       physics: {
         enabled: true,
         barnesHut: {
-          springConstant: 0,
+          springConstant: 0.2,
           avoidOverlap: 0.5
         }
       },
@@ -118,12 +119,20 @@ class GraphNet extends Component {
             _this.state.network.openCluster(event.nodes[0]);
             _this.setState({ isClustered: false });
           } else {
+            /*console.log('122', _this.props.custom_resources.find(item => {
+              return item.metadata.name === event.nodes[0];
+            }));*/
             _this.setState({
               titleModal: event.nodes[0],
               showModal: true,
-              content: nodes.find(item => {
-                return item.id === event.nodes[0];
-              }).group
+              contentModal: (
+                /** Just show the default information */
+                <JsonToTableAntd
+                  json={ _this.props.custom_resources.find(item => {
+                    return item.metadata.name === event.nodes[0];
+                  }).spec }
+                />
+              )
             });
           }
         }
@@ -172,12 +181,13 @@ class GraphNet extends Component {
           {'Cluster ' + this.props.template.spec.group.cluster + ' nodes'}
         </Button>
         <Modal style={{paddingLeft: 200}}
+               width={'40%'}
                title={this.state.titleModal}
                visible={this.state.showModal}
                onCancel={this.handleCancel}
                footer={null}
         >
-          {this.state.content}
+          {this.state.contentModal}
         </Modal>
       </div>
 
