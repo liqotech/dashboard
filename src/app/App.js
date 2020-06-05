@@ -29,7 +29,6 @@ function CallBackHandler(props) {
 class App extends Component {
   constructor(props) {
     super(props);
-    console.log('13:20');
     this.state = {
       logged: false,
       api: null,
@@ -71,9 +70,7 @@ class App extends Component {
       });
     });
     this.authManager.manager.events.addAccessTokenExpiring(() => {
-      console.log('74 silent sign in');
       this.authManager.manager.signinSilent().then(user => {
-        console.log('76 Silent OK');
         this.state.api.refreshConfig(user);
         this.setState({logged: true});
       }).catch((error) => {

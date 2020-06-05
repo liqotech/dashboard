@@ -79,7 +79,6 @@ class SideBar extends Component {
   }
 
   getFavourite(CRDs){
-    // console.log('76', CRDs);
     this.setState({favourites: CRDs});
   }
 
@@ -90,8 +89,6 @@ class SideBar extends Component {
     let index = customViews.indexOf(customViews.find((item) => {
       return item.metadata.name === object.metadata.name;
     }));
-
-    //console.log('95', object)
 
     if ((type === 'ADDED' || type === 'MODIFIED')) {
       // Object creation succeeded
@@ -107,7 +104,6 @@ class SideBar extends Component {
           });
         }
       } else {
-        //console.log('ADDED')
         customViews.push(object);
         notification.success({
           message: APP_NAME,

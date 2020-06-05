@@ -17,7 +17,6 @@ export default class JsonToTableAntd extends React.Component{
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if(JSON.stringify(prevState.json) !== JSON.stringify(this.props.json)){
-      // console.log('19, JTT UPDATED new json', this.props.json, this.state);
       this.state.json = this.props.json;
       this.state.jsonShown = this.props.json;
       /** using forceUpdate is a bit of a workaround as it should be avoided,

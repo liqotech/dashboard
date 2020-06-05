@@ -54,7 +54,6 @@ class AppHeader extends Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
       if(!prevProps.api && this.props.api){
-        // console.log(this.props.api);
         this.setState({CRDs: this.props.api.CRDs});
         this.props.api.autoCompleteCallback = this.autoCompleteSearch;
       }

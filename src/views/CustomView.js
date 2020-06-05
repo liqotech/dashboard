@@ -31,8 +31,6 @@ class CustomView extends Component {
       newBr: 'lg'
     }
 
-    //console.log('34', this.props.location.state.view.metadata);
-
     if(this.props.location.state.view.spec.layout){
       this.state.layout = this.props.location.state.view.spec.layout;
     }
@@ -128,7 +126,6 @@ class CustomView extends Component {
       let s = false;
       let CRDlayout = null;
       if (this.state.layout.lg) {
-        //console.log('114', this.state.layout.lg);
         CRDlayout = this.state.layout.lg.find(item => {return item.i === this.state.CRDs[i].metadata.name})
       }
       /** Stay where I put you even when the layout is regenerated */

@@ -106,7 +106,6 @@ class CRD extends Component {
   }
 
   loadCustomResources() {
-    // console.log(this.state.CRD)
     if(this.state.CRD.metadata.annotations && this.state.CRD.metadata.annotations.favourite)
       this.state.isFavourite=true;
 
@@ -219,7 +218,6 @@ class CRD extends Component {
   }
 
   header() {
-    //console.log('180', this.state.CRD.metadata);
     return (
       <div>
         <Row>

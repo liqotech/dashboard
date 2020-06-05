@@ -70,7 +70,6 @@ class DesignEditorCRD extends Component {
       isLoading: false
     });
 
-    //console.log(this.props.api.getTemplates());
   }
 
   componentDidMount() {
@@ -180,7 +179,6 @@ class DesignEditorCRD extends Component {
   }
 
   onClick_design(value){
-    //console.log('183', this.props.api.getCRDfromKind(value.key))
     this.setState({chosen_template: this.props.api.getCRDfromKind(value.key)},
       () => {this.content()});
     this.setState({current: 1});
@@ -192,8 +190,6 @@ class DesignEditorCRD extends Component {
       this.state.chosen_template.spec.version + '/' +
       this.state.chosen_template.spec.names.plural + '/' +
       this.state.CR_chosen_template.metadata.name;
-
-    //console.log(this.state.CR_chosen_template);
 
     this.props.api.createCustomResource(
       this.state.chosen_template.spec.group,
