@@ -119,9 +119,6 @@ class GraphNet extends Component {
             _this.state.network.openCluster(event.nodes[0]);
             _this.setState({ isClustered: false });
           } else {
-            /*console.log('122', _this.props.custom_resources.find(item => {
-              return item.metadata.name === event.nodes[0];
-            }));*/
             _this.setState({
               titleModal: event.nodes[0],
               showModal: true,

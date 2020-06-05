@@ -34,7 +34,6 @@ class CRDList extends Component {
     if(!CRDs){
       CRDs = this.props.api.CRDs;
     }
-    // console.log('37', CRDs);
     this.setState({
       CRDs: CRDs
     });

@@ -256,7 +256,6 @@ export default class ApiManager {
   watchSingleCRD(group, version, plural, func){
     /** We don't want two of the same watcher */
       if(this.watchers.find(item => {return item.plural === plural})){
-        //console.log('Cant watch any more ', plural);
         return;
       }
 
@@ -276,7 +275,6 @@ export default class ApiManager {
 
   /** is the param is true, also kill the CRDs watcher */
   abortAllWatchers(specificWatch) {
-    // console.log('274 abortWatcher', specificWatch)
     if(specificWatch && specificWatch !== 'views' && specificWatch !== 'customresourcedefinitions') {
       let w = this.watchers.find(item => {return item.plural === specificWatch});
       /** Here if the watcher has already been aborted (because we wanted to), don't restart it */
@@ -370,9 +368,7 @@ export default class ApiManager {
              * If it's the views watcher that stopped, we need to do an extra step
              */
             if(plural === 'views'){
-              //console.log('372')
               _this.watchers = _this.watchers.filter(item => {return item.plural !== plural});
-              //console.log(_this.watchers);
             }
             _this.watchSingleCRD(group, version, plural, func);
           }
@@ -399,7 +395,6 @@ export default class ApiManager {
       if(index !== -1) {
         if(CRDs[index].metadata.resourceVersion !== object.metadata.resourceVersion){
           CRDs[index] = object;
-          //console.log(this.CRDs[index], object);
           notification.success({
             message: APP_NAME,
             description: 'CRD ' + object.metadata.name + ' modified'
