@@ -9,7 +9,7 @@ import CRDList from '../CRD/CRDList';
 import AppHeader from '../common/AppHeader';
 import SideBar from '../common/SideBar';
 import AppFooter from '../common/AppFooter';
-import { Layout, notification } from 'antd';
+import { Layout, notification, message } from 'antd';
 import DashboardGeneral from '../dashboard/DashboardGeneral';
 import NewCR from '../editors/NewCR';
 import CustomView from '../views/CustomView'
@@ -18,6 +18,7 @@ import ApiManager from '../services/ApiManager';
 import CRD from '../CRD/CRD';
 import DesignEditorCRD from '../editors/DesignEditorCRD';
 import Authenticator from '../services/Authenticator';
+import ErrorRedirect from '../error-handles/ErrorRedirect';
 
 const { Content } = Layout;
 
@@ -34,11 +35,19 @@ class App extends Component {
       api: null,
       user: {}
     }
+
+    /** global notification config */
     notification.config({
       placement: 'bottomLeft',
       bottom: 20,
       duration: 3,
     });
+
+    /** global message config */
+    message.config({
+      top: 70
+    });
+
     /** Check if previously logged */
     const retrievedSessionToken = JSON.parse(
       sessionStorage.getItem(`oidc.user:${OIDC_PROVIDER_URL}:${OIDC_CLIENT_ID}`)

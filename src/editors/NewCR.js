@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './NewCR.css';
-import { Tabs, Typography, Button, notification } from 'antd';
+import { Tabs, Typography, Button, notification, message } from 'antd';
 import AceEditor from 'react-ace';
 import YAML from 'yaml';
 import 'ace-builds/src-noconflict/mode-json';
@@ -33,12 +33,22 @@ class NewCR extends Component {
   }
 
   onClick() {
-    let item;
+    let item = undefined;
 
     try {
       item = JSON.parse(this.state.value);
-    } catch (error) {
-      item = YAML.parse(this.state.value);
+    } catch(error) {
+      try {
+        item = YAML.parse(this.state.value);
+      } catch(error){
+        message.error('JSON or YAML not valid');
+        return;
+      }
+    }
+
+    if(item.name === ''){
+      message.error('Please insert a valid name');
+      return;
     }
 
     this.submit(item);
@@ -126,7 +136,6 @@ class NewCR extends Component {
                 {this.inputText()}
               </Tabs.TabPane>
               <Tabs.TabPane tab="Easy version (WIP)" key="2">
-                {/*this.formGenerator()*/}
                 <FormGenerator CRD={this.CRD} submit={this.submit}/>
               </Tabs.TabPane>
             </Tabs>

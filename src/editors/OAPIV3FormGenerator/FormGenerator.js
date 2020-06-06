@@ -7,6 +7,7 @@ import YAML from 'yaml';
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/theme-github';
+import { message } from 'antd';
 
 const Form = withTheme(Theme);
 
@@ -24,12 +25,22 @@ class FormGenerator extends Component {
   }
 
   onSubmit(value) {
-    let metadata;
+    let metadata = undefined;
 
     try {
       metadata = JSON.parse(this.value);
-    } catch (error) {
-      metadata = YAML.parse(this.value);
+    } catch(error) {
+      try {
+        metadata = YAML.parse(this.value);
+      } catch(error) {
+        message.error('JSON or YAML not valid');
+        return;
+      }
+    }
+
+    if(metadata.name === ''){
+      message.error('Please insert a valid name');
+      return;
     }
 
     let item = {
@@ -39,6 +50,7 @@ class FormGenerator extends Component {
       kind: this.props.CRD.spec.names.kind
     }
     this.props.submit(item);
+
   }
 
   onChange(value) {
