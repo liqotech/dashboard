@@ -62,7 +62,8 @@ class App extends Component {
       };
       /** Get the CRDs at the start of the app */
       this.state.api.getCRDs().catch(error => {
-        console.log(error)
+        console.log(error);
+        this.props.history.push("/error/" + error.response.statusCode);
       });
     }
     this.authManager = new Authenticator();
@@ -75,7 +76,8 @@ class App extends Component {
       });
       /** Get the CRDs at the start of the app */
       this.state.api.getCRDs().catch(error => {
-        console.log(error)
+        console.log(error);
+        this.props.history.push("/error/" + error.response.statusCode);
       });
     });
     this.authManager.manager.events.addAccessTokenExpiring(() => {
@@ -106,7 +108,11 @@ class App extends Component {
       <Route key={'logout'}
              path="/logout">
         <Redirect to="/login" />
-      </Route>
+      </Route>,
+      <Route key={'error'}
+             path="/error/:statusCode"
+             component={(props) => <ErrorRedirect {...props} logout={this.authManager.logout} />}
+      />
     ]
 
     if(this.state.api){

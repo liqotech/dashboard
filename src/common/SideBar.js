@@ -63,6 +63,7 @@ class SideBar extends Component {
           }
         ).catch((error) => {
         console.log(error);
+        this.props.history.push("/error/" + error.response.statusCode);
       })
     }
   }
