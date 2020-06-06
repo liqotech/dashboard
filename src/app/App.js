@@ -36,62 +36,17 @@ class App extends Component {
       user: {}
     }
 
-    /** global notification config */
-    notification.config({
-      placement: 'bottomLeft',
-      bottom: 20,
-      duration: 3,
-    });
+    /** set global configuration for notifications and alert*/
+    this.setGlobalConfig();
 
-    /** global message config */
-    message.config({
-      top: 70
-    });
+    /** all is needed to manage an OIDC session */
+    this.manageOIDCSession();
 
-    /** Check if previously logged */
-    const retrievedSessionToken = JSON.parse(
-      sessionStorage.getItem(`oidc.user:${OIDC_PROVIDER_URL}:${OIDC_CLIENT_ID}`)
-    );
-    if (retrievedSessionToken) {
-      let api = new ApiManager({ id_token: retrievedSessionToken.id_token,
-        token_type: retrievedSessionToken.token_type || 'Bearer'});
-      this.state = {
-        user: retrievedSessionToken.profile,
-        logged: true,
-        api: api
-      };
-      /** Get the CRDs at the start of the app */
-      this.state.api.getCRDs().catch(error => {
-        console.log(error);
-        this.props.history.push("/error/" + error.response.statusCode);
-      });
-    }
-    this.authManager = new Authenticator();
-    this.authManager.manager.events.addUserLoaded(user => {
-      let api = new ApiManager(user);
-      this.setState({
-        logged: true,
-        api: api,
-        user: user.profile
-      });
-      /** Get the CRDs at the start of the app */
-      this.state.api.getCRDs().catch(error => {
-        console.log(error);
-        this.props.history.push("/error/" + error.response.statusCode);
-      });
-    });
-    this.authManager.manager.events.addAccessTokenExpiring(() => {
-      this.authManager.manager.signinSilent().then(user => {
-        this.state.api.refreshConfig(user);
-        this.setState({logged: true});
-      }).catch((error) => {
-        console.log(error);
-        this.props.history.push("/logout");
-      });
-    });
+    console.log(this.props.location.pathname);
   }
 
   render() {
+    /** Always present routes */
     const routes = [
       <Route key={'login'}
              exact path="/login"
@@ -115,6 +70,7 @@ class App extends Component {
       />
     ]
 
+    /** Routes present only if logged in and apiManager created */
     if(this.state.api){
       routes.push([
         <Route key={'/'}
@@ -187,6 +143,67 @@ class App extends Component {
             </div>
         </Layout>
     );
+  }
+
+  setGlobalConfig() {
+    /** global notification config */
+    notification.config({
+      placement: 'bottomLeft',
+      bottom: 20,
+      duration: 3,
+    });
+
+    /** global message config */
+    message.config({
+      top: 70
+    });
+  }
+
+  manageOIDCSession() {
+    /** Check if previously logged */
+    const retrievedSessionToken = JSON.parse(
+      sessionStorage.getItem(`oidc.user:${OIDC_PROVIDER_URL}:${OIDC_CLIENT_ID}`)
+    );
+    if (retrievedSessionToken) {
+      let api = new ApiManager({ id_token: retrievedSessionToken.id_token,
+        token_type: retrievedSessionToken.token_type || 'Bearer'});
+      this.state = {
+        user: retrievedSessionToken.profile,
+        logged: true,
+        api: api
+      };
+      /** Get the CRDs at the start of the app */
+      this.state.api.getCRDs().catch(error => {
+        console.log(error);
+        this.props.history.push("/error/" + error.response.statusCode);
+      });
+    }
+
+    this.authManager = new Authenticator();
+    this.authManager.manager.events.addUserLoaded(user => {
+      let api = new ApiManager(user);
+      this.setState({
+        logged: true,
+        api: api,
+        user: user.profile
+      });
+      /** Get the CRDs at the start of the app */
+      this.state.api.getCRDs().catch(error => {
+        console.log(error);
+        this.props.history.push("/error/" + error.response.statusCode);
+      });
+    });
+
+    /** Refresh token (or logout is silent sign in is not enabled) */
+    this.authManager.manager.events.addAccessTokenExpiring(() => {
+      this.authManager.manager.signinSilent().then(user => {
+        this.state.api.refreshConfig(user);
+        this.setState({logged: true});
+      }).catch((error) => {
+        console.log(error);
+        this.props.history.push("/logout");
+      });
+    });
   }
 }
 

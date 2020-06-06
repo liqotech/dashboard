@@ -1,8 +1,8 @@
 import * as React from "react";
-
 import "./JsonToTable.css";
 import JSONToTableUtils from "./JsonToTableUtils";
 import UpCircleOutlined from '@ant-design/icons/lib/icons/UpCircleOutlined';
+import { Tooltip } from 'antd';
 
 export default class JsonToTableAntd extends React.Component{
   // constructor
@@ -80,7 +80,14 @@ export default class JsonToTableAntd extends React.Component{
 
   renderCell = (params) => {
     const {content, colspan, isHeader} = params;
-    const valueDisplay = isHeader ? <strong>{content}</strong> : content;
+    let valueDisplay = isHeader ? (
+      <Tooltip placement="bottomLeft" title={content}><strong>{content}</strong></Tooltip>
+    ) : content;
+    if(!colspan){
+      valueDisplay = (
+        <Tooltip placement="bottomLeft" title={valueDisplay}>{valueDisplay}</Tooltip>
+      )
+    }
     return <td colSpan={colspan ? colspan : 0} key={`__j2t_trObj${valueDisplay}${Math.random()}`}>{valueDisplay}</td>;
   };
 
@@ -138,12 +145,20 @@ export default class JsonToTableAntd extends React.Component{
   };
 
   renderRow = (k, v, idx) => {
+    if(v === true) v = 'true';
+    if(v === false) v = 'false';
     return (
       <tr key={`__j2t_tr${idx}`}>
         <td key={`__j2t_tdk${idx}`}>
-          <strong>{k}</strong>
+          <Tooltip placement="bottomLeft" title={k}>
+            <strong>{k}</strong>
+          </Tooltip>
         </td>
-        <td key={`__j2t_tdv${idx}`}>{v}</td>
+        <td key={`__j2t_tdv${idx}`}>
+          <Tooltip placement="bottomLeft" title={v}>
+            {v}
+          </Tooltip>
+        </td>
       </tr>
     );
   };
@@ -171,7 +186,9 @@ export default class JsonToTableAntd extends React.Component{
       <div key={`__j2t_rw${label}`}>
         <UpCircleOutlined style={{marginRight: 10}}
                           onClick={()=>{this.onClick(label)}}/>
-        <strong onClick={()=>{this.onClick(label)}}>{label}</strong>
+        <Tooltip placement="bottomLeft" title={label}>
+          <strong onClick={()=>{this.onClick(label)}}>{label}</strong>
+        </Tooltip>
       </div>
     );
   };

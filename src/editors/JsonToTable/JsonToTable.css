@@ -4,7 +4,13 @@
     border: 1px solid #bebebe; }
 
 .json-to-table td {
-    text-align: left; }
+    text-align: left;
+    max-width: 200px;
+    table-layout: fixed;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
 .json-to-table tr:nth-child(even) {
     background-color: #eee; }
