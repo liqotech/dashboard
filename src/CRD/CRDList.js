@@ -14,6 +14,7 @@ import { Pagination } from 'antd';
 class CRDList extends Component {
   constructor(props) {
     super(props);
+    this.onBreakpointChange = this.onBreakpointChange.bind(this);
     /**
      * @param: isLoading: boolean
      * @param: CRDs: array of CRDs
@@ -22,7 +23,8 @@ class CRDList extends Component {
       CRDs: this.props.api.CRDs,
       CRDshown: [],
       isLoading: true,
-      layout: {lg: []}
+      layout: {lg: []},
+      oldBr: null
     };
     this.loadCustomResourceDefinitions = this.loadCustomResourceDefinitions.bind(this);
     if(this.props.api)
@@ -61,15 +63,40 @@ class CRDList extends Component {
       CRDshown: CRDs
     });
 
-    for(let i = 0; i < CRDs.length; i++) {
-      layout.push({
-        i: CRDs[i].metadata.name, x: i%2, y: Math.floor(i/2), w: 1, h: 1, static: true
-      });
+    /**
+     * When changing from lg layout to sm
+     * let the CRDs remain in alphabetical order
+     */
+    if(this.state.oldBr === 'sm'){
+      layout = [];
+      for(let i = 0; i < CRDs.length; i++) {
+        layout.push({
+          i: CRDs[i].metadata.name, x: 0, y: Math.floor(i), w: 1, h: 1, static: true
+        });
+      }
+    } else {
+      for(let i = 0; i < CRDs.length; i++) {
+        layout.push({
+          i: CRDs[i].metadata.name, x: i%2, y: Math.floor(i/2), w: 1, h: 1, static: true
+        });
+      }
     }
+
     this.setState({
       layout: {lg: layout},
       isLoading: false
     });
+
+  }
+
+  onBreakpointChange(br){
+    if(!this.state.oldBr){
+      this.state.oldBr = br;
+    } else if(this.state.oldBr !== br){
+      console.log(br, this);
+      this.state.oldBr = br;
+      this.generateLayout(this.state.CRDshown);
+    }
   }
 
   render() {
@@ -122,9 +149,9 @@ class CRDList extends Component {
     return (
       <div className="crds-container">
         <ResponsiveGridLayout className="react-grid-layout" layouts={this.state.layout} margin={[40, 40]}
-                              breakpoints={{lg: 1000, md: 796, sm: 568, xs: 280, xxs: 0}}
-                              cols={{lg: 2, md: 2, sm: 1, xs: 1, xxs: 1}} rowHeight={300}
-                              compactType={'horizontal'}>
+                              breakpoints={{lg: 1000, md: 796, sm: 568}}
+                              cols={{lg: 2, md: 2, sm: 1}} rowHeight={300}
+                              compactType={'horizontal'} onBreakpointChange={this.onBreakpointChange}>
           {CRDViews}
         </ResponsiveGridLayout>
 
