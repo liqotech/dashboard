@@ -155,7 +155,7 @@ class App extends Component {
 
     /** global message config */
     message.config({
-      top: 70
+      top: 10
     });
   }
 
@@ -175,7 +175,8 @@ class App extends Component {
       /** Get the CRDs at the start of the app */
       this.state.api.getCRDs().catch(error => {
         console.log(error);
-        this.props.history.push("/error/" + error.response.statusCode);
+        if(error.response)
+          this.props.history.push("/error/" + error.response.statusCode);
       });
     }
 
@@ -190,7 +191,8 @@ class App extends Component {
       /** Get the CRDs at the start of the app */
       this.state.api.getCRDs().catch(error => {
         console.log(error);
-        this.props.history.push("/error/" + error.response.statusCode);
+        if(error.response)
+          this.props.history.push("/error/" + error.response.statusCode);
       });
     });
 

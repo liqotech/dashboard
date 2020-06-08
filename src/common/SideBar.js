@@ -63,7 +63,8 @@ class SideBar extends Component {
           }
         ).catch((error) => {
         console.log(error);
-        this.props.history.push("/error/" + error.response.statusCode);
+        if(error.response)
+          this.props.history.push("/error/" + error.response.statusCode);
       })
     }
   }
@@ -124,8 +125,6 @@ class SideBar extends Component {
         this.setState({
           customViews: customViews
         });
-      } else {
-        return;
       }
     }
   }

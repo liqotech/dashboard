@@ -42,8 +42,8 @@ export default class ErrorRedirect extends React.Component {
           <div className="desc">
             {this.state.desc}
           </div>
-            <Button className="go-back-btn" t
-                    ype="primary" size="large"
+            <Button className="go-back-btn"
+                    type="primary" size="large"
                     icon={<LogoutOutlined />}
                     onClick={this.props.logout}>
               Logout
