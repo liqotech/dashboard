@@ -203,6 +203,7 @@ class App extends Component {
         this.setState({logged: true});
       }).catch((error) => {
         console.log(error);
+        localStorage.clear();
         this.props.history.push("/logout");
       });
     });
