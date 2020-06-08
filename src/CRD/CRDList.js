@@ -24,7 +24,8 @@ class CRDList extends Component {
       CRDshown: [],
       isLoading: true,
       layout: {lg: []},
-      oldBr: null
+      oldBr: null,
+      currentPage: 1
     };
     this.loadCustomResourceDefinitions = this.loadCustomResourceDefinitions.bind(this);
     if(this.props.api)
@@ -39,7 +40,7 @@ class CRDList extends Component {
     this.setState({
       CRDs: CRDs
     });
-    this.generateLayout(CRDs.slice(0, 10));
+    this.generateLayout(CRDs.slice(10*(this.state.currentPage-1), 10*this.state.currentPage));
   }
 
   componentDidMount() {
@@ -48,8 +49,11 @@ class CRDList extends Component {
 
   /** When going to another page, change the CRDs shown */
   paginationChange(current, size){
-    let CRDsubset = this.state.CRDs.slice(size*(current-1), size*current);
-    this.generateLayout(CRDsubset);
+    if(current !== this.state.currentPage){
+      this.state.currentPage = current;
+      let CRDsubset = this.state.CRDs.slice(size*(current-1), size*current);
+      this.generateLayout(CRDsubset);
+    }
   }
 
   /**
@@ -89,6 +93,7 @@ class CRDList extends Component {
 
   }
 
+  /** If the size breakpoint has changed, re-sort the CRD list */
   onBreakpointChange(br){
     if(!this.state.oldBr){
       this.state.oldBr = br;
@@ -97,6 +102,19 @@ class CRDList extends Component {
       this.state.oldBr = br;
       this.generateLayout(this.state.CRDshown);
     }
+  }
+
+  /** Update CRD with the 'favourite' annotation */
+  handleClick_fav(CRD){
+    if(!CRD.metadata.annotations || !CRD.metadata.annotations.favourite){
+      CRD.metadata.annotations.favourite = 'true';
+    } else {
+      CRD.metadata.annotations.favourite = null;
+    }
+    this.props.api.updateCustomResourceDefinition(
+      CRD.metadata.name,
+      CRD
+    )
   }
 
   render() {
@@ -118,17 +136,28 @@ class CRDList extends Component {
                    * Link to the view of the specific CRD 
                    * @param CRD: this a CRD
                    */}
-                  <Link to={{
-                    pathname: '/customresources/' + CRD.metadata.name,
-                    state: {
-                      CRD: CRD
-                    }
-                  }} >
-                    <Title level={4} >
-                      {<Badge color="#108ee9" />}
+                  <Title level={4} >
+                    {<Badge color="#108ee9" />}
+                    <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
+                      pathname: '/customresources/' + CRD.metadata.name,
+                      state: {
+                        CRD: CRD
+                      }
+                    }} >
                       Kind: {CRD.spec.names.kind}
-                    </Title>
-                  </Link>
+                    </Link>
+                    { CRD.metadata.annotations ? (
+                      <Rate className="crd-fav" count={1} defaultValue={CRD.metadata.annotations.favourite ? 1 : 0}
+                            onChange={() => {this.handleClick_fav(CRD)}}
+                            style={{marginLeft: 0}}
+                      />
+                    ) : (
+                      <Rate className="crd-fav" count={1} defaultValue={0}
+                            onChange={() => {this.handleClick_fav(CRD)}}
+                            style={{marginLeft: 0}}
+                      />
+                    )}
+                  </Title>
                 </div>
               </div>
               <Tabs defaultActiveKey="1">
@@ -163,7 +192,7 @@ class CRDList extends Component {
         {this.state.isLoading ? <LoadingIndicator /> : null}
         {!this.state.isLoading && CRDViews.length > 0 ? (
           <div className="no-crds-found" style={{marginTop: 30}}>
-            <Pagination defaultCurrent={1} total={this.state.CRDs.length}
+            <Pagination defaultCurrent={this.state.currentPage} total={this.state.CRDs.length}
                         onChange={this.paginationChange}
                         showSizeChanger={false} />
           </div>

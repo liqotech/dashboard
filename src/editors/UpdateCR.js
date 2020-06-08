@@ -43,11 +43,6 @@ class UpdateCR extends Component {
       }
     }
 
-    if(item.name === ''){
-      message.error('Please insert a valid name');
-      return
-    }
-
     item = {
       spec: item
     }

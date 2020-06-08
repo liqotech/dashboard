@@ -1,19 +1,9 @@
 import React, { Component } from 'react';
 import './CRD.css';
 import './CRDList.css';
-import {
-  Badge,
-  Breadcrumb,
-  Button,
-  Layout,
-  notification,
-  Tabs,
-  Tag,
-  Typography,
-  Popover,
-  Row,
-  Tooltip,
-  Col, Descriptions, Switch, Pagination, Empty, Rate
+import { Badge, Breadcrumb, Button, Layout, Dropdown,
+  notification, Tabs, Tag, Typography, Popover, Row, Tooltip,
+  Col, Descriptions, Switch, Pagination, Empty, Rate, message
 } from 'antd';
 import CR from './CR';
 import { Link } from 'react-router-dom';
@@ -26,6 +16,8 @@ import PictureOutlined from '@ant-design/icons/lib/icons/PictureOutlined';
 import Measure from 'react-measure';
 import DragOutlined from '@ant-design/icons/lib/icons/DragOutlined';
 import PushpinOutlined from '@ant-design/icons/lib/icons/PushpinOutlined';
+import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
+import { Menu } from 'antd';
 const { Title } = Typography;
 
 class CRD extends Component {
@@ -55,7 +47,8 @@ class CRD extends Component {
       isPinned: false,
       isFavourite: false,
       CRshown: [],
-      multi: false
+      multi: false,
+      customViews: []
     }
 
     /** In case we are not on a custom view */
@@ -80,7 +73,7 @@ class CRD extends Component {
     this.tempTemplate = null;
 
     this.reloadCRD = this.reloadCRD.bind(this);
-
+    this.getCustomViews = this.getCustomViews.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.deleteCR = this.deleteCR.bind(this);
     this.abortWatchers = this.abortWatchers.bind(this);
@@ -88,6 +81,7 @@ class CRD extends Component {
     this.changeTemplate = this.changeTemplate.bind(this);
     this.paginationChange = this.paginationChange.bind(this);
     this.handleClick_fav = this.handleClick_fav.bind(this);
+    this.handleClick_addToView = this.handleClick_addToView.bind(this);
   }
 
   /** Update state if a CRD is loaded or changed */
@@ -149,8 +143,35 @@ class CRD extends Component {
     }
   }
 
+  getCustomViews(){
+    let CRD = {
+      spec: {
+        group: 'crd-template.liqo.com',
+        version: 'v1',
+        names: {
+          plural: 'views'
+        }
+      }
+    }
+    /** First get all the CR */
+    this.props.api.getCustomResourcesAllNamespaces(CRD)
+      .then((res) => {
+          this.setState({
+            customViews: res.body.items
+          });
+        }
+      ).catch((error) => {
+      console.log(error);
+      if(error.response)
+        this.props.history.push("/error/" + error.response.statusCode);
+    })
+  }
+
   componentDidMount() {
     this.props.api.CRDArrayCallback.push(this.reloadCRD);
+    if(!this.props.onCustomView){
+      this.getCustomViews();
+    }
   }
 
   componentWillUnmount() {
@@ -202,22 +223,113 @@ class CRD extends Component {
   handleClick_fav(){
     if(!this.state.isFavourite){
       this.state.CRD.metadata.annotations.favourite = 'true';
-      this.props.api.updateCustomResourceDefinition(
-        this.state.CRD.metadata.name,
-        this.state.CRD
-      )
     } else {
       this.state.CRD.metadata.annotations.favourite = null;
-      this.props.api.updateCustomResourceDefinition(
-        this.state.CRD.metadata.name,
-        this.state.CRD
-      )
     }
+    this.props.api.updateCustomResourceDefinition(
+      this.state.CRD.metadata.name,
+      this.state.CRD
+    )
     this.setState({
       isFavourite: !this.state.isFavourite});
   }
 
+  /** check if this CRD is already in a custom view */
+  checkAlreadyInView(e){
+    let cv = this.state.customViews.find(item => {
+      return item.metadata.name === e;
+    });
+    return !!cv.spec.templates.find(item => {
+      if(item)
+        return item.kind === this.state.CRD.spec.names.kind;
+    });
+  }
+
+  /** Update the custom view CR and include this CRD */
+  handleClick_addToView(e){
+    let cv = this.state.customViews.find(item => {
+      return item.metadata.name === e.key;
+    });
+    const index = cv.spec.templates.indexOf(
+      cv.spec.templates.find(item => {
+        if(item)
+          return item.kind === this.state.CRD.spec.names.kind;
+      }));
+
+    if(index !== -1){
+      cv.spec.templates[index] = null;
+    } else {
+      cv.spec.templates.push({
+        kind: this.state.CRD.spec.names.kind
+      });
+    }
+
+    let array = cv.metadata.selfLink.split('/');
+    let promise = this.props.api.updateCustomResource(
+      array[2],
+      array[3],
+      array[5],
+      array[6],
+      array[7],
+      cv
+    );
+
+    promise
+      .then((res) => {
+        notification.success({
+          message: APP_NAME,
+          description: 'Resource updated'
+        });
+        cv = res.body;
+        const i = this.state.customViews.indexOf(
+          this.state.customViews.find(item => {
+            return item.metadata.name === e.key
+        }));
+        this.state.customViews[i] = cv;
+        /** Not recommended, but it works */
+        this.forceUpdate();
+      })
+      .catch(() => {
+        notification.error({
+          message: APP_NAME,
+          description: 'Could not update the resource'
+        });
+      });
+  }
+
   header() {
+    const items = [];
+
+    this.state.customViews.forEach(item => {
+      items.push(
+        <Menu.Item key={item.metadata.name} onClick={this.handleClick_addToView}>
+          {
+            item.spec.name ? (
+              <span style={this.checkAlreadyInView(item.metadata.name) ? {
+                color: 'red'
+              } : null}>{ item.spec.name }</span>
+            ) : (
+              <span style={this.checkAlreadyInView(item.metadata.name) ? {
+                color: 'red'
+              } : null}>{ item.metadata.name }</span>
+            )
+          }
+        </Menu.Item>
+      )
+    });
+
+    if(items.length === 0){
+      items.push(
+        <Menu.Item key={'no-item'}>No custom views</Menu.Item>
+      )
+    }
+
+    const menu = (
+      <Menu>
+        {items}
+      </Menu>
+    );
+
     return (
       <div>
         <Row>
@@ -267,7 +379,13 @@ class CRD extends Component {
                   }}
                 />
               </Col>
-            ) : null
+            ) : (
+              <Dropdown overlay={menu} placement="bottomRight">
+                <Button>
+                  Add/Remove to view <LayoutOutlined />
+                </Button>
+              </Dropdown>
+            )
           }
         </Row>
         <br />
