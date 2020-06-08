@@ -46,7 +46,7 @@ export default class Utils {
    */
   OAPIV3toJSONSchema(schema){
     let toJsonSchema = require('@openapi-contrib/openapi-schema-to-json-schema');
-
     return toJsonSchema(schema);
   }
+
 }

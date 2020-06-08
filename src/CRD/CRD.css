@@ -10,3 +10,14 @@
     margin-top: 5px;
     margin-bottom: 15px;
 }
+
+.ant-typography ul,
+.ant-typography ol {
+    margin: 0 0 0 0;
+    padding: 0;
+}
+
+.ant-typography ul li, .ant-typography ol li {
+    margin: 0 0 0 10px;
+    padding: 0 0 0 4px;
+}

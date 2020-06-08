@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Badge, Breadcrumb, notification, Tabs, Typography } from 'antd';
+import { Badge, Breadcrumb, Empty, notification, Rate, Tabs, Typography } from 'antd';
 import LoadingIndicator from '../common/LoadingIndicator';
 import { Link, withRouter } from 'react-router-dom';
 import './CRDList.css';
@@ -19,48 +19,25 @@ class CRDList extends Component {
      * @param: CRDs: array of CRDs
      */
     this.state = {
-      CRDs: [],
+      CRDs: this.props.api.CRDs,
       CRDshown: [],
-      isLoading: false,
-      layout: {lg: []},
+      isLoading: true,
+      layout: {lg: []}
     };
     this.loadCustomResourceDefinitions = this.loadCustomResourceDefinitions.bind(this);
-    this.api = this.props.api;
-    this.notifyEvent = this.notifyEvent.bind(this);
+    if(this.props.api)
+      this.props.api.CRDListCallback = this.loadCustomResourceDefinitions;
     this.paginationChange = this.paginationChange.bind(this);
   }
 
-  loadCustomResourceDefinitions() {
-    /** Abort all watchers to prevent pending connections */
-    this.api.abortAllWatchers(true);
-
-    let promise = this.api.getCRDs();
-
-    if (!promise) {
-      return;
+  loadCustomResourceDefinitions(CRDs) {
+    if(!CRDs){
+      CRDs = this.props.api.CRDs;
     }
-
     this.setState({
-      isLoading: true
+      CRDs: CRDs
     });
-
-    promise
-      .then(response => {
-        /** Once we have all CRDs, let's watch for changes */
-
-        this.api.watchAllCRDs(this.notifyEvent);
-
-        this.setState({
-          CRDs: response,
-          isLoading: false
-        });
-        this.generateLayout(response.slice(0, 10));
-      })
-      .catch(() => {
-        this.setState({
-          isLoading: false
-        });
-      })
+    this.generateLayout(CRDs.slice(0, 10));
   }
 
   componentDidMount() {
@@ -90,58 +67,9 @@ class CRDList extends Component {
       });
     }
     this.setState({
-      layout: {lg: layout}
+      layout: {lg: layout},
+      isLoading: false
     });
-  }
-
-  /**
-   * Callback for CRDs watcher trigger (if the CRD is changed)
-   * @param type: description of the trigger (modify/add/delete)
-   * @param object: object modified/added/deleted
-   */
-  notifyEvent(type, object) {
-
-    let CRDs = this.state.CRDs;
-
-    let index = CRDs.indexOf(CRDs.find((item) => {
-      return item.metadata.name === object.metadata.name;
-    }));
-
-    if ((type === 'ADDED' || type === 'MODIFIED')) {
-      // Object creation succeeded
-      if(index !== -1) {
-        CRDs[index] = object;
-
-        /*notification.success({
-          message: APP_NAME,
-          description: 'CRD ' + object.metadata.name + ' modified'
-        });*/
-      } else {
-        CRDs.push(object);
-
-        notification.success({
-          message: APP_NAME,
-          description: 'CRD ' + object.metadata.name + ' added'
-        });
-      }
-    } else if (type === 'DELETED') {
-      if(index !== -1) {
-        CRDs.splice(index, 1);
-
-        notification.success({
-          message: APP_NAME,
-          description: 'CRD ' + object.metadata.name + ' deleted'
-        });
-      } else {
-        return;
-      }
-    }
-
-    this.setState({
-      CRDs: CRDs
-    });
-
-    // this.props.api.autoCompleteCallback(CRDs);
   }
 
   render() {
@@ -202,7 +130,7 @@ class CRDList extends Component {
 
         {!this.state.isLoading && CRDViews.length === 0 ? (
           <div className="no-crds-found">
-            <span>No CRDs Found.</span>
+            <Empty description={<strong>No CRDs found</strong>}/>
           </div>
         ) : null}
         {this.state.isLoading ? <LoadingIndicator /> : null}

@@ -30,13 +30,12 @@ class CustomView extends Component {
       oldBr: 'lg',
       newBr: 'lg'
     }
-
     if(this.props.location.state.view.spec.layout){
       this.state.layout = this.props.location.state.view.spec.layout;
     }
 
-    this.notifyEvent = this.notifyEvent.bind(this);
     this.loadCRD = this.loadCRD.bind(this);
+    this.props.api.CRDArrayCallback.push(this.loadCRD);
     this.generateLayout = this.generateLayout.bind(this);
     this.childSize = this.childSize.bind(this);
     this.onResize = this.onResize.bind(this);
@@ -46,30 +45,49 @@ class CustomView extends Component {
     this.onBreakpointChange = this.onBreakpointChange.bind(this);
   }
 
-  loadCRD(){
-
-    /** Abort all watchers to prevent pending connections */
-    this.props.api.abortAllWatchers(true);
-    this.setState({isLoading: true});
+  loadCRD(apiCRDs){
+    if(!apiCRDs){
+      this.setState({isLoading: true});
+    } else {
+      this.setState({CRDs: []});
+    }
 
     this.state.templates.forEach(item => {
-      this.props.api.getCRDfromKind(item.kind)
-        .then(res => {
-          let CRDs = this.state.CRDs;
-          /** If a template is defined in the CR, use that one */
-          if(item.template){
-            res.metadata.annotations.template = item.template;
-          }
-          if(item.name){
-            res.spec.names.kind = item.name;
-          }
-          CRDs.push(res);
-          this.setState({CRDs: CRDs});
-          this.generateCRDView();
+      let res = this.props.api.getCRDfromKind(item.kind);
+
+      if(!res && item.name){
+        res = this.props.api.getCRDfromKind(item.name);
+      }
+      /** CRDs could be no yet loaded */
+      if(res){
+        let CRDs = this.state.CRDs;
+        /** If a template is defined in the CR, use that one */
+        if(item.template){
+          res.metadata.annotations.template = item.template;
+        }
+        /** If a custom name is defined, use that one */
+        if(item.name){
+          res.spec.names.kind = item.name;
+        }
+        CRDs.push(res);
+        this.setState({CRDs: CRDs});
+        this.generateCRDView();
+        if(CRDs.length === this.state.templates.length)
           this.generateLayout();
-        })
+      }
     });
-    this.props.api.watchAllCRDs(this.notifyEvent);
+  }
+
+  /** Reset the kind of the CRDs to the original one
+   *  and not the name given in the custom view
+   */
+  resetKind(){
+    this.state.templates.forEach(item => {
+      if(item.name){
+        let res = this.props.api.getCRDfromKind(item.name);
+        res.spec.names.kind = item.kind;
+      }
+    });
   }
 
   generateCRDView(){
@@ -137,50 +155,26 @@ class CustomView extends Component {
     });
   }
 
-  notifyEvent(type, object) {
-
-    let CRDs = this.state.CRDs;
-
-    let index = CRDs.indexOf(CRDs.find((item) => {
-      return item.metadata.name === object.metadata.name;
-    }));
-
-    if (type === 'MODIFIED') {
-      // Object creation succeeded
-      if(index !== -1) {
-        CRDs[index] = object;
-        notification.success({
-          message: APP_NAME,
-          description: 'CRD ' + object.metadata.name + ' modified'
-        });
-      }
-    } else if (type === 'DELETED') {
-      if(index !== -1) {
-        CRDs.splice(index, 1);
-
-        notification.success({
-          message: APP_NAME,
-          description: 'CRD ' + object.metadata.name + ' deleted'
-        });
-      } else {
-        return;
-      }
-    } else {
-      return;
-    }
-
-    this.setState({
-      CRDs: CRDs
-    });
-    this.generateCRDView();
-  }
-
   componentDidMount() {
     this.loadCRD();
   }
 
+  /** Save layout to CR when exit */
   componentWillUnmount() {
+    /**
+     * Cancel all callback for the CRDs
+     * Cancel all watchers
+     * If necessary, reset the CRD kind to the original kind
+     * Then save the layout
+     */
+    this.props.api.CRDArrayCallback = [];
+    this.props.api.abortAllWatchers();
+    this.resetKind();
     this.props.location.state.view.spec.layout = this.state.layout;
+    for(let i = 0; i < this.props.location.state.view.spec.layout.lg.length; i++){
+      delete this.props.location.state.view.spec.layout.lg[i].isDraggable;
+      delete this.props.location.state.view.spec.layout.lg[i].static;
+    }
     let array = this.props.location.state.view.metadata.selfLink.split('/');
     this.props.api.updateCustomResource(
       array[2],
@@ -189,7 +183,9 @@ class CustomView extends Component {
       array[6],
       this.props.location.state.view.metadata.name,
       this.props.location.state.view
-    )
+    ).catch((error) => {
+      console.log(error);
+    })
   }
 
   /** If the child component's size have changed, change the layout */

@@ -2,19 +2,35 @@ import * as React from "react";
 
 import "./JsonToTable.css";
 import JSONToTableUtils from "./JsonToTableUtils";
+import UpCircleOutlined from '@ant-design/icons/lib/icons/UpCircleOutlined';
 
-export default class JsonToTable extends React.Component{
+export default class JsonToTableAntd extends React.Component{
   // constructor
   constructor(props, context) {
     super(props, context);
+    this.state = {
+      json: this.props.json,
+      jsonShown: JSON.parse(JSON.stringify(this.props.json))
+    }
     this.JSONToTableUtils = new JSONToTableUtils();
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if(JSON.stringify(prevState.json) !== JSON.stringify(this.props.json)){
+      this.state.json = this.props.json;
+      this.state.jsonShown = this.props.json;
+      /** using forceUpdate is a bit of a workaround as it should be avoided,
+       *  but setState throws an error, and as long as it works...
+       */
+      this.forceUpdate();
+    }
   }
 
   render() {
     return (
       <div className={'json-to-table'}>
         <table key={`__j2t_root_table`}>
-          <tbody key={`__j2t_root_tbody`}>{this.renderObject(this.props.json, undefined, 0)}</tbody>
+          <tbody key={`__j2t_root_tbody`}>{this.renderObject(this.state.jsonShown, undefined, 0)}</tbody>
         </table>
       </div>
     );
@@ -58,7 +74,7 @@ export default class JsonToTable extends React.Component{
     phrase.push(tmp);
     const retval = phrase.map(p => p);
     return header ? (
-      <tr key={`__j2t_trObj${idx}`}>{this.renderCell({content: retval, colspan: 2})}</tr>
+      <tr key={`__j2t_trObj${idx}${Math.random()}`}>{this.renderCell({content: retval, colspan: 2})}</tr>
     ) : (
       retval
     );
@@ -67,7 +83,7 @@ export default class JsonToTable extends React.Component{
   renderCell = (params) => {
     const {content, colspan, isHeader} = params;
     const valueDisplay = isHeader ? <strong>{content}</strong> : content;
-    return <td colSpan={colspan ? colspan : 0} key={`__j2t_trObj${valueDisplay}`}>{valueDisplay}</td>;
+    return <td colSpan={colspan ? colspan : 0} key={`__j2t_trObj${valueDisplay}${Math.random()}`}>{valueDisplay}</td>;
   };
 
   renderHeader = (labels) => {
@@ -92,14 +108,19 @@ export default class JsonToTable extends React.Component{
 
   renderRowValues = (anArray, labels) => {
     return anArray.map((item, idx) => {
+
       return (
         <tr key={`__j2t_Arr${idx.toString()}`}>
           {labels.map(k => {
             const isValuePrimitive =
-              this.JSONToTableUtils.getObjectType(item[k]) === 'Primitive';
+              this.JSONToTableUtils.getObjectType(item[k]) === 'Primitive' ||
+              this.JSONToTableUtils.getObjectType(item[k]) === 'Array';
             return isValuePrimitive
               ? this.renderCell({content: item[k]})
-              : this.renderObject(item[k], '', idx);
+              : (<td key={'td_' + item[k] + Math.random()}>
+                <table key={'td_' + item[k] + Math.random()}>
+                  <tbody key={'td_' + item[k] + Math.random()}>{this.renderObject(item[k], '', idx)}</tbody>
+                </table></td>)
           })}
         </tr>
       );
@@ -129,23 +150,43 @@ export default class JsonToTable extends React.Component{
     );
   };
 
+  /**
+   * @WARNING!!
+   * This could generate some problem as that it suppose the are no keys
+   * with the same name in the object (which there could actually be)
+   * @param label: the key that we want to show/hide in the object
+   *
+   * @TODO find a good solution
+   */
+  onClick(label){
+    let json = this.state.jsonShown;
+    if(Object.keys(this.JSONToTableUtils.findVal(json, label).value).length === 0){
+      json = this.JSONToTableUtils.findVal(json, label, this.JSONToTableUtils.findVal(this.state.json, label).value).object;
+    } else {
+      json = this.JSONToTableUtils.findVal(json, label, {}).object;
+    }
+    this.setState({jsonShown: json});
+  }
+
   renderRowHeader = (label) => {
     return (
       <div key={`__j2t_rw${label}`}>
-        <strong>{label}</strong>
+        <UpCircleOutlined style={{marginRight: 10}}
+                          onClick={()=>{this.onClick(label)}}/>
+        <strong onClick={()=>{this.onClick(label)}}>{label}</strong>
       </div>
     );
   };
 
   renderRows = (obj, labelKey) => {
-  return Object.keys(obj).map((k, idx) => {
-    const value = obj[k];
-    const isValuePrimitive = this.JSONToTableUtils.getObjectType(value) === 'Primitive';
-    // render row when value is primitive otherwise inspect the value and make the key as header
-    const retval = isValuePrimitive
-      ? this.renderRow(k, value, idx)
-      : this.renderObject(value, k, idx);
-    return retval;
+    return Object.keys(obj).map((k, idx) => {
+      const value = obj[k];
+      const isValuePrimitive = this.JSONToTableUtils.getObjectType(value) === 'Primitive';
+      // render row when value is primitive otherwise inspect the value and make the key as header
+      const retval = isValuePrimitive
+        ? this.renderRow(k, value, idx)
+        : this.renderObject(value, k, idx);
+      return retval;
     });
   };
 }
