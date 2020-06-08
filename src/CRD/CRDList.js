@@ -98,7 +98,6 @@ class CRDList extends Component {
     if(!this.state.oldBr){
       this.state.oldBr = br;
     } else if(this.state.oldBr !== br){
-      console.log(br, this);
       this.state.oldBr = br;
       this.generateLayout(this.state.CRDshown);
     }

@@ -3,11 +3,10 @@ import './CR.css';
 import {
   Breadcrumb,
   Button,
-  Card,
-  Menu,
+  Divider,
   notification, PageHeader,
   Popconfirm,
-  Popover
+  Tooltip
 } from 'antd';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 import { Link } from 'react-router-dom';
@@ -16,7 +15,6 @@ import { APP_NAME } from '../constants';
 import PieChart from '../templates/piechart/PieChart';
 import HistoChart from '../templates/histogram/HistoChart';
 import ErrorBoundary from '../error-handles/ErrorBoundary';
-import UpOutlined from '@ant-design/icons/lib/icons/UpOutlined';
 import UpCircleOutlined from '@ant-design/icons/lib/icons/UpCircleOutlined';
 import JsonToTableAntd from '../editors/JsonToTable/JsonToTableAntd';
 
@@ -43,6 +41,7 @@ class CR extends Component {
     this.props.api.abortAllWatchers();
   }
 
+  /** Make the JSON visible or invisible */
   handleClick_show() {
     if (!this.state.showJSON) {
       this.setState({ showJSON: true });
@@ -51,6 +50,7 @@ class CR extends Component {
     }
   }
 
+  /** Delete the CR */
   handleClick_delete() {
     if (this.props.crd.spec.names.plural !== 'views')
       this.props.api.abortAllWatchers(this.props.crd.spec.names.plural);
@@ -101,6 +101,7 @@ class CR extends Component {
     this.setState({ showInfo: !this.state.showInfo });
   }
 
+  /** If the CRD has a template, show it as the first option */
   getChart() {
     return (
       <div className="rep-container">
@@ -122,6 +123,7 @@ class CR extends Component {
   }
 
   render() {
+    /** The default view can always be switched between the custom template */
     let CRdefault = [];
     CRdefault.push(<JsonToTableAntd json={this.props.cr.spec} />);
 
@@ -139,7 +141,7 @@ class CR extends Component {
                                           onClick={this.handleClick_Info}
                                           rotate={this.state.showInfo ? 180 : 0}
                         />
-                        <span onClick={this.handleClick_Info}>{this.props.cr.metadata.name}</span>
+                        <a style={{ color: 'rgba(57,57,57,0.85)'}} onClick={this.handleClick_Info}>{this.props.cr.metadata.name}</a>
                       </div>
                     }
                   </Breadcrumb.Item>
@@ -164,11 +166,11 @@ class CR extends Component {
                     }}
                     onClick={this.abortWatchers}
                   >
-                    <Popover content={'Edit resource'}>
+                    <Tooltip title={'Edit resource'}>
                       <EditOutlined
                         style={{ fontSize: '20px', marginRight: 15 }}
                       />
-                    </Popover>
+                    </Tooltip>
                   </Link>
                   <Button
                     onClick={this.handleClick_show}
@@ -194,6 +196,7 @@ class CR extends Component {
             {
               this.state.showInfo ? (
                 <div>
+                  <Divider style={{marginTop: 4, marginBottom: 10}}/>
                   {this.state.showJSON ? (
                     <pre>{JSON.stringify(this.props.cr.spec, null, 2)}</pre>
                   ) : null}
@@ -214,7 +217,10 @@ class CR extends Component {
                               onClick={this.handleClick_Spec}
                               rotate={this.state.showSpec ? 180 : 0}
                             />
-                            <a onClick={this.handleClick_Spec}>Spec</a>
+                            <a style={{ color: 'rgba(57,57,57,0.85)'}}
+                               onClick={this.handleClick_Spec}>
+                              Spec
+                            </a>
                           </div>
                           {this.state.showSpec ? (
                             <JsonToTableAntd json={this.props.cr.spec} />
@@ -233,7 +239,10 @@ class CR extends Component {
                               onClick={this.handleClick_Status}
                               rotate={this.state.showStatus ? 180 : 0}
                             />
-                            <a onClick={this.handleClick_Status}>Status</a>
+                            <a style={{ color: 'rgba(57,57,57,0.85)'}}
+                               onClick={this.handleClick_Status}>
+                              Status
+                            </a>
                           </div>
                           {this.state.showStatus ? (
                             <JsonToTableAntd json={this.props.cr.status} />

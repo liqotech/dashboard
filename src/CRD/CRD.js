@@ -342,42 +342,46 @@ class CRD extends Component {
           {
             this.props.onCustomView ? (
               <Col flex={1}>
-                <DragOutlined style={this.state.isDraggable ?
-                  {
-                    float: 'right', fontSize: '20px',
-                    marginRight: 10, marginLeft: 25,
-                    color: '#1890FF'
-                  }:{
-                    float: 'right', fontSize: '20px',
-                    marginRight: 10, marginLeft: 25
-                  }}
-                  onClick={() => {
-                    if(this.state.isDraggable){
-                      this.setState({isDraggable: false});
-                    } else {
-                      this.setState({isDraggable: true});
-                    }
-                    this.props.dragFunc(this.state.CRD.metadata.name);
-                  }}
-                />
-                <PushpinOutlined style={this.state.isPinned ?
-                  {
-                    float: 'right', fontSize: '20px',
-                    marginRight: 10,
-                    color: '#1890FF'
-                  }:{
-                    float: 'right', fontSize: '20px',
-                    marginRight: 10,
-                  }}
-                  onClick={() => {
-                    if(this.state.isPinned){
-                      this.setState({isPinned: false});
-                    } else {
-                      this.setState({isPinned: true});
-                    }
-                    this.props.pinFunc(this.state.CRD.metadata.name);
-                  }}
-                />
+                <Tooltip title={'Drag'} placement={'top'}>
+                  <DragOutlined style={this.state.isDraggable ?
+                    {
+                      float: 'right', fontSize: '20px',
+                      marginRight: 10, marginLeft: 25,
+                      color: '#1890FF'
+                    }:{
+                      float: 'right', fontSize: '20px',
+                      marginRight: 10, marginLeft: 25
+                    }}
+                    onClick={() => {
+                      if(this.state.isDraggable){
+                        this.setState({isDraggable: false});
+                      } else {
+                        this.setState({isDraggable: true});
+                      }
+                      this.props.dragFunc(this.state.CRD.metadata.name);
+                    }}
+                  />
+                </Tooltip>
+                <Tooltip title={'Pin'} placement={'top'}>
+                  <PushpinOutlined style={this.state.isPinned ?
+                    {
+                      float: 'right', fontSize: '20px',
+                      marginRight: 10,
+                      color: '#1890FF'
+                    }:{
+                      float: 'right', fontSize: '20px',
+                      marginRight: 10,
+                    }}
+                    onClick={() => {
+                      if(this.state.isPinned){
+                        this.setState({isPinned: false});
+                      } else {
+                        this.setState({isPinned: true});
+                      }
+                      this.props.pinFunc(this.state.CRD.metadata.name);
+                    }}
+                  />
+                </Tooltip>
               </Col>
             ) : (
               <Dropdown overlay={menu} placement="bottomRight">
@@ -391,7 +395,14 @@ class CRD extends Component {
         <br />
         <Title level={4} >
           <Badge color='#1890FF' />
-          {this.state.CRD.spec.names.kind}
+          <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
+            pathname: '/customresources/' + this.state.CRD.metadata.name,
+            state: {
+              CRD: this.state.CRD
+            }
+          }} >
+            {this.state.CRD.spec.names.kind}
+          </Link>
           <Rate className="crd-fav" count={1} defaultValue={this.state.isFavourite ? 1 : 0}
                 onChange={this.handleClick_fav}
                 style={{marginLeft: 0}}
@@ -409,11 +420,11 @@ class CRD extends Component {
                 CR: this.state.custom_resources
               }}}
                   onClick={this.abortWatchers}>
-              <Popover content={'Edit design'} placement={'bottom'}>
+              <Tooltip title={'Edit design'} placement={'bottom'}>
                 <Button icon={<PictureOutlined />} size={'large'} type="primary"
                         style={{marginLeft: 15}}>
                 </Button>
-              </Popover>
+              </Tooltip>
             </Link>
             {/** Button to go to the create new CR view
              *  @param CRD: is the CRD we are currently on
@@ -425,11 +436,11 @@ class CRD extends Component {
                 CRD: this.state.CRD
               }}}
                   onClick={this.abortWatchers}>
-              <Popover content={'Create new resource'} placement={'bottom'}>
+              <Tooltip title={'Create new resource'} placement={'bottomRight'}>
                 <Button icon={<PlusOutlined />} size={'large'} type="primary"
                         style={{marginLeft: 15}}>
                 </Button>
-              </Popover>
+              </Tooltip>
             </Link>
           </div>
         </Title>
@@ -526,7 +537,7 @@ class CRD extends Component {
 
   /** Change from custom template to default */
   changeTemplate(checked){
-    if(checked){
+    if(!checked){
       this.tempTemplate = this.state.template;
       this.setState({template: null});
     } else {
@@ -604,7 +615,7 @@ class CRD extends Component {
     if(this.state.CRD.metadata.annotations){
       for(let annotation of Object.entries(this.state.CRD.metadata.annotations)) {
         CRD_annotations.push(
-          <Tag key={annotation}>
+          <Tag key={annotation} style={{maxWidth: '100%'}}>
             <pre>{JSON.stringify(annotation, null, 2)}</pre>
           </Tag>
         );
@@ -642,7 +653,7 @@ class CRD extends Component {
                         this.state.template || this.tempTemplate ? (
                             <div style={{float: 'right'}}>
                               <Tooltip placement="topRight" title="Change CR design">
-                                <Switch onChange={this.changeTemplate}/>
+                                <Switch defaultChecked onChange={this.changeTemplate}/>
                               </Tooltip>
                             </div>
                           ) : null

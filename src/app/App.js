@@ -119,28 +119,28 @@ class App extends Component {
 
     return (
         <Layout>
-            <div>
+          <div>
+            {this.state.api ? (
+            <AppHeader
+              api={this.state.api}
+              logout={this.authManager.logout}
+              logged={this.state.logged}
+            />) : null}
+            <Layout className="app-content" style={{minHeight: '92vh'}}>
               {this.state.api ? (
-              <AppHeader
-                api={this.state.api}
-                logout={this.authManager.logout}
-                logged={this.state.logged}
-              />) : null}
-              <Layout className="app-content" style={{minHeight: '92vh'}}>
-                {this.state.api ? (
-                <SideBar api={this.state.api} />) : null}
-                <Layout style={{ marginLeft: 250 }}>
-                  <Content>
-                    <div className="container">
-                      <Switch>
-                        {routes}
-                      </Switch>
-                    </div>
-                  </Content>
-                  <AppFooter />
-                </Layout>
+              <SideBar api={this.state.api} />) : null}
+              <Layout>
+                <Content>
+                  <div className="container">
+                    <Switch>
+                      {routes}
+                    </Switch>
+                  </div>
+                </Content>
+                <AppFooter />
               </Layout>
-            </div>
+            </Layout>
+          </div>
         </Layout>
     );
   }

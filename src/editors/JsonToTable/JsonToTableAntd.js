@@ -183,11 +183,12 @@ export default class JsonToTableAntd extends React.Component{
 
   renderRowHeader = (label) => {
     return (
-      <div key={`__j2t_rw${label}`}>
-        <UpCircleOutlined style={{marginRight: 10}}
-                          onClick={()=>{this.onClick(label)}}/>
+      <div key={`__j2t_rw${label}`} onClick={()=>{this.onClick(label)}}>
+        <UpCircleOutlined style={{marginRight: 10}}/>
         <Tooltip placement="bottomLeft" title={label}>
-          <strong onClick={()=>{this.onClick(label)}}>{label}</strong>
+          <a style={{ color: 'rgba(57,57,57,0.85)'}}>
+            <strong >{label}</strong>
+          </a>
         </Tooltip>
       </div>
     );
