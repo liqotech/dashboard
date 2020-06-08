@@ -3,7 +3,7 @@ import Graph from "react-graph-vis";
 import './GraphNet.css';
 import image from '../../assets/database.png'
 import Utils from '../../services/Utils';
-import { Button, Modal } from 'antd';
+import { Badge, Button, Modal } from 'antd';
 import JsonToTableAntd from '../../editors/JsonToTable/JsonToTableAntd';
 
 class GraphNet extends Component {
@@ -30,7 +30,9 @@ class GraphNet extends Component {
               _this.setState({ isClustered: false });
             } else {
               _this.setState({
-                titleModal: event.nodes[0],
+                titleModal: (
+                  <Badge status="processing" text={event.nodes[0]} />
+                ),
                 showModal: true,
                 contentModal: (
                   /** Just show the default information */
