@@ -6,6 +6,7 @@ import LoadingIndicator from '../common/LoadingIndicator';
 import 'react-resizable/css/styles.css';
 import { APP_NAME } from '../constants';
 import { Responsive, WidthProvider } from 'react-grid-layout';
+import Measure from 'react-measure';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -15,14 +16,11 @@ class CustomView extends Component {
   constructor(props) {
     super(props);
 
-    if(!this.props.location.state) {
-      this.props.history.push("/");
-    }
-
     this.flag = true;
 
     this.state = {
-      templates: this.props.location.state.view.spec.templates,
+      templates: [],
+      customView: null,
       CRDs: [],
       isLoading: true,
       layout: { lg: [] } ,
@@ -31,12 +29,11 @@ class CustomView extends Component {
       newBr: 'lg'
     }
 
-    if(this.props.location.state.view.spec.layout){
-      this.state.layout = this.props.location.state.view.spec.layout;
-    }
-
     this.loadCRD = this.loadCRD.bind(this);
+    this.getCustomViews = this.getCustomViews.bind(this);
     this.props.api.CRDArrayCallback.push(this.loadCRD);
+    this.props.api.CVArrayCallback.push(this.getCustomViews);
+
     this.generateLayout = this.generateLayout.bind(this);
     this.childSize = this.childSize.bind(this);
     this.onResize = this.onResize.bind(this);
@@ -46,12 +43,31 @@ class CustomView extends Component {
     this.onBreakpointChange = this.onBreakpointChange.bind(this);
   }
 
+  /** Update the custom views */
+  getCustomViews(customViews){
+    let customView = customViews.find(item => {
+      return item.metadata.name === this.props.match.params.viewName;
+    })
+    this.state.customView = customView;
+    this.state.templates = customView.spec.templates;
+    this.loadCRD();
+  }
+
   loadCRD(apiCRDs){
     if(!apiCRDs){
+      if(this.state.CRDs.length !== this.state.templates.length){
+        this.state.CRDs = [];
+      }
       this.setState({isLoading: true});
     } else {
-      this.setState({CRDs: []});
+      if(this.state.CRDs.length !== this.state.templates.length){
+        this.state.CRDs = [];
+      } else {
+        return;
+      }
     }
+
+    this.resetKind();
 
     this.state.templates.forEach(item => {
       let res = this.props.api.getCRDfromKind(item.kind);
@@ -86,7 +102,8 @@ class CustomView extends Component {
     this.state.templates.forEach(item => {
       if(item.name){
         let res = this.props.api.getCRDfromKind(item.name);
-        res.spec.names.kind = item.kind;
+        if(res)
+          res.spec.names.kind = item.kind;
       }
     });
   }
@@ -98,7 +115,7 @@ class CustomView extends Component {
       CRDView.push(
         <div key={item.metadata.name}>
           <CRD
-            CRD={item}
+            CRD={item.metadata.name}
             api={this.props.api}
             onCustomView={true}
             resizeParentFunc={this.childSize}
@@ -157,7 +174,13 @@ class CustomView extends Component {
   }
 
   componentDidMount() {
-    this.loadCRD();
+    this.state.customView = this.props.api.customViews.find(item => {
+      return item.metadata.name === this.props.match.params.viewName;
+    })
+    if(this.state.customView){
+      this.state.templates = this.state.customView.spec.templates;
+      this.loadCRD();
+    }
   }
 
   /** Save layout to CR when exit */
@@ -169,21 +192,24 @@ class CustomView extends Component {
      * Then save the layout
      */
     this.props.api.CRDArrayCallback = [];
+    this.props.api.CVArrayCallback = this.props.api.CVArrayCallback.filter(func => {
+      return func !== this.getCustomViews;
+    });
     this.props.api.abortAllWatchers();
     this.resetKind();
-    this.props.location.state.view.spec.layout = this.state.layout;
-    for(let i = 0; i < this.props.location.state.view.spec.layout.lg.length; i++){
-      delete this.props.location.state.view.spec.layout.lg[i].isDraggable;
-      delete this.props.location.state.view.spec.layout.lg[i].static;
+    this.state.customView.spec.layout = this.state.layout;
+    for(let i = 0; i < this.state.customView.spec.layout.lg.length; i++){
+      delete this.state.customView.spec.layout.lg[i].isDraggable;
+      delete this.state.customView.spec.layout.lg[i].static;
     }
-    let array = this.props.location.state.view.metadata.selfLink.split('/');
+    let array = this.state.customView.metadata.selfLink.split('/');
     this.props.api.updateCustomResource(
       array[2],
       array[3],
-      this.props.location.state.view.metadata.namespace,
+      this.state.customView.metadata.namespace,
       array[6],
-      this.props.location.state.view.metadata.name,
-      this.props.location.state.view
+      this.state.customView.metadata.name,
+      this.state.customView
     ).catch((error) => {
       console.log(error);
     })
@@ -263,16 +289,32 @@ class CustomView extends Component {
       return <LoadingIndicator />
 
     return (
-      <div style={{marginRight: 20}}>
-        <ResponsiveGridLayout className="react-grid-layout" layouts={this.state.layout} margin={[40, 0]}
-                              breakpoints={{lg: 1000, md: 796, sm: 568, xs: 280, xxs: 0}}
-                              cols={{lg: 3, md: 2, sm: 1, xs: 1, xxs: 1}}
-                              compactType={'vertical'} rowHeight={10} onResizeStop={this.onResize}
-                              onLayoutChange={this.onLayoutChange} onBreakpointChange={this.onBreakpointChange}
-        >
-          {this.state.CRDView}
-        </ResponsiveGridLayout>
-      </div>
+      <Measure
+        /** This measurement is used to detect resize when the sidebar is collapsed */
+        bounds
+        onResize={() => {
+          /**
+           * This is an ugly workaround but it's the best solution I found:
+           *  it is necessary because the ResponsiveGridLayout's WidthProvider
+           *  only detect width resize when the actual window is being resized,
+           *  so here I trigger the event to trick it
+           */
+          window.dispatchEvent(new Event('resize'))
+        }}
+      >
+        {({measureRef}) => (
+          <div ref={measureRef}>
+            <ResponsiveGridLayout className="react-grid-layout" layouts={this.state.layout} margin={[40, 0]}
+                                  breakpoints={{lg: 1000, md: 796, sm: 568, xs: 280, xxs: 0}}
+                                  cols={{lg: 3, md: 2, sm: 1, xs: 1, xxs: 1}}
+                                  compactType={'vertical'} rowHeight={10} onResizeStop={this.onResize}
+                                  onLayoutChange={this.onLayoutChange} onBreakpointChange={this.onBreakpointChange}
+            >
+              {this.state.CRDView}
+            </ResponsiveGridLayout>
+          </div>
+        )}
+      </Measure>
     );
   }
 }
