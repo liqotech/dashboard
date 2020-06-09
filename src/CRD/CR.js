@@ -78,6 +78,8 @@ class CR extends Component {
       })
       .catch(error => {
         console.log(error);
+        if(error.response)
+          this.props.history.push("/error/" + error.response.statusCode);
         this.setState({
           deleted: false
         });

@@ -173,6 +173,7 @@ class App extends Component {
         api: api
       };
       /** Get the CRDs at the start of the app */
+      this.state.api.loadCustomViewsCRs();
       this.state.api.getCRDs().catch(error => {
         console.log(error);
         if(error.response)
@@ -188,6 +189,7 @@ class App extends Component {
         api: api,
         user: user.profile
       });
+      this.state.api.loadCustomViewsCRs();
       /** Get the CRDs at the start of the app */
       this.state.api.getCRDs().catch(error => {
         console.log(error);

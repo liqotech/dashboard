@@ -33,7 +33,6 @@ class CRD extends Component {
      * @param template: CR of the template (if there is a template selected for this CRD)
      * @param isDraggable: if on a custom view, if the component is allowed to be dragged around
      * @param isPinned: if on a custom view, if the component is set static
-     * @param isFavourite: if the CRD is pinned on the sidebar
      * @param CRshown: actual custom resources shown in the page
      * @param multi: if the template is a cluster of more custom resources
      */
@@ -45,32 +44,10 @@ class CRD extends Component {
       template: null,
       isDraggable: false,
       isPinned: false,
-      isFavourite: false,
       CRshown: [],
       multi: false,
       customViews: []
     }
-
-    /** In case we are not on a custom view */
-    if(!this.props.onCustomView){
-      /** If there is no CRD passed from a parent component, get it using the api */
-      if(this.props.location.state === undefined){
-        this.state.CRD = this.props.api.getCRDfromName(this.props.match.params.crdName);
-        if(this.state.CRD){
-          this.loadCustomResources();
-        }
-      } else {
-        this.state.CRD = this.props.location.state.CRD;
-        this.loadCustomResources();
-      }
-    }
-    /** In case we are in a custom view */
-    else {
-      this.state.CRD = this.props.CRD;
-      this.loadCustomResources();
-    }
-
-    this.tempTemplate = null;
 
     this.reloadCRD = this.reloadCRD.bind(this);
     this.getCustomViews = this.getCustomViews.bind(this);
@@ -86,22 +63,27 @@ class CRD extends Component {
 
   /** Update state if a CRD is loaded or changed */
   reloadCRD(CRDs){
+    let CRD;
     if(CRDs){
-      let CRD;
       if(this.props.onCustomView){
-        CRD = this.props.api.getCRDfromName(this.props.CRD.metadata.name);
+        CRD = CRDs.find(item => {
+          return item.metadata.name === this.props.CRD;
+        });
       } else {
-        CRD = this.props.api.getCRDfromName(this.props.match.params.crdName);
+        CRD = CRDs.find(item => {
+          return item.metadata.name === this.props.match.params.crdName;
+        });
       }
-      if(JSON.stringify(CRD) !== JSON.stringify(this.state.CRD)) {
-        this.setState({ CRD: CRD });
-      }
+      this.setState({ CRD: CRD });
     }
   }
 
+  /** Update the custom views */
+  getCustomViews(customViews){
+    this.setState({customViews: customViews});
+  }
+
   loadCustomResources() {
-    if(this.state.CRD.metadata.annotations && this.state.CRD.metadata.annotations.favourite)
-      this.state.isFavourite=true;
 
     /** First get all the CR */
     this.props.api.getCustomResourcesAllNamespaces(this.state.CRD)
@@ -126,42 +108,6 @@ class CRD extends Component {
       }
     ).catch((error) => {
       console.log(error);
-    })
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if(!prevState.CRD && this.state.CRD){
-      this.loadCustomResources();
-    }
-    if(this.props.onCustomView) {
-      if (this.props.CRD !== this.state.CRD) {
-        this.setState({
-          CRD: this.props.CRD
-        });
-        this.findTemplate(this.props.CRD);
-      }
-    }
-  }
-
-  getCustomViews(){
-    let CRD = {
-      spec: {
-        group: 'crd-template.liqo.com',
-        version: 'v1',
-        names: {
-          plural: 'views'
-        }
-      }
-    }
-    /** First get all the CR */
-    this.props.api.getCustomResourcesAllNamespaces(CRD)
-      .then((res) => {
-          this.setState({
-            customViews: res.body.items
-          });
-        }
-      ).catch((error) => {
-      console.log(error);
       if(error.response)
         this.props.history.push("/error/" + error.response.statusCode);
     })
@@ -169,14 +115,38 @@ class CRD extends Component {
 
   componentDidMount() {
     this.props.api.CRDArrayCallback.push(this.reloadCRD);
+    this.props.api.CVArrayCallback.push(this.getCustomViews);
+
+    /** In case we are not on a custom view */
     if(!this.props.onCustomView){
-      this.getCustomViews();
+      /** Get the custom views */
+      this.state.customViews = this.props.api.customViews;
+      /** Get the CRD */
+      this.state.CRD = this.props.api.getCRDfromName(this.props.match.params.crdName);
+    }
+    /** In case we are in a custom view */
+    else {
+      this.state.CRD = this.props.api.getCRDfromName(this.props.CRD);
+    }
+    if(this.state.CRD){
+      this.loadCustomResources();
+    }
+
+    this.tempTemplate = null;
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if(!prevState.CRD && this.state.CRD){
+      this.loadCustomResources();
     }
   }
 
+  /** When unmounting, eliminate every callback and watch */
   componentWillUnmount() {
+    console.log('unmount');
     this.props.api.abortAllWatchers(this.state.CRD.spec.names.plural);
-    this.props.api.CRDArrayCallback.filter(func => {return func !== this.reloadCRD});
+    this.props.api.CRDArrayCallback = this.props.api.CRDArrayCallback.filter(func => {return func !== this.reloadCRD});
+    this.props.api.CVArrayCallback = this.props.api.CVArrayCallback.filter(func => {return func !== this.getCustomViews});
   }
 
   /**
@@ -221,7 +191,7 @@ class CRD extends Component {
 
   /** Update CRD with the 'favourite' annotation */
   handleClick_fav(){
-    if(!this.state.isFavourite){
+    if(!this.state.CRD.metadata.annotations || !this.state.CRD.metadata.annotations.favourite){
       this.state.CRD.metadata.annotations.favourite = 'true';
     } else {
       this.state.CRD.metadata.annotations.favourite = null;
@@ -230,8 +200,6 @@ class CRD extends Component {
       this.state.CRD.metadata.name,
       this.state.CRD
     )
-    this.setState({
-      isFavourite: !this.state.isFavourite});
   }
 
   /** check if this CRD is already in a custom view */
@@ -300,23 +268,27 @@ class CRD extends Component {
   header() {
     const items = [];
 
-    this.state.customViews.forEach(item => {
-      items.push(
-        <Menu.Item key={item.metadata.name} onClick={this.handleClick_addToView}>
-          {
-            item.spec.name ? (
-              <span style={this.checkAlreadyInView(item.metadata.name) ? {
-                color: 'red'
-              } : null}>{ item.spec.name }</span>
-            ) : (
-              <span style={this.checkAlreadyInView(item.metadata.name) ? {
-                color: 'red'
-              } : null}>{ item.metadata.name }</span>
-            )
-          }
-        </Menu.Item>
-      )
-    });
+    //console.log(this.state.CRD.metadata.annotations);
+
+    if(this.props.api.customViews){
+      this.state.customViews.forEach(item => {
+        items.push(
+          <Menu.Item key={item.metadata.name} onClick={this.handleClick_addToView}>
+            {
+              item.spec.name ? (
+                <span style={this.checkAlreadyInView(item.metadata.name) ? {
+                  color: 'red'
+                } : null}>{ item.spec.name }</span>
+              ) : (
+                <span style={this.checkAlreadyInView(item.metadata.name) ? {
+                  color: 'red'
+                } : null}>{ item.metadata.name }</span>
+              )
+            }
+          </Menu.Item>
+        )
+      });
+    }
 
     if(items.length === 0){
       items.push(
@@ -403,7 +375,11 @@ class CRD extends Component {
           }} >
             {this.state.CRD.spec.names.kind}
           </Link>
-          <Rate className="crd-fav" count={1} defaultValue={this.state.isFavourite ? 1 : 0}
+          <Rate className="crd-fav" count={1}
+                value={
+                  this.state.CRD.metadata.annotations &&
+                  this.state.CRD.metadata.annotations.favourite ? 1 : 0
+                }
                 onChange={this.handleClick_fav}
                 style={{marginLeft: 0}}
           />

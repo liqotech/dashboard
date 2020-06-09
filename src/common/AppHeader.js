@@ -14,50 +14,47 @@ const Header = Layout.Header;
 const { Title } = Typography;
     
 class AppHeader extends Component {
-    constructor(props) {
-      super(props);
-      this.autoCompleteSearch = this.autoCompleteSearch.bind(this);
-      this.state = {
-        CRDs: []
-      }
-      this.onSearch = this.onSearch.bind(this);
-      if(this.props.api){
-        this.props.api.autoCompleteCallback = this.autoCompleteSearch;
-      }
+  constructor(props) {
+    super(props);
+    this.autoCompleteSearch = this.autoCompleteSearch.bind(this);
+    this.state = {
+      CRDs: []
     }
-
-    autoCompleteSearch(CRDs){
-      let tempCRDs = [];
-
-      CRDs.forEach(item =>{
-        tempCRDs.push({
-          value: item.spec.names.kind,
-          singular: item.spec.names.singular,
-          name: item.metadata.name
-        })
-      });
-
-      this.setState({CRDs: tempCRDs});
+    this.onSearch = this.onSearch.bind(this);
+    if(this.props.api){
+      this.props.api.autoCompleteCallback = this.autoCompleteSearch;
     }
+  }
 
-    onSearch(value){
-      let CRD = this.state.CRDs.find(item=>{
-        if(item.value === value || item.singular === value){
-          return item;
-        }
-      });
+  autoCompleteSearch(CRDs){
+    let tempCRDs = [];
+    CRDs.forEach(item =>{
+      tempCRDs.push({
+        value: item.spec.names.kind,
+        singular: item.spec.names.singular,
+        name: item.metadata.name
+      })
+    });
+    this.setState({CRDs: tempCRDs});
+  }
 
-      if(CRD){
-        this.props.history.push("/customresources/" + CRD.name);
+  onSearch(value){
+    let CRD = this.state.CRDs.find(item=>{
+      if(item.value === value || item.singular === value){
+        return item;
       }
+    });
+    if(CRD){
+      this.props.history.push("/customresources/" + CRD.name);
     }
+  }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-      if(!prevProps.api && this.props.api){
-        this.setState({CRDs: this.props.api.CRDs});
-        this.props.api.autoCompleteCallback = this.autoCompleteSearch;
-      }
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if(!prevProps.api && this.props.api){
+      this.setState({CRDs: this.props.api.CRDs});
+      this.props.api.autoCompleteCallback = this.autoCompleteSearch;
     }
+  }
 
   render() {
       const options = this.state.CRDs;
@@ -87,13 +84,13 @@ class AppHeader extends Component {
           <div className="container">
             <Row className="app-title" align="middle">
               <Col>
-                <img src={require('../assets/logo.png')} className="image" alt="image"/>
+                <img src={require('../assets/logo_3.png')} className="image" alt="image"/>
                 <Link to="/">
                   <Title level={3} style={{color: '#326be2'}} className="title">{APP_NAME}</Title>
                 </Link>
               </Col>
               <Col>
-                <Divider type="vertical" style={{marginLeft: 70, height: 40}}/>
+                <Divider type="vertical" style={{marginLeft: 61, height: 40}}/>
               </Col>
               <Col>
                 <AutoComplete
@@ -102,7 +99,7 @@ class AppHeader extends Component {
                   }
                   options={options}
                   onSelect={this.onSearch}
-                  style={{ width: 400, marginLeft: 20, lineHeight: '35px' }}
+                  style={{ width: '22vw', marginLeft: 20, lineHeight: '35px' }}
                 >
                   <Input.Search placeholder="input CRD" enterButton onSearch={this.onSearch} />
                 </AutoComplete>
