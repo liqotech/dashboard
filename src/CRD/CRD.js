@@ -13,11 +13,11 @@ import GraphNet from '../templates/graph/GraphNet';
 import Utils from '../services/Utils';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
 import PictureOutlined from '@ant-design/icons/lib/icons/PictureOutlined';
-import Measure from 'react-measure';
 import DragOutlined from '@ant-design/icons/lib/icons/DragOutlined';
 import PushpinOutlined from '@ant-design/icons/lib/icons/PushpinOutlined';
 import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
 import { Menu } from 'antd';
+import ReactResizeDetector from 'react-resize-detector';
 const { Title } = Typography;
 
 class CRD extends Component {
@@ -606,74 +606,70 @@ class CRD extends Component {
     }
 
     return (
-      <Measure
-        /** This measurement is used by the custom views */
-        bounds
-        onResize={(contentRect) => {
-          if(this.props.resizeParentFunc){
-            this.props.resizeParentFunc(contentRect.bounds.bottom - contentRect.bounds.top, this.state.CRD.metadata.name);
-          }
-        }}
-      >
-        {({measureRef}) => (
-          <div className="crds-container" style={{maxWidth: width}}>
-            <div className="crd-content" ref={measureRef} >
-              { !this.state.deleted ? (
-                <div>
-                  <div className="crd-header">
-                    <Layout style={{background: '#fff'}}>
-                      {this.header()}
-                    </Layout>
-                    <Layout style={{background: '#fff'}}>
-                      <Tabs defaultActiveKey="2" tabBarExtraContent={
-                        this.state.template || this.tempTemplate ? (
-                            <div style={{float: 'right'}}>
-                              <Tooltip placement="topRight" title="Change CR design">
-                                <Switch defaultChecked onChange={this.changeTemplate}/>
-                              </Tooltip>
-                            </div>
-                          ) : null
-                      }>
-                        <Tabs.TabPane tab="Annotations" key="1">
-                          {
-                            CRD_annotations.length > 0 ? (
-                              <div>{CRD_annotations}</div>
-                            ) : (
-                              <Empty description={<strong>No annotations</strong>}/>
-                            )
-                          }
-                        </Tabs.TabPane>
-                        <Tabs.TabPane tab="Resources" key="2">
-                          {CRViews}
-                          { !this.state.multi ? (
-                            <div className="no-crds-found" style={{marginTop: 30}}>
-                              <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
-                                          defaultPageSize={5}
-                                          onChange={this.paginationChange}
-                                          showSizeChanger={false} />
-                            </div>
-                          ) : null}
-                        </Tabs.TabPane>
-                        {/** Show the JSON Schema of the CRD */}
-                        <Tabs.TabPane tab="Schema" key="3">
-                          {
-                            schema ? (
-                              <pre>{JSON.stringify(schema.properties.spec, null, 2)}</pre>
-                              ) : (
-                              <Empty description={<strong>No schema for this CRD</strong>}/>
-                              )
-                          }
-                        </Tabs.TabPane>
-                      </Tabs>
-                    </Layout>
-                  </div>
+      <div>
+        <ReactResizeDetector handleHeight
+                             onResize={(width, height) => {
+                               if(this.props.resizeParentFunc){
+                                 this.props.resizeParentFunc(height, this.state.CRD.metadata.name);
+                               }
+                             }} />
+        <div className="crds-container" style={{maxWidth: width}}>
+          <div className="crd-content">
+            { !this.state.deleted ? (
+              <div>
+                <div className="crd-header">
+                  <Layout style={{background: '#fff'}}>
+                    {this.header()}
+                  </Layout>
+                  <Layout style={{background: '#fff'}}>
+                    <Tabs defaultActiveKey="2" tabBarExtraContent={
+                      this.state.template || this.tempTemplate ? (
+                        <div style={{float: 'right'}}>
+                          <Tooltip placement="topRight" title="Change CR design">
+                            <Switch defaultChecked onChange={this.changeTemplate}/>
+                          </Tooltip>
+                        </div>
+                      ) : null
+                    }>
+                      <Tabs.TabPane tab="Annotations" key="1">
+                        {
+                          CRD_annotations.length > 0 ? (
+                            <div>{CRD_annotations}</div>
+                          ) : (
+                            <Empty description={<strong>No annotations</strong>}/>
+                          )
+                        }
+                      </Tabs.TabPane>
+                      <Tabs.TabPane tab="Resources" key="2">
+                        {CRViews}
+                        { !this.state.multi ? (
+                          <div className="no-crds-found" style={{marginTop: 30}}>
+                            <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
+                                        defaultPageSize={5}
+                                        onChange={this.paginationChange}
+                                        showSizeChanger={false} />
+                          </div>
+                        ) : null}
+                      </Tabs.TabPane>
+                      {/** Show the JSON Schema of the CRD */}
+                      <Tabs.TabPane tab="Schema" key="3">
+                        {
+                          schema ? (
+                            <pre>{JSON.stringify(schema.properties.spec, null, 2)}</pre>
+                          ) : (
+                            <Empty description={<strong>No schema for this CRD</strong>}/>
+                          )
+                        }
+                      </Tabs.TabPane>
+                    </Tabs>
+                  </Layout>
                 </div>
-              ) : null
-              }
-            </div>
+              </div>
+            ) : null
+            }
           </div>
-        )}
-      </Measure>
+        </div>
+      </div>
     );
   }
 }

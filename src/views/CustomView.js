@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import './CustomView.css';
 import CRD from '../CRD/CRD';
-import { notification } from 'antd';
 import LoadingIndicator from '../common/LoadingIndicator';
 import 'react-resizable/css/styles.css';
-import { APP_NAME } from '../constants';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import Measure from 'react-measure';
+import ReactResizeDetector from 'react-resize-detector';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -50,6 +48,9 @@ class CustomView extends Component {
     })
     this.state.customView = customView;
     this.state.templates = customView.spec.templates;
+    if(this.state.customView.spec.layout){
+      this.state.layout = this.state.customView.spec.layout;
+    }
     this.loadCRD();
   }
 
@@ -88,6 +89,21 @@ class CustomView extends Component {
         }
         CRDs.push(res);
         this.setState({CRDs: CRDs});
+
+        /** if there's a layout for this CRD, set it */
+        let CRDlayout = null;
+        if (this.state.layout.lg) {
+          CRDlayout = this.state.layout.lg.find(item => {return item.i === CRDs[CRDs.length - 1].metadata.name})
+          if(CRDlayout){
+            CRDs[CRDs.length - 1].x = CRDlayout.x;
+            CRDs[CRDs.length - 1].y = CRDlayout.y;
+            CRDs[CRDs.length - 1].height = CRDlayout.h;
+            CRDs[CRDs.length - 1].width = CRDlayout.w;
+            CRDs[CRDs.length - 1].draggable = false;
+            CRDs[CRDs.length - 1].static = false;
+          }
+        }
+
         this.generateCRDView();
         if(CRDs.length === this.state.templates.length)
           this.generateLayout();
@@ -178,6 +194,9 @@ class CustomView extends Component {
       return item.metadata.name === this.props.match.params.viewName;
     })
     if(this.state.customView){
+      if(this.state.customView.spec.layout){
+        this.state.layout = this.state.customView.spec.layout;
+      }
       this.state.templates = this.state.customView.spec.templates;
       this.loadCRD();
     }
@@ -289,32 +308,29 @@ class CustomView extends Component {
       return <LoadingIndicator />
 
     return (
-      <Measure
-        /** This measurement is used to detect resize when the sidebar is collapsed */
-        bounds
-        onResize={() => {
+      <div>
+        {
           /**
            * This is an ugly workaround but it's the best solution I found:
            *  it is necessary because the ResponsiveGridLayout's WidthProvider
            *  only detect width resize when the actual window is being resized,
            *  so here I trigger the event to trick it
            */
-          window.dispatchEvent(new Event('resize'))
-        }}
-      >
-        {({measureRef}) => (
-          <div ref={measureRef}>
-            <ResponsiveGridLayout className="react-grid-layout" layouts={this.state.layout} margin={[40, 0]}
-                                  breakpoints={{lg: 1000, md: 796, sm: 568, xs: 280, xxs: 0}}
-                                  cols={{lg: 3, md: 2, sm: 1, xs: 1, xxs: 1}}
-                                  compactType={'vertical'} rowHeight={10} onResizeStop={this.onResize}
-                                  onLayoutChange={this.onLayoutChange} onBreakpointChange={this.onBreakpointChange}
-            >
-              {this.state.CRDView}
-            </ResponsiveGridLayout>
-          </div>
-        )}
-      </Measure>
+        }
+        <ReactResizeDetector skipOnMount handleWidth
+                             refreshMode={'throttle'} refreshRate={150}
+                             onResize={() => {
+                               window.dispatchEvent(new Event('resize'));
+                             }} />
+        <ResponsiveGridLayout className="react-grid-layout" layouts={this.state.layout} margin={[40, 0]}
+                              breakpoints={{lg: 1000, md: 796, sm: 568, xs: 280, xxs: 0}}
+                              cols={{lg: 3, md: 2, sm: 1, xs: 1, xxs: 1}}
+                              compactType={'vertical'} rowHeight={10} onResizeStop={this.onResize}
+                              onLayoutChange={this.onLayoutChange} onBreakpointChange={this.onBreakpointChange}
+        >
+          {this.state.CRDView}
+        </ResponsiveGridLayout>
+      </div>
     );
   }
 }

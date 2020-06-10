@@ -5,10 +5,8 @@ import DesktopOutlined from '@ant-design/icons/lib/icons/DesktopOutlined';
 import './SideBar.css';
 import DashboardOutlined from '@ant-design/icons/lib/icons/DashboardOutlined';
 import SettingOutlined from '@ant-design/icons/lib/icons/SettingOutlined';
-import { APP_NAME } from '../constants';
 import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
 import StarOutlined from '@ant-design/icons/lib/icons/StarOutlined';
-import Measure from 'react-measure';
 const Sider = Layout.Sider;
 
 class SideBar extends Component {

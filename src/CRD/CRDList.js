@@ -9,7 +9,7 @@ import 'react-resizable/css/styles.css';
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const { Title } = Typography;
 import { Pagination } from 'antd';
-import Measure from 'react-measure';
+import ReactResizeDetector from 'react-resize-detector';
 
 class CRDList extends Component {
   constructor(props) {
@@ -179,46 +179,43 @@ class CRDList extends Component {
     });
 
     return (
-      <Measure
-        /** This measurement is used to detect resize when the sidebar is collapsed */
-        bounds
-        onResize={() => {
-          /**
-           * This is an ugly workaround but it's the best solution I found:
-           *  it is necessary because the ResponsiveGridLayout's WidthProvider
-           *  only detect width resize when the actual window is being resized,
-           *  so here I trigger the event to trick it
-           */
-          window.dispatchEvent(new Event('resize'))
-        }}
-      >
-        {({measureRef}) => (
-          <div ref={measureRef}>
-            <div className="crds-container">
-              <ResponsiveGridLayout className="react-grid-layout" layouts={this.state.layout} margin={[40, 40]}
-                                    breakpoints={{lg: 1000, md: 796, sm: 568}}
-                                    cols={{lg: 2, md: 2, sm: 1}} rowHeight={300}
-                                    compactType={'horizontal'} onBreakpointChange={this.onBreakpointChange}>
-                {CRDViews}
-              </ResponsiveGridLayout>
+      <div>
+        {
+         /**
+         * This is an ugly workaround but it's the best solution I found:
+         *  it is necessary because the ResponsiveGridLayout's WidthProvider
+         *  only detect width resize when the actual window is being resized,
+         *  so here I trigger the event to trick it
+         */
+        }
+        <ReactResizeDetector skipOnMount handleWidth
+                             refreshMode={'throttle'} refreshRate={150}
+                             onResize={() => {
+                               window.dispatchEvent(new Event('resize'));
+                             }} />
+        <div className="crds-container">
+          <ResponsiveGridLayout className="react-grid-layout" layouts={this.state.layout} margin={[40, 40]}
+                                breakpoints={{lg: 1000, md: 796, sm: 568}}
+                                cols={{lg: 2, md: 2, sm: 1}} rowHeight={300}
+                                compactType={'horizontal'} onBreakpointChange={this.onBreakpointChange}>
+            {CRDViews}
+          </ResponsiveGridLayout>
 
-              {!this.state.isLoading && CRDViews.length === 0 ? (
-                <div className="no-crds-found">
-                  <Empty description={<strong>No CRDs found</strong>}/>
-                </div>
-              ) : null}
-              {this.state.isLoading ? <LoadingIndicator /> : null}
-              {!this.state.isLoading && CRDViews.length > 0 ? (
-                <div className="no-crds-found" style={{marginTop: 30}}>
-                  <Pagination defaultCurrent={this.state.currentPage} total={this.state.CRDs.length}
-                              onChange={this.paginationChange}
-                              showSizeChanger={false} />
-                </div>
-              ) : null}
+          {!this.state.isLoading && CRDViews.length === 0 ? (
+            <div className="no-crds-found">
+              <Empty description={<strong>No CRDs found</strong>}/>
             </div>
-          </div>
-        )}
-      </Measure>
+          ) : null}
+          {this.state.isLoading ? <LoadingIndicator /> : null}
+          {!this.state.isLoading && CRDViews.length > 0 ? (
+            <div className="no-crds-found" style={{marginTop: 30}}>
+              <Pagination defaultCurrent={this.state.currentPage} total={this.state.CRDs.length}
+                          onChange={this.paginationChange}
+                          showSizeChanger={false} />
+            </div>
+          ) : null}
+        </div>
+      </div>
     );
   }
 }
