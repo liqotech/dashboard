@@ -84,7 +84,7 @@ class AppHeader extends Component {
           <div className="container">
             <Row className="app-title" align="middle">
               <Col>
-                <img src={require('../assets/logo_3.png')} className="image" alt="image"/>
+                <img src={require('../assets/logo_4.png')} className="image" alt="image"/>
                 <Link to="/">
                   <Title level={3} style={{color: '#326be2'}} className="title">{APP_NAME}</Title>
                 </Link>
