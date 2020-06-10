@@ -143,7 +143,6 @@ class CRD extends Component {
 
   /** When unmounting, eliminate every callback and watch */
   componentWillUnmount() {
-    console.log('unmount');
     this.props.api.abortAllWatchers(this.state.CRD.spec.names.plural);
     this.props.api.CRDArrayCallback = this.props.api.CRDArrayCallback.filter(func => {return func !== this.reloadCRD});
     this.props.api.CVArrayCallback = this.props.api.CVArrayCallback.filter(func => {return func !== this.getCustomViews});

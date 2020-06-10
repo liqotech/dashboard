@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { Divider, Layout } from 'antd';
 const Footer = Layout.Footer;
+import './AppFooter.css';
 
 class AppFooter extends Component {
   constructor(props) {

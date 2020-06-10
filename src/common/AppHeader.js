@@ -80,39 +80,32 @@ class AppHeader extends Component {
       }
 
       return (
-        <Header className="app-header">
-          <div className="container">
-            <Row className="app-title" align="middle">
-              <Col>
-                <img src={require('../assets/logo_4.png')} className="image" alt="image"/>
-                <Link to="/">
-                  <Title level={3} style={{color: '#326be2'}} className="title">{APP_NAME}</Title>
-                </Link>
-              </Col>
-              <Col>
-                <Divider type="vertical" style={{marginLeft: 61, height: 40}}/>
-              </Col>
-              <Col>
-                <AutoComplete
-                  filterOption={(inputValue, option) =>
-                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                  options={options}
-                  onSelect={this.onSearch}
-                  style={{ width: '22vw', marginLeft: 20, lineHeight: '35px' }}
-                >
-                  <Input.Search placeholder="input CRD" enterButton onSearch={this.onSearch} />
-                </AutoComplete>
-              </Col>
-            </Row>
-            <Menu
-              className="app-menu"
-              mode="horizontal"
-              style={{ lineHeight: '64px' }} >
-                {menuItems}
-            </Menu>
-          </div>
-        </Header>
+        <div>
+          <Header className="app-header">
+            <div className="container">
+              <Row className="app-title" align="middle">
+                <Col>
+                  <AutoComplete
+                    filterOption={(inputValue, option) =>
+                      option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                    options={options}
+                    onSelect={this.onSearch}
+                    style={{ width: '22vw', marginLeft: 5, lineHeight: '31px' }}
+                  >
+                    <Input.Search placeholder="input CRD" enterButton onSearch={this.onSearch} />
+                  </AutoComplete>
+                </Col>
+              </Row>
+            </div>
+          </Header>
+          <Menu
+            className="app-menu"
+            mode="horizontal"
+            style={{ lineHeight: '64px' }} >
+            {menuItems}
+          </Menu>
+        </div>
       );
     }
 }

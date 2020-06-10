@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Layout, Menu, notification } from 'antd';
+import { Col, Divider, Layout, Menu, Row, Typography } from 'antd';
 import DesktopOutlined from '@ant-design/icons/lib/icons/DesktopOutlined';
 import './SideBar.css';
 import DashboardOutlined from '@ant-design/icons/lib/icons/DashboardOutlined';
 import SettingOutlined from '@ant-design/icons/lib/icons/SettingOutlined';
 import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
 import StarOutlined from '@ant-design/icons/lib/icons/StarOutlined';
+import { APP_NAME } from '../constants';
+const { Title } = Typography;
 const Sider = Layout.Sider;
 
 class SideBar extends Component {
@@ -98,9 +100,20 @@ class SideBar extends Component {
                onCollapse={this.onCollapse}
                breakpoint="lg"
         >
-          <div className="logo" />
-          <Menu mode="inline" defaultOpenKeys={['sub_fav']}>
-            <Menu.Item key="1" style={{ marginTop: 8}}>
+          <div className="app-title" align="middle">
+              <img src={require('../assets/logo_4.png')}
+                   className="image" alt="image"
+                   style={this.state.collapsed ? {marginLeft: 22} : null}
+              />
+              {!this.state.collapsed ? (
+                <Link to="/">
+                  <Title level={3} style={{color: '#326be2'}} className="title" ellipsis>{APP_NAME}</Title>
+                </Link>
+              ) : null}
+          </div>
+          <Menu mode="inline" defaultOpenKeys={['sub_fav']}
+                defaultSelectedKeys={'1'} style={{ marginTop: 16}}>
+            <Menu.Item key="1">
               <Link to="/">
                 <DashboardOutlined style={{ fontSize: '20px' }} />
                 <span>Home</span>

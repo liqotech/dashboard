@@ -56,9 +56,7 @@ class CustomView extends Component {
 
   loadCRD(apiCRDs){
     if(!apiCRDs){
-      if(this.state.CRDs.length !== this.state.templates.length){
-        this.state.CRDs = [];
-      }
+      this.state.CRDs = [];
       this.setState({isLoading: true});
     } else {
       if(this.state.CRDs.length !== this.state.templates.length){
