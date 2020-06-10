@@ -417,6 +417,20 @@ export default class ApiManager {
    * @param object: object modified/added/deleted
    */
   CRDsNotifyEvent(type, object) {
+
+    /**
+     * When the watcher starts it returns the state of the k8s system,
+     *  so every CRD that's in the system will be returned with type: ADDED
+     *  To avoid the computational overhead of that, filter out the CRD that
+     *  are in fact not changed (field resourceVersion)
+     */
+    if(type === 'ADDED' && this.CRDs.find((item) => {
+      return item.metadata.name === object.metadata.name;
+    }).metadata.resourceVersion === object.metadata.resourceVersion){
+      return;
+    }
+
+    /** This deepcopy is the thread killer */
     let CRDs = JSON.parse(JSON.stringify(this.CRDs));
 
     let index = CRDs.indexOf(CRDs.find((item) => {
