@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Col, Divider, Layout, Menu, Row, Typography } from 'antd';
+import { Layout, Menu, Typography } from 'antd';
 import DesktopOutlined from '@ant-design/icons/lib/icons/DesktopOutlined';
 import './SideBar.css';
 import DashboardOutlined from '@ant-design/icons/lib/icons/DashboardOutlined';
@@ -106,9 +106,13 @@ class SideBar extends Component {
                    style={this.state.collapsed ? {marginLeft: 22} : null}
               />
               {!this.state.collapsed ? (
-                <Link to="/">
+                {/*<Link to="/">
                   <Title level={3} style={{color: '#326be2'}} className="title" ellipsis>{APP_NAME}</Title>
-                </Link>
+                </Link>*/},
+                <img src={require('../assets/name.png')}
+                     alt="image"
+                     style={{height: 30, width: 120, marginTop: 17}}
+                />
               ) : null}
           </div>
           <Menu mode="inline" defaultOpenKeys={['sub_fav']}
