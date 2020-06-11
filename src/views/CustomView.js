@@ -61,6 +61,7 @@ class CustomView extends Component {
     } else {
       if(this.state.CRDs.length !== this.state.templates.length){
         this.state.CRDs = [];
+        this.setState({isLoading: true});
       } else {
         return;
       }

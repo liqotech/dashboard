@@ -41,8 +41,6 @@ class App extends Component {
 
     /** all is needed to manage an OIDC session */
     this.manageOIDCSession();
-
-    console.log(this.props.location.pathname);
   }
 
   render() {
@@ -71,43 +69,43 @@ class App extends Component {
     ]
 
     /** Routes present only if logged in and apiManager created */
-    if(this.state.api){
+    if(this.state.api && this.state.logged){
       routes.push([
         <Route key={'/'}
                exact path="/"
-               render={(props) => this.state.logged ? (
+               render={(props) =>
                  <DashboardGeneral {...props} api={this.state.api} user={this.state.user}/>
-               ): (<Redirect to = "/login"/>)}/>,
+               }/>,
         <Route key={'customresources'}
                exact path="/customresources"
-               component={(props) => this.state.logged ? (
+               component={(props) =>
                  <CRDList {...props} api={this.state.api} />
-               ): (<Redirect to = "/login"/>)}/>,
+               }/>,
         <Route key={'crd'}
                exact path="/customresources/:crdName"
-               component={(props) => this.state.logged ? (
+               component={(props) =>
                  <CRD {...props} api={this.state.api} />
-               ): (<Redirect to = "/login"/>)}/>,
+               }/>,
         <Route key={'crd_create'}
                exact path="/customresources/:crdName/create"
-               render={(props) => this.state.logged ? (
+               render={(props) =>
                  <NewCR {...props} api={this.state.api} />
-               ): (<Redirect to = "/login"/>)}/>,
+               }/>,
         <Route key={'crd_editor'}
                exact path="/customresources/:crdName/representation_editor"
-               render={(props) => this.state.logged ? (
+               render={(props) =>
                  <DesignEditorCRD {...props} api={this.state.api} />
-               ): (<Redirect to = "/login"/>)}/>,
+               }/>,
         <Route key={'crd_update'}
                exact path="/customresources/:crdName/:crName/update"
-               render={(props) => this.state.logged ? (
+               render={(props) =>
                  <UpdateCR {...props} api={this.state.api} />
-               ): (<Redirect to = "/login"/>)}/>,
+               }/>,
         <Route key={'customview'}
                exact path="/customview/:viewName/"
-               component={(props) => this.state.logged ? (
+               component={(props) =>
                  <CustomView {...props} api={this.state.api} />
-               ): (<Redirect to = "/login"/>)}/>
+               }/>
       ])
     } else {
       routes.push([
@@ -144,7 +142,7 @@ class App extends Component {
     /** global notification config */
     notification.config({
       placement: 'bottomLeft',
-      bottom: 20,
+      bottom: 30,
       duration: 3,
     });
 

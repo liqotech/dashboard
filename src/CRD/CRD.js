@@ -642,7 +642,7 @@ class CRD extends Component {
                       <Tabs.TabPane tab="Resources" key="2">
                         {CRViews}
                         { !this.state.multi ? (
-                          <div className="no-crds-found" style={{marginTop: 30}}>
+                          <div className="no-crds-found">
                             <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
                                         defaultPageSize={5}
                                         onChange={this.paginationChange}
