@@ -69,7 +69,6 @@ class DesignEditorCRD extends Component {
       templates: this.props.api.getTemplates(),
       isLoading: false
     });
-
   }
 
   componentDidMount() {
