@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  namespace: nap-test
+  name: liqo-dashboard-content
+spec:
+  rules:
+    - host: liqodashboard.crown-labs.ipv6.polito.it
+      http:
+        paths:
+          - backend:
+              serviceName: liqo-dashboard
+              servicePort: 80
+            path: /
+  tls:
+    - hosts:
+        - liqodashboard.crown-labs.ipv6.polito.it
+      secretName: dashboard-cert

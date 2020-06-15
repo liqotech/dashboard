@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: liqo-dashboard-env-vars
+data:
+  oidc_client_id: "k8s"
+  oidc_provider_url: "https://auth.crown-labs.ipv6.polito.it/auth/realms/crownlabs"
+  oidc_client_secret: "81266530-d39d-4193-af5a-acda494f0b01"
+  oidc_redirect_uri: "https://liqodashboard.crown-labs.ipv6.polito.it"
+  apiserver_url: "https://apiserver.crown-labs.ipv6.polito.it"
