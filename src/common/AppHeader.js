@@ -11,7 +11,7 @@ import NotificationOutlined from '@ant-design/icons/lib/icons/NotificationOutlin
 import { APP_NAME } from '../constants';
 import LogoutOutlined from '@ant-design/icons/lib/icons/LogoutOutlined';
 const Header = Layout.Header;
-const { Title } = Typography;
+const { Title, Text } = Typography;
     
 class AppHeader extends Component {
   constructor(props) {
@@ -30,7 +30,7 @@ class AppHeader extends Component {
     let tempCRDs = [];
     CRDs.forEach(item =>{
       tempCRDs.push({
-        value: item.spec.names.kind,
+        value: item.spec.names.kind + '@' + item.metadata.name,
         singular: item.spec.names.singular,
         name: item.metadata.name
       })
@@ -87,13 +87,13 @@ class AppHeader extends Component {
                 <Col>
                   <AutoComplete
                     filterOption={(inputValue, option) =>
-                      option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                      option.name.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                     }
                     options={options}
                     onSelect={this.onSearch}
                     style={{ width: '22vw', marginLeft: 5, lineHeight: '31px' }}
                   >
-                    <Input.Search placeholder="input CRD" enterButton onSearch={this.onSearch} />
+                    <Input.Search placeholder="input CRD" enterButton onSearch={this.onSearch} allowClear />
                   </AutoComplete>
                 </Col>
               </Row>

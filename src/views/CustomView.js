@@ -70,10 +70,10 @@ class CustomView extends Component {
     this.resetKind();
 
     this.state.templates.forEach(item => {
-      let res = this.props.api.getCRDfromKind(item.kind);
+      let res = this.props.api.getCRDfromName(item.kind);
 
       if(!res && item.name){
-        res = this.props.api.getCRDfromKind(item.name);
+        res = this.props.api.getCRDfromName(item.name);
       }
       /** CRDs could be no yet loaded */
       if(res){

@@ -18,7 +18,7 @@ import PushpinOutlined from '@ant-design/icons/lib/icons/PushpinOutlined';
 import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
 import { Menu } from 'antd';
 import ReactResizeDetector from 'react-resize-detector';
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 class CRD extends Component {
   constructor(props) {
@@ -220,14 +220,14 @@ class CRD extends Component {
     const index = cv.spec.templates.indexOf(
       cv.spec.templates.find(item => {
         if(item)
-          return item.kind === this.state.CRD.spec.names.kind;
+          return item.kind === this.state.CRD.metadata.name;
       }));
 
     if(index !== -1){
       cv.spec.templates[index] = null;
     } else {
       cv.spec.templates.push({
-        kind: this.state.CRD.spec.names.kind
+        kind: this.state.CRD.metadata.name
       });
     }
 
@@ -304,10 +304,12 @@ class CRD extends Component {
     return (
       <div>
         <Row>
-          <Col flex={8}>
+          <Col flex={7}>
             <Breadcrumb separator={'>'}>
               <Breadcrumb.Item>CRD</Breadcrumb.Item>
-              <Breadcrumb.Item>{this.state.CRD.metadata.name}</Breadcrumb.Item>
+              <Breadcrumb.Item>
+                <Text ellipsis>{this.state.CRD.metadata.name}</Text>
+              </Breadcrumb.Item>
             </Breadcrumb>
           </Col>
           {
@@ -577,7 +579,7 @@ class CRD extends Component {
       })
       if(CRViews.length === 0) {
         CRViews.push(
-          <Empty description={<strong>No resources present</strong>}/>
+          <Empty key={'empty_res'} description={<strong>No resources present</strong>}/>
         )
       }
     }
@@ -635,7 +637,7 @@ class CRD extends Component {
                           CRD_annotations.length > 0 ? (
                             <div>{CRD_annotations}</div>
                           ) : (
-                            <Empty description={<strong>No annotations</strong>}/>
+                            <Empty key={'empty_ann'} description={<strong>No annotations</strong>}/>
                           )
                         }
                       </Tabs.TabPane>
@@ -656,7 +658,7 @@ class CRD extends Component {
                           schema ? (
                             <pre>{JSON.stringify(schema.properties.spec, null, 2)}</pre>
                           ) : (
-                            <Empty description={<strong>No schema for this CRD</strong>}/>
+                            <Empty key={'empty_schema'} description={<strong>No schema for this CRD</strong>}/>
                           )
                         }
                       </Tabs.TabPane>

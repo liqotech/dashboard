@@ -6,7 +6,7 @@ import {
   Divider,
   notification, PageHeader,
   Popconfirm,
-  Tooltip
+  Tooltip, Typography
 } from 'antd';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 import { Link } from 'react-router-dom';
@@ -17,6 +17,8 @@ import HistoChart from '../templates/histogram/HistoChart';
 import ErrorBoundary from '../error-handles/ErrorBoundary';
 import UpCircleOutlined from '@ant-design/icons/lib/icons/UpCircleOutlined';
 import JsonToTableAntd from '../editors/JsonToTable/JsonToTableAntd';
+import DeleteOutlined from '@ant-design/icons/lib/icons/DeleteOutlined';
+const { Text } = Typography;
 
 class CR extends Component {
   constructor(props) {
@@ -43,11 +45,7 @@ class CR extends Component {
 
   /** Make the JSON visible or invisible */
   handleClick_show() {
-    if (!this.state.showJSON) {
-      this.setState({ showJSON: true });
-    } else {
-      this.setState({ showJSON: false });
-    }
+    this.setState({showJSON: !this.state.showJSON});
   }
 
   /** Delete the CR */
@@ -135,19 +133,15 @@ class CR extends Component {
             <PageHeader
               className="cr-header"
               title={
-                <Breadcrumb separator={'>'}>
-                  <Breadcrumb.Item>
-                    {
-                      <div>
-                        <UpCircleOutlined style={{ marginRight: 10 }}
-                                          onClick={this.handleClick_Info}
-                                          rotate={this.state.showInfo ? 180 : 0}
-                        />
-                        <a style={{ color: 'rgba(57,57,57,0.85)'}} onClick={this.handleClick_Info}>{this.props.cr.metadata.name}</a>
-                      </div>
-                    }
-                  </Breadcrumb.Item>
-                </Breadcrumb>
+                <div style={{fontSize: 14}}>
+                  <UpCircleOutlined style={{ marginRight: 10 }}
+                                    onClick={this.handleClick_Info}
+                                    rotate={this.state.showInfo ? 180 : 0}
+                  />
+                  <Text strong ellipsis style={{minWidth: 200}}>
+                    <a style={{ color: 'rgba(57,57,57,0.85)'}} onClick={this.handleClick_Info}>{this.props.cr.metadata.name}</a>
+                  </Text>
+                </div>
               }
               extra={
                 <div>
@@ -174,24 +168,27 @@ class CR extends Component {
                       />
                     </Tooltip>
                   </Link>
-                  <Button
-                    onClick={this.handleClick_show}
-                    style={{ marginRight: 15 }}
-                  >
-                    JSON
-                  </Button>
-                  <Popconfirm
-                    placement="topRight"
-                    title="Are you sure?"
-                    icon={<ExclamationCircleOutlined style={{ color: 'red' }}/>}
-                    onConfirm={this.handleClick_delete}
-                    okText="Yes"
-                    cancelText="No"
-                  >
-                    <Button type="primary" danger>
-                      Delete
+                  <Tooltip title={'Show JSON'}>
+                    <Button
+                      onClick={this.handleClick_show}
+                      style={ !this.state.showJSON ?
+                        { marginRight: 15 } : { marginRight: 15, color: '#1890FF' }}
+                    >
+                      JSON
                     </Button>
-                  </Popconfirm>
+                  </Tooltip>
+                  <Tooltip title={'Delete resource'}>
+                    <Popconfirm
+                      placement="topRight"
+                      title="Are you sure?"
+                      icon={<ExclamationCircleOutlined style={{ color: 'red' }}/>}
+                      onConfirm={this.handleClick_delete}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Button type="primary" danger icon={<DeleteOutlined />}/>
+                    </Popconfirm>
+                  </Tooltip>
                 </div>
               }
             >
@@ -200,7 +197,11 @@ class CR extends Component {
                 <div>
                   <Divider style={{marginTop: 4, marginBottom: 10}}/>
                   {this.state.showJSON ? (
-                    <pre>{JSON.stringify(this.props.cr.spec, null, 2)}</pre>
+                    <div>
+                      {this.props.cr.spec ? (<pre>{JSON.stringify(this.props.cr.spec, null, 2)}</pre>) : null}
+                      {this.props.cr.status ? (<pre>{JSON.stringify(this.props.cr.status, null, 2)}</pre>) : null}
+                    </div>
+
                   ) : null}
                   {!this.state.showJSON && this.props.template
                     ? this.getChart()
