@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './DesignEditorCRD.css';
-import { Typography, Button, notification, Layout, Menu, Divider, Row, Col, Steps } from 'antd';
+import { Typography, Button, notification, Layout, Menu,
+  Divider, Row, Col, Steps, Carousel, Tabs, Card } from 'antd';
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/theme-monokai';
@@ -10,6 +11,7 @@ import PieChart from '../templates/piechart/PieChart';
 import HistoChart from '../templates/histogram/HistoChart';
 import { APP_NAME } from '../constants';
 import GraphNet from '../templates/graph/GraphNet';
+import ReactResizeDetector from 'react-resize-detector';
 
 const { Title } = Typography;
 const { Step } = Steps;
@@ -18,20 +20,17 @@ class DesignEditorCRD extends Component {
   constructor(props) {
     super(props);
 
-    // Return to CRD page if accessed not from the CRD page
-    if (!this.props.api.kcc.apiServer) {
-      this.props.history.push("/customresources/" + this.props.match.params.crdName);
-    }
-
     this.state = {
       example_CR: null,
       schema_object: null,
       isLoading: true,
       templates: [],
       chosen_template: null,
-      current: 0,
+      currentStep: 0,
+      currentTab: '0',
       save_enabled: false,
       CR_chosen_template: null,
+      editorWidth: "auto",
       template_form:
         (
           <div style={{textAlign: 'center'}}>
@@ -47,10 +46,9 @@ class DesignEditorCRD extends Component {
           </Title>
         )
     };
-    if(this.props.location.state.CR) {
-      this.state.example_CR = this.props.location.state.CR;
-    }
-    this.CRD = this.props.location.state.CRD;
+
+    this.state.example_CR = this.props.CR;
+    this.CRD = this.props.CRD;
     this.loadTemplates = this.loadTemplates.bind(this);
     this.onClick_design = this.onClick_design.bind(this);
     this.content = this.content.bind(this);
@@ -60,9 +58,8 @@ class DesignEditorCRD extends Component {
   }
 
   loadTemplates(){
-
-    if(this.props.location.state.CR) {
-      this.setState({example_CR: this.props.location.state.CR});
+    if(this.props.CR) {
+      this.setState({example_CR: this.props.CR});
     }
 
     this.setState({
@@ -72,15 +69,14 @@ class DesignEditorCRD extends Component {
   }
 
   componentDidMount() {
-    if (this.props.api.kcc.apiServer) {
-      this.loadTemplates();
-    }
+    this.loadTemplates();
   }
 
   submit(CR_template){
     this.setState({CR_chosen_template: CR_template},
       () => {this.preview(CR_template)});
-    this.setState({current: 2, save_enabled: true});
+    this.setState({currentStep: 2, save_enabled: true});
+    this.changeTab("2");
   }
 
   preview(CR_template) {
@@ -178,9 +174,12 @@ class DesignEditorCRD extends Component {
   }
 
   onClick_design(value){
-    this.setState({chosen_template: this.props.api.getCRDfromKind(value.key)},
+    this.setState({chosen_template: this.props.api.getCRDfromKind(value)},
       () => {this.content()});
-    this.setState({current: 1});
+    this.setState({
+      currentStep: 1,
+    });
+    this.changeTab("1");
   }
 
   // modify the CRD and add a CR of the template
@@ -196,7 +195,6 @@ class DesignEditorCRD extends Component {
       this.state.CR_chosen_template.metadata.namespace,
       this.state.chosen_template.spec.names.plural,
       this.state.CR_chosen_template).then(() => {
-      // this.props.history.push("/customresources/" + this.props.match.params.crdName);
       notification.success({
         message: APP_NAME,
         description: 'New Resource created'
@@ -210,24 +208,27 @@ class DesignEditorCRD extends Component {
       });
     }).then(() => {
         this.props.api.updateCustomResourceDefinition(
-          this.props.match.params.crdName,
+          this.CRD.metadata.name,
           this.CRD
         ).then(() => {
-          this.props.history.push("/customresources/" + this.props.match.params.crdName);
           notification.success({
             message: APP_NAME,
             description: 'CRD modified'
           });
+          this.props.this.setState({showEditor: false});
         }).catch((error) => {
           console.log(error);
-          notification.error({
-            message: APP_NAME,
-            description: 'Could not modify the CRD'
-          });
         })
       }
     )
   }
+
+  changeTab = activeKey => {
+    // console.log(118, activeKey);
+    this.setState({
+      currentTab: activeKey
+    });
+  };
 
   render() {
     if (this.state.isLoading){
@@ -237,51 +238,55 @@ class DesignEditorCRD extends Component {
       const options = [];
       this.state.templates.forEach(item => {
         options.push(
-          <Menu.Item key={item.kind} onClick={this.onClick_design}>
-            {item.kind}
-          </Menu.Item>
+          <Card.Grid key={item.kind}
+                     style={{width: '45%', textAlign: 'center',
+                       marginLeft: 15, marginRight: 15,
+                       marginTop: 15, marginBottom: 15}}
+                     onClick={() => {this.onClick_design(item.kind)}}>
+              {item.kind}
+          </Card.Grid>
         );
       })
 
       return (
-        <div className="rep-crd-content">
-          <Title level={4}>
-            {'Choose the design for: ' + this.CRD.spec.names.kind}
-          </Title>
-          <Divider/>
-          <Layout style={{background: '#fff'}}>
-            <Layout.Content>
-              <Row justify="space-around" align="middle">
-                <Col span={11}>
-                  {this.state.template_form}
-                </Col>
-                <Col span={1}>
-                  <Divider type="vertical" style={{minHeight: 400}}/>
-                </Col>
-                <Col span={12}>
-                  {this.state.preview}
-                </Col>
-              </Row>
-            </Layout.Content>
-            <Layout.Sider style={{background: '#fff'}}>
-              <Menu mode="vertical-right">
-                {options}
-              </Menu>
-            </Layout.Sider>
-          </Layout>
-          <Divider/>
-          <Steps current={this.state.current}>
-            <Step title="Select design" />
-            <Step title="Submit values" />
-            <Step title={
-              <Button disabled={!this.state.save_enabled}
-                      type="primary" style={{width: 200}}
-                      onClick={this.onClick_save}
-              >
-                Save it
-              </Button>
-            } />
-          </Steps>
+        <div>
+          <ReactResizeDetector handleWidth
+                               onResize={(w) => {this.setState({
+                                 editorWidth: w
+                               })}}/>
+          <div style={{marginBottom: 100}}>
+            <Tabs type="card" animated activeKey={this.state.currentTab} onChange={this.changeTab}>
+              <Tabs.TabPane tab={'Template'} key={"0"}>
+                <Card bordered={false}>
+                  {options}
+                </Card>
+              </Tabs.TabPane>
+              <Tabs.TabPane tab={'Form'} key={"1"}>
+                {this.state.template_form}
+              </Tabs.TabPane>
+              <Tabs.TabPane tab={'Preview'} key={"2"}>
+                {this.state.preview}
+              </Tabs.TabPane>
+            </Tabs>
+          </div>
+          <div style={{
+            width: this.state.editorWidth, position: 'fixed',
+            bottom: 0, backgroundColor: '#fff', paddingBottom: 30
+          }}>
+            <Divider style={{marginTop: 4}}/>
+            <Steps current={this.state.currentStep}>
+              <Step title="Select design" />
+              <Step title="Submit values" />
+              <Step title={
+                <Button disabled={!this.state.save_enabled}
+                        type="primary" style={{width: 200}}
+                        onClick={this.onClick_save}
+                >
+                  Save it
+                </Button>
+              } />
+            </Steps>
+          </div>
         </div>
       )
     }
