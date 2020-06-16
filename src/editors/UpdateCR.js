@@ -7,6 +7,7 @@ import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/theme-monokai';
 import LoadingIndicator from '../common/LoadingIndicator';
+import ReactResizeDetector from 'react-resize-detector';
 import { APP_NAME } from '../constants';
 
 const { Title } = Typography;
@@ -15,15 +16,11 @@ class UpdateCR extends Component {
   constructor(props) {
     super(props);
 
-    // Return to CRD page if accessed not from the CRD page
-    if(!this.props.location.state.CR) {
-      this.props.history.push("/customresources/" + this.props.match.params.crdName);
-    }
-
-    this.CR = this.props.location.state.CR;
+    this.CR = this.props.CR;
     this.state = {
       value: JSON.stringify(this.CR.spec, null, 2),
-      isLoading: false
+      isLoading: false,
+      editorWidth: "auto"
     };
     this.onChange = this.onChange.bind(this);
     this.onClick = this.onClick.bind(this);
@@ -50,11 +47,11 @@ class UpdateCR extends Component {
     this.setState({isLoading: true});
 
     let promise = this.props.api.updateCustomResource(
-      this.props.location.state.group,
-      this.props.location.state.version,
+      this.props.group,
+      this.props.version,
       this.CR.metadata.namespace,
-      this.props.location.state.plural,
-      this.props.match.params.crName,
+      this.props.plural,
+      this.props.CR.metadata.name,
       item
     );
 
@@ -63,7 +60,7 @@ class UpdateCR extends Component {
         this.setState({
           isLoading: false
         });
-        this.props.history.push("/customresources/" + this.props.match.params.crdName);
+        this.props.this.setState({showUpdate: false});
         notification.success({
           message: APP_NAME,
           description: 'Resource updated'
@@ -87,18 +84,19 @@ class UpdateCR extends Component {
   inputText() {
     return(
       <div>
+        <ReactResizeDetector handleWidth
+                             onResize={(w) => {this.setState({
+                               editorWidth: w + 'px'
+                             })}}/>
         <AceEditor
           mode="yaml"
           theme="monokai"
           fontSize={16}
           value={this.state.value}
-          showPrintMargin={true}
-          showGutter={true}
           onChange={this.onChange}
-          highlightActiveLine={true}
-          showLineNumbers={true}
           tabSize={2}
-          width="100%"
+          height={'75vh'}
+          width={this.state.editorWidth}
         />
         <div style={{marginTop: 20}}>
           <Button onClick={this.onClick} style={{width: "20%"}}>OK</Button>
@@ -109,10 +107,7 @@ class UpdateCR extends Component {
 
   render() {
     return (
-      <div className="update-cr-content">
-        <Title level={4} >
-          {"Update " + this.props.match.params.crName}
-        </Title>
+      <div>
         { !this.state.isLoading ? (
             <Tabs>
               <Tabs.TabPane tab="JSON/YAML" key="1">
