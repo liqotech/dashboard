@@ -71,7 +71,7 @@ module.exports = {
         'theme-color': '#000000',
         description: 'Kubernetes dashboard'
       },
-      favicon: 'src/assets/k8s-2.png'
+      favicon: 'src/assets/logo_4.png'
     }),
     new webpack.DefinePlugin({
       OIDC_PROVIDER_URL: JSON.stringify(process.env.OIDC_PROVIDER_URL),
