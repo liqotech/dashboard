@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './NewCR.css';
-import { Tabs, Typography, Button, notification, message } from 'antd';
+import { Tabs, Typography, Button, notification, message, Drawer, Badge } from 'antd';
 import AceEditor from 'react-ace';
 import YAML from 'yaml';
 import 'ace-builds/src-noconflict/mode-json';
@@ -9,6 +9,7 @@ import 'ace-builds/src-noconflict/theme-monokai';
 import LoadingIndicator from '../common/LoadingIndicator';
 import { APP_NAME } from '../constants';
 import FormGenerator from './OAPIV3FormGenerator/FormGenerator';
+import ReactResizeDetector from 'react-resize-detector';
 
 const { Title } = Typography;
 
@@ -16,17 +17,13 @@ class NewCR extends Component {
   constructor(props) {
     super(props);
 
-    // Return to CRD page if accessed not from the CRD page
-    if(!this.props.location.state.CRD) {
-      this.props.history.push("/customresources/" + this.props.match.params.crdName);
-    }
-
     this.state = {
       value: '',
       schema_object: null,
-      isLoading: false
+      isLoading: false,
+      editorWidth: "auto"
     };
-    this.CRD = this.props.location.state.CRD;
+    this.CRD = this.props.CRD;
     this.onChange = this.onChange.bind(this);
     this.onClick = this.onClick.bind(this);
     this.submit = this.submit.bind(this);
@@ -80,13 +77,14 @@ class NewCR extends Component {
         this.setState({
           isLoading: false
         });
-        this.props.history.push("/customresources/" + this.props.match.params.crdName);
         notification.success({
           message: APP_NAME,
           description: 'Resource created'
         });
+        this.props.this.setState({showCreate: false});
       })
-      .catch(() => {
+      .catch((error) => {
+        console.log(error);
         this.setState({
           isLoading: false
         });
@@ -104,6 +102,10 @@ class NewCR extends Component {
   inputText() {
     return(
       <div>
+        <ReactResizeDetector handleWidth
+                             onResize={(w) => {this.setState({
+                               editorWidth: w + 'px'
+                             })}}/>
         <AceEditor
           mode="yaml"
           theme="monokai"
@@ -115,7 +117,8 @@ class NewCR extends Component {
           highlightActiveLine={true}
           showLineNumbers={true}
           tabSize={2}
-          width="100%"
+          width={this.state.editorWidth}
+          height="75vh"
         />
         <div style={{marginTop: 20}}>
           <Button onClick={this.onClick} style={{width: "20%"}}>OK</Button>
@@ -126,20 +129,17 @@ class NewCR extends Component {
 
   render() {
     return (
-      <div className="new-cr-content">
-        <Title level={4} >
-          {"Create a new " + this.CRD.spec.names.kind + " resource"}
-        </Title>
+      <div>
         { !this.state.isLoading ? (
-            <Tabs>
-              <Tabs.TabPane tab="JSON/YAML" key="1">
-                {this.inputText()}
-              </Tabs.TabPane>
-              <Tabs.TabPane tab="Easy version (WIP)" key="2">
-                <FormGenerator CRD={this.CRD} submit={this.submit}/>
-              </Tabs.TabPane>
-            </Tabs>
-          ) : null }
+          <Tabs>
+            <Tabs.TabPane tab="JSON/YAML" key="1">
+              {this.inputText()}
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="Form Generator" key="2">
+              <FormGenerator CRD={this.CRD} submit={this.submit}/>
+            </Tabs.TabPane>
+          </Tabs>
+        ) : null }
         { this.state.isLoading ? <LoadingIndicator /> : null }
       </div>
     );
