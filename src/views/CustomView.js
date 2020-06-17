@@ -33,7 +33,6 @@ class CustomView extends Component {
     this.props.api.CVArrayCallback.push(this.getCustomViews);
 
     this.generateLayout = this.generateLayout.bind(this);
-    this.childSize = this.childSize.bind(this);
     this.onResize = this.onResize.bind(this);
     this.childDrag = this.childDrag.bind(this);
     this.childPin = this.childPin.bind(this);
@@ -127,15 +126,20 @@ class CustomView extends Component {
     let CRDView = [];
 
     this.state.CRDs.forEach(item => {
+      let height = 350;
+      let CRDs = this.state.CRDs;
+      let index = CRDs.indexOf(CRDs.find(_item => {return _item.metadata.name === item.metadata.name}));
+      if(CRDs[index].height)
+        height = (CRDs[index].height * 350) + (CRDs[index].height - 1)*20 ;
       CRDView.push(
         <div key={item.metadata.name}>
           <CRD
             CRD={item.metadata.name}
             api={this.props.api}
             onCustomView={true}
-            resizeParentFunc={this.childSize}
             dragFunc={this.childDrag}
             pinFunc={this.childPin}
+            height={height}
           />
         </div>
       );
@@ -182,10 +186,11 @@ class CustomView extends Component {
       });
     }
     this.setState({
-      layout: {lg: layout},
       isLoading: false,
       oldBr: this.state.newBr
-    });
+    }, () => {this.onLayoutChange(layout)});
+
+    //console.log(191, layout);
   }
 
   componentDidMount() {
@@ -233,38 +238,16 @@ class CustomView extends Component {
     })
   }
 
-  /** If the child component's size have changed, change the layout */
-  childSize(size, id){
-    let CRDs = this.state.CRDs;
-    let index = CRDs.indexOf(CRDs.find(item => {return item.metadata.name === id}));
-    CRDs[index].height = (size/10) + 2;
-    this.setState({CRDs: CRDs});
-    this.generateLayout();
-  }
-
   childLogic(id, type){
     let CRDs = this.state.CRDs;
     let index = CRDs.indexOf(CRDs.find(item => {return item.metadata.name === id}));
     if(type === 'drag') {
-      if(!CRDs[index].draggable){
-        CRDs[index].draggable = true;
-      } else {
-        CRDs[index].draggable = !CRDs[index].draggable;
-      }
+      CRDs[index].draggable = !CRDs[index].draggable;
     } else {
-      if(!CRDs[index].static){
-        CRDs[index].static = true;
-      } else {
-        CRDs[index].static = !CRDs[index].static;
-      }
+      CRDs[index].static = !CRDs[index].static;
     }
-    this.setState({CRDs: CRDs});
+    this.state.CRDs = CRDs;
     this.generateLayout();
-    if(CRDs[index].draggable){
-      this.childSize((CRDs[index].height*10)-19, CRDs[index].metadata.name);
-    } else {
-      this.childSize((CRDs[index].height*10)-21, CRDs[index].metadata.name);
-    }
   }
 
   /** Enable child component's draggable */
@@ -280,19 +263,44 @@ class CustomView extends Component {
   onResize(layout, oldLayoutItem, layoutItem) {
     // `oldLayoutItem` contains the state of the item before the resize.
     // You can modify `layoutItem` to enforce constraints.
+    if(!oldLayoutItem) return;
 
+    /** When changing width */
     if(oldLayoutItem.w !== layoutItem.w){
       let CRDs = this.state.CRDs;
       let index = CRDs.indexOf(CRDs.find(item => {return item.metadata.name === layoutItem.i}));
       CRDs[index].width = layoutItem.w;
-      this.setState({CRDs: CRDs});
+      this.state.CRDs = CRDs;
       this.generateLayout();
-    } else {
-      layoutItem.h = oldLayoutItem.h;
+    }
+    /** When changing height */
+    if(oldLayoutItem.h !== layoutItem.h){
+      let CRDs = this.state.CRDs;
+      let index = CRDs.indexOf(CRDs.find(item => {return item.metadata.name === layoutItem.i}));
+      let offset = (layoutItem.h - 1) * 20;
+      if(layoutItem.h < oldLayoutItem.h){
+        offset = -(offset);
+      }
+        this.state.CRDView[index] = (
+          <div key={CRDs[index].metadata.name}>
+            <CRD
+              CRD={CRDs[index].metadata.name}
+              api={this.props.api}
+              onCustomView={true}
+              resizeParentFunc={this.childSize}
+              dragFunc={this.childDrag}
+              pinFunc={this.childPin}
+              height={(layoutItem.h * 350) + offset}
+            />
+          </div>
+        )
+        CRDs[index].height = layoutItem.h;
+        this.setState({CRDs: CRDs});
     }
   }
 
   onLayoutChange(layout){
+    console.log(layout);
     this.setState({layout: {lg: layout}});
   }
 
@@ -321,10 +329,10 @@ class CustomView extends Component {
                              onResize={() => {
                                window.dispatchEvent(new Event('resize'));
                              }} />
-        <ResponsiveGridLayout className="react-grid-layout" layouts={this.state.layout} margin={[40, 0]}
+        <ResponsiveGridLayout className="react-grid-layout" layouts={this.state.layout} margin={[40, 20]}
                               breakpoints={{lg: 1000, md: 796, sm: 568, xs: 280, xxs: 0}}
                               cols={{lg: 3, md: 2, sm: 1, xs: 1, xxs: 1}}
-                              compactType={'vertical'} rowHeight={10} onResizeStop={this.onResize}
+                              compactType={'vertical'} rowHeight={350} onResizeStop={this.onResize}
                               onLayoutChange={this.onLayoutChange} onBreakpointChange={this.onBreakpointChange}
         >
           {this.state.CRDView}

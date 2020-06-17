@@ -4,7 +4,7 @@ import './CRDList.css';
 import {
   Badge, Breadcrumb, Button, Layout, Dropdown,
   notification, Tabs, Tag, Typography, Popover, Row, Tooltip,
-  Col, Descriptions, Switch, Pagination, Empty, Rate, message, Drawer
+  Col, Descriptions, Switch, Pagination, Empty, Rate, message, Drawer, Card
 } from 'antd';
 import CR from './CR';
 import { Link } from 'react-router-dom';
@@ -102,7 +102,7 @@ class CRD extends Component {
         CRshown: res.body.items.slice(0, 5)
       });
 
-      console.log(103, res.body.items);
+      //console.log(103, res.body.items);
 
       this.setState({isLoading: false});
 
@@ -384,51 +384,62 @@ class CRD extends Component {
                 onChange={this.handleClick_fav}
                 style={{marginLeft: 0}}
           />
-          <div style={{float: "right"}}>
-            <Tooltip title={'Edit design'} placement={'bottom'}>
-              <Button icon={<PictureOutlined />} size={'large'} type="primary"
-                      style={{marginLeft: 15}} onClick={() => {this.setState({showEditor: true})}}>
-              </Button>
-            </Tooltip>
-            <Drawer
-              title={
-                <Badge status="processing"
-                       text={'Customize the design for: ' + this.state.CRD.spec.names.kind}
-                />
-              }
-              placement={'right'}
-              visible={this.state.showEditor}
-              onClose={() => {this.setState({showEditor: false})}}
-              width={'40%'}
-            >
-              <DesignEditorCRD CRD={this.state.CRD}
-                               this={this} api={this.props.api}
-                               CR={this.state.custom_resources}
-              />
-            </Drawer>
-            <Tooltip title={'Create new resource'} placement={'bottomRight'}>
-              <Button icon={<PlusOutlined />} size={'large'} type="primary"
-                      style={{marginLeft: 15}}
-                      onClick={() => {
-                        this.setState({showCreate: true});
-                      }}
-              >
-              </Button>
-            </Tooltip>
-            <Drawer
-              title={
-                <Badge status="processing"
-                       text={"Create a new " + this.state.CRD.spec.names.kind + " resource"}
-                />
-              }
-              placement={'right'}
-              visible={this.state.showCreate}
-              onClose={() => {this.setState({showCreate: false})}}
-              width={'40%'}
-            >
-              <NewCR CRD={this.state.CRD} this={this} api={this.props.api} />
-            </Drawer>
-          </div>
+          {
+            !this.props.onCustomView ? (
+              <div style={{float: "right"}}>
+                <Tooltip title={'Edit design'} placement={'bottom'}>
+                  <Button icon={<PictureOutlined />} size={'large'} type="primary"
+                          style={{marginLeft: 15}} onClick={() => {this.setState({showEditor: true})}}>
+                  </Button>
+                </Tooltip>
+                <Drawer
+                  title={
+                    <Badge status="processing"
+                           text={'Customize the design for: ' + this.state.CRD.spec.names.kind}
+                    />
+                  }
+                  placement={'right'}
+                  visible={this.state.showEditor}
+                  onClose={() => {this.setState({showEditor: false})}}
+                  width={'40%'}
+                >
+                  <DesignEditorCRD CRD={this.state.CRD}
+                                   this={this} api={this.props.api}
+                                   CR={this.state.custom_resources}
+                  />
+                </Drawer>
+                <Tooltip title={'Create new resource'} placement={'bottomRight'}>
+                  <Button icon={<PlusOutlined />} size={'large'} type="primary"
+                          style={{marginLeft: 15}}
+                          onClick={() => {
+                            this.setState({showCreate: true});
+                          }}
+                  >
+                  </Button>
+                </Tooltip>
+                <Drawer
+                  title={
+                    <Badge status="processing"
+                           text={"Create a new " + this.state.CRD.spec.names.kind + " resource"}
+                    />
+                  }
+                  placement={'right'}
+                  visible={this.state.showCreate}
+                  onClose={() => {this.setState({showCreate: false})}}
+                  width={'40%'}
+                >
+                  <NewCR CRD={this.state.CRD} this={this} api={this.props.api} />
+                </Drawer>
+              </div>
+            ) : (
+              this.state.template || this.tempTemplate ? (
+                <div style={{float: 'right'}}>
+                  <Tooltip placement="bottomRight" title="Change CR design">
+                    <Switch defaultChecked onChange={this.changeTemplate}/>
+                  </Tooltip>
+                </div>
+              ) : null
+            )}
         </Title>
         <Descriptions style={{marginTop: 20, marginLeft: 15}}>
           <Descriptions.Item>
@@ -618,14 +629,8 @@ class CRD extends Component {
 
     return (
       <div>
-        <ReactResizeDetector handleHeight
-                             onResize={(width, height) => {
-                               if(this.props.resizeParentFunc){
-                                 this.props.resizeParentFunc(height, this.state.CRD.metadata.name);
-                               }
-                             }} />
         <div className="crds-container" style={{maxWidth: width}}>
-          <div className="crd-content">
+          <div className="crd-content" style={this.props.height ? {height: this.props.height, overflow: 'auto'} : null}>
             { !this.state.deleted ? (
               <div>
                 <div className="crd-header">
@@ -633,46 +638,63 @@ class CRD extends Component {
                     {this.header()}
                   </Layout>
                   <Layout style={{background: '#fff'}}>
-                    <Tabs defaultActiveKey="2" tabBarExtraContent={
-                      this.state.template || this.tempTemplate ? (
-                        <div style={{float: 'right'}}>
-                          <Tooltip placement="topRight" title="Change CR design">
-                            <Switch defaultChecked onChange={this.changeTemplate}/>
-                          </Tooltip>
+                    <Layout.Content>
+                      { this.props.onCustomView ? (
+                        <div>
+                          {CRViews}
+                          { !this.state.multi && this.state.custom_resources.length > 5 ? (
+                            <div className="no-crds-found">
+                              <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
+                                          defaultPageSize={5}
+                                          onChange={this.paginationChange}
+                                          showSizeChanger={false} />
+                            </div>
+                          ) : null}
                         </div>
-                      ) : null
-                    }>
-                      <Tabs.TabPane tab="Annotations" key="1">
-                        {
-                          CRD_annotations.length > 0 ? (
-                            <div>{CRD_annotations}</div>
-                          ) : (
-                            <Empty key={'empty_ann'} description={<strong>No annotations</strong>}/>
-                          )
-                        }
-                      </Tabs.TabPane>
-                      <Tabs.TabPane tab="Resources" key="2">
-                        {CRViews}
-                        { !this.state.multi && this.state.custom_resources.length > 5 ? (
-                          <div className="no-crds-found">
-                            <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
-                                        defaultPageSize={5}
-                                        onChange={this.paginationChange}
-                                        showSizeChanger={false} />
-                          </div>
-                        ) : null}
-                      </Tabs.TabPane>
-                      {/** Show the JSON Schema of the CRD */}
-                      <Tabs.TabPane tab="Schema" key="3">
-                        {
-                          schema ? (
-                            <pre>{JSON.stringify(schema.properties.spec, null, 2)}</pre>
-                          ) : (
-                            <Empty key={'empty_schema'} description={<strong>No schema for this CRD</strong>}/>
-                          )
-                        }
-                      </Tabs.TabPane>
-                    </Tabs>
+                      ) : (
+                        <Tabs defaultActiveKey="2" tabBarExtraContent={
+                          this.state.template || this.tempTemplate ? (
+                            <div style={{float: 'right'}}>
+                              <Tooltip placement="topRight" title="Change CR design">
+                                <Switch defaultChecked onChange={this.changeTemplate}/>
+                              </Tooltip>
+                            </div>
+                          ) : null
+                        }>
+                          <Tabs.TabPane tab="Annotations" key="1">
+                            {
+                              CRD_annotations.length > 0 ? (
+                                <div>{CRD_annotations}</div>
+                              ) : (
+                                <Empty key={'empty_ann'} description={<strong>No annotations</strong>}/>
+                              )
+                            }
+                          </Tabs.TabPane>
+                          <Tabs.TabPane tab="Resources" key="2">
+                            {CRViews}
+                            { !this.state.multi && this.state.custom_resources.length > 5 ? (
+                              <div className="no-crds-found">
+                                <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
+                                            defaultPageSize={5}
+                                            onChange={this.paginationChange}
+                                            showSizeChanger={false} />
+                              </div>
+                            ) : null}
+                          </Tabs.TabPane>
+                          {/** Show the JSON Schema of the CRD */}
+                          <Tabs.TabPane tab="Schema" key="3">
+                            {
+                              schema ? (
+                                <pre>{JSON.stringify(schema.properties.spec, null, 2)}</pre>
+                              ) : (
+                                <Empty key={'empty_schema'} description={<strong>No schema for this CRD</strong>}/>
+                              )
+                            }
+                          </Tabs.TabPane>
+                        </Tabs>
+                      )}
+
+                    </Layout.Content>
                   </Layout>
                 </div>
               </div>
