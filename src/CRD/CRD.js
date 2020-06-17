@@ -82,6 +82,8 @@ class CRD extends Component {
         });
       }
       this.setState({ CRD: CRD });
+      /** See if there is a template for the CRD */
+      this.findTemplate(CRD);
     }
   }
 
@@ -516,6 +518,8 @@ class CRD extends Component {
 
         this.setState({template: CR});
       });
+    } else {
+      this.setState({template: null});
     }
   };
 

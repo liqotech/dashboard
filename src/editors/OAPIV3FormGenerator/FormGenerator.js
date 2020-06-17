@@ -19,6 +19,7 @@ class FormGenerator extends Component {
       CRD: this.props.CRD
     };
     this.util = new Utils();
+    this.schema = this.util.OAPIV3toJSONSchema(this.props.CRD.spec.validation.openAPIV3Schema).properties.spec;
     this.value = '';
     this.onSubmit = this.onSubmit.bind(this);
     this.onChange = this.onChange.bind(this);
@@ -50,7 +51,6 @@ class FormGenerator extends Component {
       kind: this.props.CRD.spec.names.kind
     }
     this.props.submit(item);
-
   }
 
   onChange(value) {
@@ -58,10 +58,9 @@ class FormGenerator extends Component {
   }
 
   render() {
-    const schema = this.util.OAPIV3toJSONSchema(this.props.CRD.spec.validation.openAPIV3Schema).properties.spec;
 
     return(
-      <div style={{marginTop: 20, marginLeft: 10, marginRight: 10, marginBottom: 20}}>
+      <div style={{marginTop: 20, marginLeft: 10, marginRight: 10, marginBottom: 20, minHeight: '80vh'}}>
         <div>
           <div style={{marginBottom: 10}}>
             metadata
@@ -83,7 +82,7 @@ class FormGenerator extends Component {
         </div>
         <br/>
         <Form
-          schema={schema}
+          schema={this.schema}
           onSubmit={this.onSubmit}
         />
       </div>
