@@ -69,7 +69,7 @@ module.exports = {
       meta: {
         viewport: 'width=device-width, initial-scale=1',
         'theme-color': '#000000',
-        description: 'Kubernetes dashboard'
+        description: 'Liqo dashboard'
       },
       favicon: 'src/assets/logo_4.png'
     }),
