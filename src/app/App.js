@@ -86,21 +86,6 @@ class App extends Component {
                component={(props) =>
                  <CRD {...props} api={this.state.api} />
                }/>,
-        <Route key={'crd_create'}
-               exact path="/customresources/:crdName/create"
-               render={(props) =>
-                 <NewCR {...props} api={this.state.api} />
-               }/>,
-        <Route key={'crd_editor'}
-               exact path="/customresources/:crdName/representation_editor"
-               render={(props) =>
-                 <DesignEditorCRD {...props} api={this.state.api} />
-               }/>,
-        <Route key={'crd_update'}
-               exact path="/customresources/:crdName/:crName/update"
-               render={(props) =>
-                 <UpdateCR {...props} api={this.state.api} />
-               }/>,
         <Route key={'customview'}
                exact path="/customview/:viewName/"
                component={(props) =>
