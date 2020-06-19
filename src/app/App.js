@@ -9,7 +9,7 @@ import CRDList from '../CRD/CRDList';
 import AppHeader from '../common/AppHeader';
 import SideBar from '../common/SideBar';
 import AppFooter from '../common/AppFooter';
-import { Layout, notification } from 'antd';
+import { Layout, notification, message } from 'antd';
 import DashboardGeneral from '../dashboard/DashboardGeneral';
 import NewCR from '../editors/NewCR';
 import CustomView from '../views/CustomView'
@@ -18,6 +18,7 @@ import ApiManager from '../services/ApiManager';
 import CRD from '../CRD/CRD';
 import DesignEditorCRD from '../editors/DesignEditorCRD';
 import Authenticator from '../services/Authenticator';
+import ErrorRedirect from '../error-handles/ErrorRedirect';
 
 const { Content } = Layout;
 
@@ -34,53 +35,16 @@ class App extends Component {
       api: null,
       user: {}
     }
-    notification.config({
-      placement: 'bottomLeft',
-      bottom: 20,
-      duration: 3,
-    });
-    /** Check if previously logged */
-    const retrievedSessionToken = JSON.parse(
-      sessionStorage.getItem(`oidc.user:${OIDC_PROVIDER_URL}:${OIDC_CLIENT_ID}`)
-    );
-    if (retrievedSessionToken) {
-      let api = new ApiManager({ id_token: retrievedSessionToken.id_token,
-        token_type: retrievedSessionToken.token_type || 'Bearer'});
-      this.state = {
-        user: retrievedSessionToken.profile,
-        logged: true,
-        api: api
-      };
-      /** Get the CRDs at the start of the app */
-      this.state.api.getCRDs().catch(error => {
-        console.log(error)
-      });
-    }
-    this.authManager = new Authenticator();
-    this.authManager.manager.events.addUserLoaded(user => {
-      let api = new ApiManager(user);
-      this.setState({
-        logged: true,
-        api: api,
-        user: user.profile
-      });
-      /** Get the CRDs at the start of the app */
-      this.state.api.getCRDs().catch(error => {
-        console.log(error)
-      });
-    });
-    this.authManager.manager.events.addAccessTokenExpiring(() => {
-      this.authManager.manager.signinSilent().then(user => {
-        this.state.api.refreshConfig(user);
-        this.setState({logged: true});
-      }).catch((error) => {
-        console.log(error);
-        this.props.history.push("/logout");
-      });
-    });
+
+    /** set global configuration for notifications and alert*/
+    this.setGlobalConfig();
+
+    /** all is needed to manage an OIDC session */
+    this.manageOIDCSession();
   }
 
   render() {
+    /** Always present routes */
     const routes = [
       <Route key={'login'}
              exact path="/login"
@@ -97,46 +61,51 @@ class App extends Component {
       <Route key={'logout'}
              path="/logout">
         <Redirect to="/login" />
-      </Route>
+      </Route>,
+      <Route key={'error'}
+             path="/error/:statusCode"
+             component={(props) => <ErrorRedirect {...props} logout={this.authManager.logout} />}
+      />
     ]
 
-    if(this.state.api){
+    /** Routes present only if logged in and apiManager created */
+    if(this.state.api && this.state.logged){
       routes.push([
         <Route key={'/'}
                exact path="/"
-               render={(props) => this.state.logged ? (
+               render={(props) =>
                  <DashboardGeneral {...props} api={this.state.api} user={this.state.user}/>
-               ): (<Redirect to = "/login"/>)}/>,
+               }/>,
         <Route key={'customresources'}
                exact path="/customresources"
-               component={(props) => this.state.logged ? (
+               component={(props) =>
                  <CRDList {...props} api={this.state.api} />
-               ): (<Redirect to = "/login"/>)}/>,
+               }/>,
         <Route key={'crd'}
                exact path="/customresources/:crdName"
-               component={(props) => this.state.logged ? (
+               component={(props) =>
                  <CRD {...props} api={this.state.api} />
-               ): (<Redirect to = "/login"/>)}/>,
+               }/>,
         <Route key={'crd_create'}
                exact path="/customresources/:crdName/create"
-               render={(props) => this.state.logged ? (
+               render={(props) =>
                  <NewCR {...props} api={this.state.api} />
-               ): (<Redirect to = "/login"/>)}/>,
+               }/>,
         <Route key={'crd_editor'}
                exact path="/customresources/:crdName/representation_editor"
-               render={(props) => this.state.logged ? (
+               render={(props) =>
                  <DesignEditorCRD {...props} api={this.state.api} />
-               ): (<Redirect to = "/login"/>)}/>,
+               }/>,
         <Route key={'crd_update'}
                exact path="/customresources/:crdName/:crName/update"
-               render={(props) => this.state.logged ? (
+               render={(props) =>
                  <UpdateCR {...props} api={this.state.api} />
-               ): (<Redirect to = "/login"/>)}/>,
+               }/>,
         <Route key={'customview'}
                exact path="/customview/:viewName/"
-               component={(props) => this.state.logged ? (
+               component={(props) =>
                  <CustomView {...props} api={this.state.api} />
-               ): (<Redirect to = "/login"/>)}/>
+               }/>
       ])
     } else {
       routes.push([
@@ -148,30 +117,91 @@ class App extends Component {
 
     return (
         <Layout>
-            <div>
-              {this.state.api ? (
+          {this.state.api ? (
+              <SideBar api={this.state.api} />
+          ) : null}
+          <Layout>
+            {this.state.api ? (
               <AppHeader
                 api={this.state.api}
                 logout={this.authManager.logout}
                 logged={this.state.logged}
               />) : null}
-              <Layout className="app-content" style={{minHeight: '92vh'}}>
-                {this.state.api ? (
-                <SideBar api={this.state.api} />) : null}
-                <Layout style={{ marginLeft: 250 }}>
-                  <Content>
-                    <div className="container">
-                      <Switch>
-                        {routes}
-                      </Switch>
-                    </div>
-                  </Content>
-                  <AppFooter />
-                </Layout>
-              </Layout>
-            </div>
+              <Content className="app-content">
+                <Switch>
+                  {routes}
+                </Switch>
+              </Content>
+              <AppFooter />
+            </Layout>
         </Layout>
     );
+  }
+
+  setGlobalConfig() {
+    /** global notification config */
+    notification.config({
+      placement: 'bottomLeft',
+      bottom: 30,
+      duration: 3,
+    });
+
+    /** global message config */
+    message.config({
+      top: 10
+    });
+  }
+
+  manageOIDCSession() {
+    /** Check if previously logged */
+    const retrievedSessionToken = JSON.parse(
+      sessionStorage.getItem(`oidc.user:${OIDC_PROVIDER_URL}:${OIDC_CLIENT_ID}`)
+    );
+    if (retrievedSessionToken) {
+      let api = new ApiManager({ id_token: retrievedSessionToken.id_token,
+        token_type: retrievedSessionToken.token_type || 'Bearer'});
+      this.state = {
+        user: retrievedSessionToken.profile,
+        logged: true,
+        api: api
+      };
+      /** Get the CRDs at the start of the app */
+      this.state.api.loadCustomViewsCRs();
+      this.state.api.getCRDs().catch(error => {
+        console.log(error);
+        if(error.response)
+          this.props.history.push("/error/" + error.response.statusCode);
+      });
+    }
+
+    this.authManager = new Authenticator();
+    this.authManager.manager.events.addUserLoaded(user => {
+      let api = new ApiManager(user);
+      this.setState({
+        logged: true,
+        api: api,
+        user: user.profile
+      });
+      this.state.api.loadCustomViewsCRs();
+      /** Get the CRDs at the start of the app */
+      this.state.api.getCRDs().catch(error => {
+        console.log(error);
+        if(error.response)
+          this.props.history.push("/error/" + error.response.statusCode);
+      });
+    });
+
+    /** Refresh token (or logout is silent sign in is not enabled) */
+    this.authManager.manager.events.addAccessTokenExpiring(() => {
+      this.authManager.manager.signinSilent().then(user => {
+        this.state.api.refreshConfig(user);
+        this.setState({logged: true});
+      }).catch((error) => {
+        console.log(error);
+        localStorage.clear();
+        this.props.history.push("/logout");
+      });
+    });
   }
 }
 

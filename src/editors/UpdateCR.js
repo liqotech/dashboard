@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './UpdateCR.css';
-import { Tabs, Typography, Button, notification } from 'antd';
+import { Tabs, Typography, Button, notification, message } from 'antd';
 import AceEditor from 'react-ace';
 import YAML from 'yaml';
 import 'ace-builds/src-noconflict/mode-json';
@@ -25,19 +25,22 @@ class UpdateCR extends Component {
       value: JSON.stringify(this.CR.spec, null, 2),
       isLoading: false
     };
-    // this.spec = this.CRD.spec.validation.openAPIV3Schema.properties.spec;
-    this.requiredFields = [];
     this.onChange = this.onChange.bind(this);
     this.onClick = this.onClick.bind(this);
   }
 
   onClick() {
-    let item;
+    let item = undefined;
 
     try {
       item = JSON.parse(this.state.value);
     } catch(error) {
-      item = YAML.parse(this.state.value);
+      try {
+        item = YAML.parse(this.state.value);
+      } catch(error){
+         message.error('JSON or YAML not valid');
+         return;
+      }
     }
 
     item = {

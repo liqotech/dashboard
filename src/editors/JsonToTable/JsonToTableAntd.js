@@ -1,8 +1,8 @@
 import * as React from "react";
-
 import "./JsonToTable.css";
 import JSONToTableUtils from "./JsonToTableUtils";
 import UpCircleOutlined from '@ant-design/icons/lib/icons/UpCircleOutlined';
+import { Tooltip } from 'antd';
 
 export default class JsonToTableAntd extends React.Component{
   // constructor
@@ -17,12 +17,10 @@ export default class JsonToTableAntd extends React.Component{
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if(JSON.stringify(prevState.json) !== JSON.stringify(this.props.json)){
-      this.state.json = this.props.json;
-      this.state.jsonShown = this.props.json;
-      /** using forceUpdate is a bit of a workaround as it should be avoided,
-       *  but setState throws an error, and as long as it works...
-       */
-      this.forceUpdate();
+      this.setState({
+        json: this.props.json,
+        jsonShown: this.props.json
+      })
     }
   }
 
@@ -82,7 +80,14 @@ export default class JsonToTableAntd extends React.Component{
 
   renderCell = (params) => {
     const {content, colspan, isHeader} = params;
-    const valueDisplay = isHeader ? <strong>{content}</strong> : content;
+    let valueDisplay = isHeader ? (
+      <Tooltip placement="bottomLeft" title={content}><strong>{content}</strong></Tooltip>
+    ) : content;
+    if(!colspan){
+      valueDisplay = (
+        <Tooltip placement="bottomLeft" title={valueDisplay}>{valueDisplay}</Tooltip>
+      )
+    }
     return <td colSpan={colspan ? colspan : 0} key={`__j2t_trObj${valueDisplay}${Math.random()}`}>{valueDisplay}</td>;
   };
 
@@ -140,12 +145,20 @@ export default class JsonToTableAntd extends React.Component{
   };
 
   renderRow = (k, v, idx) => {
+    if(v === true) v = 'true';
+    if(v === false) v = 'false';
     return (
       <tr key={`__j2t_tr${idx}`}>
         <td key={`__j2t_tdk${idx}`}>
-          <strong>{k}</strong>
+          <Tooltip placement="bottomLeft" title={k}>
+            <strong>{k}</strong>
+          </Tooltip>
         </td>
-        <td key={`__j2t_tdv${idx}`}>{v}</td>
+        <td key={`__j2t_tdv${idx}`}>
+          <Tooltip placement="bottomLeft" title={v}>
+            {v}
+          </Tooltip>
+        </td>
       </tr>
     );
   };
@@ -170,10 +183,13 @@ export default class JsonToTableAntd extends React.Component{
 
   renderRowHeader = (label) => {
     return (
-      <div key={`__j2t_rw${label}`}>
-        <UpCircleOutlined style={{marginRight: 10}}
-                          onClick={()=>{this.onClick(label)}}/>
-        <strong onClick={()=>{this.onClick(label)}}>{label}</strong>
+      <div key={`__j2t_rw${label}`} onClick={()=>{this.onClick(label)}}>
+        <UpCircleOutlined style={{marginRight: 10}}/>
+        <Tooltip placement="bottomLeft" title={label}>
+          <a style={{ color: 'rgba(57,57,57,0.85)'}}>
+            <strong >{label}</strong>
+          </a>
+        </Tooltip>
       </div>
     );
   };

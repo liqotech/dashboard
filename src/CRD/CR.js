@@ -3,11 +3,10 @@ import './CR.css';
 import {
   Breadcrumb,
   Button,
-  Card,
-  Menu,
+  Divider,
   notification, PageHeader,
   Popconfirm,
-  Popover
+  Tooltip, Typography
 } from 'antd';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 import { Link } from 'react-router-dom';
@@ -16,9 +15,10 @@ import { APP_NAME } from '../constants';
 import PieChart from '../templates/piechart/PieChart';
 import HistoChart from '../templates/histogram/HistoChart';
 import ErrorBoundary from '../error-handles/ErrorBoundary';
-import UpOutlined from '@ant-design/icons/lib/icons/UpOutlined';
 import UpCircleOutlined from '@ant-design/icons/lib/icons/UpCircleOutlined';
 import JsonToTableAntd from '../editors/JsonToTable/JsonToTableAntd';
+import DeleteOutlined from '@ant-design/icons/lib/icons/DeleteOutlined';
+const { Text } = Typography;
 
 class CR extends Component {
   constructor(props) {
@@ -43,14 +43,12 @@ class CR extends Component {
     this.props.api.abortAllWatchers();
   }
 
+  /** Make the JSON visible or invisible */
   handleClick_show() {
-    if (!this.state.showJSON) {
-      this.setState({ showJSON: true });
-    } else {
-      this.setState({ showJSON: false });
-    }
+    this.setState({showJSON: !this.state.showJSON});
   }
 
+  /** Delete the CR */
   handleClick_delete() {
     if (this.props.crd.spec.names.plural !== 'views')
       this.props.api.abortAllWatchers(this.props.crd.spec.names.plural);
@@ -78,6 +76,8 @@ class CR extends Component {
       })
       .catch(error => {
         console.log(error);
+        if(error.response)
+          this.props.history.push("/error/" + error.response.statusCode);
         this.setState({
           deleted: false
         });
@@ -101,6 +101,7 @@ class CR extends Component {
     this.setState({ showInfo: !this.state.showInfo });
   }
 
+  /** If the CRD has a template, show it as the first option */
   getChart() {
     return (
       <div className="rep-container">
@@ -122,6 +123,7 @@ class CR extends Component {
   }
 
   render() {
+    /** The default view can always be switched between the custom template */
     let CRdefault = [];
     CRdefault.push(<JsonToTableAntd json={this.props.cr.spec} />);
 
@@ -131,19 +133,15 @@ class CR extends Component {
             <PageHeader
               className="cr-header"
               title={
-                <Breadcrumb separator={'>'}>
-                  <Breadcrumb.Item>
-                    {
-                      <div>
-                        <UpCircleOutlined style={{ marginRight: 10 }}
-                                          onClick={this.handleClick_Info}
-                                          rotate={this.state.showInfo ? 180 : 0}
-                        />
-                        <span onClick={this.handleClick_Info}>{this.props.cr.metadata.name}</span>
-                      </div>
-                    }
-                  </Breadcrumb.Item>
-                </Breadcrumb>
+                <div style={{fontSize: 14}}>
+                  <UpCircleOutlined style={{ marginRight: 10 }}
+                                    onClick={this.handleClick_Info}
+                                    rotate={this.state.showInfo ? 180 : 0}
+                  />
+                  <Text strong ellipsis style={{minWidth: 200}}>
+                    <a style={{ color: 'rgba(57,57,57,0.85)'}} onClick={this.handleClick_Info}>{this.props.cr.metadata.name}</a>
+                  </Text>
+                </div>
               }
               extra={
                 <div>
@@ -164,38 +162,46 @@ class CR extends Component {
                     }}
                     onClick={this.abortWatchers}
                   >
-                    <Popover content={'Edit resource'}>
+                    <Tooltip title={'Edit resource'}>
                       <EditOutlined
                         style={{ fontSize: '20px', marginRight: 15 }}
                       />
-                    </Popover>
+                    </Tooltip>
                   </Link>
-                  <Button
-                    onClick={this.handleClick_show}
-                    style={{ marginRight: 15 }}
-                  >
-                    JSON
-                  </Button>
-                  <Popconfirm
-                    placement="topRight"
-                    title="Are you sure?"
-                    icon={<ExclamationCircleOutlined style={{ color: 'red' }}/>}
-                    onConfirm={this.handleClick_delete}
-                    okText="Yes"
-                    cancelText="No"
-                  >
-                    <Button type="primary" danger>
-                      Delete
+                  <Tooltip title={'Show JSON'}>
+                    <Button
+                      onClick={this.handleClick_show}
+                      style={ !this.state.showJSON ?
+                        { marginRight: 15 } : { marginRight: 15, color: '#1890FF' }}
+                    >
+                      JSON
                     </Button>
-                  </Popconfirm>
+                  </Tooltip>
+                  <Tooltip title={'Delete resource'}>
+                    <Popconfirm
+                      placement="topRight"
+                      title="Are you sure?"
+                      icon={<ExclamationCircleOutlined style={{ color: 'red' }}/>}
+                      onConfirm={this.handleClick_delete}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Button type="primary" danger icon={<DeleteOutlined />}/>
+                    </Popconfirm>
+                  </Tooltip>
                 </div>
               }
             >
             {
               this.state.showInfo ? (
                 <div>
+                  <Divider style={{marginTop: 4, marginBottom: 10}}/>
                   {this.state.showJSON ? (
-                    <pre>{JSON.stringify(this.props.cr.spec, null, 2)}</pre>
+                    <div>
+                      {this.props.cr.spec ? (<pre>{JSON.stringify(this.props.cr.spec, null, 2)}</pre>) : null}
+                      {this.props.cr.status ? (<pre>{JSON.stringify(this.props.cr.status, null, 2)}</pre>) : null}
+                    </div>
+
                   ) : null}
                   {!this.state.showJSON && this.props.template
                     ? this.getChart()
@@ -214,7 +220,10 @@ class CR extends Component {
                               onClick={this.handleClick_Spec}
                               rotate={this.state.showSpec ? 180 : 0}
                             />
-                            <a onClick={this.handleClick_Spec}>Spec</a>
+                            <a style={{ color: 'rgba(57,57,57,0.85)'}}
+                               onClick={this.handleClick_Spec}>
+                              Spec
+                            </a>
                           </div>
                           {this.state.showSpec ? (
                             <JsonToTableAntd json={this.props.cr.spec} />
@@ -233,7 +242,10 @@ class CR extends Component {
                               onClick={this.handleClick_Status}
                               rotate={this.state.showStatus ? 180 : 0}
                             />
-                            <a onClick={this.handleClick_Status}>Status</a>
+                            <a style={{ color: 'rgba(57,57,57,0.85)'}}
+                               onClick={this.handleClick_Status}>
+                              Status
+                            </a>
                           </div>
                           {this.state.showStatus ? (
                             <JsonToTableAntd json={this.props.cr.status} />

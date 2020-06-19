@@ -23,6 +23,7 @@ export default class ApiManager {
     this.apiCRD = this.kcc.makeApiClient(CustomObjectsApi);
     this.apiCore = this.kcc.makeApiClient(CoreV1Api);
     this.CRDs = [];
+    this.customViews = [];
     this.watchers = [];
     /** used to change the content-type of a PATCH request */
     this.options = {
@@ -30,15 +31,21 @@ export default class ApiManager {
         "Content-Type": "application/merge-patch+json"
       }
     }
+
     /** Callback for CRD list view */
     this.CRDListCallback = null;
     /** Callback for the autocomplete search bar */
     this.autoCompleteCallback = null;
-    /** Callback array for custom views */
+    /** Callback array for CRDs in CRD view */
     this.CRDArrayCallback = [];
     /** Callback for the favourites CRDs in the sidebar */
     this.sidebarCallback = null;
+
+    /** Callback array for custom views */
+    this.CVArrayCallback = [];
+
     this.CRDsNotifyEvent = this.CRDsNotifyEvent.bind(this);
+    this.CVsNotifyEvent = this.CVsNotifyEvent.bind(this);
   }
 
   refreshConfig(user){
@@ -50,17 +57,14 @@ export default class ApiManager {
    *
    * @returns a list of CRDs: {CRD, custom_resource}
    */
-  async getCRDs() {
-    let response_crd = await this.apiExt.listCustomResourceDefinition();
-    let results_crd = await response_crd.body;
-    this.CRDs = results_crd.items;
-
-    /** update CRDs in the views */
-    this.manageCallback(this.CRDs);
-
-    this.watchAllCRDs();
-
-    return results_crd.items;
+  getCRDs() {
+    return this.apiExt.listCustomResourceDefinition().then(res => {
+      this.CRDs = res.body.items;
+      /** update CRDs in the views */
+      this.manageCallbackCRDs(this.CRDs);
+    }).finally(() => {
+      this.watchAllCRDs();
+    });
   }
 
   getCRDfromKind(kind) {
@@ -75,7 +79,7 @@ export default class ApiManager {
     });
   }
 
-  /** get the CRDs for the group crd-template.liqo.com */
+  /** Get the CRDs for the group crd-template.liqo.com */
   getTemplates() {
     let templates = [];
     this.CRDs.forEach(CRD => {
@@ -84,6 +88,35 @@ export default class ApiManager {
       }
     });
     return templates;
+  }
+
+  /** Load Custom Views CRs */
+  loadCustomViewsCRs() {
+    let CRD = {
+      spec: {
+        group: 'crd-template.liqo.com',
+        version: 'v1',
+        names: {
+          plural: 'views'
+        }
+      }
+    }
+    /** First get all the CR */
+    this.getCustomResourcesAllNamespaces(CRD)
+      .then((res) => {
+        this.customViews = res.body.items;
+
+        /** update CVs in the views */
+        this.manageCallbackCVs(this.customViews);
+
+        /** Then set up a watch to watch changes in the CR of the CRD */
+        this.watchSingleCRD(
+          CRD.spec.group,
+          CRD.spec.version,
+          CRD.spec.names.plural,
+          this.CVsNotifyEvent);
+        }
+      );
   }
 
   /**
@@ -384,6 +417,20 @@ export default class ApiManager {
    * @param object: object modified/added/deleted
    */
   CRDsNotifyEvent(type, object) {
+
+    /**
+     * When the watcher starts it returns the state of the k8s system,
+     *  so every CRD that's in the system will be returned with type: ADDED
+     *  To avoid the computational overhead of that, filter out the CRD that
+     *  are in fact not changed (field resourceVersion)
+     */
+    if(type === 'ADDED' && this.CRDs.find((item) => {
+      return item.metadata.name === object.metadata.name;
+    }).metadata.resourceVersion === object.metadata.resourceVersion){
+      return;
+    }
+
+    /** This deepcopy is the thread killer */
     let CRDs = JSON.parse(JSON.stringify(this.CRDs));
 
     let index = CRDs.indexOf(CRDs.find((item) => {
@@ -424,12 +471,11 @@ export default class ApiManager {
     if(JSON.stringify(this.CRDs) !== JSON.stringify(CRDs)){
       this.CRDs = CRDs;
       /** update CRDs in the views */
-      this.manageCallback(CRDs);
+      this.manageCallbackCRDs(CRDs, object, type);
     }
-
   }
 
-  manageCallback(CRDs){
+  manageCallbackCRDs(CRDs, object, type){
     /** update CRDs in the search bar */
     if(this.autoCompleteCallback)
       this.autoCompleteCallback(CRDs);
@@ -438,10 +484,9 @@ export default class ApiManager {
     if(this.CRDListCallback)
       this.CRDListCallback(CRDs);
 
-    /** update CRDs in the custom views */
-
+    /** update CRDs in the CRD views */
     this.CRDArrayCallback.forEach(func => {
-      func(CRDs);
+      func(CRDs, object, type);
     })
 
     /** update CRDs in the sidebar */
@@ -450,4 +495,57 @@ export default class ApiManager {
         return item.metadata.annotations && item.metadata.annotations.favourite;
       }));
   }
+
+  CVsNotifyEvent(type, object) {
+    let customViews = JSON.parse(JSON.stringify(this.customViews));
+
+    let index = customViews.indexOf(customViews.find((item) => {
+      return item.metadata.name === object.metadata.name;
+    }));
+
+    if ((type === 'ADDED' || type === 'MODIFIED')) {
+      // Object creation succeeded
+      if(index !== -1) {
+        if(customViews[index].metadata.resourceVersion !== object.metadata.resourceVersion){
+          customViews[index] = object;
+          notification.success({
+            message: APP_NAME,
+            description: 'CR ' + object.metadata.name + ' modified'
+          });
+        }
+      } else {
+        customViews.push(object);
+        customViews.sort((a, b) => a.kind.localeCompare(b.kind));
+        notification.success({
+          message: APP_NAME,
+          description: 'CR ' + object.metadata.name + ' added'
+        });
+      }
+    } else if (type === 'DELETED') {
+      if(index !== -1) {
+        customViews.splice(index, 1);
+
+        notification.success({
+          message: APP_NAME,
+          description: 'CR ' + object.metadata.name + ' deleted'
+        });
+      } else {
+        return;
+      }
+    }
+
+    if(JSON.stringify(this.customViews) !== JSON.stringify(customViews)){
+      this.customViews = customViews;
+      /** update customViews in the views */
+      this.manageCallbackCVs(customViews);
+    }
+  }
+
+  manageCallbackCVs(customViews){
+    /** update custom views */
+    this.CVArrayCallback.forEach(func => {
+      func(customViews);
+    })
+  }
+
 }

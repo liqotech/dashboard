@@ -11,53 +11,50 @@ import NotificationOutlined from '@ant-design/icons/lib/icons/NotificationOutlin
 import { APP_NAME } from '../constants';
 import LogoutOutlined from '@ant-design/icons/lib/icons/LogoutOutlined';
 const Header = Layout.Header;
-const { Title } = Typography;
+const { Title, Text } = Typography;
     
 class AppHeader extends Component {
-    constructor(props) {
-      super(props);
-      this.autoCompleteSearch = this.autoCompleteSearch.bind(this);
-      this.state = {
-        CRDs: []
-      }
-      this.onSearch = this.onSearch.bind(this);
-      if(this.props.api){
-        this.props.api.autoCompleteCallback = this.autoCompleteSearch;
-      }
+  constructor(props) {
+    super(props);
+    this.autoCompleteSearch = this.autoCompleteSearch.bind(this);
+    this.state = {
+      CRDs: []
     }
-
-    autoCompleteSearch(CRDs){
-      let tempCRDs = [];
-
-      CRDs.forEach(item =>{
-        tempCRDs.push({
-          value: item.spec.names.kind,
-          singular: item.spec.names.singular,
-          name: item.metadata.name
-        })
-      });
-
-      this.setState({CRDs: tempCRDs});
+    this.onSearch = this.onSearch.bind(this);
+    if(this.props.api){
+      this.props.api.autoCompleteCallback = this.autoCompleteSearch;
     }
+  }
 
-    onSearch(value){
-      let CRD = this.state.CRDs.find(item=>{
-        if(item.value === value || item.singular === value){
-          return item;
-        }
-      });
+  autoCompleteSearch(CRDs){
+    let tempCRDs = [];
+    CRDs.forEach(item =>{
+      tempCRDs.push({
+        value: item.spec.names.kind + '@' + item.metadata.name,
+        singular: item.spec.names.singular,
+        name: item.metadata.name
+      })
+    });
+    this.setState({CRDs: tempCRDs});
+  }
 
-      if(CRD){
-        this.props.history.push("/customresources/" + CRD.name);
+  onSearch(value){
+    let CRD = this.state.CRDs.find(item=>{
+      if(item.value === value || item.singular === value){
+        return item;
       }
+    });
+    if(CRD){
+      this.props.history.push("/customresources/" + CRD.name);
     }
+  }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-      if(!prevProps.api && this.props.api){
-        this.setState({CRDs: this.props.api.CRDs});
-        this.props.api.autoCompleteCallback = this.autoCompleteSearch;
-      }
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if(!prevProps.api && this.props.api){
+      this.setState({CRDs: this.props.api.CRDs});
+      this.props.api.autoCompleteCallback = this.autoCompleteSearch;
     }
+  }
 
   render() {
       const options = this.state.CRDs;
@@ -83,39 +80,32 @@ class AppHeader extends Component {
       }
 
       return (
-        <Header className="app-header">
-          <div className="container">
-            <Row className="app-title" align="middle">
-              <Col>
-                <img src={require('../assets/logo.png')} className="image" alt="image"/>
-                <Link to="/">
-                  <Title level={3} style={{color: '#326be2'}} className="title">{APP_NAME}</Title>
-                </Link>
-              </Col>
-              <Col>
-                <Divider type="vertical" style={{marginLeft: 70, height: 40}}/>
-              </Col>
-              <Col>
-                <AutoComplete
-                  filterOption={(inputValue, option) =>
-                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                  options={options}
-                  onSelect={this.onSearch}
-                  style={{ width: 400, marginLeft: 20, lineHeight: '35px' }}
-                >
-                  <Input.Search placeholder="input CRD" enterButton onSearch={this.onSearch} />
-                </AutoComplete>
-              </Col>
-            </Row>
-            <Menu
-              className="app-menu"
-              mode="horizontal"
-              style={{ lineHeight: '64px' }} >
-                {menuItems}
-            </Menu>
-          </div>
-        </Header>
+        <div>
+          <Header className="app-header">
+            <div className="container">
+              <Row className="app-title" align="middle">
+                <Col>
+                  <AutoComplete
+                    filterOption={(inputValue, option) =>
+                      option.name.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                    options={options}
+                    onSelect={this.onSearch}
+                    style={{ width: '22vw', marginLeft: 5, lineHeight: '31px' }}
+                  >
+                    <Input.Search placeholder="input CRD" enterButton onSearch={this.onSearch} allowClear />
+                  </AutoComplete>
+                </Col>
+              </Row>
+            </div>
+          </Header>
+          <Menu
+            className="app-menu"
+            mode="horizontal"
+            style={{ lineHeight: '64px' }} >
+            {menuItems}
+          </Menu>
+        </div>
       );
     }
 }
