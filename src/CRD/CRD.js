@@ -18,7 +18,6 @@ import DragOutlined from '@ant-design/icons/lib/icons/DragOutlined';
 import PushpinOutlined from '@ant-design/icons/lib/icons/PushpinOutlined';
 import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
 import { Menu } from 'antd';
-import ReactResizeDetector from 'react-resize-detector';
 import NewCR from '../editors/NewCR';
 import DesignEditorCRD from '../editors/DesignEditorCRD';
 const { Title, Text } = Typography;
@@ -48,7 +47,6 @@ class CRD extends Component {
       custom_resources: [],
       deleted: false,
       template: null,
-      isDraggable: false,
       isPinned: false,
       CRshown: [],
       multi: false,
@@ -101,8 +99,6 @@ class CRD extends Component {
         custom_resources: res.body.items,
         CRshown: res.body.items.slice(0, 5)
       });
-
-      //console.log(103, res.body.items);
 
       this.setState({isLoading: false});
 
@@ -201,7 +197,7 @@ class CRD extends Component {
     if(cv.spec.templates){
       return !!cv.spec.templates.find(item => {
         if(item)
-          return item.kind === this.state.CRD.spec.names.kind;
+          return item.kind === this.state.CRD.metadata.name;
       });
     }
   }
@@ -211,10 +207,10 @@ class CRD extends Component {
     let cv = this.state.customViews.find(item => {
       return item.metadata.name === e.key;
     });
-    const index = -1;
+    let index = -1;
 
     if(cv.spec.templates){
-      cv.spec.templates.indexOf(
+      index = cv.spec.templates.indexOf(
         cv.spec.templates.find(item => {
           if(item)
             return item.kind === this.state.CRD.metadata.name;
@@ -267,8 +263,6 @@ class CRD extends Component {
   header() {
     const items = [];
 
-    //console.log(this.state.CRD.metadata.annotations);
-
     if(this.props.api.customViews){
       this.state.customViews.forEach(item => {
         items.push(
@@ -316,23 +310,11 @@ class CRD extends Component {
             this.props.onCustomView ? (
               <Col flex={1}>
                 <Tooltip title={'Drag'} placement={'top'}>
-                  <DragOutlined style={this.state.isDraggable ?
-                    {
-                      float: 'right', fontSize: '20px',
-                      marginRight: 10, marginLeft: 25,
-                      color: '#1890FF'
-                    }:{
-                      float: 'right', fontSize: '20px',
-                      marginRight: 10, marginLeft: 25
-                    }}
-                    onClick={() => {
-                      if(this.state.isDraggable){
-                        this.setState({isDraggable: false});
-                      } else {
-                        this.setState({isDraggable: true});
-                      }
-                      this.props.dragFunc(this.state.CRD.metadata.name);
-                    }}
+                  <DragOutlined className={'draggable'}
+                                style={{
+                                  float: 'right', fontSize: '20px',
+                                  marginRight: 10, marginLeft: 25
+                                }}
                   />
                 </Tooltip>
                 <Tooltip title={'Pin'} placement={'top'}>
@@ -351,7 +333,7 @@ class CRD extends Component {
                       } else {
                         this.setState({isPinned: true});
                       }
-                      this.props.pinFunc(this.state.CRD.metadata.name);
+                      this.props.func(this.state.CRD.metadata.name);
                     }}
                   />
                 </Tooltip>
@@ -365,8 +347,7 @@ class CRD extends Component {
             )
           }
         </Row>
-        <br />
-        <Title level={4} >
+        <Title level={4} style={{marginTop: 20}}>
           <Badge color='#1890FF' />
           <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
             pathname: '/customresources/' + this.state.CRD.metadata.name,
@@ -374,7 +355,8 @@ class CRD extends Component {
               CRD: this.state.CRD
             }
           }} >
-            {this.state.CRD.spec.names.kind}
+            {this.props.altName ? this.props.altName
+              : this.state.CRD.spec.names.kind}
           </Link>
           <Rate className="crd-fav" count={1}
                 value={
@@ -431,27 +413,29 @@ class CRD extends Component {
                   <NewCR CRD={this.state.CRD} this={this} api={this.props.api} />
                 </Drawer>
               </div>
-            ) : (
-              this.state.template || this.tempTemplate ? (
-                <div style={{float: 'right'}}>
-                  <Tooltip placement="bottomRight" title="Change CR design">
-                    <Switch defaultChecked onChange={this.changeTemplate}/>
-                  </Tooltip>
-                </div>
-              ) : null
-            )}
-        </Title>
-        <Descriptions style={{marginTop: 20, marginLeft: 15}}>
-          <Descriptions.Item>
-            {
-              this.state.CRD.metadata.annotations && this.state.CRD.metadata.annotations.description ? (
-                <div>{this.state.CRD.metadata.annotations.description}</div>
               ) : (
-                <div>No description for this CRD</div>
-              )
+              this.state.template || this.tempTemplate ? (
+                  <div style={{float: 'right'}}>
+                    <Tooltip placement="bottomRight" title="Change CR design">
+                      <Switch defaultChecked onChange={this.changeTemplate}/>
+                    </Tooltip>
+                  </div>
+                ) : null)
             }
-          </Descriptions.Item>
-        </Descriptions>
+        </Title>
+        <div style={{maxWidth: '80%'}}>
+          <Descriptions style={{marginTop: 15, marginLeft: 15}}>
+            <Descriptions.Item>
+              {
+                this.state.CRD.metadata.annotations && this.state.CRD.metadata.annotations.description ? (
+                  <Text type={'secondary'}>{this.state.CRD.metadata.annotations.description}</Text>
+                ) : (
+                  <Text type={'secondary'}>No description for this CRD</Text>
+                )
+              }
+            </Descriptions.Item>
+          </Descriptions>
+        </div>
       </div>
     )
   }
@@ -513,9 +497,15 @@ class CRD extends Component {
    * @param CRD: this CRD
    */
   findTemplate(CRD) {
-    if (CRD.metadata.annotations && CRD.metadata.annotations.template) {
+    if ((CRD.metadata.annotations && CRD.metadata.annotations.template) || this.props.altTemplate) {
       let CR = null;
-      let array = CRD.metadata.annotations.template.split('/');
+      let array = [];
+      if(this.props.altTemplate){
+        array = this.props.altTemplate.split('/');
+      }else{
+        array = CRD.metadata.annotations.template.split('/');
+      }
+
       this.props.api.getCustomResourcesAllNamespaces({
         spec: {
           group: array[0],
@@ -528,6 +518,8 @@ class CRD extends Component {
         });
 
         this.setState({template: CR});
+      }).catch(error => {
+        console.log(error);
       });
     } else {
       this.setState({template: null});
@@ -630,7 +622,7 @@ class CRD extends Component {
     return (
       <div>
         <div className="crds-container" style={{maxWidth: width}}>
-          <div className="crd-content" style={this.props.height ? {height: this.props.height, overflow: 'auto'} : null}>
+          <div className={!this.props.onCustomView ? 'crd-content' : null}>
             { !this.state.deleted ? (
               <div>
                 <div className="crd-header">

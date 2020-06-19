@@ -266,7 +266,6 @@ class DesignEditorCRD extends Component {
   }
 
   changeTab = activeKey => {
-    // console.log(118, activeKey);
     this.setState({
       currentTab: activeKey
     });
@@ -279,7 +278,6 @@ class DesignEditorCRD extends Component {
     else {
       const options = [];
       this.state.templates.forEach(item => {
-        //console.log(item.kind);
         if(item.kind !== 'LiqoDashTest'){
           options.push(
             <Card.Grid key={item.kind}
