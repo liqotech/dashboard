@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import './CR.css';
 import {
+  Badge,
   Breadcrumb,
   Button,
-  Divider,
+  Divider, Drawer,
   notification, PageHeader,
   Popconfirm,
   Tooltip, Typography
 } from 'antd';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
-import { Link } from 'react-router-dom';
 import EditOutlined from '@ant-design/icons/lib/icons/EditOutlined';
 import { APP_NAME } from '../constants';
 import PieChart from '../templates/piechart/PieChart';
@@ -18,6 +18,7 @@ import ErrorBoundary from '../error-handles/ErrorBoundary';
 import UpCircleOutlined from '@ant-design/icons/lib/icons/UpCircleOutlined';
 import JsonToTableAntd from '../editors/JsonToTable/JsonToTableAntd';
 import DeleteOutlined from '@ant-design/icons/lib/icons/DeleteOutlined';
+import UpdateCR from '../editors/UpdateCR';
 const { Text } = Typography;
 
 class CR extends Component {
@@ -28,19 +29,15 @@ class CR extends Component {
       deleted: false,
       showStatus: false,
       showSpec: false,
-      showInfo: false
+      showInfo: false,
+      showUpdate: false
     };
     this.handleClick_show = this.handleClick_show.bind(this);
     this.handleClick_delete = this.handleClick_delete.bind(this);
-    this.abortWatchers = this.abortWatchers.bind(this);
     this.getChart = this.getChart.bind(this);
     this.handleClick_Spec = this.handleClick_Spec.bind(this);
     this.handleClick_Status = this.handleClick_Status.bind(this);
     this.handleClick_Info = this.handleClick_Info.bind(this);
-  }
-
-  abortWatchers() {
-    this.props.api.abortAllWatchers();
   }
 
   /** Make the JSON visible or invisible */
@@ -50,9 +47,6 @@ class CR extends Component {
 
   /** Delete the CR */
   handleClick_delete() {
-    if (this.props.crd.spec.names.plural !== 'views')
-      this.props.api.abortAllWatchers(this.props.crd.spec.names.plural);
-
     let promise = this.props.api.deleteCustomResource(
       this.props.crd.spec.group,
       this.props.crd.spec.version,
@@ -71,8 +65,6 @@ class CR extends Component {
           message: APP_NAME,
           description: 'Resource deleted'
         });
-
-        this.props.func(this.props.cr);
       })
       .catch(error => {
         console.log(error);
@@ -145,29 +137,31 @@ class CR extends Component {
               }
               extra={
                 <div>
-                  <Link
-                    to={{
-                      pathname:
-                        '/customresources/' +
-                        this.props.crd.metadata.name +
-                        '/' +
-                        this.props.cr.metadata.name +
-                        '/update',
-                      state: {
-                        CR: this.props.cr,
-                        group: this.props.crd.spec.group,
-                        version: this.props.crd.spec.version,
-                        plural: this.props.crd.spec.names.plural
-                      }
-                    }}
-                    onClick={this.abortWatchers}
-                  >
-                    <Tooltip title={'Edit resource'}>
-                      <EditOutlined
-                        style={{ fontSize: '20px', marginRight: 15 }}
+                  <Tooltip title={'Edit resource'}>
+                    <EditOutlined
+                      onClick={() => {this.setState({showUpdate: true})}}
+                      style={{ fontSize: '20px', marginRight: 15, color: '#1890FF' }}
+                    />
+                  </Tooltip>
+                  <Drawer
+                    title={
+                      <Badge status="processing"
+                             text={"Update " + this.props.cr.metadata.name}
                       />
-                    </Tooltip>
-                  </Link>
+                    }
+                    placement={'right'}
+                    visible={this.state.showUpdate}
+                    onClose={() => {this.setState({showUpdate: false})}}
+                    width={'40%'}
+                  >
+                    <UpdateCR CR={this.props.cr}
+                        group={this.props.crd.spec.group}
+                        version={this.props.crd.spec.version}
+                        plural={this.props.crd.spec.names.plural}
+                        this={this}
+                        api={this.props.api}
+                    />
+                  </Drawer>
                   <Tooltip title={'Show JSON'}>
                     <Button
                       onClick={this.handleClick_show}
@@ -177,7 +171,7 @@ class CR extends Component {
                       JSON
                     </Button>
                   </Tooltip>
-                  <Tooltip title={'Delete resource'}>
+                  <Tooltip title={'Delete resource'} placement={'bottomRight'}>
                     <Popconfirm
                       placement="topRight"
                       title="Are you sure?"
