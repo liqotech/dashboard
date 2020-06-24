@@ -1,17 +1,13 @@
 import React, { Component } from 'react';
 import {
-    Link,
     withRouter
 } from 'react-router-dom';
 import './AppHeader.css';
 import { Col, Layout, Menu, Row, Input, Divider, AutoComplete } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Typography } from 'antd';
 import NotificationOutlined from '@ant-design/icons/lib/icons/NotificationOutlined';
-import { APP_NAME } from '../constants';
 import LogoutOutlined from '@ant-design/icons/lib/icons/LogoutOutlined';
 const Header = Layout.Header;
-const { Title, Text } = Typography;
     
 class AppHeader extends Component {
   constructor(props) {
@@ -74,7 +70,14 @@ class AppHeader extends Component {
       if(this.props.logged){
         menuItems.push(
           <Menu.Item key="logout" >
-            <LogoutOutlined style={{ fontSize: '20px', color: 'rgba(220,21,21,0.79)' }} onClick={this.props.logout} />
+            <LogoutOutlined style={{ fontSize: '20px', color: 'rgba(220,21,21,0.79)' }}
+                            onClick={() => {
+                              if(this.props.authManager.OIDC)
+                                this.props.authManager.logout();
+                              else{
+                                this.props.tokenLogout();
+                              }
+                            }} />
           </Menu.Item>
         )
       }

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import './DashBoardGeneral.css';
+import './Home.css';
 
-class DashboardGeneral extends Component {
+class Home extends Component {
   constructor(props) {
     super(props);
   }
@@ -26,7 +26,7 @@ class DashboardGeneral extends Component {
           </div>
         </div>
         {
-          this.props.user ? (
+          this.props.user.given_name ? (
             <h1 className="home-title">{'Welcome to Liqo, ' + this.props.user.given_name}</h1>
           ) : (
             <h1 className="home-title">{'Welcome to Liqo'}</h1>
@@ -46,4 +46,4 @@ class DashboardGeneral extends Component {
   }
 }
 
-export default withRouter(DashboardGeneral);
+export default withRouter(Home);

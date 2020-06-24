@@ -10,15 +10,15 @@ import AppHeader from '../common/AppHeader';
 import SideBar from '../common/SideBar';
 import AppFooter from '../common/AppFooter';
 import { Layout, notification, message } from 'antd';
-import DashboardGeneral from '../dashboard/DashboardGeneral';
-import NewCR from '../editors/NewCR';
+import Home from '../home/Home';
 import CustomView from '../views/CustomView'
-import UpdateCR from '../editors/UpdateCR';
 import ApiManager from '../services/ApiManager';
 import CRD from '../CRD/CRD';
-import DesignEditorCRD from '../editors/DesignEditorCRD';
 import Authenticator from '../services/Authenticator';
 import ErrorRedirect from '../error-handles/ErrorRedirect';
+import Login from '../login/Login';
+import { APP_NAME } from '../constants';
+import Cookies from 'js-cookie';
 
 const { Content } = Layout;
 
@@ -36,21 +36,31 @@ class App extends Component {
       user: {}
     }
 
+    /** Manage the login via token */
+    this.manageToken = this.manageToken.bind(this);
+    /** Manage the logout via token */
+    this.tokenLogout = this.tokenLogout.bind(this);
+
     /** set global configuration for notifications and alert*/
     this.setGlobalConfig();
 
-    /** all is needed to manage an OIDC session */
-    this.manageOIDCSession();
+    this.authManager = new Authenticator();
+
+    if (this.authManager.OIDC) {
+      /** all is needed to manage an OIDC session */
+      this.manageOIDCSession();
+    }
   }
+
 
   render() {
     /** Always present routes */
     const routes = [
       <Route key={'login'}
              exact path="/login"
-             render={() => {
-               this.authManager.login();
-             }}
+             render={() => this.authManager.OIDC ? (
+               this.authManager.login()
+             ) : <Login func={this.manageToken} logged={this.state.logged} />}
       />,
       <Route key={'callback'}
              path="/callback"
@@ -64,7 +74,7 @@ class App extends Component {
       </Route>,
       <Route key={'error'}
              path="/error/:statusCode"
-             component={(props) => <ErrorRedirect {...props} logout={this.authManager.logout} />}
+             component={(props) => <ErrorRedirect {...props} authManager={this.authManager} tokenLogout={this.tokenLogout} />}
       />
     ]
 
@@ -74,7 +84,7 @@ class App extends Component {
         <Route key={'/'}
                exact path="/"
                render={(props) =>
-                 <DashboardGeneral {...props} api={this.state.api} user={this.state.user}/>
+                 <Home {...props} api={this.state.api} user={this.state.user}/>
                }/>,
         <Route key={'customresources'}
                exact path="/customresources"
@@ -109,7 +119,8 @@ class App extends Component {
             {this.state.api ? (
               <AppHeader
                 api={this.state.api}
-                logout={this.authManager.logout}
+                tokenLogout={this.tokenLogout}
+                authManager={this.authManager}
                 logged={this.state.logged}
               />) : null}
               <Content className="app-content">
@@ -121,6 +132,15 @@ class App extends Component {
             </Layout>
         </Layout>
     );
+  }
+
+  /** Remove everything and redirect to the login page */
+  tokenLogout() {
+    this.state.logged = false;
+    this.state.api = null;
+    this.state.user = {};
+    Cookies.remove('token');
+    this.props.history.push('/login');
   }
 
   setGlobalConfig() {
@@ -135,6 +155,49 @@ class App extends Component {
     message.config({
       top: 10
     });
+  }
+
+  manageToken(token){
+    let user = {
+      id_token: token
+    };
+    let api = new ApiManager(user);
+    /** Get the CRDs at the start of the app */
+    api.getCRDs().
+    then(() => {
+      api.loadCustomViewsCRs();
+      this.setState({
+        logged: true,
+        api: api,
+        user: user
+      });
+      notification.success({
+        message: APP_NAME,
+        description: 'Successfully logged in'
+      });
+      Cookies.set('token', token)
+      this.props.history.push('/');
+    }).
+    catch(error => {
+      console.log(error);
+      /** If this first api call fails, this means that the token is not valid */
+      if(error.response){
+        notification.error({
+          message: APP_NAME,
+          description: 'Login failed: token not valid'
+        });
+        if(error.response.statusCode === 401){
+          this.tokenLogout();
+        }else{
+          this.setState({
+            logged: false,
+            api: null,
+            user: {}
+          });
+          this.props.history.push("/error/" + error.response.statusCode);
+        }
+      }
+    })
   }
 
   manageOIDCSession() {
@@ -159,7 +222,6 @@ class App extends Component {
       });
     }
 
-    this.authManager = new Authenticator();
     this.authManager.manager.events.addUserLoaded(user => {
       let api = new ApiManager(user);
       this.setState({
