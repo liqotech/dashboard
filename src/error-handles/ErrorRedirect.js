@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button, Card } from 'antd';
 import './ErrorRedirect.css'
 import LogoutOutlined from '@ant-design/icons/lib/icons/LogoutOutlined';
+import Cookies from 'js-cookie';
 
 export default class ErrorRedirect extends React.Component {
   constructor(props) {
@@ -10,13 +11,14 @@ export default class ErrorRedirect extends React.Component {
     this.state = {
       desc: ''
     }
+    Cookies.remove('token');
   }
 
   componentDidMount() {
     let desc = '';
     switch(this.props.match.params.statusCode){
       case '401':
-        desc = 'Forbidden, something in the ticket renewal failed';
+        desc = 'Forbidden, not valid authentication credentials';
         break;
       case '403':
         desc = 'It seems you do not have the right permissions to perform this operation';
@@ -45,7 +47,13 @@ export default class ErrorRedirect extends React.Component {
             <Button className="go-back-btn"
                     type="primary" size="large"
                     icon={<LogoutOutlined />}
-                    onClick={this.props.logout}>
+                    onClick={() => {
+                      console.log(this.props)
+                      if(this.props.authManager.OIDC)
+                        this.props.authManager.logout();
+                      else
+                        this.props.tokenLogout();
+                    }}>
               Logout
             </Button>
         </div>

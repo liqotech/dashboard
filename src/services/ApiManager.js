@@ -62,7 +62,7 @@ export default class ApiManager {
       this.CRDs = res.body.items;
       /** update CRDs in the views */
       this.manageCallbackCRDs(this.CRDs);
-    }).finally(() => {
+    }).then(() => {
       this.watchAllCRDs();
     });
   }
