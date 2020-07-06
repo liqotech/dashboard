@@ -18,6 +18,9 @@ class AppHeader extends Component {
     }
     this.onSearch = this.onSearch.bind(this);
     if(this.props.api){
+      if(this.props.api.CRDs){
+        this.state.CRDs = this.props.api.CRDs;
+      }
       this.props.api.autoCompleteCallback = this.autoCompleteSearch;
     }
   }
@@ -43,6 +46,10 @@ class AppHeader extends Component {
     if(CRD){
       this.props.history.push("/customresources/" + CRD.name);
     }
+  }
+
+  componentDidMount() {
+    this.autoCompleteSearch(this.state.CRDs);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
