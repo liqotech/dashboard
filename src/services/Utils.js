@@ -46,7 +46,52 @@ export default class Utils {
    */
   OAPIV3toJSONSchema(schema){
     let toJsonSchema = require('@openapi-contrib/openapi-schema-to-json-schema');
+    this.formatSchema(schema);
     return toJsonSchema(schema);
+  }
+
+  /**
+   * The field 'format' is not accepted in the Json schema,
+   * so we get rid of it before converting
+   * @param schema
+   */
+  formatSchema(schema) {
+    Object.keys(schema).forEach(key => {
+      if(schema[key] && key !== 'description' && key !== 'type' && key !== 'required'){
+        if(schema[key].type){
+          if(schema[key].type === 'object'){
+            this.formatSchema(schema[key]);
+          } else {
+            if(schema[key].format){
+              delete schema[key].format;
+            }
+          }
+        } else {
+          this.formatSchema(schema[key]);
+        }
+      }
+    })
+  }
+
+
+  setDefault(schema, config) {
+    try{
+      Object.keys(schema).forEach(key => {
+        if(schema[key] && key !== 'description' && key !== 'type' && key !== 'required') {
+          if (schema[key].type) {
+            if (schema[key].type === 'object') {
+              this.setDefault(schema[key], config[key]);
+            } else {
+              schema[key].default = config[key];
+            }
+          } else {
+            this.setDefault(schema[key], config);
+          }
+        }
+      })
+    } catch {
+      return;
+    }
   }
 
 }

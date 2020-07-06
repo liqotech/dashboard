@@ -33,7 +33,7 @@ export default class Authenticator {
      * If the user wants to use an OIDC provider, let them use it
      * If there is no OIDC provider specified, use a token
      */
-    if(window.OIDC_PROVIDER_URL !== undefined){
+    if(window.OIDC_PROVIDER_URL){
       this.manager = new UserManager({
         automaticSilentRenew: true,
         response_type: 'code',

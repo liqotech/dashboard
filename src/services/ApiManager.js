@@ -219,15 +219,26 @@ export default class ApiManager {
    * @returns a promise
    */
   updateCustomResource(group, version, namespace, plural, name, item){
-    return this.apiCRD.patchNamespacedCustomObject(
-      group,
-      version,
-      namespace,
-      plural,
-      name,
-      item,
-      this.options
-    )
+    if(namespace){
+      return this.apiCRD.patchNamespacedCustomObject(
+        group,
+        version,
+        namespace,
+        plural,
+        name,
+        item,
+        this.options
+      )
+    } else {
+      return this.apiCRD.patchClusterCustomObject(
+        group,
+        version,
+        plural,
+        name,
+        item,
+        this.options
+      )
+    }
   }
 
   /**

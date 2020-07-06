@@ -140,8 +140,10 @@ class SideBar extends Component {
             </Menu.SubMenu>
             <Menu.Divider/>
             <Menu.Item key="3" style={{ marginTop: 8}}>
-              <SettingOutlined style={{ fontSize: '20px' }} />
-              <span>Settings</span>
+              <Link to="/settings">
+                <SettingOutlined style={{ fontSize: '20px' }} />
+                <span>Settings</span>
+              </Link>
             </Menu.Item>
           </Menu>
         </Sider>

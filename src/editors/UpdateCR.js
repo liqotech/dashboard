@@ -10,8 +10,6 @@ import LoadingIndicator from '../common/LoadingIndicator';
 import ReactResizeDetector from 'react-resize-detector';
 import { APP_NAME } from '../constants';
 
-const { Title } = Typography;
-
 class UpdateCR extends Component {
   constructor(props) {
     super(props);

@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
 import Utils from '../../services/Utils';
 import { withTheme } from '@rjsf/core';
-import { Theme } from './theme';
+import { Theme as AntDTheme } from '@rjsf/antd';
 import AceEditor from 'react-ace';
 import YAML from 'yaml';
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/theme-github';
-import { message } from 'antd';
+import { Button, message } from 'antd';
+import { uiSchema, widgets } from './CustomWidget';
 
-const Form = withTheme(Theme);
+const Form = withTheme(AntDTheme);
 
 class FormGenerator extends Component {
   constructor(props) {
@@ -83,8 +84,12 @@ class FormGenerator extends Component {
         <br/>
         <Form
           schema={this.schema}
+          uiSchema={uiSchema}
+          widgets={widgets}
           onSubmit={this.onSubmit}
-        />
+        >
+          <Button type="primary" htmlType={'submit'}>Submit</Button>
+        </Form>
       </div>
     )
   }
