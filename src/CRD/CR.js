@@ -216,7 +216,7 @@ class CR extends Component {
                             />
                             <a style={{ color: 'rgba(57,57,57,0.85)'}}
                                onClick={this.handleClick_Spec}>
-                              Spec
+                              <Typography.Text strong>Spec</Typography.Text>
                             </a>
                           </div>
                           {this.state.showSpec ? (
@@ -238,7 +238,7 @@ class CR extends Component {
                             />
                             <a style={{ color: 'rgba(57,57,57,0.85)'}}
                                onClick={this.handleClick_Status}>
-                              Status
+                              <Typography.Text strong>Status</Typography.Text>
                             </a>
                           </div>
                           {this.state.showStatus ? (

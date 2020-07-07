@@ -8,7 +8,8 @@ import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/theme-github';
 import { Button, message } from 'antd';
-import { uiSchema, widgets } from './CustomWidget';
+import { widgets } from './CustomWidget';
+import { CustomFieldTemplate, fields } from './CustomField';
 
 const Form = withTheme(AntDTheme);
 
@@ -84,7 +85,8 @@ class FormGenerator extends Component {
         <br/>
         <Form
           schema={this.schema}
-          uiSchema={uiSchema}
+          fields={fields}
+          FieldTemplate={CustomFieldTemplate}
           widgets={widgets}
           onSubmit={this.onSubmit}
         >

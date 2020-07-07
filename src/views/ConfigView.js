@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import { Badge, Button, Layout, message, notification, Space, Tabs, Typography } from 'antd';
+import { Alert, Badge, Button, Layout, message, notification, Space, Tabs, Typography } from 'antd';
 import { withTheme } from '@rjsf/core';
 import { Theme as AntDTheme } from '@rjsf/antd';
 import Utils from '../services/Utils';
 import ToolOutlined from '@ant-design/icons/lib/icons/ToolOutlined';
-import { uiSchema, widgets } from '../editors/OAPIV3FormGenerator/CustomWidget';
+import { widgets } from '../editors/OAPIV3FormGenerator/CustomWidget';
+import { CustomFieldTemplate } from '../editors/OAPIV3FormGenerator/CustomField';
 import LoadingIndicator from '../common/LoadingIndicator';
 import { splitCamelCaseAndUp } from '../services/stringUtils';
-import YAML from 'yaml';
 import { APP_NAME } from '../constants';
 
 const Form = withTheme(AntDTheme);
@@ -33,6 +33,11 @@ class ConfigView extends Component {
         loading: false,
         currentConfig: Object.keys(res.body.items[0].spec)[0]
       })
+    }).catch(error => {
+      console.log(error);
+      this.setState({
+        loading: false
+      })
     })
   }
 
@@ -57,9 +62,11 @@ class ConfigView extends Component {
     );
 
     promise
-      .then(() => {
+      .then((res) => {
+        console.log(res);
         this.setState({
-          isLoading: false
+          isLoading: false,
+          prevConfig: res.body
         });
         notification.success({
           message: APP_NAME,
@@ -84,7 +91,7 @@ class ConfigView extends Component {
     if(this.state.prevConfig && this.state.CRD){
       const schema = this.util.OAPIV3toJSONSchema(this.state.CRD.spec.validation.openAPIV3Schema).properties.spec.properties;
       this.util.setDefault(schema, this.state.prevConfig.spec);
-      Object.keys(this.state.prevConfig.spec).forEach(config => {
+      Object.keys(this.state.CRD.spec.validation.openAPIV3Schema.properties.spec.properties).forEach(config => {
         const sub_schema = schema[config];
         configs.push(
           <Tabs.TabPane tab={
@@ -96,11 +103,11 @@ class ConfigView extends Component {
             <div style={{paddingLeft: 10}}>
               <Form
                 schema={sub_schema}
-                uiSchema={uiSchema}
+                FieldTemplate={CustomFieldTemplate}
                 widgets={widgets}
                 onSubmit={this.onSubmit}
               >
-                <Button type="primary" htmlType={'submit'}>Submit</Button>
+                <Button type="primary" htmlType={'submit'}>Save configuration</Button>
               </Form>
             </div>
           </Tabs.TabPane>
@@ -109,7 +116,7 @@ class ConfigView extends Component {
     }
 
     return(
-      <div className="crds-container" style={{maxWidth: '70%'}}>
+      <div className="crds-container" style={{maxWidth: '60%'}}>
         <div className={'crd-content'}>
           <Layout style={{background: '#fff'}}>
             <Space align="center">
@@ -125,10 +132,18 @@ class ConfigView extends Component {
           <Layout style={{background: '#fff'}}>
             <Layout.Content>
               { !this.state.loading ? (
-                <Tabs onChange={(key) => {this.state.currentConfig = key}}>
-                  {configs}
-                </Tabs>
-              ) : <LoadingIndicator/>}
+                  this.state.prevConfig ? (
+                      <Tabs onChange={(key) => {this.state.currentConfig = key}}>
+                        {configs}
+                      </Tabs>
+                    ): (
+                      <Alert
+                        message="Error"
+                        description="No configuration file has been found."
+                        type="error"
+                        showIcon
+                      />)
+                ) : <LoadingIndicator/>}
             </Layout.Content>
           </Layout>
         </div>

@@ -1,20 +1,21 @@
-import { Col, Input, InputNumber, Row, Slider, Space, Switch, Typography } from 'antd';
+import {
+  Col, Input, InputNumber, Row, Slider,
+  Space, Switch, Typography, Tooltip, Badge, Card
+} from 'antd';
 import React from 'react';
 import { splitCamelCaseAndUp } from '../../services/stringUtils';
+import QuestionOutlined from '@ant-design/icons/lib/icons/QuestionOutlined';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 
-export const uiSchema = {
-  "ui:widget": "custom",
-  "ui:options": {
-    label: false
-  }
-};
+/** Custom widgets */
 
 const CustomCheckbox = function(props) {
+  //console.log(props)
   return (
-    <Space size={'small'}>
-      <Switch id={props.id} checked={props.value} onClick={() => props.onChange(!props.value)} />
-      <Typography.Text strong>{splitCamelCaseAndUp(props.label)}</Typography.Text>
-    </Space>
+    <Switch id={props.id} style={{marginTop: 5, marginBottom: 5, float: 'right'}}
+            checkedChildren={'ON'}
+            unCheckedChildren={'OFF'}
+            checked={props.value} onClick={() => props.onChange(!props.value)} />
   );
 };
 
@@ -25,7 +26,7 @@ const CustomText = function(props) {
       if(props.schema.maximum === 100 && props.schema.minimum === 0){
         return (
           <Row>
-            <Col span={12}>
+            <Col span={19}>
               <Slider id={props.id}
                       min={0}
                       max={100}
@@ -33,11 +34,13 @@ const CustomText = function(props) {
                       value={typeof props.value === 'number' ? props.value : 0}
               />
             </Col>
-            <Col span={4}>
+            <Col span={5}>
               <InputNumber
+                style={{float: 'right'}}
+                formatter={value => `${value}%`}
+                parser={value => value.replace('%', '')}
                 min={0}
                 max={100}
-                style={{ margin: '0 16px' }}
                 value={typeof props.value === 'number' ? props.value : 0}
                 onChange={(value) => props.onChange(value)}
               />
@@ -47,7 +50,7 @@ const CustomText = function(props) {
       }
     }
     return (
-      <InputNumber id={props.id}
+      <InputNumber id={props.id} style={{float: 'right'}}
                    min={ (props.schema.minimum || props.schema.minimum === 0) ? props.schema.minimum : Number.MIN_SAFE_INTEGER}
                    max={props.schema.maximum ? props.schema.maximum : Number.MAX_SAFE_INTEGER}
                    defaultValue={props.value}
