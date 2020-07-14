@@ -19,6 +19,7 @@ import ErrorRedirect from '../error-handles/ErrorRedirect';
 import Login from '../login/Login';
 import { APP_NAME } from '../constants';
 import Cookies from 'js-cookie';
+import ConfigView from '../views/ConfigView';
 
 const { Content } = Layout;
 
@@ -100,6 +101,11 @@ class App extends Component {
                exact path="/customview/:viewName/"
                component={(props) =>
                  <CustomView {...props} api={this.state.api} />
+               }/>,
+        <Route key={'liqonfig'}
+               exact path="/settings"
+               component={(props) =>
+                 <ConfigView {...props} api={this.state.api} />
                }/>
       ])
     } else {

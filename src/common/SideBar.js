@@ -125,7 +125,7 @@ class SideBar extends Component {
             </Menu.Item>
             <Menu.Divider/>
             {cv}
-            <Menu.Divider/>
+            {cv.length ? <Menu.Divider/> : null}
             <Menu.Item key="2" style={{ marginTop: 8}}>
               <Link to="/customresources">
                 <DesktopOutlined style={{ fontSize: '20px' }} />
@@ -140,8 +140,10 @@ class SideBar extends Component {
             </Menu.SubMenu>
             <Menu.Divider/>
             <Menu.Item key="3" style={{ marginTop: 8}}>
-              <SettingOutlined style={{ fontSize: '20px' }} />
-              <span>Settings</span>
+              <Link to="/settings">
+                <SettingOutlined style={{ fontSize: '20px' }} />
+                <span>Settings</span>
+              </Link>
             </Menu.Item>
           </Menu>
         </Sider>

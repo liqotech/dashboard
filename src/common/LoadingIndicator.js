@@ -6,7 +6,7 @@ export default function LoadingIndicator(props) {
   return (
     <Spin
       size={'large'}
-      style={{ display: 'block', textAlign: 'center', marginTop: '15%' }}
+      style={{ display: 'block', textAlign: 'center', marginTop: '10%', marginBottom: '10%' }}
     />
   );
 }
