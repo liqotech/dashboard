@@ -1,0 +1,25 @@
+{
+  "apiVersion": "test/v1",
+  "items": [
+    {
+      "apiVersion": "test/v1",
+      "kind": "HistoChart",
+      "metadata": {
+        "name": "histo-test",
+        "namespace": "default",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/test/v1/namespaces/default/histocharts/histo-test",
+        "uid": "82ac3885-ffc4-4a0f-a7fd-6f8e72703a11"
+      },
+      "spec": {
+        "labels": "item.name",
+        "values": "item.cost"
+      }
+    }
+  ],
+  "kind": "HistoChartList",
+  "metadata": {
+    "continue": "",
+    "resourceVersion": "000000"
+  }
+}

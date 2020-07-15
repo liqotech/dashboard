@@ -1,0 +1,36 @@
+{
+  "apiVersion": "policy.liqo.io/v1",
+  "items": [
+    {
+      "apiVersion": "policy.liqo.io/v1",
+      "kind": "ClusterConfig",
+      "metadata": {
+        "name": "test",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/policy.liqo.io/v1/clusterconfigs/testcc"
+      },
+      "spec": {
+        "advertisementConfig": {
+          "autoAccept": false,
+          "maxAcceptableAdvertisement": 10,
+          "resourceSharingPercentage": 63
+        },
+        "discoveryConfig": {
+          "autojoin": true,
+          "domain": "domain-test",
+          "enableAdvertisement": true,
+          "enableDiscovery": true,
+          "name": "name-test",
+          "port": 12345,
+          "service": "service-test",
+          "updateTime": 3,
+          "waitTime": 4
+        }
+      }
+    }
+  ],
+  "kind": "ClusterConfigList",
+  "metadata": {
+    "resourceVersion": "0000000"
+  }
+}

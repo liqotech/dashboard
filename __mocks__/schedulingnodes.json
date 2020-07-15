@@ -1,0 +1,125 @@
+{
+  "apiVersion": "scheduling.liqo.io/v1",
+  "items": [
+    {
+      "apiVersion": "scheduling.liqo.io/v1",
+      "kind": "SchedulingNode",
+      "metadata": {
+        "name": "crown-master-vm",
+        "resourceVersion": "67254675",
+        "selfLink": "/apis/scheduling.liqo.io/v1/schedulingnodes/crown-master-vm",
+        "uid": "0b0a26ac-8eb4-4561-aae5-5671103bbaa3"
+      },
+      "spec": {
+        "nodeName": "crown-master-vm",
+        "nodeType": "liqo.io/physical"
+      },
+      "status": {}
+    },
+    {
+      "apiVersion": "scheduling.liqo.io/v1",
+      "kind": "SchedulingNode",
+      "metadata": {
+        "name": "vinod-0-1",
+        "resourceVersion": "00000",
+        "selfLink": "/apis/scheduling.liqo.io/v1/schedulingnodes/vinod-0-1"
+      },
+      "spec": {
+        "nodeName": "vinod-0-1",
+        "nodeType": "liqo.io/physical"
+      },
+      "status": {}
+    },
+    {
+      "apiVersion": "scheduling.liqo.io/v1",
+      "kind": "SchedulingNode",
+      "metadata": {
+        "name": "vinod-0-2",
+        "resourceVersion": "00000",
+        "selfLink": "/apis/scheduling.liqo.io/v1/schedulingnodes/vinod-0-2"
+      },
+      "spec": {
+        "nodeName": "vinod-0-2",
+        "nodeType": "liqo.io/physical"
+      },
+      "status": {}
+    },
+    {
+      "apiVersion": "scheduling.liqo.io/v1",
+      "kind": "SchedulingNode",
+      "metadata": {
+        "name": "vinod-0-3",
+        "resourceVersion": "00000",
+        "selfLink": "/apis/scheduling.liqo.io/v1/schedulingnodes/vinod-0-3"
+      },
+      "spec": {
+        "nodeName": "vinod-0-3",
+        "nodeType": "liqo.io/physical"
+      },
+      "status": {}
+    },
+    {
+      "apiVersion": "scheduling.liqo.io/v1",
+      "kind": "SchedulingNode",
+      "metadata": {
+        "name": "vinod-0-4",
+        "resourceVersion": "0000000",
+        "selfLink": "/apis/scheduling.liqo.io/v1/schedulingnodes/vinod-0-4"
+      },
+      "spec": {
+        "nodeName": "vinod-0-4",
+        "nodeType": "liqo.io/physical"
+      },
+      "status": {}
+    },
+    {
+      "apiVersion": "scheduling.liqo.io/v1",
+      "kind": "SchedulingNode",
+      "metadata": {
+        "name": "virtual-node-01",
+        "resourceVersion": "00000",
+        "selfLink": "/apis/scheduling.liqo.io/v1/schedulingnodes/virtual-node-01"
+      },
+      "spec": {
+        "nodeName": "virtual-node-01",
+        "nodeType": "liqo.io/virtual",
+        "resourceQuota": {}
+      },
+      "status": {}
+    },
+    {
+      "apiVersion": "scheduling.liqo.io/v1",
+      "kind": "SchedulingNode",
+      "metadata": {
+        "name": "virtual-node-02",
+        "resourceVersion": "00000",
+        "selfLink": "/apis/scheduling.liqo.io/v1/schedulingnodes/virtual-node-02"
+      },
+      "spec": {
+        "nodeName": "virtual-node-02",
+        "nodeType": "liqo.io/virtual",
+        "resourceQuota": {}
+      },
+      "status": {}
+    },
+    {
+      "apiVersion": "scheduling.liqo.io/v1",
+      "kind": "SchedulingNode",
+      "metadata": {
+        "name": "virtual-node-03",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/scheduling.liqo.io/v1/schedulingnodes/virtual-node-03"
+      },
+      "spec": {
+        "nodeName": "virtual-node-03",
+        "nodeType": "liqo.io/virtual",
+        "resourceQuota": {}
+      },
+      "status": {}
+    }
+  ],
+  "kind": "SchedulingNodeList",
+  "metadata": {
+    "resourceVersion": "000000"
+  }
+}

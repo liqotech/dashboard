@@ -1,0 +1,911 @@
+{
+  "kind": "CustomResourceDefinitionList",
+  "apiVersion": "apiextensions.k8s.io/v1beta1",
+  "metadata": {
+    "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions",
+    "resourceVersion": "80093040"
+  },
+  "items": [
+    {
+      "metadata": {
+        "name": "advertisements.protocol.liqo.io",
+        "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/advertisements.protocol.liqo.io",
+        "resourceVersion": "000000",
+        "annotations": {
+          "controller-gen.kubebuilder.io/version": "v0.2.5"
+        }
+      },
+      "spec": {
+        "group": "protocol.liqo.io",
+        "version": "v1",
+        "names": {
+          "plural": "advertisements",
+          "singular": "advertisement",
+          "kind": "Advertisement",
+          "listKind": "AdvertisementList"
+        },
+        "scope": "Cluster",
+        "validation": {
+          "openAPIV3Schema": {
+            "description": "Advertisement is the Schema for the advertisements API",
+            "type": "object",
+            "properties": {
+              "apiVersion": {
+                "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                "type": "string"
+              },
+              "metadata": {
+                "type": "object"
+              },
+              "spec": {
+                "description": "AdvertisementSpec defines the desired state of Advertisement",
+                "type": "object",
+                "required": [
+                  "clusterId",
+                  "network",
+                  "timeToLive",
+                  "timestamp"
+                ],
+                "properties": {
+                  "clusterId": {
+                    "type": "string"
+                  },
+                  "network": {
+                    "type": "object",
+                    "required": [
+                      "gatewayIP",
+                      "gatewayPrivateIP",
+                      "podCIDR"
+                    ],
+                    "properties": {
+                      "gatewayIP": {
+                        "type": "string"
+                      },
+                      "gatewayPrivateIP": {
+                        "type": "string"
+                      },
+                      "podCIDR": {
+                        "type": "string"
+                      },
+                      "supportedProtocols": {
+                        "type": "array",
+                        "items": {"type":"string"}
+                      }
+                    }
+                  },
+                  "properties": {
+                    "type": "object",
+                    "additionalProperties": {"type":"string"}
+                  },
+                  "timeToLive": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "timestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              "status": {
+                "description": "AdvertisementStatus defines the observed state of Advertisement",
+                "type": "object",
+                "required": [
+                  "advertisementStatus",
+                  "foreignNetwork",
+                  "tunnelEndpointKey",
+                  "vkCreated"
+                ],
+                "properties": {
+                  "advertisementStatus": {
+                    "type": "string"
+                  },
+                  "foreignNetwork": {
+                    "type": "object",
+                    "required": [
+                      "gatewayIP",
+                      "gatewayPrivateIP",
+                      "podCIDR"
+                    ],
+                    "properties": {
+                      "gatewayIP": {
+                        "type": "string"
+                      },
+                      "gatewayPrivateIP": {
+                        "type": "string"
+                      },
+                      "podCIDR": {
+                        "type": "string"
+                      },
+                      "supportedProtocols": {
+                        "type": "array",
+                        "items": {"type":"string"}
+                      }
+                    }
+                  },
+                  "localRemappedPodCIDR": {
+                    "type": "string"
+                  },
+                  "observedGeneration": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "remoteRemappedPodCIDR": {
+                    "type": "string"
+                  },
+                  "tunnelEndpointKey": {
+                    "description": "the tunnelEndpoint associated with the foreign cluster",
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "namespace"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "namespace": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "vkCreated": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "status": {}
+    },
+    {
+          "metadata": {
+            "name": "noannnoresnoschemas.test",
+            "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/noannnoresnoschemas.test",
+            "resourceVersion": "0000000"
+          },
+          "spec": {
+            "group": "test",
+            "version": "v1alpha1",
+            "names": {
+              "plural": "noannnoresnoschemas",
+              "singular": "noannnoresnoschema",
+              "kind": "NoAnnNoResNoSchema",
+              "listKind": "NoAnnNoResNoSchemaList"
+            }
+          }
+        },
+    {
+          "metadata": {
+            "name": "manyresources.test",
+            "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/manyresources.test",
+            "resourceVersion": "000000"
+          },
+          "spec": {
+            "group": "crd.projectcalico.org",
+            "version": "v1",
+            "names": {
+              "plural": "manyresources",
+              "singular": "manyresource",
+              "kind": "ManyResource",
+              "listKind": "ManyResourceList"
+            }
+          }
+        },
+    {
+          "metadata": {
+            "name": "liqodashtests.crd-template.liqo.com",
+            "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/liqodashtests.crd-template.liqo.com",
+            "uid": "22332251-e719-463d-b4a0-be3835e0f04b",
+            "resourceVersion": "75319285",
+            "generation": 1,
+            "creationTimestamp": "2020-06-01T10:13:44Z",
+            "annotations": {
+              "description": "A test CRD for some implemetation on the liqo-dashboard",
+              "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apiextensions.k8s.io/v1beta1\",\"kind\":\"CustomResourceDefinition\",\"metadata\":{\"annotations\":{\"description\":\"A test CRD for some implemetation on the liqo-dashboard\"},\"name\":\"liqodashtests.crd-template.liqo.com\"},\"spec\":{\"group\":\"crd-template.liqo.com\",\"names\":{\"kind\":\"LiqoDashTest\",\"listKind\":\"LiqoDashTestList\",\"plural\":\"liqodashtests\",\"singular\":\"liqodashtest\"},\"scope\":\"Namespaced\",\"subresources\":{\"status\":{}},\"validation\":{\"openAPIV3Schema\":{\"properties\":{\"apiVersion\":{\"type\":\"string\"},\"kind\":{\"type\":\"string\"},\"metadata\":{\"type\":\"object\"},\"spec\":{\"properties\":{\"item\":{\"description\":\"Collection of items\",\"items\":{\"properties\":{\"cost\":{\"description\":\"Cost of the item\",\"type\":\"integer\"},\"name\":{\"description\":\"Name of the item\",\"type\":\"string\"}},\"type\":\"object\"},\"type\":\"array\"}}}},\"type\":\"object\"}},\"version\":\"v1\",\"versions\":[{\"name\":\"v1\",\"served\":true,\"storage\":true}]},\"status\":{\"acceptedNames\":{\"kind\":\"\",\"plural\":\"\"},\"conditions\":[],\"storedVersions\":[]}}\n",
+              "template": "crd-template.liqo.com/v1/piecharts/pie-test-123455"
+            }
+          },
+          "spec": {
+            "group": "crd-template.liqo.com",
+            "version": "v1",
+            "names": {
+              "plural": "liqodashtests",
+              "singular": "liqodashtest",
+              "kind": "LiqoDashTest",
+              "listKind": "LiqoDashTestList"
+            },
+            "scope": "Namespaced",
+            "validation": {
+              "openAPIV3Schema": {
+                "type": "object",
+                "properties": {
+                  "apiVersion": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "type": "object"
+                  },
+                  "spec": {
+                    "properties": {
+                      "item": {
+                        "description": "Collection of items",
+                        "type": "array",
+                        "items": {"type":"object","properties":{"cost":{"description":"Cost of the item","type":"integer"},"name":{"description":"Name of the item","type":"string"}}}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "subresources": {
+              "status": {}
+            },
+            "versions": [
+              {
+                "name": "v1",
+                "served": true,
+                "storage": true
+              }
+            ],
+            "conversion": {
+              "strategy": "None"
+            },
+            "preserveUnknownFields": true
+          },
+          "status": {
+            "conditions": [
+              {
+                "type": "NamesAccepted",
+                "status": "True",
+                "lastTransitionTime": "2020-06-01T10:13:44Z",
+                "reason": "NoConflicts",
+                "message": "no conflicts found"
+              },
+              {
+                "type": "Established",
+                "status": "True",
+                "lastTransitionTime": "2020-06-01T10:13:44Z",
+                "reason": "InitialNamesAccepted",
+                "message": "the initial names have been accepted"
+              },
+              {
+                "type": "NonStructuralSchema",
+                "status": "True",
+                "lastTransitionTime": "2020-06-01T10:13:44Z",
+                "reason": "Violations",
+                "message": "spec.versions[0].schema.openAPIV3Schema.properties[spec].type: Required value: must not be empty for specified object fields"
+              }
+            ],
+            "acceptedNames": {
+              "plural": "liqodashtests",
+              "singular": "liqodashtest",
+              "kind": "LiqoDashTest",
+              "listKind": "LiqoDashTestList"
+            },
+            "storedVersions": [
+              "v1"
+            ]
+          }
+        },
+    {
+          "metadata": {
+            "name": "piecharts.crd-template.liqo.com",
+            "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/piecharts.crd-template.liqo.com",
+            "uid": "a97b51b8-21ae-4867-80a3-70f30d791c5f",
+            "resourceVersion": "62270658",
+            "generation": 1,
+            "creationTimestamp": "2020-06-03T13:35:46Z",
+            "annotations": {
+              "description": "This CRD is used to create generic pie chart designs",
+              "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apiextensions.k8s.io/v1beta1\",\"kind\":\"CustomResourceDefinition\",\"metadata\":{\"annotations\":{\"description\":\"This CRD is used to create generic pie chart designs\"},\"name\":\"piecharts.crd-template.liqo.com\"},\"spec\":{\"group\":\"crd-template.liqo.com\",\"names\":{\"kind\":\"PieChart\",\"listKind\":\"PieChartList\",\"plural\":\"piecharts\",\"shortNames\":[\"pies\"],\"singular\":\"piechart\"},\"scope\":\"Namespaced\",\"subresources\":{\"status\":{}},\"validation\":{\"openAPIV3Schema\":{\"properties\":{\"apiVersion\":{\"description\":\"APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources\",\"type\":\"string\"},\"kind\":{\"description\":\"Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds\",\"type\":\"string\"},\"metadata\":{\"type\":\"object\"},\"spec\":{\"properties\":{\"labels\":{\"description\":\"Path to the labels to use\",\"type\":\"string\"},\"values\":{\"description\":\"Path to the values to use\",\"type\":\"string\"}},\"required\":[\"values\",\"labels\"],\"type\":\"object\"}},\"type\":\"object\"}},\"version\":\"v1\",\"versions\":[{\"name\":\"v1\",\"served\":true,\"storage\":true}]},\"status\":{\"acceptedNames\":{\"kind\":\"\",\"plural\":\"\"},\"conditions\":[],\"storedVersions\":[]}}\n"
+            }
+          },
+          "spec": {
+            "group": "crd-template.liqo.com",
+            "version": "v1",
+            "names": {
+              "plural": "piecharts",
+              "singular": "piechart",
+              "shortNames": [
+                "pies"
+              ],
+              "kind": "PieChart",
+              "listKind": "PieChartList"
+            },
+            "scope": "Namespaced",
+            "validation": {
+              "openAPIV3Schema": {
+                "type": "object",
+                "properties": {
+                  "apiVersion": {
+                    "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+                    "type": "string"
+                  },
+                  "kind": {
+                    "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "type": "object"
+                  },
+                  "spec": {
+                    "type": "object",
+                    "required": [
+                      "values",
+                      "labels"
+                    ],
+                    "properties": {
+                      "labels": {
+                        "description": "Path to the labels to use",
+                        "type": "string"
+                      },
+                      "values": {
+                        "description": "Path to the values to use",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "subresources": {
+              "status": {}
+            },
+            "versions": [
+              {
+                "name": "v1",
+                "served": true,
+                "storage": true
+              }
+            ],
+            "conversion": {
+              "strategy": "None"
+            },
+            "preserveUnknownFields": true
+          },
+          "status": {
+            "conditions": [
+              {
+                "type": "NamesAccepted",
+                "status": "True",
+                "lastTransitionTime": "2020-06-03T13:35:46Z",
+                "reason": "NoConflicts",
+                "message": "no conflicts found"
+              },
+              {
+                "type": "Established",
+                "status": "True",
+                "lastTransitionTime": "2020-06-03T13:35:46Z",
+                "reason": "InitialNamesAccepted",
+                "message": "the initial names have been accepted"
+              }
+            ],
+            "acceptedNames": {
+              "plural": "piecharts",
+              "singular": "piechart",
+              "shortNames": [
+                "pies"
+              ],
+              "kind": "PieChart",
+              "listKind": "PieChartList"
+            },
+            "storedVersions": [
+              "v1"
+            ]
+          }
+        },
+    {
+          "metadata": {
+            "name": "tunnelendpoints.liqonet.liqo.io",
+            "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/tunnelendpoints.liqonet.liqo.io",
+            "uid": "f56d99a0-ea18-46e6-868a-df6ba1b8348a",
+            "resourceVersion": "67246742",
+            "generation": 1,
+            "creationTimestamp": "2020-06-11T13:57:31Z",
+            "annotations": {
+              "controller-gen.kubebuilder.io/version": "v0.2.5"
+            }
+          },
+          "spec": {
+            "group": "liqonet.liqo.io",
+            "version": "v1",
+            "names": {
+              "plural": "tunnelendpoints",
+              "singular": "tunnelendpoint",
+              "kind": "TunnelEndpoint",
+              "listKind": "TunnelEndpointList"
+            },
+            "scope": "Cluster",
+            "validation": {
+              "openAPIV3Schema": {
+                "description": "TunnelEndpoint is the Schema for the endpoints API",
+                "type": "object",
+                "properties": {
+                  "apiVersion": {
+                    "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+                    "type": "string"
+                  },
+                  "kind": {
+                    "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "type": "object"
+                  },
+                  "spec": {
+                    "description": "TunnelEndpointSpec defines the desired state of TunnelEndpoint",
+                    "type": "object",
+                    "required": [
+                      "clusterID",
+                      "podCIDR",
+                      "tunnelPrivateIP",
+                      "tunnelPublicIP"
+                    ],
+                    "properties": {
+                      "clusterID": {
+                        "type": "string"
+                      },
+                      "podCIDR": {
+                        "type": "string"
+                      },
+                      "tunnelPrivateIP": {
+                        "type": "string"
+                      },
+                      "tunnelPublicIP": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "status": {
+                    "description": "TunnelEndpointStatus defines the observed state of TunnelEndpoint",
+                    "type": "object",
+                    "properties": {
+                      "NAT": {
+                        "type": "boolean"
+                      },
+                      "localRemappedPodCIDR": {
+                        "type": "string"
+                      },
+                      "localTunnelPrivateIP": {
+                        "type": "string"
+                      },
+                      "localTunnelPublicIP": {
+                        "type": "string"
+                      },
+                      "phase": {
+                        "description": "INSERT ADDITIONAL STATUS FIELD - define observed state of cluster Important: Run \"make\" to regenerate code after modifying this file\\",
+                        "type": "string"
+                      },
+                      "remoteRemappedPodCIDR": {
+                        "type": "string"
+                      },
+                      "remoteTunnelPrivateIP": {
+                        "type": "string"
+                      },
+                      "remoteTunnelPublicIP": {
+                        "type": "string"
+                      },
+                      "tunnelIFaceIndex": {
+                        "type": "integer"
+                      },
+                      "tunnelIFaceName": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "subresources": {
+              "status": {}
+            },
+            "versions": [
+              {
+                "name": "v1",
+                "served": true,
+                "storage": true
+              }
+            ],
+            "conversion": {
+              "strategy": "None"
+            },
+            "preserveUnknownFields": true
+          },
+          "status": {
+            "conditions": [
+              {
+                "type": "NamesAccepted",
+                "status": "True",
+                "lastTransitionTime": "2020-06-11T13:57:31Z",
+                "reason": "NoConflicts",
+                "message": "no conflicts found"
+              },
+              {
+                "type": "Established",
+                "status": "True",
+                "lastTransitionTime": "2020-06-11T13:57:31Z",
+                "reason": "InitialNamesAccepted",
+                "message": "the initial names have been accepted"
+              }
+            ],
+            "acceptedNames": {
+              "plural": "tunnelendpoints",
+              "singular": "tunnelendpoint",
+              "kind": "TunnelEndpoint",
+              "listKind": "TunnelEndpointList"
+            },
+            "storedVersions": [
+              "v1"
+            ]
+          }
+        },
+    {
+          "metadata": {
+            "name": "views.crd-template.liqo.com",
+            "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/views.crd-template.liqo.com",
+            "resourceVersion": "0000000",
+            "annotations": {
+              "description": "This CRD is used to create custom views from a set of CRDs",
+              "favourite": "true",
+              "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apiextensions.k8s.io/v1beta1\",\"kind\":\"CustomResourceDefinition\",\"metadata\":{\"annotations\":{\"description\":\"This CRD is used to create custom views from a set of CRDs\"},\"name\":\"views.crd-template.liqo.com\"},\"spec\":{\"group\":\"crd-template.liqo.com\",\"names\":{\"kind\":\"View\",\"listKind\":\"ViewList\",\"plural\":\"views\",\"singular\":\"view\"},\"scope\":\"Namespaced\",\"subresources\":{\"status\":{}},\"validation\":{\"openAPIV3Schema\":{\"properties\":{\"apiVersion\":{\"description\":\"APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources\",\"type\":\"string\"},\"kind\":{\"description\":\"Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds\",\"type\":\"string\"},\"metadata\":{\"type\":\"object\"},\"spec\":{\"properties\":{\"layout\":{\"description\":\"Layout that will be displayed\",\"type\":\"object\"},\"name\":{\"description\":\"The name showed in the sidebar\",\"type\":\"string\"},\"templates\":{\"description\":\"Collection of CR template views\",\"items\":{\"properties\":{\"kind\":{\"description\":\"The kind of a CRD we want to put in the view\",\"type\":\"string\"},\"name\":{\"description\":\"The name showed in the custom view for this CRD\",\"type\":\"string\"},\"template\":{\"description\":\"The path of a type template CRD custom resource (if default use the template in the CRD)\",\"type\":\"string\"}},\"type\":\"object\"},\"type\":\"array\"}},\"type\":\"object\"}},\"type\":\"object\"}},\"version\":\"v1\",\"versions\":[{\"name\":\"v1\",\"served\":true,\"storage\":true}]},\"status\":{\"acceptedNames\":{\"kind\":\"\",\"plural\":\"\"},\"conditions\":[],\"storedVersions\":[]}}\n"
+            }
+          },
+          "spec": {
+            "group": "crd-template.liqo.com",
+            "version": "v1",
+            "names": {
+              "plural": "views",
+              "singular": "view",
+              "kind": "View",
+              "listKind": "ViewList"
+            },
+            "scope": "Namespaced",
+            "validation": {
+              "openAPIV3Schema": {
+                "type": "object",
+                "properties": {
+                  "apiVersion": {
+                    "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+                    "type": "string"
+                  },
+                  "kind": {
+                    "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "type": "object"
+                  },
+                  "spec": {
+                    "type": "object",
+                    "properties": {
+                      "layout": {
+                        "description": "Layout that will be displayed",
+                        "type": "object"
+                      },
+                      "name": {
+                        "description": "The name showed in the sidebar",
+                        "type": "string"
+                      },
+                      "templates": {
+                        "description": "Collection of CR template views",
+                        "type": "array",
+                        "items": {"type":"object","properties":{"kind":{"description":"The kind of a CRD we want to put in the view","type":"string"},"name":{"description":"The name showed in the custom view for this CRD","type":"string"},"template":{"description":"The path of a type template CRD custom resource (if default use the template in the CRD)","type":"string"}}}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "status": {}
+        },
+    {
+          "metadata": {
+            "name": "test1.liqo.com",
+            "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/test1s.test.com",
+            "resourceVersion": "0000000"
+          },
+          "spec": {
+            "group": "test.com",
+            "version": "v1",
+            "names": {
+              "plural": "test1s",
+              "singular": "test1",
+              "kind": "Test1",
+              "listKind": "Test1List"
+            }
+          }
+        },
+    {
+      "metadata": {
+        "name": "test4.liqo.com",
+        "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/test4s.test.com",
+        "resourceVersion": "000000"
+      },
+      "spec": {
+        "group": "test.com",
+        "version": "v1",
+        "names": {
+          "plural": "test4s",
+          "singular": "test4",
+          "kind": "Test4",
+          "listKind": "Test4List"
+        }
+      }
+    },
+    {
+      "metadata": {
+        "name": "clusterconfigs.policy.liqo.io",
+        "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/clusterconfigs.policy.liqo.io",
+        "uid": "012e79f2-fe78-4ac3-9bd5-06c5d98f14b8",
+        "resourceVersion": "0000000"
+      },
+      "spec": {
+        "group": "policy.liqo.io",
+        "version": "v1",
+        "names": {
+          "plural": "clusterconfigs",
+          "singular": "clusterconfig",
+          "kind": "ClusterConfig",
+          "listKind": "ClusterConfigList"
+        },
+        "scope": "Cluster",
+        "validation": {
+          "openAPIV3Schema": {
+            "description": "ClusterConfig is the Schema for the clusterconfigs API",
+            "type": "object",
+            "properties": {
+              "apiVersion": {
+                "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                "type": "string"
+              },
+              "metadata": {
+                "type": "object"
+              },
+              "spec": {
+                "description": "ClusterConfigSpec defines the desired state of ClusterConfig",
+                "type": "object",
+                "required": [
+                  "advertisementConfig",
+                  "discoveryConfig"
+                ],
+                "properties": {
+                  "advertisementConfig": {
+                    "type": "object",
+                    "required": [
+                      "autoAccept"
+                    ],
+                    "properties": {
+                      "autoAccept": {
+                        "description": "This is a description",
+                        "type": "boolean"
+                      },
+                      "maxAcceptableAdvertisement": {
+                        "description": "This is a description",
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0
+                      },
+                      "resourceSharingPercentage": {
+                        "description": "This is a description",
+                        "type": "integer",
+                        "format": "int32",
+                        "maximum": 100,
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  "discoveryConfig": {
+                    "type": "object",
+                    "required": [
+                      "autojoin",
+                      "domain",
+                      "enableAdvertisement",
+                      "enableDiscovery",
+                      "name",
+                      "port",
+                      "service",
+                      "updateTime",
+                      "waitTime"
+                    ],
+                    "properties": {
+                      "autojoin": {
+                        "description": "This is a description",
+                        "type": "boolean"
+                      },
+                      "domain": {
+                        "description": "This is a description",
+                        "type": "string"
+                      },
+                      "enableAdvertisement": {
+                        "description": "This is a description",
+                        "type": "boolean"
+                      },
+                      "enableDiscovery": {
+                        "description": "This is a description",
+                        "type": "boolean"
+                      },
+                      "name": {
+                        "description": "This is a description",
+                        "type": "string"
+                      },
+                      "port": {
+                        "description": "This is a description",
+                        "type": "integer",
+                        "maximum": 65355,
+                        "minimum": 1
+                      },
+                      "service": {
+                        "description": "This is a description",
+                        "type": "string"
+                      },
+                      "updateTime": {
+                        "description": "This is a description",
+                        "type": "integer",
+                        "minimum": 2
+                      },
+                      "waitTime": {
+                        "description": "This is a description",
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    }
+                  }
+                }
+              },
+              "status": {}
+            }
+          }
+        }
+      },
+      "status": {}
+    },
+    {
+      "metadata": {
+        "name": "schedulingnodes.scheduling.liqo.io",
+        "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/schedulingnodes.scheduling.liqo.io",
+        "resourceVersion": "000000",
+        "annotations": {
+          "template": "crd-template.liqo.com/v1/graphs/graph-test"
+        }
+      },
+      "spec": {
+        "group": "scheduling.liqo.io",
+        "version": "v1",
+        "names": {
+          "plural": "schedulingnodes",
+          "singular": "schedulingnode",
+          "kind": "SchedulingNode",
+          "listKind": "SchedulingNodeList"
+        },
+        "scope": "Cluster",
+        "validation": {
+          "openAPIV3Schema": {
+            "description": "SchedulingNode is the Schema for the schedulingnodes API",
+            "type": "object",
+            "properties": {
+              "apiVersion": {
+                "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                "type": "string"
+              },
+              "metadata": {
+                "type": "object"
+              },
+              "spec": {
+                "description": "SchedulingNodeSpec defines the desired state of SchedulingNode",
+                "type": "object",
+                "required": [
+                  "nodeName",
+                  "nodeType"
+                ],
+                "properties": {
+                  "nodeName": {
+                    "description": "ResourceName is the name identifying various resources in a ResourceList.",
+                    "type": "string"
+                  },
+                  "nodeType": {
+                    "description": "ResourceName is the name identifying various resources in a ResourceList.",
+                    "type": "string"
+                  },
+                  "properties": {
+                    "type": "object",
+                    "additionalProperties": {"type":"string"}
+                  }
+                }
+              },
+              "status": {
+                "description": "SchedulingNodeStatus defines the observed state of SchedulingNode",
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "status": {}
+    },
+    {
+      "metadata": {
+        "name": "graphs.test"
+      },
+      "spec": {
+        "group": "test",
+        "names": {
+          "plural": "graphs",
+          "singular": "graph",
+          "kind": "Graph",
+          "listKind": "GraphList"
+        },
+        "validation": {
+          "openAPIV3Schema": {
+            "properties": {
+              "apiVersion": {
+                "description": "APIVersion defines the versioned schema of this representation\nof an object. Servers should convert recognized schemas to the latest\ninternal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind is a string value representing the REST resource this\nobject represents. Servers may infer this from the endpoint the client\nsubmits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                "type": "string"
+              },
+              "metadata": {
+                "type": "object"
+              },
+              "spec": {
+                "properties": {
+                  "node": {
+                    "description": "Name of the node",
+                    "type": "string"
+                  },
+                  "group": {
+                    "description": "Group to differentiate between nodes",
+                    "properties": {
+                      "type": {
+                        "description": "On what basis differentiate the groups",
+                        "type": "string"
+                      },
+                      "cluster": {
+                        "description": "Cluster nodes based on group's name",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "type": "object"
+                  },
+                  "neighbors": {
+                    "description": "Path to a neighbors object",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "node"
+                ],
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        }
+      },
+      "status": {}
+    }
+  ]
+}

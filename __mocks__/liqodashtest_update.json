@@ -1,0 +1,22 @@
+{
+  "apiVersion": "test/v1",
+  "kind": "LiqoDashTest",
+  "metadata": {
+    "name": "test-1",
+    "namespace": "default",
+    "resourceVersion": "0000001",
+    "selfLink": "/apis/test/v1/namespaces/default/liqodashtests/test-1"
+  },
+  "spec": {
+    "item": [
+      {
+        "cost": 13,
+        "name": "green"
+      },
+      {
+        "cost": 15,
+        "name": "purple"
+      }
+    ]
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "apiVersion": "test/v1",
+  "items": [
+    {
+      "apiVersion": "test/v1",
+      "kind": "ManyResource",
+      "metadata": {
+        "name": "test-1",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/test/v1/manyresources/test-1"
+      },
+      "spec": {
+        "cidr": "",
+        "deleted": "",
+        "node": "",
+        "state": ""
+      }
+    },
+    {
+      "apiVersion": "test/v1",
+      "kind": "ManyResource",
+      "metadata": {
+        
+        "name": "test-2",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/test/v1/manyresources/test-2"
+      },
+      "spec": {
+        "cidr": "",
+        "deleted": "",
+        "node": "",
+        "state": ""
+      }
+    },
+    {
+      "apiVersion": "test/v1",
+      "kind": "ManyResource",
+      "metadata": {
+        
+        "name": "test-3",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/test/v1/manyresources/test-3"
+      },
+      "spec": {
+        "cidr": "",
+        "deleted": "",
+        "node": "",
+        "state": ""
+      }
+    },
+    {
+      "apiVersion": "test/v1",
+      "kind": "ManyResource",
+      "metadata": {
+        
+        "name": "test-4",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/test/v1/manyresources/test-4"
+      },
+      "spec": {
+        "cidr": "",
+        "deleted": "",
+        "node": "",
+        "state": ""
+      }
+    },
+    {
+      "apiVersion": "test/v1",
+      "kind": "ManyResource",
+      "metadata": {
+        
+        "name": "test-5",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/test/v1/manyresources/test-5"
+      },
+      "spec": {
+        "cidr": "",
+        "deleted": "",
+        "node": "",
+        "state": ""
+      }
+    },
+    {
+      "apiVersion": "test/v1",
+      "kind": "ManyResource",
+      "metadata": {
+        
+        "name": "test-6",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/test/v1/manyresources/test-6"
+      },
+      "spec": {
+        "cidr": "",
+        "deleted": "",
+        "node": "",
+        "state": ""
+      }
+    },
+    {
+      "apiVersion": "test/v1",
+      "kind": "ManyResource",
+      "metadata": {
+        
+        "name": "test-7",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/test/v1/manyresources/test-7"
+      },
+      "spec": {
+        "cidr": "",
+        "deleted": "",
+        "node": "",
+        "state": ""
+      }
+    },
+    {
+      "apiVersion": "test/v1",
+      "kind": "ManyResource",
+      "metadata": {
+        
+        "name": "test-8",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/test/v1/manyresources/test-8"
+      },
+      "spec": {
+        "cidr": "",
+        "deleted": "",
+        "node": "",
+        "state": ""
+      }
+    }
+  ],
+  "kind": "ManyResourceList",
+  "metadata": {
+    "continue": "",
+    "resourceVersion": "80733027",
+    "selfLink": "/apis/test/v1/manyresources"
+  }
+}

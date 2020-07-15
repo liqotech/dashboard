@@ -1,0 +1,16 @@
+{
+  "body": {
+    "kind": "Status",
+    "apiVersion": "v1",
+    "metadata": {},
+    "status": "Failure",
+    "message": "Forbidden",
+    "reason":  "Forbidden",
+    "code": 403,
+    "response": {
+      "_fetchResponse": {
+        "status": 403
+      }
+    }
+  }
+}
