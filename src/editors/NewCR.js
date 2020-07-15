@@ -11,8 +11,6 @@ import { APP_NAME } from '../constants';
 import FormGenerator from './OAPIV3FormGenerator/FormGenerator';
 import ReactResizeDetector from 'react-resize-detector';
 
-const { Title } = Typography;
-
 class NewCR extends Component {
   constructor(props) {
     super(props);
@@ -43,8 +41,8 @@ class NewCR extends Component {
       }
     }
 
-    if(item.name === ''){
-      message.error('Please insert a valid name');
+    if(!item || !item.metadata || item.metadata.name === ''){
+      message.error('Errors in the custom resource definition');
       return;
     }
 
@@ -84,7 +82,7 @@ class NewCR extends Component {
         this.props.this.setState({showCreate: false});
       })
       .catch((error) => {
-        console.log(error);
+        //console.log(error);
         this.setState({
           isLoading: false
         });
@@ -135,9 +133,11 @@ class NewCR extends Component {
             <Tabs.TabPane tab="JSON/YAML" key="1">
               {this.inputText()}
             </Tabs.TabPane>
-            <Tabs.TabPane tab="Form Generator" key="2">
-              <FormGenerator CRD={this.CRD} submit={this.submit}/>
-            </Tabs.TabPane>
+            { this.CRD.spec.validation && this.CRD.spec.validation.openAPIV3Schema ? (
+              <Tabs.TabPane tab="Form Generator" key="2">
+                <FormGenerator CRD={this.CRD} submit={this.submit}/>
+              </Tabs.TabPane>
+            ) : null}
           </Tabs>
         ) : null }
         { this.state.isLoading ? <LoadingIndicator /> : null }

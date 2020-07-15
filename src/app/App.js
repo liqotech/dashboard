@@ -21,8 +21,6 @@ import { APP_NAME } from '../constants';
 import Cookies from 'js-cookie';
 import ConfigView from '../views/ConfigView';
 
-const { Content } = Layout;
-
 function CallBackHandler(props) {
   props.func()
   return <div></div>
@@ -118,22 +116,22 @@ class App extends Component {
 
     return (
         <Layout>
-          {this.state.api ? (
+          {this.state.api && this.state.logged ? (
               <SideBar api={this.state.api} />
           ) : null}
           <Layout>
-            {this.state.api ? (
+            {this.state.api && this.state.logged ? (
               <AppHeader
                 api={this.state.api}
                 tokenLogout={this.tokenLogout}
                 authManager={this.authManager}
                 logged={this.state.logged}
               />) : null}
-              <Content className="app-content">
+              <Layout.Content className="app-content">
                 <Switch>
                   {routes}
                 </Switch>
-              </Content>
+              </Layout.Content>
               <AppFooter />
             </Layout>
         </Layout>
@@ -164,6 +162,7 @@ class App extends Component {
   }
 
   manageToken(token){
+    if(this.state.logged) return;
     let user = {
       id_token: token
     };
@@ -185,7 +184,7 @@ class App extends Component {
       this.props.history.push('/');
     }).
     catch(error => {
-      console.log(error);
+      //console.log(error);
       /** If this first api call fails, this means that the token is not valid */
       if(error.response){
         notification.error({
@@ -200,7 +199,8 @@ class App extends Component {
             api: null,
             user: {}
           });
-          this.props.history.push("/error/" + error.response.statusCode);
+          if(error.response._fetchResponse.status)
+            this.props.history.push("/error/" + error.response._fetchResponse.status);
         }
       }
     })
@@ -223,8 +223,8 @@ class App extends Component {
       this.state.api.loadCustomViewsCRs();
       this.state.api.getCRDs().catch(error => {
         console.log(error);
-        if(error.response)
-          this.props.history.push("/error/" + error.response.statusCode);
+        if(error.response._fetchResponse.status)
+          this.props.history.push("/error/" + error.response._fetchResponse.status);
       });
     }
 
@@ -239,8 +239,8 @@ class App extends Component {
       /** Get the CRDs at the start of the app */
       this.state.api.getCRDs().catch(error => {
         console.log(error);
-        if(error.response)
-          this.props.history.push("/error/" + error.response.statusCode);
+        if(error.response._fetchResponse.status)
+          this.props.history.push("/error/" + error.response._fetchResponse.status);
       });
     });
 

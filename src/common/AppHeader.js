@@ -52,13 +52,6 @@ class AppHeader extends Component {
     this.autoCompleteSearch(this.state.CRDs);
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if(!prevProps.api && this.props.api){
-      this.setState({CRDs: this.props.api.CRDs});
-      this.props.api.autoCompleteCallback = this.autoCompleteSearch;
-    }
-  }
-
   render() {
       const options = this.state.CRDs;
 
@@ -95,16 +88,18 @@ class AppHeader extends Component {
             <div className="container">
               <Row className="app-title" align="middle">
                 <Col>
-                  <AutoComplete
-                    filterOption={(inputValue, option) =>
-                      option.name.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                    }
-                    options={options}
-                    onSelect={this.onSearch}
-                    style={{ width: '22vw', marginLeft: 5, lineHeight: '31px' }}
-                  >
-                    <Input.Search placeholder="input CRD" enterButton onSearch={this.onSearch} allowClear />
-                  </AutoComplete>
+                  <div aria-label={'autocompletesearch'}>
+                    <AutoComplete
+                      filterOption={(inputValue, option) =>
+                        option.name.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                      options={options}
+                      onSelect={this.onSearch}
+                      style={{ width: '22vw', marginLeft: 5, lineHeight: '31px' }}
+                    >
+                      <Input.Search placeholder="input CRD" enterButton onSearch={this.onSearch} allowClear />
+                    </AutoComplete>
+                  </div>
                 </Col>
               </Row>
             </div>

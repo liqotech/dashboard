@@ -69,7 +69,7 @@ class GraphNet extends Component {
           shadow: true
         },
         physics: {
-          enabled: true,
+          enabled: false,
           barnesHut: {
             springConstant: 0.2,
             avoidOverlap: 0.5
@@ -199,6 +199,7 @@ class GraphNet extends Component {
             options={this.state.options}
             events={this.state.events}
             getNetwork={network => {
+              console.log(network);
               this.setState({network: network});
             }}
           />

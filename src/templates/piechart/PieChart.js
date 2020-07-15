@@ -4,8 +4,6 @@ import Utils from '../../services/Utils';
 import { Axis, Chart, Coordinate, Interval, Tooltip } from 'bizcharts';
 import { Typography } from 'antd';
 
-const { Title } = Typography;
-
 /**
  * template is a CR of a CRD template (piechart in this case)
  * CR is the spec field of a CR of the user defined CRD that we want to represent
@@ -67,9 +65,9 @@ class PieChart extends Component {
       );
     } else {
       return (
-        <Title level={4} style={{textAlign: 'center'}} type={'danger'}>
+        <Typography.Title level={4} style={{textAlign: 'center'}} type={'danger'}>
           Something went wrong
-        </Title>
+        </Typography.Title>
 
       )
     }

@@ -16,9 +16,6 @@ import GraphNet from '../templates/graph/GraphNet';
 import ReactResizeDetector from 'react-resize-detector';
 import JsonToTableAntd from './JsonToTable/JsonToTableAntd';
 
-const { Title } = Typography;
-const { Step } = Steps;
-
 class DesignEditorCRD extends Component {
   constructor(props) {
     super(props);
@@ -38,16 +35,16 @@ class DesignEditorCRD extends Component {
       template_form:
         (
           <div style={{textAlign: 'center'}}>
-            <Title level={4}>
+            <Typography.Title level={4}>
               Please choose a template
-            </Title>
+            </Typography.Title>
           </div>
         ),
       preview:
         (
-          <Title level={4} style={{textAlign: 'center'}}>
+          <Typography.Title level={4} style={{textAlign: 'center'}}>
             Click Submit to see a preview
-          </Title>
+          </Typography.Title>
         )
     };
 
@@ -96,9 +93,9 @@ class DesignEditorCRD extends Component {
         this.setState({
           preview: (
             <div>
-              <Title level={4} style={{textAlign: 'center'}}>
+              <Typography.Title level={4} style={{textAlign: 'center'}}>
                 {'Showing preview for: ' + this.state.example_CR[0].metadata.name}
-              </Title>
+              </Typography.Title>
               <br/>
               <PieChart
                 CR={this.state.example_CR[0].spec}
@@ -110,9 +107,9 @@ class DesignEditorCRD extends Component {
         this.setState({
           preview: (
             <div>
-              <Title level={4} style={{textAlign: 'center'}}>
+              <Typography.Title level={4} style={{textAlign: 'center'}}>
                 {'Showing preview for: ' + this.state.example_CR[0].metadata.name}
-              </Title>
+              </Typography.Title>
               <br/>
               <HistoChart
                 CR={this.state.example_CR[0].spec}
@@ -130,9 +127,9 @@ class DesignEditorCRD extends Component {
       } else {
         this.setState({
           preview: (
-            <Title level={4} style={{marginLeft: 10}}>
+            <Typography.Title level={4} style={{marginLeft: 10}}>
               No preview supported for this template :(
-            </Title>
+            </Typography.Title>
           )})
       }
     } else {
@@ -148,18 +145,18 @@ class DesignEditorCRD extends Component {
       this.setState({
         template_form: (
           <div>
-            <Title level={4} style={{marginLeft: 10}}>
+            <Typography.Title level={4} style={{marginLeft: 10}}>
               {this.state.chosen_template.spec.names.kind}
-            </Title>
+            </Typography.Title>
             <br/>
             <FormGenerator CRD={this.state.chosen_template} submit={this.submit}/>
           </div>
         ),
         preview:
           (
-            <Title level={4} style={{textAlign: 'center'}}>
+            <Typography.Title level={4} style={{textAlign: 'center'}}>
               Click Submit to see a preview
-            </Title>
+            </Typography.Title>
           )
       });
     } else{
@@ -167,16 +164,16 @@ class DesignEditorCRD extends Component {
         template_form:
           (
             <div style={{textAlign: 'center'}}>
-              <Title level={4}>
+              <Typography.Title level={4}>
                 Please choose a template
-              </Title>
+              </Typography.Title>
             </div>
           ),
         preview:
           (
-            <Title level={4} style={{textAlign: 'center'}}>
+            <Typography.Title level={4} style={{textAlign: 'center'}}>
               Click Submit to see a preview
-            </Title>
+            </Typography.Title>
           )
       });
     }
@@ -327,18 +324,20 @@ class DesignEditorCRD extends Component {
             bottom: 0, backgroundColor: '#fff', paddingBottom: 30
           }}>
             <Divider style={{marginTop: 4}}/>
-            <Steps current={this.state.currentStep}>
-              <Step title="Select design" />
-              <Step title="Submit values" />
-              <Step title={
-                <Button disabled={!this.state.save_enabled}
-                        type="primary" style={{width: 200}}
-                        onClick={this.onClick_save}
-                >
-                  Save it
-                </Button>
-              } />
-            </Steps>
+            <div  aria-label={'steps'}>
+              <Steps current={this.state.currentStep}>
+                <Steps.Step title="Select design" />
+                <Steps.Step title="Submit values" />
+                <Steps.Step title={
+                  <Button disabled={!this.state.save_enabled}
+                          type="primary" style={{width: 200}}
+                          onClick={this.onClick_save}
+                  >
+                    Save it
+                  </Button>
+                } />
+              </Steps>
+            </div>
           </div>
         </div>
       )

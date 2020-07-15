@@ -4,7 +4,6 @@ import { Form, Input, Button, Icon, notification, Typography } from 'antd';
 import { Redirect } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import ApiManager from '../services/ApiManager';
-const { Title } = Typography;
 
 class Login extends Component {
   constructor(props) {
@@ -39,9 +38,9 @@ class Login extends Component {
 
     return (
       <div className={'login-container'}>
-        <Title style={{marginBottom: 50, fontSize: 50}}>
+        <Typography.Title style={{marginBottom: 50, fontSize: 50}}>
           Liqo Login
-        </Title>
+        </Typography.Title>
         <Form onFinish={this.onFinish} className="login-form">
           <Form.Item
             validateTrigger={'onSubmit'}
@@ -63,7 +62,7 @@ class Login extends Component {
                 }}
               }
             ]}>
-            <Input.Password placeholder={'Please input your secret token'}/>
+            <Input.Password aria-label={'lab'}  placeholder={'Please input your secret token'}/>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" size="large" className="login-form-button" >Login</Button>

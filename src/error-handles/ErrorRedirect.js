@@ -26,9 +26,6 @@ export default class ErrorRedirect extends React.Component {
       case '404':
         desc = 'Resource not found, probably you have already destroyed it';
         break;
-      case '409':
-        desc = 'The resource is already present';
-        break;
       default:
         desc = 'An error occurred, please login again';
     }
@@ -48,7 +45,6 @@ export default class ErrorRedirect extends React.Component {
                     type="primary" size="large"
                     icon={<LogoutOutlined />}
                     onClick={() => {
-                      console.log(this.props)
                       if(this.props.authManager.OIDC)
                         this.props.authManager.logout();
                       else

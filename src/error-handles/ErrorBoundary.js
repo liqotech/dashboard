@@ -1,8 +1,6 @@
 import React from 'react';
 import { Typography } from 'antd';
 
-const { Title } = Typography;
-
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
