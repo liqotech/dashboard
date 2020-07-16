@@ -23,8 +23,6 @@ usage of a built-in editor that let you choose between different templates (from
 to a more complex design such as a network graph).
 - **Authentication**: The acces to you cluster's apiserver is secure and managed in two ways: through an OIDC provider 
 (e.g keycloack) or with a secret token generated in your cluster.
-- **Flexibile**: Access your Liqo (and your cluster), whenever you want, wherever you are without the limitation
-of being on the cluster's LAN.
 - **Real time event responsiveness**: If a resource or component gets updated (or added/deleted) outside the dashboard,
 the dashboard will be automatically updated without the need to refresh the page.
 
