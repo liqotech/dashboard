@@ -4,6 +4,8 @@ all the Liqo components, as well as manage the status of the Liqo system itself.
 LiqoDash is also a general purpose, dynamic dashboard that let you create your own
 views, and fully customize your resources.
 
+![alt text](docs/images/dashboard-ui.png)
+
 ### Features
 - **Visualize**: View your components, custom resources and shared applications with a user friendly,
 easy to explore UI.
