@@ -1,5 +1,5 @@
 # LiqoDash
-LiqoDash is a web-based UI for **Liqo**. It allows you to visualize and manage
+LiqoDash is a web-based UI for [Liqo](https://github.com/LiqoTech/liqo). It allows you to visualize and manage
 all the Liqo components, as well as manage the status of the Liqo system itself.
 LiqoDash is also a general purpose, dynamic dashboard that let you create your own
 views, and fully customize your resources.
@@ -31,3 +31,4 @@ the dashboard will be automatically updated without the need to refresh the page
 ### Limitations
 - **Home page**: First page that shows status and overall view of Liqo yet to implement
 - **CRD templates**: The set of customizable templates can be expanded.
+
