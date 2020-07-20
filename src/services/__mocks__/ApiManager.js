@@ -88,7 +88,7 @@ export default class ApiManager {
   }
 
   /** Load Custom Views CRs */
-  loadCustomViewsCRs() {
+  async loadCustomViewsCRs() {
     let CRD = {
       spec: {
         group: 'crd-template.liqo.com',
@@ -99,7 +99,7 @@ export default class ApiManager {
       }
     }
     /** First get all the CR */
-    this.getCustomResourcesAllNamespaces(CRD)
+    await this.getCustomResourcesAllNamespaces(CRD)
       .then((res) => {
           this.customViews = res.body.items;
 
@@ -113,7 +113,7 @@ export default class ApiManager {
             CRD.spec.names.plural,
             this.CVsNotifyEvent);*/
         }
-      );
+      )
   }
 
   /**
