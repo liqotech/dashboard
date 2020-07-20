@@ -1,8 +1,10 @@
+[![Coverage Status](https://coveralls.io/repos/github/LiqoTech/dashboard/badge.svg?branch=master)](https://coveralls.io/github/LiqoTech/dashboard?branch=master)
+
 # LiqoDash
-LiqoDash is a web-based UI for [Liqo](https://github.com/LiqoTech/liqo). It allows you to visualize and manage
-all the Liqo components, as well as manage the status of the Liqo system itself.
-LiqoDash is also a general purpose, dynamic dashboard that let you create your own
+LiqoDash is a general purpose, dynamic dashboard that let you create your own
 views, and fully customize your resources.
+LiqoDash is  also a web-based UI for [Liqo](https://github.com/LiqoTech/liqo). It allows you to visualize and manage
+all the Liqo components, as well as manage the status of the Liqo system itself.
 
 ![alt text](docs/images/dashboard-ui.png)
 

@@ -40,7 +40,7 @@ describe('ConfigView', () => {
     userEvent.click(screen.getByText('Save configuration'));
 
     expect(await screen.findByText(/updated/i))
-  })
+  }, 30000)
 
   test('Error notification when config not updated', async () => {
     await setup();
@@ -49,5 +49,5 @@ describe('ConfigView', () => {
     userEvent.click(screen.getByText('Save configuration'));
 
     expect(await screen.findByText(/updated/i))
-  })
+  }, 30000)
 })
