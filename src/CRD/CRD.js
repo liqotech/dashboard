@@ -120,10 +120,11 @@ class CRD extends Component {
 
   componentDidMount() {
     this.props.api.CRDArrayCallback.push(this.reloadCRD);
-    this.props.api.CVArrayCallback.push(this.getCustomViews);
 
     /** In case we are not on a custom view */
     if(!this.props.onCustomView){
+      /** Set a callback to keep track of custom view's update */
+      this.props.api.CVArrayCallback.push(this.getCustomViews);
       /** Get the custom views */
       this.state.customViews = this.props.api.customViews;
       /** Get the CRD */
@@ -150,7 +151,8 @@ class CRD extends Component {
   componentWillUnmount() {
     this.props.api.abortAllWatchers(this.state.CRD.spec.names.plural);
     this.props.api.CRDArrayCallback = this.props.api.CRDArrayCallback.filter(func => {return func !== this.reloadCRD});
-    this.props.api.CVArrayCallback = this.props.api.CVArrayCallback.filter(func => {return func !== this.getCustomViews});
+    if(!this.props.onCustomView)
+      this.props.api.CVArrayCallback = this.props.api.CVArrayCallback.filter(func => {return func !== this.getCustomViews});
   }
 
   abortWatchers() {
