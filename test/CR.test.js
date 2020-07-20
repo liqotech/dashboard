@@ -11,7 +11,7 @@ import userEvent from '@testing-library/user-event';
 import CR from '../src/CRD/CR';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import LiqoDashAlteredMockResponse from '../__mocks__/liqodashtest_noSpec_noStatus.json';
-import { mockCRDAndViewsExtended, setup_resource } from '../src/services/__mocks__/RTLUtils';
+import { mockCRDAndViewsExtended, setup_resource } from './RTLUtils';
 import { MemoryRouter } from 'react-router-dom';
 
 fetchMock.enableMocks();

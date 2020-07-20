@@ -4,7 +4,7 @@ import '@testing-library/jest-dom/extend-expect';
 import userEvent from '@testing-library/user-event';
 import fetchMock from 'jest-fetch-mock';
 import ErrorMockResponse from '../__mocks__/401.json';
-import { loginTest, mockCRDAndViews, setup_login } from '../src/services/__mocks__/RTLUtils';
+import { loginTest, mockCRDAndViews, setup_login } from './RTLUtils';
 
 fetchMock.enableMocks();
 

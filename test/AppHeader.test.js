@@ -2,7 +2,7 @@ import { findByLabelText, render, screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { loginTest, mockCRDAndViews, mockCRDAndViewsExtended } from '../src/services/__mocks__/RTLUtils';
+import { loginTest, mockCRDAndViews, mockCRDAndViewsExtended } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import CRDmockEmpty from '../__mocks__/crd_fetch.json';
 import ViewMockResponse from '../__mocks__/views.json';

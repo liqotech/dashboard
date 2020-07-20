@@ -8,7 +8,7 @@ import ViewMockResponse from '../__mocks__/views.json';
 import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import PieMockResponse from '../__mocks__/piecharts.json';
 import userEvent from '@testing-library/user-event';
-import { setup_resource } from '../src/services/__mocks__/RTLUtils';
+import { setup_resource } from './RTLUtils';
 import DesignEditorCRD from '../src/editors/DesignEditorCRD';
 import { MemoryRouter } from 'react-router-dom';
 

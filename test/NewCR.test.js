@@ -8,7 +8,7 @@ import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import LiqoDashNewMockResponse from '../__mocks__/liqodashtest_new.json';
 import NoAnnNoResNoSch from '../__mocks__/no_Ann_noRes_noSch.json';
 import userEvent from '@testing-library/user-event';
-import { setup_resource } from '../src/services/__mocks__/RTLUtils';
+import { setup_resource } from './RTLUtils';
 import NewCR from '../src/editors/NewCR';
 
 async function setup() {

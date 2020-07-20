@@ -6,7 +6,7 @@ import ApiManager from '../src/services/__mocks__/ApiManager';
 import CRDmockEmpty from '../__mocks__/crd_fetch.json';
 import ViewMockResponse from '../__mocks__/views.json';
 import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
-import { setup_resource } from '../src/services/__mocks__/RTLUtils';
+import { setup_resource } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import LiqoDashUpdatedMockResponse from '../__mocks__/liqodashtest_update.json';
 import UpdateCR from '../src/editors/UpdateCR';

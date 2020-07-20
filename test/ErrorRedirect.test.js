@@ -8,7 +8,7 @@ import Error401 from '../__mocks__/401.json';
 import Error403 from '../__mocks__/403.json';
 import Error404 from '../__mocks__/404.json';
 import Error409 from '../__mocks__/409.json';
-import { loginTest } from '../src/services/__mocks__/RTLUtils';
+import { loginTest } from './RTLUtils';
 import ViewMockResponse from '../__mocks__/views.json';
 
 fetchMock.enableMocks();

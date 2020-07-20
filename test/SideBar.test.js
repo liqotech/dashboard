@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react'
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { loginTest, mockCRDAndViews, setup_cv } from '../src/services/__mocks__/RTLUtils';
+import { loginTest, mockCRDAndViews, setup_cv } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 
 fetchMock.enableMocks();

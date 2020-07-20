@@ -3,7 +3,7 @@ import CRDmockResponse from '../__mocks__/crd_fetch_long.json';
 import ClusterConfigMockResponse from '../__mocks__/configs.json';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { loginTest } from '../src/services/__mocks__/RTLUtils';
+import { loginTest } from './RTLUtils';
 
 async function setup() {
   fetch.mockImplementation((url) => {

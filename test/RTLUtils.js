@@ -1,20 +1,20 @@
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
-import App from '../../app/App';
-import CRDmockResponse from '../../../__mocks__/crd_fetch.json';
-import ViewMockResponse from '../../../__mocks__/views.json';
+import App from '../src/app/App';
+import CRDmockResponse from '../__mocks__/crd_fetch.json';
+import ViewMockResponse from '../__mocks__/views.json';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import AdvMockResponse from '../../../__mocks__/advertisement.json';
-import TunnMockResponse from '../../../__mocks__/tunnelendpoints.json';
-import LiqoDashMockResponse from '../../../__mocks__/liqodashtest.json';
-import PieMockResponse from '../../../__mocks__/piecharts.json';
-import HistoMockResponse from '../../../__mocks__/histocharts.json';
-import LiqoDashNewMockResponse from '../../../__mocks__/liqodashtest_new.json';
-import LiqoDashUpdatedMockResponse from '../../../__mocks__/liqodashtest_update.json';
-import Error409 from '../../../__mocks__/409.json';
-import Error401 from '../../../__mocks__/401.json';
-import Error404 from '../../../__mocks__/404.json';
+import AdvMockResponse from '../__mocks__/advertisement.json';
+import TunnMockResponse from '../__mocks__/tunnelendpoints.json';
+import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
+import PieMockResponse from '../__mocks__/piecharts.json';
+import HistoMockResponse from '../__mocks__/histocharts.json';
+import LiqoDashNewMockResponse from '../__mocks__/liqodashtest_new.json';
+import LiqoDashUpdatedMockResponse from '../__mocks__/liqodashtest_update.json';
+import Error409 from '../__mocks__/409.json';
+import Error401 from '../__mocks__/401.json';
+import Error404 from '../__mocks__/404.json';
 
 export function setup_login() {
   return render(
