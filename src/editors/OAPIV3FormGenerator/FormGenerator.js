@@ -41,7 +41,8 @@ class FormGenerator extends Component {
       }
     }
 
-    if(metadata.name === ''){
+
+    if(!metadata || metadata.name === ''){
       message.error('Please insert a valid name');
       return;
     }

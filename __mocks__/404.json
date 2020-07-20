@@ -1,0 +1,16 @@
+{
+  "body": {
+    "kind": "Status",
+    "apiVersion": "v1",
+    "metadata": {},
+    "status": "Failure",
+    "message": "NotFound",
+    "reason":  "NotFound",
+    "code": 404,
+    "response": {
+      "_fetchResponse": {
+        "status": 404
+      }
+    }
+  }
+}

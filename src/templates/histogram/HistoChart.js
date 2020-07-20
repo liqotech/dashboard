@@ -4,8 +4,6 @@ import Utils from '../../services/Utils';
 import { Chart, Interval } from 'bizcharts';
 import { Typography } from 'antd';
 
-const { Title } = Typography;
-
 class HistoChart extends Component {
   constructor(props) {
     super(props);
@@ -48,9 +46,9 @@ class HistoChart extends Component {
       );
     } else {
       return (
-          <Title level={4} style={{textAlign: 'center'}} type={'danger'}>
+          <Typography.Title level={4} style={{textAlign: 'center'}} type={'danger'}>
             Something went wrong
-          </Title>
+          </Typography.Title>
         )
     }
   }

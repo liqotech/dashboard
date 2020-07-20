@@ -1,0 +1,49 @@
+{
+  "metadata": {
+    "name": "liqodashtests.crd-template.liqo.com",
+    "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/liqodashtests.crd-template.liqo.com",
+    "resourceVersion": "000001",
+    "annotations": {
+      "description": "A test CRD for some implemetation on the liqo-dashboard",
+      "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apiextensions.k8s.io/v1beta1\",\"kind\":\"CustomResourceDefinition\",\"metadata\":{\"annotations\":{\"description\":\"A test CRD for some implemetation on the liqo-dashboard\"},\"name\":\"liqodashtests.crd-template.liqo.com\"},\"spec\":{\"group\":\"crd-template.liqo.com\",\"names\":{\"kind\":\"LiqoDashTest\",\"listKind\":\"LiqoDashTestList\",\"plural\":\"liqodashtests\",\"singular\":\"liqodashtest\"},\"scope\":\"Namespaced\",\"subresources\":{\"status\":{}},\"validation\":{\"openAPIV3Schema\":{\"properties\":{\"apiVersion\":{\"type\":\"string\"},\"kind\":{\"type\":\"string\"},\"metadata\":{\"type\":\"object\"},\"spec\":{\"properties\":{\"item\":{\"description\":\"Collection of items\",\"items\":{\"properties\":{\"cost\":{\"description\":\"Cost of the item\",\"type\":\"integer\"},\"name\":{\"description\":\"Name of the item\",\"type\":\"string\"}},\"type\":\"object\"},\"type\":\"array\"}}}},\"type\":\"object\"}},\"version\":\"v1\",\"versions\":[{\"name\":\"v1\",\"served\":true,\"storage\":true}]},\"status\":{\"acceptedNames\":{\"kind\":\"\",\"plural\":\"\"},\"conditions\":[],\"storedVersions\":[]}}\n",
+      "template": "crd-template.liqo.com/v1/piecharts/pie-test-123455"
+    }
+  },
+  "spec": {
+    "group": "crd-template.liqo.com",
+    "version": "v1",
+    "names": {
+      "plural": "liqodashtests",
+      "singular": "liqodashtest",
+      "kind": "LiqoDashTestMod",
+      "listKind": "LiqoDashTestList"
+    },
+    "scope": "Namespaced",
+    "validation": {
+      "openAPIV3Schema": {
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          },
+          "spec": {
+            "properties": {
+              "item": {
+                "description": "Collection of items",
+                "type": "array",
+                "items": {"type":"object","properties":{"cost":{"description":"Cost of the item","type":"integer"},"name":{"description":"Name of the item","type":"string"}}}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "status": {}
+}

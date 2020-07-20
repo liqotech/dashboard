@@ -1,0 +1,16 @@
+{
+  "body": {
+    "kind": "Status",
+    "apiVersion": "v1",
+    "metadata": {},
+    "status": "Failure",
+    "message": "Conflict",
+    "reason": "Conflict",
+    "code": 409,
+    "response": {
+      "_fetchResponse": {
+        "status": 409
+      }
+    }
+  }
+}

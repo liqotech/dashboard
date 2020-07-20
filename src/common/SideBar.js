@@ -8,7 +8,7 @@ import SettingOutlined from '@ant-design/icons/lib/icons/SettingOutlined';
 import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
 import StarOutlined from '@ant-design/icons/lib/icons/StarOutlined';
 import { APP_NAME } from '../constants';
-const { Title } = Typography;
+
 const Sider = Layout.Sider;
 
 class SideBar extends Component {

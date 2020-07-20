@@ -110,20 +110,22 @@ class CustomView extends Component {
     let CRDView = [];
 
     this.state.CRDs.forEach(item => {
-      CRDView.push(
-        <div key={item.metadata.name} className="crd-content">
-          <div style={{overflow: 'auto', height: '100%'}}>
-            <CRD
-              CRD={item.metadata.name}
-              altName={item.altName}
-              altTemplate={item.altTemplate}
-              api={this.props.api}
-              onCustomView={true}
-              func={this.childLogic}
-            />
+      if(this.props.api.getCRDfromName(item.metadata.name)){
+        CRDView.push(
+          <div key={item.metadata.name} className="crd-content" aria-label={'crd_custom_view'} >
+            <div style={{overflow: 'auto', height: '100%'}}>
+              <CRD
+                CRD={item.metadata.name}
+                altName={item.altName}
+                altTemplate={item.altTemplate}
+                api={this.props.api}
+                onCustomView={true}
+                func={this.childLogic}
+              />
+            </div>
           </div>
-        </div>
-      );
+        );
+      }
     })
 
     this.setState({CRDView: CRDView})
@@ -272,8 +274,6 @@ class CustomView extends Component {
   }
 
   render() {
-
-    console.log(this.state.CRDView);
 
     if(this.state.isLoading)
       return <LoadingIndicator />

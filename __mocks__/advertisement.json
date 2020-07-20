@@ -1,0 +1,45 @@
+{
+  "apiVersion": "protocol.liqo.io/v1",
+  "items": [
+    {
+      "apiVersion": "protocol.liqo.io/v1",
+      "kind": "Advertisement",
+      "metadata": {
+        "name": "advertisement-test-1",
+        "resourceVersion": "000000000",
+        "selfLink": "/apis/protocol.liqo.io/v1/advertisements/advertisement-09f709f0-96bd-48ad-9e1a-8efb22bed89e"
+      },
+      "spec": {
+        "clusterId": "test",
+        "network": {
+          "gatewayIP": "test",
+          "gatewayPrivateIP": "test",
+          "podCIDR": "test"
+        },
+        "timeToLive": "",
+        "timestamp": ""
+      },
+      "status": {
+        "advertisementStatus": "ACCEPTED",
+        "foreignNetwork": {
+          "gatewayIP": "",
+          "gatewayPrivateIP": "",
+          "podCIDR": ""
+        },
+        "observedGeneration": 1,
+        "remoteRemappedPodCIDR": "",
+        "tunnelEndpointKey": {
+          "name": "",
+          "namespace": ""
+        },
+        "vkCreated": true
+      }
+    }
+  ],
+  "kind": "AdvertisementList",
+  "metadata": {
+    "continue": "",
+    "resourceVersion": "000000",
+    "selfLink": "/apis/protocol.liqo.io/v1/advertisements"
+  }
+}

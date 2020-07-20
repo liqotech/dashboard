@@ -51,6 +51,7 @@ const CustomText = function(props) {
     }
     return (
       <InputNumber id={props.id} style={{float: 'right'}}
+                   role={'textbox'}
                    min={ (props.schema.minimum || props.schema.minimum === 0) ? props.schema.minimum : Number.MIN_SAFE_INTEGER}
                    max={props.schema.maximum ? props.schema.maximum : Number.MAX_SAFE_INTEGER}
                    defaultValue={props.value}

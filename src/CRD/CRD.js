@@ -20,7 +20,6 @@ import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
 import { Menu } from 'antd';
 import NewCR from '../editors/NewCR';
 import DesignEditorCRD from '../editors/DesignEditorCRD';
-const { Title, Text } = Typography;
 
 class CRD extends Component {
   constructor(props) {
@@ -57,7 +56,7 @@ class CRD extends Component {
 
     this.reloadCRD = this.reloadCRD.bind(this);
     this.getCustomViews = this.getCustomViews.bind(this);
-    this.handleClick = this.handleClick.bind(this);
+    //this.handleClick = this.handleClick.bind(this);
     this.abortWatchers = this.abortWatchers.bind(this);
     this.loadCustomResources = this.loadCustomResources.bind(this);
     this.changeTemplate = this.changeTemplate.bind(this);
@@ -114,18 +113,18 @@ class CRD extends Component {
       this.findTemplate(this.state.CRD);
       }
     ).catch((error) => {
-      console.log(error);
       if(error.response)
-        this.props.history.push("/error/" + error.response.statusCode);
+        this.props.history.push("/error/" + error.response._fetchResponse.status);
     })
   }
 
   componentDidMount() {
     this.props.api.CRDArrayCallback.push(this.reloadCRD);
-    this.props.api.CVArrayCallback.push(this.getCustomViews);
 
     /** In case we are not on a custom view */
     if(!this.props.onCustomView){
+      /** Set a callback to keep track of custom view's update */
+      this.props.api.CVArrayCallback.push(this.getCustomViews);
       /** Get the custom views */
       this.state.customViews = this.props.api.customViews;
       /** Get the CRD */
@@ -152,7 +151,8 @@ class CRD extends Component {
   componentWillUnmount() {
     this.props.api.abortAllWatchers(this.state.CRD.spec.names.plural);
     this.props.api.CRDArrayCallback = this.props.api.CRDArrayCallback.filter(func => {return func !== this.reloadCRD});
-    this.props.api.CVArrayCallback = this.props.api.CVArrayCallback.filter(func => {return func !== this.getCustomViews});
+    if(!this.props.onCustomView)
+      this.props.api.CVArrayCallback = this.props.api.CVArrayCallback.filter(func => {return func !== this.getCustomViews});
   }
 
   abortWatchers() {
@@ -160,7 +160,7 @@ class CRD extends Component {
   }
 
   /** @NOT_USED: if we want to implement the deletion of the CRD... */
-  handleClick() {
+  /*handleClick() {
     let promise = this.props.api.deleteCRD(this.name);
 
     promise
@@ -174,7 +174,7 @@ class CRD extends Component {
           deleted: false
         });
       });
-  }
+  }*/
 
   /** Update CRD with the 'favourite' annotation */
   handleClick_fav(){
@@ -302,7 +302,7 @@ class CRD extends Component {
             <Breadcrumb separator={'>'}>
               <Breadcrumb.Item>CRD</Breadcrumb.Item>
               <Breadcrumb.Item>
-                <Text ellipsis>{this.state.CRD.metadata.name}</Text>
+                <Typography.Text ellipsis>{this.state.CRD.metadata.name}</Typography.Text>
               </Breadcrumb.Item>
             </Breadcrumb>
           </Col>
@@ -347,7 +347,7 @@ class CRD extends Component {
             )
           }
         </Row>
-        <Title level={4} style={{marginTop: 20}}>
+        <Typography.Title level={4} style={{marginTop: 20}}>
           <Badge color='#1890FF' />
           <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
             pathname: '/customresources/' + this.state.CRD.metadata.name,
@@ -422,15 +422,15 @@ class CRD extends Component {
                   </div>
                 ) : null)
             }
-        </Title>
+        </Typography.Title>
         <div style={{maxWidth: '80%'}}>
           <Descriptions style={{marginTop: 15, marginLeft: 15}}>
             <Descriptions.Item>
               {
                 this.state.CRD.metadata.annotations && this.state.CRD.metadata.annotations.description ? (
-                  <Text type={'secondary'}>{this.state.CRD.metadata.annotations.description}</Text>
+                  <Typography.Text type={'secondary'}>{this.state.CRD.metadata.annotations.description}</Typography.Text>
                 ) : (
-                  <Text type={'secondary'}>No description for this CRD</Text>
+                  <Typography.Text type={'secondary'}>No description for this CRD</Typography.Text>
                 )
               }
             </Descriptions.Item>
@@ -520,6 +520,8 @@ class CRD extends Component {
         this.setState({template: CR});
       }).catch(error => {
         console.log(error);
+        if(error.response)
+          this.props.history.push("/error/" + error.response._fetchResponse.status);
       });
     } else {
       this.setState({template: null});
@@ -605,7 +607,7 @@ class CRD extends Component {
     if(this.state.CRD.metadata.annotations){
       for(let annotation of Object.entries(this.state.CRD.metadata.annotations)) {
         CRD_annotations.push(
-          <Tag key={annotation} style={{maxWidth: '100%'}}>
+          <Tag key={annotation} style={{maxWidth: '100%'}} aria-label={'tag'}>
             <pre>{JSON.stringify(annotation, null, 2)}</pre>
           </Tag>
         );
@@ -620,7 +622,7 @@ class CRD extends Component {
     }
 
     return (
-      <div>
+      <div aria-label={'crd'}>
         <div className="crds-container" style={{maxWidth: width}}>
           <div className={!this.props.onCustomView ? 'crd-content' : null}>
             { !this.state.deleted ? (
@@ -635,7 +637,7 @@ class CRD extends Component {
                         <div>
                           {CRViews}
                           { !this.state.multi && this.state.custom_resources.length > 5 ? (
-                            <div className="no-crds-found">
+                            <div className="no-crds-found" aria-label={'pagination'}>
                               <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
                                           defaultPageSize={5}
                                           onChange={this.paginationChange}
@@ -665,7 +667,7 @@ class CRD extends Component {
                           <Tabs.TabPane tab="Resources" key="2">
                             {CRViews}
                             { !this.state.multi && this.state.custom_resources.length > 5 ? (
-                              <div className="no-crds-found">
+                              <div className="no-crds-found" aria-label={'pagination'}>
                                 <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
                                             defaultPageSize={5}
                                             onChange={this.paginationChange}
@@ -677,7 +679,7 @@ class CRD extends Component {
                           <Tabs.TabPane tab="Schema" key="3">
                             {
                               schema ? (
-                                <pre>{JSON.stringify(schema.properties.spec, null, 2)}</pre>
+                                <pre aria-label={'schema'}>{JSON.stringify(schema.properties.spec, null, 2)}</pre>
                               ) : (
                                 <Empty key={'empty_schema'} description={<strong>No schema for this CRD</strong>}/>
                               )

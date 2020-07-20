@@ -19,7 +19,7 @@ import UpCircleOutlined from '@ant-design/icons/lib/icons/UpCircleOutlined';
 import JsonToTableAntd from '../editors/JsonToTable/JsonToTableAntd';
 import DeleteOutlined from '@ant-design/icons/lib/icons/DeleteOutlined';
 import UpdateCR from '../editors/UpdateCR';
-const { Text } = Typography;
+import { withRouter } from 'react-router-dom';
 
 class CR extends Component {
   constructor(props) {
@@ -66,13 +66,10 @@ class CR extends Component {
           description: 'Resource deleted'
         });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
-        if(error.response)
-          this.props.history.push("/error/" + error.response.statusCode);
-        this.setState({
-          deleted: false
-        });
+        if(error.response._fetchResponse.status)
+          this.props.history.push("/error/" + error.response._fetchResponse.status);
 
         notification.error({
           message: APP_NAME,
@@ -98,12 +95,12 @@ class CR extends Component {
     return (
       <div className="rep-container">
         {this.props.template.kind === 'PieChart' ? (
-          <div>
+          <div  aria-label={'piechart'}>
             <PieChart CR={this.props.cr.spec} template={this.props.template} />
           </div>
         ) : null}
         {this.props.template.kind === 'HistoChart' ? (
-          <div>
+          <div aria-label={'histochart'}>
             <HistoChart
               CR={this.props.cr.spec}
               template={this.props.template}
@@ -122,6 +119,7 @@ class CR extends Component {
     return (
       <div className="crd-choices">
         {!this.state.deleted ? (
+          <div aria-label={'cr'}>
             <PageHeader
               className="cr-header"
               title={
@@ -130,9 +128,9 @@ class CR extends Component {
                                     onClick={this.handleClick_Info}
                                     rotate={this.state.showInfo ? 180 : 0}
                   />
-                  <Text strong ellipsis style={{minWidth: 200}}>
+                  <Typography.Text strong ellipsis style={{minWidth: 200}}>
                     <a style={{ color: 'rgba(57,57,57,0.85)'}} onClick={this.handleClick_Info}>{this.props.cr.metadata.name}</a>
-                  </Text>
+                  </Typography.Text>
                 </div>
               }
               extra={
@@ -191,7 +189,7 @@ class CR extends Component {
                 <div>
                   <Divider style={{marginTop: 4, marginBottom: 10}}/>
                   {this.state.showJSON ? (
-                    <div>
+                    <div aria-label={'json'}>
                       {this.props.cr.spec ? (<pre>{JSON.stringify(this.props.cr.spec, null, 2)}</pre>) : null}
                       {this.props.cr.status ? (<pre>{JSON.stringify(this.props.cr.status, null, 2)}</pre>) : null}
                     </div>
@@ -220,7 +218,9 @@ class CR extends Component {
                             </a>
                           </div>
                           {this.state.showSpec ? (
-                            <JsonToTableAntd json={this.props.cr.spec} />
+                            <div aria-label={'jtt_spec'}>
+                              <JsonToTableAntd json={this.props.cr.spec} />
+                            </div>
                           ) : null}
                         </div>
                       ) : null}
@@ -242,7 +242,9 @@ class CR extends Component {
                             </a>
                           </div>
                           {this.state.showStatus ? (
-                            <JsonToTableAntd json={this.props.cr.status} />
+                            <div aria-label={'jtt_status'}>
+                              <JsonToTableAntd json={this.props.cr.status} />
+                            </div>
                           ) : null}
                         </div>
                       ) : null}
@@ -252,10 +254,11 @@ class CR extends Component {
               ) : null
             }
             </PageHeader>
+          </div>
         ) : null}
       </div>
     );
   }
 }
 
-export default CR;
+export default withRouter(CR);

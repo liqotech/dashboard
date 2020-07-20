@@ -1,0 +1,35 @@
+{
+  "apiVersion": "test/v1",
+  "items": [
+    {
+      "apiVersion": "test/v1",
+      "kind": "View",
+      "metadata": {
+        "name": "awesome-view",
+        "resourceVersion": "000001",
+        "selfLink": "/apis/test/v1/namespaces/default/views/awesome-view"
+      },
+      "spec": {
+        "name": "Liqo View",
+        "templates": [
+          {
+            "name": "Test",
+            "kind": "advertisements.protocol.liqo.io"
+          },
+          {
+            "kind": "tunnelendpoints.liqonet.liqo.io"
+          },
+          {
+            "kind": "liqodashtests.crd-template.liqo.com"
+          }
+        ]
+      }
+    }
+  ],
+  "kind": "ViewList",
+  "metadata": {
+    "continue": "",
+    "resourceVersion": "0000001"
+  }
+}
+

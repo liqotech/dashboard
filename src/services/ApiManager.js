@@ -21,7 +21,6 @@ export default class ApiManager {
     this.kcc = new Config(window.APISERVER_URL, user.id_token, user.token_type);
     this.apiExt = this.kcc.makeApiClient(ApiextensionsV1beta1Api);
     this.apiCRD = this.kcc.makeApiClient(CustomObjectsApi);
-    this.apiCore = this.kcc.makeApiClient(CoreV1Api);
     this.CRDs = [];
     this.customViews = [];
     this.watchers = [];
@@ -58,7 +57,8 @@ export default class ApiManager {
    * @returns a list of CRDs: {CRD, custom_resource}
    */
   getCRDs() {
-    return this.apiExt.listCustomResourceDefinition().then(res => {
+    return this.apiExt.listCustomResourceDefinition()
+    .then(res => {
       this.CRDs = res.body.items;
       /** update CRDs in the views */
       this.manageCallbackCRDs(this.CRDs);

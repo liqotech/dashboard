@@ -1,0 +1,8 @@
+{
+  "apiVersion": "crd.projectcalico.org/v1",
+  "items": [],
+  "kind": "NoAnnNoResNoSchemaList",
+  "metadata": {
+    "resourceVersion": "0000000"
+  }
+}

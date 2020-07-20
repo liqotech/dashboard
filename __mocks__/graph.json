@@ -1,0 +1,28 @@
+{
+  "apiVersion": "crd-template.liqo.com/v1",
+  "items": [
+    {
+      "apiVersion": "crd-template.liqo.com/v1",
+      "kind": "Graph",
+      "metadata": {
+        "name": "graph-test",
+        "namespace": "default",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/crd-template.liqo.com/v1/namespaces/nap-test/graphs/graph-test"
+      },
+      "spec": {
+        "group": {
+          "cluster": "liqo.io/physical",
+          "type": "nodeType"
+        },
+        "neighbors": "neighbors",
+        "node": "nodeName"
+      }
+    }
+  ],
+  "kind": "GraphList",
+  "metadata": {
+    "continue": "",
+    "resourceVersion": "0000000"
+  }
+}

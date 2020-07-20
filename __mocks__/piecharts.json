@@ -1,0 +1,37 @@
+{
+  "apiVersion": "test/v1",
+  "items": [
+    {
+      "apiVersion": "test/v1",
+      "kind": "PieChart",
+      "metadata": {
+        "name": "pie-test",
+        "namespace": "nap-test",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/test/v1/namespaces/default/piecharts/pie-test"
+      },
+      "spec": {
+        "labels": "item.name",
+        "values": "item.cost"
+      }
+    },
+    {
+      "apiVersion": "test/v1",
+      "kind": "PieChart",
+      "metadata": {
+        "name": "pie-test-123455",
+        "namespace": "nap-test",
+        "resourceVersion": "00000000",
+        "selfLink": "/apis/test/v1/namespaces/default/piecharts/pie-test-123455"
+      },
+      "spec": {
+        "labels": "item.name",
+        "values": "item.cost"
+      }
+    }
+  ],
+  "kind": "PieChartList",
+  "metadata": {
+    "resourceVersion": "000000"
+  }
+}

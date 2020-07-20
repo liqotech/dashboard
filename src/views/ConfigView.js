@@ -27,18 +27,24 @@ class ConfigView extends Component {
   }
 
   componentDidMount() {
-    this.props.api.getCustomResourcesAllNamespaces(this.state.CRD).then( res => {
-      this.setState({
-        prevConfig: res.body.items[0],
-        loading: false,
-        currentConfig: Object.keys(res.body.items[0].spec)[0]
+    if(this.state.CRD){
+      this.props.api.getCustomResourcesAllNamespaces(this.state.CRD).then( res => {
+        this.setState({
+          prevConfig: res.body.items[0],
+          loading: false,
+          currentConfig: Object.keys(res.body.items[0].spec)[0]
+        })
+      }).catch(error => {
+        console.log(error);
+        this.setState({
+          loading: false
+        })
       })
-    }).catch(error => {
-      console.log(error);
+    } else {
       this.setState({
         loading: false
       })
-    })
+    }
   }
 
   onSubmit(value) {
@@ -63,7 +69,7 @@ class ConfigView extends Component {
 
     promise
       .then((res) => {
-        console.log(res);
+        //console.log(res);
         this.setState({
           isLoading: false,
           prevConfig: res.body
@@ -132,17 +138,25 @@ class ConfigView extends Component {
           <Layout style={{background: '#fff'}}>
             <Layout.Content>
               { !this.state.loading ? (
-                  this.state.prevConfig ? (
+                this.state.CRD ? (
+                    this.state.prevConfig ? (
                       <Tabs onChange={(key) => {this.state.currentConfig = key}}>
                         {configs}
                       </Tabs>
-                    ): (
+                    ) : (
                       <Alert
                         message="Error"
                         description="No configuration file has been found."
                         type="error"
                         showIcon
                       />)
+                  ) : (
+                  <Alert
+                    message="Error"
+                    description="No configuration CRD has been found."
+                    type="error"
+                    showIcon
+                  />)
                 ) : <LoadingIndicator/>}
             </Layout.Content>
           </Layout>

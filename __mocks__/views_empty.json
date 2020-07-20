@@ -1,0 +1,24 @@
+{
+  "apiVersion": "test/v1",
+  "items": [
+    {
+      "apiVersion": "test/v1",
+      "kind": "View",
+      "metadata": {
+        "name": "awesome-view",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/test/v1/namespaces/default/views/awesome-view"
+      },
+      "spec": {
+        "name": "Liqo View",
+        "templates": []
+      }
+    }
+  ],
+  "kind": "ViewList",
+  "metadata": {
+    "continue": "",
+    "resourceVersion": "0000000"
+  }
+}
+

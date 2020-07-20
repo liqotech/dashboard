@@ -7,7 +7,6 @@ import './CRD.css';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-resizable/css/styles.css';
 const ResponsiveGridLayout = WidthProvider(Responsive);
-const { Title } = Typography;
 import { Pagination } from 'antd';
 import ReactResizeDetector from 'react-resize-detector';
 
@@ -124,7 +123,7 @@ class CRDList extends Component {
     const CRDViews = [];
     this.state.CRDshown.forEach(CRD => {
       CRDViews.push(
-        <div className="crd-content" key={CRD.metadata.name}>
+        <div className="crd-content" key={CRD.metadata.name} aria-label={'crd'}>
           <div>
             <div className="crd-header">
               <div>
@@ -139,7 +138,7 @@ class CRDList extends Component {
                    * Link to the view of the specific CRD 
                    * @param CRD: this a CRD
                    */}
-                  <Title level={4} >
+                  <Typography.Title level={4} >
                     {<Badge color="#108ee9" />}
                     <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
                       pathname: '/customresources/' + CRD.metadata.name,
@@ -160,7 +159,7 @@ class CRDList extends Component {
                             style={{marginLeft: 0}}
                       />
                     )}
-                  </Title>
+                  </Typography.Title>
                 </div>
               </div>
               <Tabs defaultActiveKey="1">
