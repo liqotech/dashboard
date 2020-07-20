@@ -1,12 +1,11 @@
 import '@testing-library/jest-dom/extend-expect';
 import React from 'react';
 import fetchMock from 'jest-fetch-mock';
-import GraphMock from './__mocks__/mockGraph';
-import Graph from './__mocks__/mockGraph';
 
 fetchMock.enableMocks();
 
 jest.mock('./src/services/ApiManager');
+jest.mock('./src/services/Authenticator');
 
 jest.mock('react-ace', () => {
   const AceEditor = ({onChange}) => {
