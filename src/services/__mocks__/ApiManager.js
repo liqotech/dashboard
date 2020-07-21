@@ -196,7 +196,7 @@ export default class ApiManager {
       itemDC.metadata.resourceVersion++;
       this.CVsNotifyEvent('MODIFIED', itemDC);
       return Promise.resolve(new Response(JSON.stringify(item)))
-    } else if (plural === 'liqodashtests') {
+    } else if (plural === 'liqodashtests' || plural === 'clusterconfigs') {
       return fetch('http://localhost:3001/clustercustomobject/' + plural, { method: 'PUT', body: item})
         .then(res => res.json())
         .then((res) => {
@@ -204,6 +204,7 @@ export default class ApiManager {
             if (w.plural === plural)
               w.callback('MODIFIED', res.body);
           })
+          return res;
         });
     } else {
       return Promise.resolve(item)

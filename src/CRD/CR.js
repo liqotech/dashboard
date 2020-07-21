@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import './CR.css';
 import {
   Badge,
-  Breadcrumb,
   Button,
   Divider, Drawer,
   notification, PageHeader,
-  Popconfirm,
+  Popconfirm, Alert,
   Tooltip, Typography
 } from 'antd';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
@@ -14,7 +13,6 @@ import EditOutlined from '@ant-design/icons/lib/icons/EditOutlined';
 import { APP_NAME } from '../constants';
 import PieChart from '../templates/piechart/PieChart';
 import HistoChart from '../templates/histogram/HistoChart';
-import ErrorBoundary from '../error-handles/ErrorBoundary';
 import UpCircleOutlined from '@ant-design/icons/lib/icons/UpCircleOutlined';
 import JsonToTableAntd from '../editors/JsonToTable/JsonToTableAntd';
 import DeleteOutlined from '@ant-design/icons/lib/icons/DeleteOutlined';
@@ -199,7 +197,7 @@ class CR extends Component {
                     ? this.getChart()
                     : null}
                   {!this.state.showJSON && !this.props.template ? (
-                    <ErrorBoundary>
+                    <Alert.ErrorBoundary>
                       {this.props.cr.spec ? (
                         <div>
                           <div>
@@ -248,7 +246,7 @@ class CR extends Component {
                           ) : null}
                         </div>
                       ) : null}
-                    </ErrorBoundary>
+                    </Alert.ErrorBoundary>
                   ) : null}
                 </div>
               ) : null
