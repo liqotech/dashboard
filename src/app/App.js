@@ -184,25 +184,12 @@ class App extends Component {
       this.props.history.push('/');
     }).
     catch(error => {
-      //console.log(error);
       /** If this first api call fails, this means that the token is not valid */
-      if(error.response){
-        notification.error({
-          message: APP_NAME,
-          description: 'Login failed: token not valid'
-        });
-        if(error.response.statusCode === 401){
-          this.tokenLogout();
-        }else{
-          this.setState({
-            logged: false,
-            api: null,
-            user: {}
-          });
-          if(error.response._fetchResponse.status)
-            this.props.history.push("/error/" + error.response._fetchResponse.status);
-        }
-      }
+      notification.error({
+        message: APP_NAME,
+        description: 'Login failed: token not valid'
+      });
+      this.tokenLogout();
     })
   }
 

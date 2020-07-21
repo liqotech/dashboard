@@ -71,37 +71,35 @@ class CustomView extends Component {
     this.state.templates.forEach(item => {
       let res = {metadata: {name: item.kind}}
 
-      /** CRDs could be no yet loaded */
-      if(res){
-        let CRDs = this.state.CRDs;
-        /** If a template is defined in the CR, use that one */
-        if(item.template){
-          res.altTemplate = item.template;
-        }
-        /** If a custom name is defined, use that one */
-        if(item.name){
-          res.altName = item.name;
-        }
-        CRDs.push(res);
-        this.setState({CRDs: CRDs});
-
-        /** if there's a layout for this CRD, set it */
-        let CRDlayout = null;
-        if (this.state.layout[this.state.newBr]) {
-          CRDlayout = this.state.layout[this.state.newBr].find(item => {return item.i === CRDs[CRDs.length - 1].metadata.name})
-          if(CRDlayout){
-            CRDs[CRDs.length - 1].x = CRDlayout.x;
-            CRDs[CRDs.length - 1].y = CRDlayout.y;
-            CRDs[CRDs.length - 1].height = CRDlayout.h;
-            CRDs[CRDs.length - 1].width = CRDlayout.w;
-            CRDs[CRDs.length - 1].static = false;
-          }
-        }
-
-        this.generateCRDView();
-        if(CRDs.length === this.state.templates.length)
-          this.generateLayout();
+      let CRDs = this.state.CRDs;
+      /** If a template is defined in the CR, use that one */
+      if(item.template){
+        res.altTemplate = item.template;
       }
+      /** If a custom name is defined, use that one */
+      if(item.name){
+        res.altName = item.name;
+      }
+      CRDs.push(res);
+      this.setState({CRDs: CRDs});
+
+      /** if there's a layout for this CRD, set it */
+      let CRDlayout = null;
+      if (this.state.layout[this.state.newBr]) {
+        CRDlayout = this.state.layout[this.state.newBr].find(item => {return item.i === CRDs[CRDs.length - 1].metadata.name})
+        if(CRDlayout){
+          CRDs[CRDs.length - 1].x = CRDlayout.x;
+          CRDs[CRDs.length - 1].y = CRDlayout.y;
+          CRDs[CRDs.length - 1].height = CRDlayout.h;
+          CRDs[CRDs.length - 1].width = CRDlayout.w;
+          CRDs[CRDs.length - 1].static = false;
+        }
+      }
+
+      this.generateCRDView();
+      if(CRDs.length === this.state.templates.length)
+        this.generateLayout();
+
     });
   }
 

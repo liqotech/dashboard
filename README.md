@@ -77,11 +77,11 @@ Open a browser and access the UI under `localhost:8000`.
 ### Using Docker
 You can also pull the docker image:
 ```
-docker pull nappozord/dashboard:latest
+docker pull liqo/dashboard:latest
 ```
 And then run it:
 ```
-docker run -p 80:8000 nappozord/dashboard:latest
+docker run -p 80:8000 liqo/dashboard:latest
 ```
 Open a browser and visit `localhost:8000`.
 
@@ -89,5 +89,5 @@ Open a browser and visit `localhost:8000`.
 
 If you want to export the env variables only when running the image, you can do the following:
 ```
-docker run --env APISERVER_URL=<APISERVER_IP>:<APISERVER_PORT> -p 80:8000 nappozord/dashboard:latest
+docker run --env APISERVER_URL=<APISERVER_IP>:<APISERVER_PORT> -p 80:8000 liqo/dashboard:latest
 ```
