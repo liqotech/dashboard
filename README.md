@@ -1,8 +1,10 @@
+[![Coverage Status](https://coveralls.io/repos/github/LiqoTech/dashboard/badge.svg?branch=master)](https://coveralls.io/github/LiqoTech/dashboard?branch=master)
+
 # LiqoDash
-LiqoDash is a web-based UI for [Liqo](https://github.com/LiqoTech/liqo). It allows you to visualize and manage
-all the Liqo components, as well as manage the status of the Liqo system itself.
-LiqoDash is also a general purpose, dynamic dashboard that let you create your own
+LiqoDash is a general purpose, dynamic dashboard that let you create your own
 views, and fully customize your resources.
+LiqoDash is  also a web-based UI for [Liqo](https://github.com/LiqoTech/liqo). It allows you to visualize and manage
+all the Liqo components, as well as manage the status of the Liqo system itself.
 
 ![alt text](docs/images/dashboard-ui.png)
 
@@ -75,11 +77,11 @@ Open a browser and access the UI under `localhost:8000`.
 ### Using Docker
 You can also pull the docker image:
 ```
-docker pull nappozord/dashboard:latest
+docker pull liqo/dashboard:latest
 ```
 And then run it:
 ```
-docker run -p 80:8000 nappozord/dashboard:latest
+docker run -p 80:8000 liqo/dashboard:latest
 ```
 Open a browser and visit `localhost:8000`.
 
@@ -87,5 +89,5 @@ Open a browser and visit `localhost:8000`.
 
 If you want to export the env variables only when running the image, you can do the following:
 ```
-docker run --env APISERVER_URL=<APISERVER_IP>:<APISERVER_PORT> -p 80:8000 nappozord/dashboard:latest
+docker run --env APISERVER_URL=<APISERVER_IP>:<APISERVER_PORT> -p 80:8000 liqo/dashboard:latest
 ```
