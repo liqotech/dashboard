@@ -13,19 +13,19 @@ export default class Authenticator {
     this.OIDC = false;
     this.token = '';
 
-    if (window.OIDC_CLIENT_ID === undefined) {
+    if (window.OIDC_CLIENT_ID === 'undefined') {
       window.OIDC_CLIENT_ID = OIDC_CLIENT_ID;
     }
 
-    if (window.OIDC_PROVIDER_URL === undefined) {
+    if (window.OIDC_PROVIDER_URL === 'undefined') {
       window.OIDC_PROVIDER_URL = OIDC_PROVIDER_URL;
     }
 
-    if (window.OIDC_CLIENT_SECRET === undefined) {
+    if (window.OIDC_CLIENT_SECRET === 'undefined') {
       window.OIDC_CLIENT_SECRET = OIDC_CLIENT_SECRET;
     }
 
-    if (window.OIDC_REDIRECT_URI === undefined) {
+    if (window.OIDC_REDIRECT_URI === 'undefined') {
       window.OIDC_REDIRECT_URI = OIDC_REDIRECT_URI;
     }
 
