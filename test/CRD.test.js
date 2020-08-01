@@ -42,7 +42,7 @@ async function setup_extended() {
 
   await setup();
 
-  let kind = screen.getAllByText(/Kind/i)[0];
+  let kind = screen.getByText('Advertisement');
   userEvent.click(kind);
 }
 
@@ -74,16 +74,15 @@ async function setup_only_CRD() {
   });
 }
 
-async function alwaysPresent(kind, name, descr) {
+async function alwaysPresent(kind, descr) {
   expect(await screen.findByLabelText('crd')).toBeInTheDocument();
-  expect(screen.getByText(name)).toBeInTheDocument();
   expect(screen.getByText(kind)).toBeInTheDocument();
   expect(screen.getByText(descr)).toBeInTheDocument();
   expect(screen.getAllByLabelText('star')).toHaveLength(3);
   expect(screen.getByText('Annotations')).toBeInTheDocument();
   expect(screen.getByText('Resources')).toBeInTheDocument();
   expect(screen.getByText('Schema')).toBeInTheDocument();
-  expect(screen.getByText('Add/Remove to view')).toBeInTheDocument();
+  expect(screen.getAllByLabelText('layout')).toHaveLength(2);
   expect(screen.getByLabelText('picture')).toBeInTheDocument();
   expect(screen.getByLabelText('plus')).toBeInTheDocument();
 }
@@ -106,20 +105,21 @@ describe('CRD', () => {
 
     await setup();
 
-    let kind = screen.getAllByText(/Kind/i)[0];
-    userEvent.click(kind);
+    let row = screen.getByText('Advertisement');
 
-    await alwaysPresent('Advertisement','advertisements.protocol.liqo.io', 'No description for this CRD');
+    userEvent.click(row);
+
+    await alwaysPresent('Advertisement','No description for this CRD');
     expect(screen.queryByRole('switch')).not.toBeInTheDocument();
 
     const customview = screen.getByText('Custom Resources');
     userEvent.click(customview);
 
-    kind = screen.getByText('Kind: LiqoDashTest');
-    userEvent.click(kind);
+    row = screen.getByText('LiqoDashTest');
+    userEvent.click(row);
 
     /** This CRD contains a custom template and a description, so there has to be a switch and not the default description*/
-    await alwaysPresent('LiqoDashTest','liqodashtests.crd-template.liqo.com', 'A test CRD for some implemetation on the liqo-dashboard');
+    await alwaysPresent('LiqoDashTest','A test CRD for some implemetation on the liqo-dashboard');
     expect(screen.queryByRole('switch')).toBeInTheDocument();
   })
 
@@ -138,7 +138,7 @@ describe('CRD', () => {
 
     await setup();
 
-    let kind = screen.getAllByText(/Kind/i)[0];
+    let kind = screen.getByText('Advertisement');
     userEvent.click(kind);
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
@@ -151,7 +151,7 @@ describe('CRD', () => {
     const customview = screen.getByText('Custom Resources');
     userEvent.click(customview);
 
-    kind = screen.getByText('Kind: NoAnnNoResNoSchema');
+    kind = screen.getByText('NoAnnNoResNoSchema');
     userEvent.click(kind);
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
@@ -179,7 +179,7 @@ describe('CRD', () => {
 
     await setup();
 
-    let kind = screen.getByText('Kind: NoAnnNoResNoSchema');
+    let kind = screen.getByText('NoAnnNoResNoSchema');
     userEvent.click(kind);
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
@@ -191,7 +191,7 @@ describe('CRD', () => {
     const customview = screen.getByText('Custom Resources');
     userEvent.click(customview);
 
-    kind = screen.getAllByText(/Kind/i)[0];
+    kind = screen.getByText('Advertisement');
     userEvent.click(kind);
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
@@ -200,7 +200,7 @@ describe('CRD', () => {
 
     userEvent.click(customview);
 
-    kind = screen.getByText('Kind: ManyResource');
+    kind = screen.getByText('ManyResource');
     userEvent.click(kind);
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
@@ -223,7 +223,7 @@ describe('CRD', () => {
 
     await setup();
 
-    let kind = screen.getByText('Kind: NoAnnNoResNoSchema');
+    let kind = screen.getByText('NoAnnNoResNoSchema');
     userEvent.click(kind);
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
@@ -236,7 +236,7 @@ describe('CRD', () => {
     const customview = screen.getByText('Custom Resources');
     userEvent.click(customview);
 
-    kind = screen.getAllByText(/Kind/i)[0];
+    kind = screen.getByText('Advertisement');
     userEvent.click(kind);
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
@@ -311,7 +311,7 @@ describe('CRD', () => {
 
     await setup();
 
-    let kind = screen.getByText('Kind: LiqoDashTest');
+    let kind = screen.getByText('LiqoDashTest');
     userEvent.click(kind);
 
     /** This CRD contains a custom template and a description, so there has to be a switch and not the default description*/
@@ -323,10 +323,10 @@ describe('CRD', () => {
 
     userEvent.click(switcher);
     userEvent.click(screen.getByText('Spec'));
-    expect(await screen.findByLabelText('jtt_spec'));
+    expect(await screen.findByLabelText('form_spec'));
 
     userEvent.click(screen.getByText('Status'));
-    expect(await screen.findByLabelText('jtt_status'));
+    expect(await screen.findByLabelText('form_status'));
   })
 
   test('CR with no spec or status still works', async () => {
@@ -344,7 +344,7 @@ describe('CRD', () => {
 
     await setup();
 
-    let kind = screen.getByText('Kind: LiqoDashTest');
+    let kind = screen.getByText('LiqoDashTest');
     userEvent.click(kind);
 
     /** This CRD contains a custom template and a description, so there has to be a switch and not the default description*/

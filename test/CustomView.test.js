@@ -1,10 +1,9 @@
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import ViewMockResponse from '../__mocks__/views.json';
 import ViewMockModified from '../__mocks__/views_modified.json';
-import CRDEmpty from '../__mocks__/crd_empty.json';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { loginTest, setup_cv, setup_login } from './RTLUtils';
+import { setup_cv } from './RTLUtils';
 import fetchMock from 'jest-fetch-mock';
 import ApiManager from '../src/services/__mocks__/ApiManager';
 import { MemoryRouter } from 'react-router-dom';

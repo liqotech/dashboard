@@ -38,7 +38,7 @@ describe('Sidebar', () => {
     const customview = await screen.findByText('Custom Resources');
     userEvent.click(customview);
 
-    expect(await screen.findAllByLabelText('crd')).toHaveLength(8);
+    expect(await screen.findAllByRole('row')).toHaveLength(9);
   })
 
   test('Sidebar favourite redirect is ok', async () => {

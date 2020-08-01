@@ -11,7 +11,7 @@
       },
       "spec": {
         "advertisementConfig": {
-          "autoAccept": false,
+          "autoAccept": true,
           "maxAcceptableAdvertisement": 10,
           "resourceSharingPercentage": 63
         },
