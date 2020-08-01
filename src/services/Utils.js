@@ -75,24 +75,23 @@ export default class Utils {
   }
 
 
-  setDefault(schema, config) {
+  setRealProperties(schemaGen, schemaReal) {
     try{
-      Object.keys(schema).forEach(key => {
-        if(schema[key] && key !== 'description' && key !== 'type' && key !== 'required') {
-          if (schema[key].type) {
-            if (schema[key].type === 'object') {
-              this.setDefault(schema[key], config[key]);
+      Object.keys(schemaGen).forEach(key => {
+        if(schemaGen[key] && key !== 'description' && key !== 'type' && key !== 'required') {
+          if (schemaGen[key].type) {
+            if (schemaGen[key].type === 'object' || schemaGen[key].type === 'array' || !schemaGen[key].type) {
+              this.setRealProperties(schemaGen[key], schemaReal[key]);
             } else {
-              schema[key].default = config[key];
+              schemaGen[key] = schemaReal[key];
             }
           } else {
-            this.setDefault(schema[key], config);
+            this.setRealProperties(schemaGen[key], schemaReal[key]);
           }
         }
       })
-    } catch {
-      return;
-    }
+    } catch {}
   }
+
 
 }

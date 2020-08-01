@@ -29,7 +29,16 @@ export function lowerCase(str) {
 }
 
 export function splitCamelCaseAndUp(str) {
-  str = unCamelCase(str);
-  str = properCase(str);
+  if(str) {
+    str = unCamelCase(str);
+    str = properCase(str);
+    return str;
+  }
+}
+
+export function rootSplitCamelCaseAndUp(str) {
+  const array = str.split("_");
+  str = splitCamelCaseAndUp(array[array.length - 2]);
+  str = str + ' (' + array.pop() + ')';
   return str;
 }

@@ -158,14 +158,24 @@ export default class ApiManager {
    * @returns a promise
    */
   deleteCustomResource(group, version, namespace, plural, name) {
-    return this.apiCRD.deleteNamespacedCustomObject(
-      group,
-      version,
-      namespace,
-      plural,
-      name,
-      {}
-    )
+    if(namespace){
+      return this.apiCRD.deleteNamespacedCustomObject(
+        group,
+        version,
+        namespace,
+        plural,
+        name,
+        {}
+      )
+    } else {
+      return this.apiCRD.deleteClusterCustomObject(
+        group,
+        version,
+        plural,
+        name,
+        {}
+      )
+    }
   }
 
   /**

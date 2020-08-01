@@ -4,7 +4,7 @@ import './GraphNet.css';
 import image from '../../assets/database.png'
 import Utils from '../../services/Utils';
 import { Badge, Button, Modal } from 'antd';
-import JsonToTableAntd from '../../editors/JsonToTable/JsonToTableAntd';
+import FormViewer from '../../editors/OAPIV3FormGenerator/FormViewer';
 
 class GraphNet extends Component {
   constructor(props) {
@@ -36,10 +36,10 @@ class GraphNet extends Component {
                 showModal: true,
                 contentModal: (
                   /** Just show the default information */
-                  <JsonToTableAntd
-                    json={ _this.props.custom_resources.find(item => {
+                  <FormViewer onEditor={true} CRD={_this.props.CRD}
+                    CR={ _this.props.custom_resources.find(item => {
                       return item.metadata.name === event.nodes[0];
-                    }).spec }
+                    }) }
                   />
                 )
               });
