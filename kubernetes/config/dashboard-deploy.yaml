@@ -4,6 +4,7 @@ metadata:
   labels:
     app: liqo-dashboard
   name: liqo-dashboard
+  namespace: liqo
 spec:
   replicas: 1
   selector:
@@ -15,7 +16,7 @@ spec:
         app: liqo-dashboard
     spec:
       containers:
-        - image: nappozord/dashboard:latest
+        - image: liqo/dashboard:latest
           imagePullPolicy: Always
           name: liqo-dashboard
           ports:

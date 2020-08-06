@@ -1,14 +1,20 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  labels:
+    app: liqo-dashboard
   name: liqodash-admin-sa
+  namespace: liqo
 
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
+  namespace: liqo-dashboard
   name: liqodash-admin-sa
+  labels:
+    app: liqo-dashboard
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -16,4 +22,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: liqodash-admin-sa
-  namespace: default
+  namespace: liqo-dashboard

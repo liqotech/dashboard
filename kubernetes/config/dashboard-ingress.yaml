@@ -3,8 +3,10 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
-  namespace: nap-test
+  labels:
+    app: liqo-dashboard
   name: liqo-dashboard-content
+  namespace: liqo
 spec:
   rules:
     - host: liqodashboard.crown-labs.ipv6.polito.it

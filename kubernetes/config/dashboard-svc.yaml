@@ -4,10 +4,13 @@ metadata:
   labels:
     app: liqo-dashboard
   name: liqo-dashboard
+  namespace: liqo
 spec:
+  type: NodePort
   selector:
     app: liqo-dashboard
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 80
       targetPort: 80
