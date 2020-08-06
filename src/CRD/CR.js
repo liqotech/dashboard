@@ -1,23 +1,24 @@
 import React, { Component } from 'react';
 import './CR.css';
 import {
-  Badge,
+  Badge, Card,
   Button,
-  Divider, Drawer,
-  notification, PageHeader,
+  Drawer,
+  notification,
   Popconfirm, Alert,
-  Tooltip, Typography
+  Tooltip, Typography, Collapse
+
 } from 'antd';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 import EditOutlined from '@ant-design/icons/lib/icons/EditOutlined';
 import { APP_NAME } from '../constants';
 import PieChart from '../templates/piechart/PieChart';
 import HistoChart from '../templates/histogram/HistoChart';
-import UpCircleOutlined from '@ant-design/icons/lib/icons/UpCircleOutlined';
-import JsonToTableAntd from '../editors/JsonToTable/JsonToTableAntd';
 import DeleteOutlined from '@ant-design/icons/lib/icons/DeleteOutlined';
 import UpdateCR from '../editors/UpdateCR';
 import { withRouter } from 'react-router-dom';
+import FormViewer from '../editors/OAPIV3FormGenerator/FormViewer';
+import ToolOutlined from '@ant-design/icons/lib/icons/ToolOutlined';
 
 class CR extends Component {
   constructor(props) {
@@ -27,19 +28,66 @@ class CR extends Component {
       deleted: false,
       showStatus: false,
       showSpec: false,
-      showInfo: false,
-      showUpdate: false
+      showUpdate: false,
+      currentTab: 'Spec'
     };
     this.handleClick_show = this.handleClick_show.bind(this);
     this.handleClick_delete = this.handleClick_delete.bind(this);
     this.getChart = this.getChart.bind(this);
     this.handleClick_Spec = this.handleClick_Spec.bind(this);
     this.handleClick_Status = this.handleClick_Status.bind(this);
-    this.handleClick_Info = this.handleClick_Info.bind(this);
+    this.onTabChange = this.onTabChange.bind(this);
+
+    this.tabList = [];
+
+    if(this.props.cr.spec)
+      this.tabList.push({
+        key: 'Spec',
+        tab: <span>
+              <ToolOutlined />
+              Spec
+             </span>
+      })
+
+    if(this.props.cr.status)
+      this.tabList.push({
+        key: 'Status',
+        tab: <span>
+              <ToolOutlined />
+              Status
+             </span>
+      })
+
+    this.contentList = {
+      Spec: this.props.cr.spec ? (
+        <div key={'spec_' + this.props.cr.metadata.name}>
+          <Alert.ErrorBoundary>
+            <div aria-label={'form_spec'}>
+              <FormViewer CR={this.props.cr} CRD={this.props.crd} api={this.props.api} />
+              {/*<JsonToTableAntd json={this.props.cr.spec} />*/}
+            </div>
+          </Alert.ErrorBoundary>
+        </div>
+      ) : null,
+      Status: this.props.cr.status ? (
+        <div key={'status_' + this.props.cr.metadata.name}>
+          <Alert.ErrorBoundary>
+            <div aria-label={'form_status'}>
+              {/*<JsonToTableAntd json={this.props.cr.status} />*/}
+              <FormViewer CR={this.props.cr} CRD={this.props.crd} status={true} api={this.props.api} />
+            </div>
+          </Alert.ErrorBoundary>
+        </div>) : null,
+    };
   }
 
+  onTabChange = (key) => {
+    this.setState({ currentTab: key });
+  };
+
   /** Make the JSON visible or invisible */
-  handleClick_show() {
+  handleClick_show(event) {
+    event.stopPropagation();
     this.setState({showJSON: !this.state.showJSON});
   }
 
@@ -84,10 +132,6 @@ class CR extends Component {
     this.setState({ showStatus: !this.state.showStatus });
   }
 
-  handleClick_Info() {
-    this.setState({ showInfo: !this.state.showInfo });
-  }
-
   /** If the CRD has a template, show it as the first option */
   getChart() {
     return (
@@ -110,33 +154,26 @@ class CR extends Component {
   }
 
   render() {
-    /** The default view can always be switched between the custom template */
-    let CRdefault = [];
-    CRdefault.push(<JsonToTableAntd json={this.props.cr.spec} />);
 
     return (
-      <div className="crd-choices">
-        {!this.state.deleted ? (
-          <div aria-label={'cr'}>
-            <PageHeader
-              className="cr-header"
-              title={
-                <div style={{fontSize: 14}}>
-                  <UpCircleOutlined style={{ marginRight: 10 }}
-                                    onClick={this.handleClick_Info}
-                                    rotate={this.state.showInfo ? 180 : 0}
-                  />
-                  <Typography.Text strong ellipsis style={{minWidth: 200}}>
-                    <a style={{ color: 'rgba(57,57,57,0.85)'}} onClick={this.handleClick_Info}>{this.props.cr.metadata.name}</a>
-                  </Typography.Text>
-                </div>
-              }
+      !this.state.deleted ? (
+        <div aria-label={'cr'} style={{ marginBottom: 10 }}>
+          <Collapse className={'crd-collapse'} style={{backgroundColor: '#fafafa'}}>
+            <Collapse.Panel
+              key={'collapse_' + this.props.cr.metadata.name}
+              style={{ borderBottomColor: '#f0f0f0' }}
+              header={<Typography.Text strong>{this.props.cr.metadata.name}</Typography.Text>}
               extra={
-                <div>
+                <div onClick={(event) => {
+                  event.stopPropagation();
+                }}>
                   <Tooltip title={'Edit resource'}>
                     <EditOutlined
-                      onClick={() => {this.setState({showUpdate: true})}}
-                      style={{ fontSize: '20px', marginRight: 15, color: '#1890FF' }}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        this.setState({showUpdate: true})}
+                      }
+                      style={{ fontSize: 15, marginRight: 15, color: '#1890FF' }}
                     />
                   </Tooltip>
                   <Drawer
@@ -150,24 +187,24 @@ class CR extends Component {
                     onClose={() => {this.setState({showUpdate: false})}}
                     width={'40%'}
                   >
-                    <UpdateCR CR={this.props.cr}
-                        group={this.props.crd.spec.group}
-                        version={this.props.crd.spec.version}
-                        plural={this.props.crd.spec.names.plural}
-                        this={this}
-                        api={this.props.api}
+                    <UpdateCR CR={this.props.cr} CRD={this.props.crd}
+                              group={this.props.crd.spec.group}
+                              version={this.props.crd.spec.version}
+                              plural={this.props.crd.spec.names.plural}
+                              this={this}
+                              api={this.props.api}
                     />
                   </Drawer>
                   <Tooltip title={'Show JSON'}>
-                    <Button
-                      onClick={this.handleClick_show}
+                    <Button size={'small'}
+                      onClick={(event) => this.handleClick_show(event)}
                       style={ !this.state.showJSON ?
                         { marginRight: 15 } : { marginRight: 15, color: '#1890FF' }}
                     >
                       JSON
                     </Button>
                   </Tooltip>
-                  <Tooltip title={'Delete resource'} placement={'bottomRight'}>
+                  <Tooltip title={'Delete resource'} placement={'topRight'}>
                     <Popconfirm
                       placement="topRight"
                       title="Are you sure?"
@@ -176,85 +213,47 @@ class CR extends Component {
                       okText="Yes"
                       cancelText="No"
                     >
-                      <Button type="primary" danger icon={<DeleteOutlined />}/>
+                      <Button size={'small'}
+                              type="primary" danger icon={<DeleteOutlined />}
+                              onClick={event => {
+                                event.stopPropagation();
+                              }}
+                      />
                     </Popconfirm>
                   </Tooltip>
                 </div>
               }
             >
-            {
-              this.state.showInfo ? (
-                <div>
-                  <Divider style={{marginTop: 4, marginBottom: 10}}/>
-                  {this.state.showJSON ? (
+              <div>
+                {this.state.showJSON ? (
+                  <div>
                     <div aria-label={'json'}>
                       {this.props.cr.spec ? (<pre>{JSON.stringify(this.props.cr.spec, null, 2)}</pre>) : null}
                       {this.props.cr.status ? (<pre>{JSON.stringify(this.props.cr.status, null, 2)}</pre>) : null}
                     </div>
-
-                  ) : null}
-                  {!this.state.showJSON && this.props.template
-                    ? this.getChart()
-                    : null}
-                  {!this.state.showJSON && !this.props.template ? (
-                    <Alert.ErrorBoundary>
-                      {this.props.cr.spec ? (
-                        <div>
-                          <div>
-                            <UpCircleOutlined
-                              style={{
-                                marginRight: 10,
-                                marginBottom: 20,
-                                marginTop: 15
-                              }}
-                              onClick={this.handleClick_Spec}
-                              rotate={this.state.showSpec ? 180 : 0}
-                            />
-                            <a style={{ color: 'rgba(57,57,57,0.85)'}}
-                               onClick={this.handleClick_Spec}>
-                              <Typography.Text strong>Spec</Typography.Text>
-                            </a>
-                          </div>
-                          {this.state.showSpec ? (
-                            <div aria-label={'jtt_spec'}>
-                              <JsonToTableAntd json={this.props.cr.spec} />
-                            </div>
-                          ) : null}
-                        </div>
-                      ) : null}
-                      {this.props.cr.status ? (
-                        <div>
-                          <div>
-                            <UpCircleOutlined
-                              style={{
-                                marginRight: 10,
-                                marginBottom: 20,
-                                marginTop: 25
-                              }}
-                              onClick={this.handleClick_Status}
-                              rotate={this.state.showStatus ? 180 : 0}
-                            />
-                            <a style={{ color: 'rgba(57,57,57,0.85)'}}
-                               onClick={this.handleClick_Status}>
-                              <Typography.Text strong>Status</Typography.Text>
-                            </a>
-                          </div>
-                          {this.state.showStatus ? (
-                            <div aria-label={'jtt_status'}>
-                              <JsonToTableAntd json={this.props.cr.status} />
-                            </div>
-                          ) : null}
-                        </div>
-                      ) : null}
-                    </Alert.ErrorBoundary>
-                  ) : null}
-                </div>
-              ) : null
-            }
-            </PageHeader>
-          </div>
-        ) : null}
-      </div>
+                  </div>
+                ) : null}
+                {!this.state.showJSON && this.props.template
+                  ? this.getChart()
+                  : null}
+                {!this.state.showJSON && !this.props.template ? (
+                  <Card tabList={this.tabList}
+                        tabProps={{
+                          size: 'small'
+                        }}
+                        size={'small'}
+                        type={'inner'}
+                        activeTabKey={this.state.currentTab}
+                        onTabChange={key => {this.onTabChange(key)}}
+                  >
+                    {this.contentList[this.state.currentTab]}
+                  </Card>
+                ) : null}
+              </div>
+            </Collapse.Panel>
+          </Collapse>
+        </div>
+      ) : <div/>
     );
   }
 }

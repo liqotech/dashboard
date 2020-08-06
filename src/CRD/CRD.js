@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import './CRD.css';
 import './CRDList.css';
 import {
+  Space,
   Badge, Breadcrumb, Button, Layout, Dropdown,
   notification, Tabs, Tag, Typography, Popover, Row, Tooltip,
-  Col, Descriptions, Switch, Pagination, Empty, Rate, message, Drawer, Card
+  Col, Descriptions, Switch, Pagination, Empty, Rate, message, Drawer, Card, Divider
 } from 'antd';
 import CR from './CR';
 import { Link } from 'react-router-dom';
@@ -51,7 +52,10 @@ class CRD extends Component {
       multi: false,
       customViews: [],
       showCreate: false,
-      showEditor: false
+      showEditor: false,
+      showResources: true,
+      showAnnotations: false,
+      showSchema: false
     }
 
     this.reloadCRD = this.reloadCRD.bind(this);
@@ -110,6 +114,7 @@ class CRD extends Component {
       );
 
       /** See if there is a template for the CRD */
+      this.findTemplate(this.state.CRD);
       this.findTemplate(this.state.CRD);
       }
     ).catch((error) => {
@@ -297,80 +302,38 @@ class CRD extends Component {
 
     return (
       <div>
-        <Row>
-          <Col flex={7}>
-            <Breadcrumb separator={'>'}>
-              <Breadcrumb.Item>CRD</Breadcrumb.Item>
-              <Breadcrumb.Item>
-                <Typography.Text ellipsis>{this.state.CRD.metadata.name}</Typography.Text>
-              </Breadcrumb.Item>
-            </Breadcrumb>
-          </Col>
-          {
-            this.props.onCustomView ? (
-              <Col flex={1}>
-                <Tooltip title={'Drag'} placement={'top'}>
-                  <DragOutlined className={'draggable'}
-                                style={{
-                                  float: 'right', fontSize: '20px',
-                                  marginRight: 10, marginLeft: 25
-                                }}
-                  />
-                </Tooltip>
-                <Tooltip title={'Pin'} placement={'top'}>
-                  <PushpinOutlined style={this.state.isPinned ?
-                    {
-                      float: 'right', fontSize: '20px',
-                      marginRight: 10,
-                      color: '#1890FF'
-                    }:{
-                      float: 'right', fontSize: '20px',
-                      marginRight: 10,
-                    }}
-                    onClick={() => {
-                      if(this.state.isPinned){
-                        this.setState({isPinned: false});
-                      } else {
-                        this.setState({isPinned: true});
-                      }
-                      this.props.func(this.state.CRD.metadata.name);
-                    }}
-                  />
-                </Tooltip>
-              </Col>
-            ) : (
-              <Dropdown overlay={menu} placement="bottomRight">
-                <Button>
-                  Add/Remove to view <LayoutOutlined />
-                </Button>
-              </Dropdown>
-            )
-          }
-        </Row>
-        <Typography.Title level={4} style={{marginTop: 20}}>
-          <Badge color='#1890FF' />
-          <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
+        <div>
+          <Badge color='#1890FF' text={<Link to={{
             pathname: '/customresources/' + this.state.CRD.metadata.name,
             state: {
               CRD: this.state.CRD
             }
           }} >
-            {this.props.altName ? this.props.altName
-              : this.state.CRD.spec.names.kind}
-          </Link>
+            <Tooltip title={this.state.CRD.metadata.name} placement={'top'}>
+              <Typography.Text strong style={{fontSize: 20}}>
+                {this.props.altName ? this.props.altName
+                  : this.state.CRD.spec.names.kind}
+              </Typography.Text>
+            </Tooltip>
+          </Link>} />
           <Rate className="crd-fav" count={1}
                 value={
                   this.state.CRD.metadata.annotations &&
                   this.state.CRD.metadata.annotations.favourite ? 1 : 0
                 }
                 onChange={this.handleClick_fav}
-                style={{marginLeft: 0}}
+                style={{marginLeft: 10}}
           />
           {
             !this.props.onCustomView ? (
               <div style={{float: "right"}}>
-                <Tooltip title={'Edit design'} placement={'bottom'}>
-                  <Button icon={<PictureOutlined />} size={'large'} type="primary"
+                <Tooltip title={'Add or Remove to View'} placement={'topLeft'}>
+                  <Dropdown overlay={menu} placement="bottomCenter" trigger={['click']}>
+                    <Button icon={<LayoutOutlined />}/>
+                  </Dropdown>
+                </Tooltip>
+                <Tooltip title={'Edit design'} placement={'top'}>
+                  <Button icon={<PictureOutlined />} type="primary"
                           style={{marginLeft: 15}} onClick={() => {this.setState({showEditor: true})}}>
                   </Button>
                 </Tooltip>
@@ -390,8 +353,8 @@ class CRD extends Component {
                                    CR={this.state.custom_resources}
                   />
                 </Drawer>
-                <Tooltip title={'Create new resource'} placement={'bottomRight'}>
-                  <Button icon={<PlusOutlined />} size={'large'} type="primary"
+                <Tooltip title={'Create new resource'} placement={'topRight'}>
+                  <Button icon={<PlusOutlined />} type="primary"
                           style={{marginLeft: 15}}
                           onClick={() => {
                             this.setState({showCreate: true});
@@ -414,16 +377,42 @@ class CRD extends Component {
                 </Drawer>
               </div>
               ) : (
-              this.state.template || this.tempTemplate ? (
-                  <div style={{float: 'right'}}>
-                    <Tooltip placement="bottomRight" title="Change CR design">
-                      <Switch defaultChecked onChange={this.changeTemplate}/>
-                    </Tooltip>
-                  </div>
-                ) : null)
-            }
-        </Typography.Title>
-        <div style={{maxWidth: '80%'}}>
+              <div style={{float: 'right'}}>
+                <Tooltip title={'Pin'} placement={'top'}>
+                  <PushpinOutlined style={this.state.isPinned ?
+                                   {
+                                     fontSize: '20px',
+                                     marginRight: 10,
+                                     marginLeft: 30,
+                                     color: '#1890FF'
+                                   }:{
+                                     fontSize: '20px',
+                                     marginRight: 10,
+                                     marginLeft: 30
+                                   }}
+                                   onClick={() => {
+                                     if(this.state.isPinned){
+                                       this.setState({isPinned: false});
+                                     } else {
+                                       this.setState({isPinned: true});
+                                     }
+                                     this.props.func(this.state.CRD.metadata.name);
+                                   }}
+                  />
+                </Tooltip>
+                <Tooltip title={'Drag'} placement={'top'}>
+                  <DragOutlined className={'draggable'}
+                                style={{
+                                  fontSize: '20px',
+                                  marginLeft: 20
+                                }}
+                  />
+                </Tooltip>
+              </div>
+            )
+          }
+        </div>
+        <Space align={'center'}>
           <Descriptions style={{marginTop: 15, marginLeft: 15}}>
             <Descriptions.Item>
               {
@@ -435,7 +424,16 @@ class CRD extends Component {
               }
             </Descriptions.Item>
           </Descriptions>
-        </div>
+          {
+            (this.state.template || this.tempTemplate) ? (
+              <div style={{float: 'right'}}>
+                <Tooltip placement="left" title="Change CR design">
+                  <Switch defaultChecked onChange={this.changeTemplate}/>
+                </Tooltip>
+              </div>
+            ) : null
+          }
+        </Space>
       </div>
     )
   }
@@ -570,7 +568,7 @@ class CRD extends Component {
       CRViews.push(
         <GraphNet key={'0'}
           custom_resources={this.state.custom_resources}
-          template={this.state.template}
+          template={this.state.template} CRD={this.state.CRD}
         />
       )
     } else {
@@ -621,20 +619,41 @@ class CRD extends Component {
        width = '100%';
     }
 
-    return (
-      <div aria-label={'crd'}>
-        <div className="crds-container" style={{maxWidth: width}}>
-          <div className={!this.props.onCustomView ? 'crd-content' : null}>
-            { !this.state.deleted ? (
-              <div>
-                <div className="crd-header">
-                  <Layout style={{background: '#fff'}}>
-                    {this.header()}
-                  </Layout>
-                  <Layout style={{background: '#fff'}}>
-                    <Layout.Content>
-                      { this.props.onCustomView ? (
-                        <div>
+    const content = (
+      <div>
+        { !this.state.deleted ? (
+          <div>
+            <div className="crd-header">
+              <Layout style={{background: '#fff'}}>
+                {this.header()}
+              </Layout>
+              <Layout style={{background: '#fff'}}>
+                <Layout.Content>
+                  { this.props.onCustomView ? (
+                    <div>
+                      <Divider style={{marginTop: 0, marginBottom: 15}}/>
+                      {CRViews}
+                      { !this.state.multi && this.state.custom_resources.length > 5 ? (
+                        <div className="no-crds-found" aria-label={'pagination'}>
+                          <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
+                                      defaultPageSize={5}
+                                      onChange={this.paginationChange}
+                                      showSizeChanger={false} />
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <div>
+                      <Divider style={{marginTop: 0, marginBottom: 15, marginLeft: -24, marginRight: -24, width: '100vw'}}/>
+                      { this.state.showAnnotations ? (
+                        CRD_annotations.length > 0 ? (
+                          <div>{CRD_annotations}</div>
+                        ) : (
+                          <Empty key={'empty_ann'} description={<strong>No annotations</strong>}/>
+                        )
+                      ) : null}
+                      { this.state.showResources ? (
+                        <>
                           {CRViews}
                           { !this.state.multi && this.state.custom_resources.length > 5 ? (
                             <div className="no-crds-found" aria-label={'pagination'}>
@@ -644,58 +663,64 @@ class CRD extends Component {
                                           showSizeChanger={false} />
                             </div>
                           ) : null}
-                        </div>
-                      ) : (
-                        <Tabs defaultActiveKey="2" tabBarExtraContent={
-                          this.state.template || this.tempTemplate ? (
-                            <div style={{float: 'right'}}>
-                              <Tooltip placement="topRight" title="Change CR design">
-                                <Switch defaultChecked onChange={this.changeTemplate}/>
-                              </Tooltip>
-                            </div>
-                          ) : null
-                        }>
-                          <Tabs.TabPane tab="Annotations" key="1">
-                            {
-                              CRD_annotations.length > 0 ? (
-                                <div>{CRD_annotations}</div>
-                              ) : (
-                                <Empty key={'empty_ann'} description={<strong>No annotations</strong>}/>
-                              )
-                            }
-                          </Tabs.TabPane>
-                          <Tabs.TabPane tab="Resources" key="2">
-                            {CRViews}
-                            { !this.state.multi && this.state.custom_resources.length > 5 ? (
-                              <div className="no-crds-found" aria-label={'pagination'}>
-                                <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
-                                            defaultPageSize={5}
-                                            onChange={this.paginationChange}
-                                            showSizeChanger={false} />
-                              </div>
-                            ) : null}
-                          </Tabs.TabPane>
-                          {/** Show the JSON Schema of the CRD */}
-                          <Tabs.TabPane tab="Schema" key="3">
-                            {
-                              schema ? (
-                                <pre aria-label={'schema'}>{JSON.stringify(schema.properties.spec, null, 2)}</pre>
-                              ) : (
-                                <Empty key={'empty_schema'} description={<strong>No schema for this CRD</strong>}/>
-                              )
-                            }
-                          </Tabs.TabPane>
-                        </Tabs>
-                      )}
-
-                    </Layout.Content>
-                  </Layout>
-                </div>
-              </div>
-            ) : null
-            }
+                        </>
+                      ) : null}
+                      {/** Show the JSON Schema of the CRD */}
+                      { this.state.showSchema ? (
+                        schema ? (
+                          <pre aria-label={'schema'}>{JSON.stringify(schema.properties.spec, null, 2)}</pre>
+                        ) : (
+                          <Empty key={'empty_schema'} description={<strong>No schema for this CRD</strong>}/>
+                        )
+                      ) : null}
+                    </div>
+                  )}
+                </Layout.Content>
+              </Layout>
+            </div>
           </div>
-        </div>
+        ) : null
+        }
+      </div>
+    )
+
+    return (
+      <div aria-label={'crd'}>
+        {!this.props.onCustomView ? (
+          <Card style={{maxWidth: width, margin: 'auto'}}
+                actions={[
+                  <div onClick={() => this.setState({
+                    showAnnotations: true,
+                    showResources: false,
+                    showSchema: false
+                  })}>
+                    <Typography.Text strong>Annotations</Typography.Text>
+                  </div>
+                  ,
+                  <div onClick={() => this.setState({
+                    showAnnotations: false,
+                    showResources: true,
+                    showSchema: false
+                  })}>
+                    <Typography.Text strong>Resources</Typography.Text>
+                  </div>,
+                  <div onClick={() => this.setState({
+                    showAnnotations: false,
+                    showResources: false,
+                    showSchema: true
+                  })}>
+                    <Typography.Text strong>Schema</Typography.Text>
+                  </div>
+                ]}
+          >
+            {content}
+          </Card>
+        ) : (
+          <div>
+            {content}
+          </div>
+        )}
+
       </div>
     );
   }

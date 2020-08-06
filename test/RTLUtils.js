@@ -101,7 +101,7 @@ export async function setup_resource(error, method) {
   const customview = screen.getByText('Custom Resources');
   userEvent.click(customview);
 
-  userEvent.click(await screen.findByText('Kind: LiqoDashTest'));
+  userEvent.click(await screen.findByText('LiqoDashTest'));
 
   await screen.findByLabelText('plus');
 }

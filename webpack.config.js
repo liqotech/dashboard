@@ -2,6 +2,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const RobotstxtPlugin = require('robotstxt-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
+const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
 
 module.exports = {
   context: __dirname,
@@ -75,6 +76,7 @@ module.exports = {
       },
       favicon: 'src/assets/logo_4.png'
     }),
+    new AntdDayjsWebpackPlugin(),
     new webpack.DefinePlugin({
       OIDC_PROVIDER_URL: JSON.stringify(process.env.OIDC_PROVIDER_URL),
       OIDC_CLIENT_ID: JSON.stringify(process.env.OIDC_CLIENT_ID),

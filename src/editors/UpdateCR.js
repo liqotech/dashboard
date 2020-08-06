@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './UpdateCR.css';
-import { Tabs, Typography, Button, notification, message } from 'antd';
+import { Tabs, Typography, Button, notification, message, Alert } from 'antd';
 import AceEditor from 'react-ace';
 import YAML from 'yaml';
 import 'ace-builds/src-noconflict/mode-json';
@@ -9,6 +9,7 @@ import 'ace-builds/src-noconflict/theme-monokai';
 import LoadingIndicator from '../common/LoadingIndicator';
 import ReactResizeDetector from 'react-resize-detector';
 import { APP_NAME } from '../constants';
+import FormGenerator from './OAPIV3FormGenerator/FormGenerator';
 
 class UpdateCR extends Component {
   constructor(props) {
@@ -22,6 +23,7 @@ class UpdateCR extends Component {
     };
     this.onChange = this.onChange.bind(this);
     this.onClick = this.onClick.bind(this);
+    this.submit = this.submit.bind(this);
   }
 
   onClick() {
@@ -38,6 +40,10 @@ class UpdateCR extends Component {
       }
     }
 
+    this.submit(item);
+  }
+
+  submit(item){
     item = {
       spec: item
     }
@@ -107,10 +113,17 @@ class UpdateCR extends Component {
     return (
       <div>
         { !this.state.isLoading ? (
-            <Tabs>
+            <Tabs defaultActiveKey="2">
               <Tabs.TabPane tab="JSON/YAML" key="1">
                 {this.inputText()}
               </Tabs.TabPane>
+              { this.props.CRD.spec.validation && this.props.CRD.spec.validation.openAPIV3Schema ? (
+                <Tabs.TabPane tab="Form Wizard" key="2">
+                  <Alert.ErrorBoundary>
+                    <FormGenerator CRD={this.props.CRD} submit={this.submit} CR={this.CR} onUpdate={true}/>
+                  </Alert.ErrorBoundary>
+                </Tabs.TabPane>
+              ) : null}
             </Tabs>
           ) : null }
         { this.state.isLoading ? <LoadingIndicator /> : null }

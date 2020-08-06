@@ -79,15 +79,10 @@ You can also pull the docker image:
 ```
 docker pull liqo/dashboard:latest
 ```
-And then run it:
+And then run:
 ```
-docker run -p 80:8000 liqo/dashboard:latest
+docker run --env APISERVER_URL=<APISERVER_IP>:<APISERVER_PORT> -p 8000:80 liqo/dashboard:latest
 ```
 Open a browser and visit `localhost:8000`.
 
-**NOTE: exporting the environment variables is necessary even when running the docker image**
-
-If you want to export the env variables only when running the image, you can do the following:
-```
-docker run --env APISERVER_URL=<APISERVER_IP>:<APISERVER_PORT> -p 80:8000 liqo/dashboard:latest
-```
+**NOTE: the command above uses the `--env` option to export the env variables needed to run the dashboard.**

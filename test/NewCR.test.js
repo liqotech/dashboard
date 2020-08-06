@@ -36,7 +36,10 @@ async function setup() {
 }
 
 async function check_new_CR(){
+
   const test = await screen.findByText('test-3');
+
+  expect(screen.getAllByLabelText('cr')).toHaveLength(3);
 
   expect(test).toBeInTheDocument();
 
@@ -44,14 +47,16 @@ async function check_new_CR(){
 
   userEvent.click(test);
 
-  userEvent.click(await screen.findByText('Spec'));
+  const items = await screen.findAllByText('Item');
 
-  expect(await screen.findByText('cost'));
-  expect(screen.getByText('name'));
-  expect(screen.getByText('cyan'));
-  expect(screen.getByText('orange'));
-  expect(screen.getByText('1'));
-  expect(screen.getByText('2'));
+  userEvent.click(items[0]);
+
+  expect(await screen.findAllByText('Cost')).toHaveLength(2);
+  expect(screen.getAllByText('Name')).toHaveLength(3);
+  //expect(screen.getByText('cyan'));
+  //expect(screen.getByText('orange'));
+  //expect(screen.getByText('1'));
+  //expect(screen.getByText('2'));
 }
 
 describe('NewCR', () => {
@@ -59,11 +64,9 @@ describe('NewCR', () => {
     await setup();
 
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    expect(screen.getByText('Form Generator')).toBeInTheDocument();
-    expect(screen.getByRole('tabpanel')).toHaveAttribute('tabindex', '0');
+    expect(screen.getByText('Form Wizard')).toBeInTheDocument();
 
-    expect(screen.getByRole('button'));
-    //expect(screen.getByRole('tabpanel').querySelector(`[class="ace_layer ace_marker-layer"]`)).toBeInTheDocument();
+    expect(screen.getByText('Submit'));
   })
 
   test('CR form generator tab is not present when no schema', async () => {
@@ -90,31 +93,35 @@ describe('NewCR', () => {
     });
 
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    expect(screen.queryByText('Form Generator')).not.toBeInTheDocument();
+    expect(screen.queryByText('Form Wizard')).not.toBeInTheDocument();
   })
 
   test('CR second tab show the form generator properly', async () => {
     await setup();
 
-    userEvent.click(await screen.findByText('Form Generator'));
+    userEvent.click(await screen.findByText('Form Wizard'));
 
-    expect(await screen.findByText('metadata'));
-    //expect(screen.getByRole('tabpanel').querySelector(`[class="ace_layer ace_marker-layer"]`)).toBeInTheDocument();
+    expect(await screen.findByText('Metadata'));
+
     expect(screen.getByText('Submit')).toBeInTheDocument();
+
+    expect(screen.getByText('Item')).toBeInTheDocument();
+    userEvent.click(screen.getByText('Item'));
 
     const button = screen.getByText('Add Item');
     userEvent.click(button);
 
     expect(await screen.findByText('Cost')).toBeInTheDocument();
-    expect(await screen.findByText('Name')).toBeInTheDocument();
+    expect(await screen.findAllByText('Name')).toHaveLength(2);
   })
 
   test('Error message if no value inserted', async () => {
     await setup();
 
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+    userEvent.click(screen.getByText('JSON/YAML'));
 
-    userEvent.click(screen.getByRole('button'));
+    userEvent.click(screen.getByText('OK'));
 
     expect(await screen.findByText(/errors/i)).toBeInTheDocument();
   })
@@ -122,18 +129,19 @@ describe('NewCR', () => {
   test('Error message if no name in form generator', async () => {
     await setup();
 
-    userEvent.click(await screen.findByText('Form Generator'));
+    userEvent.click(await screen.findByText('Form Wizard'));
 
-    expect(await screen.findByText('metadata'));
+    expect(await screen.findByText('Metadata'));
     userEvent.click(screen.getByText('Submit'));
 
-    expect(await screen.findAllByText(/errors/i)).toHaveLength(1);
+    expect(await screen.findByText(/Please/i)).toBeInTheDocument();
   })
 
   test('Error message when wrong metadata', async () => {
     await setup();
 
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+    userEvent.click(screen.getByText('JSON/YAML'));
 
     await userEvent.type(screen.getByLabelText('editor'), '{"name": "test", "namespace": "test"}');
 
@@ -147,6 +155,7 @@ describe('NewCR', () => {
 
     userEvent.click(screen.getByLabelText('plus'));
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+    userEvent.click(screen.getByText('JSON/YAML'));
 
     await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashNewMockResponse));
 
@@ -160,24 +169,33 @@ describe('NewCR', () => {
 
     userEvent.click(screen.getByLabelText('plus'));
 
-    const form = await screen.findByText('Form Generator');
+    const form = await screen.findByText('Form Wizard');
     userEvent.click(form);
 
-    const editors = await screen.findAllByLabelText('editor');
-    expect(editors).toHaveLength(2);
-    await userEvent.type(editors[1], '{"name": "test-3", "namespace": "default"}');
+    let textbox = await screen.findAllByRole('textbox', {name: ''});
+
+    expect(textbox).toHaveLength(2);
+
+    await userEvent.type(textbox[0], 'test');
+    await userEvent.type(textbox[1], 'test-ns');
+
+    userEvent.click(await screen.findByText('Item'));
 
     userEvent.click(await screen.findByText('Add Item'));
-    let textbox = await screen.findAllByRole('textbox', {name: ''});
-    await userEvent.type(textbox[0], '1');
-    await userEvent.type(textbox[1], 'cyan');
+
+    await screen.findByText('Cost');
+
+    textbox = await screen.findAllByRole('textbox', {name: ''});
+
+    await userEvent.type(textbox[2], '1');
+    await userEvent.type(textbox[3], 'cyan');
 
     userEvent.click(await screen.findByText('Add Item'));
 
     textbox = await screen.findAllByRole('textbox', {name: ''});
 
-    await userEvent.type(textbox[2], '2');
-    await userEvent.type(textbox[3], 'orange');
+    await userEvent.type(textbox[4], '2');
+    await userEvent.type(textbox[5], 'orange');
 
     userEvent.click(screen.getByRole('button', {name: 'Submit'}));
 
@@ -189,6 +207,7 @@ describe('NewCR', () => {
 
     userEvent.click(screen.getByLabelText('plus'));
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+    userEvent.click(screen.getByText('JSON/YAML'));
 
     await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashNewMockResponse));
 

@@ -19,7 +19,7 @@ async function setup() {
   const customview = screen.getByText('Custom Resources');
   userEvent.click(customview);
 
-  expect(screen.getAllByLabelText('crd')).toHaveLength(8);
+  expect(screen.getAllByRole('row')).toHaveLength(9);
 }
 
 describe('CRD List', () => {
@@ -37,20 +37,19 @@ describe('CRD List', () => {
     const customview = screen.getByText('Custom Resources');
     userEvent.click(customview);
 
-    expect(screen.getAllByLabelText('crd')).toHaveLength(10);
+    expect(screen.getAllByRole('row')).toHaveLength(11);
 
     userEvent.click(screen.getByText('2'));
 
-    expect(await screen.findAllByLabelText('crd')).toHaveLength(2);
+    expect(await screen.findAllByRole('row')).toHaveLength(3);
 
   })
 
   test('CRD list cards show all the data and the right description', async () => {
     await setup();
 
-    expect(screen.getByText('advertisements.protocol.liqo.io'));
-    expect(screen.getByText('Kind: Advertisement'));
-    expect(screen.getAllByText('Description')).toHaveLength(8);
+    expect(screen.getByText('protocol.liqo.io'));
+    expect(screen.getByText('Advertisement'));
     expect(screen.getAllByText('This CRD has no description')).toHaveLength(5);
 
     expect(screen.getByText('This CRD is used to create custom views from a set of CRDs'));
@@ -62,11 +61,11 @@ describe('CRD List', () => {
     const favCRD = screen.getAllByLabelText('star')[2];
     userEvent.click(favCRD);
 
-    expect(await screen.findByText('Advertisement'));
+    expect(await screen.findAllByText('Advertisement')).toHaveLength(2);
 
     userEvent.click(favCRD);
 
-    expect(screen.queryByText('Advertisement')).not.toBeInTheDocument();
+    expect(screen.findByText('Advertisement'));
   })
 
   test('Empty notification when no CRDs', async () => {

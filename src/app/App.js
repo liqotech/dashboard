@@ -22,8 +22,8 @@ import Cookies from 'js-cookie';
 import ConfigView from '../views/ConfigView';
 
 function CallBackHandler(props) {
-  props.func()
-  return <div></div>
+  props.func();
+  return <div/>
 }
 
 class App extends Component {
@@ -54,11 +54,11 @@ class App extends Component {
 
   render() {
     /** Always present routes */
-    const routes = [
+    let routes = [
       <Route key={'login'}
              exact path="/login"
              render={() => this.authManager.OIDC ? (
-               this.authManager.login()
+               <CallBackHandler func={this.authManager.login} />
              ) : <Login func={this.manageToken} logged={this.state.logged} />}
       />,
       <Route key={'callback'}
@@ -79,7 +79,7 @@ class App extends Component {
 
     /** Routes present only if logged in and apiManager created */
     if(this.state.api && this.state.logged){
-      routes.push([
+      routes.push(
         <Route key={'/'}
                exact path="/"
                render={(props) =>
@@ -105,13 +105,13 @@ class App extends Component {
                component={(props) =>
                  <ConfigView {...props} api={this.state.api} />
                }/>
-      ])
+      )
     } else {
-      routes.push([
+      routes.push(
       <Route key={'*'}
              path="*">
         <Redirect to={'/login'} />
-      </Route>])
+      </Route>)
     }
 
     return (

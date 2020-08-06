@@ -14,7 +14,7 @@ import HistoChart from '../templates/histogram/HistoChart';
 import { APP_NAME } from '../constants';
 import GraphNet from '../templates/graph/GraphNet';
 import ReactResizeDetector from 'react-resize-detector';
-import JsonToTableAntd from './JsonToTable/JsonToTableAntd';
+import FormViewer from './OAPIV3FormGenerator/FormViewer';
 
 class DesignEditorCRD extends Component {
   constructor(props) {
@@ -84,7 +84,7 @@ class DesignEditorCRD extends Component {
     if(CR_template === 'default' && this.state.example_CR[0]){
       this.setState({
         preview: (
-          <JsonToTableAntd json={this.state.example_CR[0].spec} />
+          <FormViewer CR={this.state.example_CR[0]} CRD={this.CRD} onEditor={true} />
         )
       })
     }
@@ -122,6 +122,7 @@ class DesignEditorCRD extends Component {
           preview: (
             <GraphNet custom_resources={this.state.example_CR}
                       template={CR_template}
+                      CRD={this.CRD}
             />
           )})
       } else {

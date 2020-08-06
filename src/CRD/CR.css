@@ -14,3 +14,25 @@
 .cr-header .ant-page-header-heading-left{
     width: 60%;
 }
+
+.ant-collapse-content{
+    border-top-color: #f0f0f0;
+}
+
+.ant-collapse{
+    border-color: #f0f0f0;
+}
+
+.ant-collapse .ant-collapse-item .ant-collapse-header {
+    position: relative;
+    padding: 8px 16px 8px 40px;
+    color: rgba(0, 0, 0, 0.85);
+    line-height: 1.5715;
+    cursor: pointer;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+.ant-collapse-content .ant-collapse-content-box {
+    padding: 8px 12px;
+}

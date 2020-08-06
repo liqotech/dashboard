@@ -129,12 +129,12 @@ class NewCR extends Component {
     return (
       <div>
         { !this.state.isLoading ? (
-          <Tabs>
+          <Tabs defaultActiveKey="2">
             <Tabs.TabPane tab="JSON/YAML" key="1">
               {this.inputText()}
             </Tabs.TabPane>
             { this.CRD.spec.validation && this.CRD.spec.validation.openAPIV3Schema ? (
-              <Tabs.TabPane tab="Form Generator" key="2">
+              <Tabs.TabPane tab="Form Wizard" key="2">
                 <FormGenerator CRD={this.CRD} submit={this.submit}/>
               </Tabs.TabPane>
             ) : null}

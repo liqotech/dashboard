@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Badge, Breadcrumb, Empty, notification, Rate, Tabs, Typography } from 'antd';
+import { Badge, Breadcrumb, Empty, notification, Rate, Tabs, Typography, Table } from 'antd';
 import LoadingIndicator from '../common/LoadingIndicator';
 import { Link, withRouter } from 'react-router-dom';
 import './CRDList.css';
@@ -13,12 +13,13 @@ import ReactResizeDetector from 'react-resize-detector';
 class CRDList extends Component {
   constructor(props) {
     super(props);
-    this.onBreakpointChange = this.onBreakpointChange.bind(this);
+    //this.onBreakpointChange = this.onBreakpointChange.bind(this);
     /**
      * @param: isLoading: boolean
      * @param: CRDs: array of CRDs
      */
     this.state = {
+      pageSize: 10,
       CRDs: this.props.api.CRDs,
       CRDshown: [],
       isLoading: true,
@@ -30,6 +31,45 @@ class CRDList extends Component {
     if(this.props.api)
       this.props.api.CRDListCallback = this.loadCustomResourceDefinitions;
     this.paginationChange = this.paginationChange.bind(this);
+
+    this.columns = [
+      {
+        title: 'Kind',
+        dataIndex: 'kind',
+        render: (text, record) => (
+          <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
+                           pathname: '/customresources/' + this.state.CRDshown.find(item => {return item.metadata.name === record.key}).metadata.name,
+                           state: {
+                             CRD: this.state.CRDshown.find(item => {return item.metadata.name === record.key})
+                           }
+                         }} >
+            <Typography.Text strong>{text}</Typography.Text>
+          </Link>
+        )
+      },
+      {
+        title: 'Description',
+        dataIndex: 'description'
+      },
+      {
+        title: 'Group',
+        dataIndex: 'group'
+      },
+      {
+        title: 'Favourite',
+        dataIndex: 'favourite',
+        render: (text, record) => (
+          <>
+            {
+              <Rate className="crd-fav" count={1} defaultValue={text ? 1 : 0}
+                    onChange={() => {this.handleClick_fav(record.key)}}
+                    style={{marginLeft: 0}}
+              />
+            }
+          </>
+        )
+      }
+    ]
   }
 
   loadCustomResourceDefinitions(CRDs) {
@@ -39,7 +79,7 @@ class CRDList extends Component {
     this.setState({
       CRDs: CRDs
     });
-    this.generateLayout(CRDs.slice(10*(this.state.currentPage-1), 10*this.state.currentPage));
+    this.generateLayout(CRDs.slice(this.state.pageSize*(this.state.currentPage-1), this.state.pageSize*this.state.currentPage));
   }
 
   componentDidMount() {
@@ -70,25 +110,6 @@ class CRDList extends Component {
       CRDshown: CRDs
     });
 
-    /**
-     * When changing from lg layout to sm
-     * let the CRDs remain in alphabetical order
-     */
-    if(this.state.oldBr === 'sm'){
-      layout = [];
-      for(let i = 0; i < CRDs.length; i++) {
-        layout.push({
-          i: CRDs[i].metadata.name, x: 0, y: Math.floor(i), w: 1, h: 1, static: true
-        });
-      }
-    } else {
-      for(let i = 0; i < CRDs.length; i++) {
-        layout.push({
-          i: CRDs[i].metadata.name, x: i%2, y: Math.floor(i/2), w: 1, h: 1, static: true
-        });
-      }
-    }
-
     this.setState({
       layout: {lg: layout},
       isLoading: false
@@ -96,18 +117,11 @@ class CRDList extends Component {
 
   }
 
-  /** If the size breakpoint has changed, re-sort the CRD list */
-  onBreakpointChange(br){
-    if(!this.state.oldBr){
-      this.state.oldBr = br;
-    } else if(this.state.oldBr !== br){
-      this.state.oldBr = br;
-      this.generateLayout(this.state.CRDshown);
-    }
-  }
-
   /** Update CRD with the 'favourite' annotation */
   handleClick_fav(CRD){
+
+    CRD = this.state.CRDshown.find(item => {return item.metadata.name === CRD});
+
     if(!CRD.metadata.annotations || !CRD.metadata.annotations.favourite){
       CRD.metadata.annotations.favourite = 'true';
     } else {
@@ -122,98 +136,41 @@ class CRDList extends Component {
   render() {
     const CRDViews = [];
     this.state.CRDshown.forEach(CRD => {
-      CRDViews.push(
-        <div className="crd-content" key={CRD.metadata.name} aria-label={'crd'}>
-          <div>
-            <div className="crd-header">
-              <div>
-                <Breadcrumb separator={'>'}>
-                  <Breadcrumb.Item>API</Breadcrumb.Item>
-                  <Breadcrumb.Item>CRD</Breadcrumb.Item>
-                  <Breadcrumb.Item>{CRD.metadata.name}</Breadcrumb.Item>
-                </Breadcrumb>
-                <br />
-                <div>
-                  {/** 
-                   * Link to the view of the specific CRD 
-                   * @param CRD: this a CRD
-                   */}
-                  <Typography.Title level={4} >
-                    {<Badge color="#108ee9" />}
-                    <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
-                      pathname: '/customresources/' + CRD.metadata.name,
-                      state: {
-                        CRD: CRD
-                      }
-                    }} >
-                      Kind: {CRD.spec.names.kind}
-                    </Link>
-                    { CRD.metadata.annotations ? (
-                      <Rate className="crd-fav" count={1} defaultValue={CRD.metadata.annotations.favourite ? 1 : 0}
-                            onChange={() => {this.handleClick_fav(CRD)}}
-                            style={{marginLeft: 0}}
-                      />
-                    ) : (
-                      <Rate className="crd-fav" count={1} defaultValue={0}
-                            onChange={() => {this.handleClick_fav(CRD)}}
-                            style={{marginLeft: 0}}
-                      />
-                    )}
-                  </Typography.Title>
-                </div>
-              </div>
-              <Tabs defaultActiveKey="1">
-                <Tabs.TabPane tab="Description" key="1">
-                  {
-                    CRD.metadata.annotations && CRD.metadata.annotations.description ? (
-                      <div>{CRD.metadata.annotations.description}</div>
-                      ) : <div>This CRD has no description</div>
-                  }
-                </Tabs.TabPane>
-              </Tabs>
-            </div>
-          </div>
-        </div>
-      );
+      let favourite = false;
+      let description = 'This CRD has no description';
+      if(CRD.metadata.annotations){
+        if(CRD.metadata.annotations.favourite)
+          favourite = true;
+        if(CRD.metadata.annotations.description)
+          description = CRD.metadata.annotations.description
+      }
+      CRDViews.push({
+        key: CRD.metadata.name,
+        kind: CRD.spec.names.kind,
+        favourite: favourite,
+        group: CRD.spec.group,
+        description: description
+      });
     });
 
     return (
       <div>
-        {
-         /**
-         * This is an ugly workaround but it's the best solution I found:
-         *  it is necessary because the ResponsiveGridLayout's WidthProvider
-         *  only detect width resize when the actual window is being resized,
-         *  so here I trigger the event to trick it
-         */
-        }
-        <ReactResizeDetector skipOnMount handleWidth
-                             refreshMode={'throttle'} refreshRate={150}
-                             onResize={() => {
-                               window.dispatchEvent(new Event('resize'));
-                             }} />
-        <div className="crds-container">
-          <ResponsiveGridLayout className="react-grid-layout" layouts={this.state.layout} margin={[40, 40]}
-                                breakpoints={{lg: 1000, md: 796, sm: 568}}
-                                cols={{lg: 2, md: 2, sm: 1}} rowHeight={300}
-                                compactType={'horizontal'} onBreakpointChange={this.onBreakpointChange}>
-            {CRDViews}
-          </ResponsiveGridLayout>
-
-          {!this.state.isLoading && CRDViews.length === 0 ? (
-            <div className="no-crds-found">
-              <Empty description={<strong>No CRDs found</strong>}/>
-            </div>
+        {!this.state.isLoading && CRDViews.length > 0 ? (
+          <Table columns={this.columns} dataSource={CRDViews} pagination={false}/>
           ) : null}
-          {this.state.isLoading ? <LoadingIndicator /> : null}
-          {!this.state.isLoading && CRDViews.length > 0 ? (
-            <div className="no-crds-found" style={{marginTop: 30}}>
-              <Pagination defaultCurrent={this.state.currentPage} total={this.state.CRDs.length}
-                          onChange={this.paginationChange}
-                          showSizeChanger={false} />
-            </div>
-          ) : null}
-        </div>
+        {!this.state.isLoading && CRDViews.length === 0 ? (
+          <div className="no-crds-found">
+            <Empty description={<strong>No CRDs found</strong>}/>
+          </div>
+        ) : null}
+        {this.state.isLoading ? <LoadingIndicator /> : null}
+        {!this.state.isLoading && CRDViews.length > 0 ? (
+          <div className="no-crds-found" style={{marginTop: 30}}>
+            <Pagination defaultCurrent={this.state.currentPage} total={this.state.CRDs.length}
+                        onChange={this.paginationChange} defaultPageSize={this.state.pageSize}
+                        showSizeChanger={false} />
+          </div>
+        ) : null}
       </div>
     );
   }

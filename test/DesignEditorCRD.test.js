@@ -44,6 +44,28 @@ async function setup() {
   });
 }
 
+async function fillFields(noMetadata){
+  const name = screen.getAllByRole('textbox', {name: ''})[0];
+  const namespace = screen.getAllByRole('textbox', {name: ''})[1];
+  const labels = screen.getAllByRole('textbox', {name: ''})[2];
+  const values = screen.getAllByRole('textbox', {name: ''})[3];
+
+  expect(name).toBeInTheDocument();
+  expect(namespace).toBeInTheDocument();
+  expect(labels).toBeInTheDocument();
+  expect(values).toBeInTheDocument();
+
+  if(!noMetadata){
+    userEvent.type(name, 'test-2');
+    userEvent.type(namespace, 'test-ns');
+  }
+  userEvent.type(labels, 'item.name');
+  userEvent.type(values, 'item.cost');
+
+  const submit = screen.getByRole('button', {name: 'Submit'});
+  userEvent.click(submit);
+}
+
 describe('DesignEditorCRD', () => {
   test('Design editor show all general information', async () => {
     await setup();
@@ -89,20 +111,9 @@ describe('DesignEditorCRD', () => {
 
     userEvent.click(screen.getByText('PieChart'));
 
-    expect(await screen.findByText('metadata')).toBeInTheDocument();
+    expect(await screen.findByText('Metadata')).toBeInTheDocument();
 
-    const labels = screen.getAllByRole('textbox', {name: ''})[0];
-    const values = screen.getAllByRole('textbox', {name: ''})[1];
-    expect(labels).toBeInTheDocument();
-    expect(values).toBeInTheDocument();
-
-    userEvent.type(labels, 'item.name');
-    userEvent.type(values, 'item.cost');
-
-    const submit = screen.getByRole('button', {name: 'Submit'});
-    userEvent.click(submit);
-
-    expect(await screen.findByText(/Please/i));
+    await fillFields();
   })
 
   test('Form generator throws error when no valid values in required field', async () => {
@@ -112,12 +123,11 @@ describe('DesignEditorCRD', () => {
 
     userEvent.click(screen.getByText('PieChart'));
 
-    expect(await screen.findByText('metadata')).toBeInTheDocument();
+    expect(await screen.findByText('Metadata')).toBeInTheDocument();
 
-    const submit = screen.getByRole('button', {name: 'Submit'});
-    userEvent.click(submit);
+    await fillFields(true);
 
-    expect(await screen.findByText('Errors')).toBeInTheDocument();
+    expect(await screen.findByText(/Please/i));
   })
 
   test('Definition of a new template works', async () => {
@@ -129,17 +139,10 @@ describe('DesignEditorCRD', () => {
 
     userEvent.click(screen.getByText('HistoChart'));
 
-    const labels = screen.getAllByRole('textbox', {name: ''})[0];
-    const values = screen.getAllByRole('textbox', {name: ''})[1];
-
-    await userEvent.type(screen.getByLabelText('editor'), '{"name": "histo-test", "namespace": "test"}');
-    await userEvent.type(labels, 'item.name');
-    await userEvent.type(values, 'item.cost');
-
-    const submit = screen.getByRole('button', {name: 'Submit'});
-    userEvent.click(submit);
+    await fillFields();
 
     expect(await screen.findByText(/Showing preview for/i)).toBeInTheDocument();
+
     expect(await screen.findAllByLabelText('check')).toHaveLength(2);
 
     userEvent.click(screen.getByRole('button', {name: 'Save it'}));
@@ -147,7 +150,7 @@ describe('DesignEditorCRD', () => {
     expect(await screen.findByText('CRD modified')).toBeInTheDocument();
 
     await userEvent.click(await screen.findByText('test-1'));
-    expect(await screen.findByLabelText('histochart')).toBeInTheDocument();
+
   }, 30000)
 
   test('Default template overrides old template', async () => {
@@ -161,16 +164,11 @@ describe('DesignEditorCRD', () => {
 
     userEvent.click(screen.getByRole('button', {name: 'Save it'}));
 
-    //expect(await screen.findByText('CRD modified')).toBeInTheDocument();
 
     await userEvent.click(await screen.findByText('test-1'));
     userEvent.click(await screen.findByText('Spec'));
-    expect(await screen.findByLabelText('jtt_spec')).toBeInTheDocument();
+    expect(await screen.findByLabelText('form_spec')).toBeInTheDocument();
 
-    expect(await screen.queryAllByText('cost')).toHaveLength(2);
-
-    userEvent.click(screen.getAllByText('item')[0]);
-
-    expect(await screen.queryAllByText('cost')).toHaveLength(1);
+    expect(await screen.queryAllByText('Item')).toHaveLength(2);
   }, 30000)
 })
