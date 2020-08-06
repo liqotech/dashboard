@@ -1,0 +1,34 @@
+name: Rebase
+on:
+  issue_comment:
+     types: [created]
+jobs:
+  rebase:
+    name: Rebase
+    if: github.event.issue.pull_request != '' && contains(github.event.comment.body, '/rebase')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.CI_TOKEN }}
+      - name: Automatic Rebase
+        uses: cirrus-actions/rebase@1.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+
+      - name: Create comment (Success)
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.CI_TOKEN }}
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Rebase status: ${{ job.status }}!
+        if: always()
+
+  always_job:
+    name: Always run job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Always run
+        run: echo "This job is used to prevent the workflow to fail when all other jobs are skipped."
