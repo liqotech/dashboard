@@ -184,7 +184,7 @@ class CRD extends Component {
   /** Update CRD with the 'favourite' annotation */
   handleClick_fav(){
     if(!this.state.CRD.metadata.annotations || !this.state.CRD.metadata.annotations.favourite){
-      this.state.CRD.metadata.annotations.favourite = 'true';
+      this.state.CRD.metadata.annotations = {favourite: 'true'};
     } else {
       this.state.CRD.metadata.annotations.favourite = null;
     }
@@ -347,6 +347,7 @@ class CRD extends Component {
                   visible={this.state.showEditor}
                   onClose={() => {this.setState({showEditor: false})}}
                   width={'40%'}
+                  destroyonClose
                 >
                   <DesignEditorCRD CRD={this.state.CRD}
                                    this={this} api={this.props.api}
@@ -372,6 +373,7 @@ class CRD extends Component {
                   visible={this.state.showCreate}
                   onClose={() => {this.setState({showCreate: false})}}
                   width={'40%'}
+                  destroyonClose
                 >
                   <NewCR CRD={this.state.CRD} this={this} api={this.props.api} />
                 </Drawer>
