@@ -123,7 +123,7 @@ class CRDList extends Component {
     CRD = this.state.CRDshown.find(item => {return item.metadata.name === CRD});
 
     if(!CRD.metadata.annotations || !CRD.metadata.annotations.favourite){
-      CRD.metadata.annotations.favourite = 'true';
+      CRD.metadata.annotations = {favourite: 'true'};
     } else {
       CRD.metadata.annotations.favourite = null;
     }
