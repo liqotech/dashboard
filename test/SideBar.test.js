@@ -2,14 +2,15 @@ import { screen } from '@testing-library/react'
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { loginTest, mockCRDAndViews, setup_cv } from './RTLUtils';
+import { loginTest, mockCRDAndViewsExtended, setup_cv } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
+import CRDmockResponse from '../__mocks__/crd_fetch.json';
 
 fetchMock.enableMocks();
 
 describe('Sidebar', () => {
   test('Sidebar main menus item and submenus item are showed', async () => {
-    mockCRDAndViews();
+    mockCRDAndViewsExtended();
     await loginTest();
 
     expect(await screen.findByText(/Home/i)).toBeInTheDocument();
@@ -32,17 +33,17 @@ describe('Sidebar', () => {
   })
 
   test('Sidebar custom resource redirect is ok', async () => {
-    mockCRDAndViews();
+    mockCRDAndViewsExtended();
     await loginTest();
 
     const customview = await screen.findByText('Custom Resources');
     userEvent.click(customview);
 
-    expect(await screen.findAllByRole('row')).toHaveLength(9);
+    expect(await screen.findAllByRole('row')).toHaveLength(CRDmockResponse.items.length);
   })
 
   test('Sidebar favourite redirect is ok', async () => {
-    mockCRDAndViews();
+    mockCRDAndViewsExtended();
     await loginTest();
 
     const customview = await screen.findByText('View');

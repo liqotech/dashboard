@@ -44,7 +44,7 @@ async function setup_Graph(){
 
 describe('GraphNet', () => {
 
-  test('', async () => {
+  test('Graph works', async () => {
     await setup_Graph();
 
     expect(await screen.findByRole('button', {name: /cluster/i})).toHaveAttribute('disabled', '');

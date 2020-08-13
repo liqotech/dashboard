@@ -1,19 +1,17 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { loginTest } from './RTLUtils';
+import { generalHomeGET, loginTest } from './RTLUtils';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import ViewMockResponse from '../__mocks__/views.json';
-import AdvMockResponse from '../__mocks__/advertisement.json';
 import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import LiqoDashModifiedMockResponse from '../__mocks__/liqodashtest_modifiedCRD.json';
 import LiqoDashAlteredMockResponse from '../__mocks__/liqodashtest_noSpec_noStatus.json';
 import PieMockResponse from '../__mocks__/piecharts.json';
 import NoAnnNoResNoSch from '../__mocks__/no_Ann_noRes_noSch.json';
 import ManyResources from '../__mocks__/manyResources.json';
-import CRDmockEmpty from '../__mocks__/crd_fetch.json';
 import ApiManager from '../src/services/__mocks__/ApiManager';
 import CRD from '../src/CRD/CRD';
 import { MemoryRouter } from 'react-router-dom';
@@ -31,13 +29,7 @@ async function setup() {
 
 async function setup_extended() {
   fetch.mockImplementation((url) => {
-    if (url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-    } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
-    } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
-      return Promise.resolve(new Response(JSON.stringify({ body: AdvMockResponse })))
-    }
+    return mocks(url);
   })
 
   await setup();
@@ -46,17 +38,27 @@ async function setup_extended() {
   userEvent.click(kind);
 }
 
+function mocks(url) {
+  if (url === 'http://localhost:3001/customresourcedefinition') {
+    return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+  } else if (url === 'http://localhost:3001/clustercustomobject/views') {
+    return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
+  } else if (url === 'http://localhost:3001/clustercustomobject/liqodashtests') {
+    return Promise.resolve(new Response(JSON.stringify({ body: LiqoDashMockResponse })))
+  } else if (url === 'http://localhost:3001/clustercustomobject/piecharts') {
+    return Promise.resolve(new Response(JSON.stringify({ body: PieMockResponse })))
+  } else if (url === 'http://localhost:3001/clustercustomobject/noannnoresnoschemas') {
+    return Promise.resolve(new Response(JSON.stringify({ body: NoAnnNoResNoSch })))
+  } else if (url === 'http://localhost:3001/clustercustomobject/manyresources') {
+    return Promise.resolve(new Response(JSON.stringify({ body: ManyResources })))
+  } else {
+    return generalHomeGET(url);
+  }
+}
+
 async function setup_only_CRD() {
   fetch.mockImplementation((url) => {
-    if (url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
-    } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-    } else if (url === 'http://localhost:3001/clustercustomobject/liqodashtests') {
-      return Promise.resolve(new Response(JSON.stringify({ body: LiqoDashMockResponse })))
-    } else if (url === 'http://localhost:3001/clustercustomobject/piecharts') {
-      return Promise.resolve(new Response(JSON.stringify({ body: PieMockResponse })))
-    }
+    return mocks(url);
   })
 
   api = new ApiManager();
@@ -90,17 +92,7 @@ async function alwaysPresent(kind, descr) {
 describe('CRD', () => {
   test('CRD card shows every general information in different cases', async () => {
     fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition') {
-        return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-      } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-        return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
-      } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
-        return Promise.resolve(new Response(JSON.stringify({ body: AdvMockResponse })))
-      } else if (url === 'http://localhost:3001/clustercustomobject/liqodashtests') {
-        return Promise.resolve(new Response(JSON.stringify({ body: LiqoDashMockResponse })))
-      } else if (url === 'http://localhost:3001/clustercustomobject/piecharts') {
-        return Promise.resolve(new Response(JSON.stringify({ body: PieMockResponse })))
-      }
+      return mocks(url);
     })
 
     await setup();
@@ -125,15 +117,7 @@ describe('CRD', () => {
 
   test('Annotations tab works', async () => {
     fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition') {
-        return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-      } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-        return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
-      } else if (url === 'http://localhost:3001/clustercustomobject/noannnoresnoschemas') {
-        return Promise.resolve(new Response(JSON.stringify({ body: NoAnnNoResNoSch })))
-      } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
-        return Promise.resolve(new Response(JSON.stringify({ body: AdvMockResponse })))
-      }
+      return mocks(url);
     })
 
     await setup();
@@ -164,17 +148,7 @@ describe('CRD', () => {
 
   test('Resources tab works', async () => {
     fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition') {
-        return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-      } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-        return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
-      } else if (url === 'http://localhost:3001/clustercustomobject/noannnoresnoschemas') {
-        return Promise.resolve(new Response(JSON.stringify({ body: NoAnnNoResNoSch })))
-      } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
-        return Promise.resolve(new Response(JSON.stringify({ body: AdvMockResponse })))
-      } else if (url === 'http://localhost:3001/clustercustomobject/manyresources') {
-        return Promise.resolve(new Response(JSON.stringify({ body: ManyResources })))
-      }
+      return mocks(url);
     })
 
     await setup();
@@ -210,15 +184,7 @@ describe('CRD', () => {
 
   test('Schema tab works', async () => {
     fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition') {
-        return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-      } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-        return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
-      } else if (url === 'http://localhost:3001/clustercustomobject/noannnoresnoschemas') {
-        return Promise.resolve(new Response(JSON.stringify({ body: NoAnnNoResNoSch })))
-      } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
-        return Promise.resolve(new Response(JSON.stringify({ body: AdvMockResponse })))
-      }
+      return mocks(url);
     })
 
     await setup();
@@ -298,15 +264,7 @@ describe('CRD', () => {
 
   test('Templates are switched correctly', async () => {
     fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition') {
-        return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-      } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-        return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
-      } else if (url === 'http://localhost:3001/clustercustomobject/liqodashtests') {
-        return Promise.resolve(new Response(JSON.stringify({ body: LiqoDashMockResponse })))
-      } else if (url === 'http://localhost:3001/clustercustomobject/piecharts') {
-        return Promise.resolve(new Response(JSON.stringify({ body: PieMockResponse })))
-      }
+      return mocks(url);
     })
 
     await setup();
@@ -339,6 +297,8 @@ describe('CRD', () => {
         return Promise.resolve(new Response(JSON.stringify({ body: LiqoDashAlteredMockResponse })))
       } else if (url === 'http://localhost:3001/clustercustomobject/piecharts') {
         return Promise.resolve(new Response(JSON.stringify({ body: PieMockResponse })))
+      } else {
+        return generalHomeGET(url);
       }
     })
 
