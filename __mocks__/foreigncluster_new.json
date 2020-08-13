@@ -1,0 +1,39 @@
+{
+  "apiVersion": "discovery.liqo.io/v1",
+  "kind": "ForeignCluster",
+  "metadata": {
+    "labels": {
+      "cluster-id": "9d73c01a-f23a-45dc-822b-7d3232683f53",
+      "discovery-type": "LAN"
+    },
+    "name": "89d73c01a-f23a-45dc-822b-7d3232683f53",
+    "resourceVersion": "000010",
+    "selfLink": "/apis/discovery.liqo.io/v1/foreignclusters/9d73c01a-f23a-45dc-822b-7d3232683f53"
+  },
+  "spec": {
+    "allowUntrustedCA": true,
+    "apiUrl": "https://1.1.1.2:1234",
+    "clusterID": "9d73c01a-f23a-45dc-822b-7d3232683f53",
+    "discoveryType": "LAN",
+    "join": true,
+    "namespace": "liqo"
+  },
+  "status": {
+    "incoming": {
+      "joined": true,
+      "peeringRequest": {
+        "name": "9d73c01a-f23a-45dc-822b-7d3232683f53"
+      }
+    },
+    "outgoing": {
+      "advertisement": {
+        "apiVersion": "protocol.liqo.io/v1",
+        "kind": "Advertisement",
+        "name": "advertisement-9d73c01a-f23a-45dc-822b-7d3232683f53"
+      },
+      "joined": true,
+      "remote-peering-request-name": "4317f039-e7b8-40d2-ae20-19d1c47e69f0"
+    },
+    "ttl": 3
+  }
+}
