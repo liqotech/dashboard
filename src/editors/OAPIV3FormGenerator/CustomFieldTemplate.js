@@ -96,14 +96,11 @@ class CustomFieldTemplate extends Component{
     const props = this.props;
     const { id, classNames, label, help, required, description, errors, children } = props;
 
-    //console.log(props);
-
     let render = customFieldTemplateGeneral(props);
 
     if(!render) {
 
       //TODO: fix additionalProperties
-      //console.log(props);
       if(this.props.schema.__additional_property){
         return(
           <div className={classNames} id={id} style={{ marginBottom: 5, marginTop: 5 }}>

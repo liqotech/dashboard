@@ -6,28 +6,232 @@
       "kind": "Advertisement",
       "metadata": {
         "name": "advertisement-8d73c01a-f23a-45dc-822b-7d3232683f53",
-        "resourceVersion": "000000000",
-        "selfLink": "/apis/protocol.liqo.io/v1/advertisements/advertisement-8d73c01a-f23a-45dc-822b-7d3232683f53"
+        "ownerReferences": [
+          {
+            "apiVersion": "discovery.liqo.io/v1",
+            "controller": true,
+            "kind": "ForeignCluster",
+            "name": "8d73c01a-f23a-45dc-822b-7d3232683f53"
+          }
+        ],
+        "resourceVersion": "00000",
+        "selfLink": "/apis/protocol.liqo.io/v1/advertisements/advertisement-8d73c01a-f23a-45dc-822b-7d3232683f53",
+        "uid": "cb97e3a7-22c3-4bde-bbb5-18a5096ad2c5"
       },
       "spec": {
-        "clusterId": "test",
-        "network": {
-          "gatewayIP": "test",
-          "gatewayPrivateIP": "test",
-          "podCIDR": "test"
+        "clusterId": "8d73c01a-f23a-45dc-822b-7d3232683f53",
+        "images": [
+          {
+            "names": [
+              "docker.io/kindest/kindnetd:0.5.4"
+            ],
+            "sizeBytes": 113207016
+          },
+          {
+            "names": [
+              "docker.io/liqo/init-vkubelet@sha256:ae4eab11e1d573a0be540a0047184db8b0af78d492ade10e670e3fc014dccdb2",
+              "docker.io/liqo/init-vkubelet:latest"
+            ],
+            "sizeBytes": 50892533
+          },
+          {
+            "names": [
+              "docker.io/liqo/init-vkubelet@sha256:ae4eab11e1d573a0be540a0047184db8b0af78d492ade10e670e3fc014dccdb2",
+              "docker.io/liqo/init-vkubelet:latest"
+            ],
+            "sizeBytes": 50892533
+          },
+          {
+            "names": [
+              "docker.io/rancher/local-path-provisioner:v0.0.12"
+            ],
+            "sizeBytes": 41994847
+          },
+          {
+            "names": [
+              "docker.io/liqo/secret-creation@sha256:078c52666c737cef2575d7fad681b3b296297d2b2a6f73a69b67f85435f7f7ac",
+              "docker.io/liqo/secret-creation:latest"
+            ],
+            "sizeBytes": 32778743
+          },
+          {
+            "names": [
+              "docker.io/liqo/secret-creation@sha256:078c52666c737cef2575d7fad681b3b296297d2b2a6f73a69b67f85435f7f7ac",
+              "docker.io/liqo/secret-creation:latest"
+            ],
+            "sizeBytes": 32778743
+          },
+          {
+            "names": [
+              "docker.io/liqo/init-pod-mutator@sha256:425848f91243e8dfaeac93240cee42ce19ef203675e6355348d92031aa4624cc",
+              "docker.io/liqo/init-pod-mutator:latest"
+            ],
+            "sizeBytes": 32506292
+          },
+          {
+            "names": [
+              "docker.io/liqo/init-pod-mutator@sha256:425848f91243e8dfaeac93240cee42ce19ef203675e6355348d92031aa4624cc",
+              "docker.io/liqo/init-pod-mutator:latest"
+            ],
+            "sizeBytes": 32506292
+          },
+          {
+            "names": [
+              "docker.io/liqo/peering-request-webhook-init@sha256:4b91d4f7fee8cf0f409a0bd86c57988e3e70a320215498fe002cc02bb089b1ce",
+              "docker.io/liqo/peering-request-webhook-init:latest"
+            ],
+            "sizeBytes": 32505032
+          },
+          {
+            "names": [
+              "docker.io/liqo/peering-request-webhook-init@sha256:4b91d4f7fee8cf0f409a0bd86c57988e3e70a320215498fe002cc02bb089b1ce",
+              "docker.io/liqo/peering-request-webhook-init:latest"
+            ],
+            "sizeBytes": 32505032
+          },
+          {
+            "names": [
+              "docker.io/liqo/liqonet@sha256:12e314149db41ac9ceede3cd0467c5e5c91a7da5aebddda8f1180c7c3fd91015",
+              "docker.io/liqo/liqonet:latest"
+            ],
+            "sizeBytes": 26245437
+          },
+          {
+            "names": [
+              "docker.io/liqo/liqonet@sha256:12e314149db41ac9ceede3cd0467c5e5c91a7da5aebddda8f1180c7c3fd91015",
+              "docker.io/liqo/liqonet:latest"
+            ],
+            "sizeBytes": 26245437
+          },
+          {
+            "names": [
+              "docker.io/liqo/discovery@sha256:4bfd5885e08edad9558c71e62964a7b68fca4952aed7de49a05e3f07df0d5948",
+              "docker.io/liqo/discovery:latest"
+            ],
+            "sizeBytes": 24159147
+          },
+          {
+            "names": [
+              "docker.io/liqo/discovery@sha256:4bfd5885e08edad9558c71e62964a7b68fca4952aed7de49a05e3f07df0d5948",
+              "docker.io/liqo/discovery:latest"
+            ],
+            "sizeBytes": 24159147
+          },
+          {
+            "names": [
+              "docker.io/liqo/advertisement-operator@sha256:630ff31f2a81cb5fcc99e4d112515276b0d8d539b0131a0c374c5ac0d4008671",
+              "docker.io/liqo/advertisement-operator:latest"
+            ],
+            "sizeBytes": 19448362
+          },
+          {
+            "names": [
+              "docker.io/liqo/advertisement-operator@sha256:630ff31f2a81cb5fcc99e4d112515276b0d8d539b0131a0c374c5ac0d4008671",
+              "docker.io/liqo/advertisement-operator:latest"
+            ],
+            "sizeBytes": 19448362
+          },
+          {
+            "names": [
+              "docker.io/liqo/peering-request-operator@sha256:b0f2dff073fc797ecc0935647d019f111f25b8c06332f44c6291d397660e4798",
+              "docker.io/liqo/peering-request-operator:latest"
+            ],
+            "sizeBytes": 19399610
+          },
+          {
+            "names": [
+              "docker.io/liqo/peering-request-operator@sha256:b0f2dff073fc797ecc0935647d019f111f25b8c06332f44c6291d397660e4798",
+              "docker.io/liqo/peering-request-operator:latest"
+            ],
+            "sizeBytes": 19399610
+          },
+          {
+            "names": [
+              "docker.io/liqo/schedulingnode-operator@sha256:ec7ab9c9e11de7ebabd3f642e28797c5859a0c56f55f54b14f0f07ce03073384",
+              "docker.io/liqo/schedulingnode-operator:latest"
+            ],
+            "sizeBytes": 18396550
+          },
+          {
+            "names": [
+              "docker.io/liqo/schedulingnode-operator@sha256:ec7ab9c9e11de7ebabd3f642e28797c5859a0c56f55f54b14f0f07ce03073384",
+              "docker.io/liqo/schedulingnode-operator:latest"
+            ],
+            "sizeBytes": 18396550
+          },
+          {
+            "names": [
+              "docker.io/liqo/pod-mutator@sha256:3293807b3d83777807f78dbe7bd928a383dd37ed91cb1651aa4d19261f4bb5df",
+              "docker.io/liqo/pod-mutator:latest"
+            ],
+            "sizeBytes": 8915223
+          },
+          {
+            "names": [
+              "docker.io/liqo/pod-mutator@sha256:3293807b3d83777807f78dbe7bd928a383dd37ed91cb1651aa4d19261f4bb5df",
+              "docker.io/liqo/pod-mutator:latest"
+            ],
+            "sizeBytes": 8915223
+          }
+        ],
+        "kubeConfigRef": {
+          "name": "vk-kubeconfig-secret-8d73c01a-f23a-45dc-822b-7d3232683f53",
+          "namespace": "liqo"
         },
-        "timeToLive": "",
-        "timestamp": ""
+        "limitRange": {
+          "limits": [
+            {
+              "max": {
+                "cpu": "100m",
+                "memory": "390Mi"
+              },
+              "type": ""
+            }
+          ]
+        },
+        "network": {
+          "gatewayIP": "172.18.0.2",
+          "gatewayPrivateIP": "192.168.1.1",
+          "podCIDR": "10.244.0.0/16"
+        },
+        "prices": {
+          "cpu": "1",
+          "docker.io/kindest/kindnetd:0.5.4": "5",
+          "docker.io/liqo/advertisement-operator:latest": "5",
+          "docker.io/liqo/advertisement-operator@sha256:630ff31f2a81cb5fcc99e4d112515276b0d8d539b0131a0c374c5ac0d4008671": "5",
+          "docker.io/liqo/discovery:latest": "5",
+          "docker.io/liqo/discovery@sha256:4bfd5885e08edad9558c71e62964a7b68fca4952aed7de49a05e3f07df0d5948": "5",
+          "docker.io/liqo/init-pod-mutator:latest": "5",
+          "docker.io/liqo/init-pod-mutator@sha256:425848f91243e8dfaeac93240cee42ce19ef203675e6355348d92031aa4624cc": "5",
+          "docker.io/liqo/init-vkubelet:latest": "5",
+          "docker.io/liqo/init-vkubelet@sha256:ae4eab11e1d573a0be540a0047184db8b0af78d492ade10e670e3fc014dccdb2": "5",
+          "docker.io/liqo/liqonet:latest": "5",
+          "docker.io/liqo/liqonet@sha256:12e314149db41ac9ceede3cd0467c5e5c91a7da5aebddda8f1180c7c3fd91015": "5",
+          "docker.io/liqo/peering-request-operator:latest": "5",
+          "docker.io/liqo/peering-request-operator@sha256:b0f2dff073fc797ecc0935647d019f111f25b8c06332f44c6291d397660e4798": "5",
+          "docker.io/liqo/peering-request-webhook-init:latest": "5",
+          "docker.io/liqo/peering-request-webhook-init@sha256:4b91d4f7fee8cf0f409a0bd86c57988e3e70a320215498fe002cc02bb089b1ce": "5",
+          "docker.io/liqo/pod-mutator:latest": "5",
+          "docker.io/liqo/pod-mutator@sha256:3293807b3d83777807f78dbe7bd928a383dd37ed91cb1651aa4d19261f4bb5df": "5",
+          "docker.io/liqo/schedulingnode-operator:latest": "5",
+          "docker.io/liqo/schedulingnode-operator@sha256:ec7ab9c9e11de7ebabd3f642e28797c5859a0c56f55f54b14f0f07ce03073384": "5",
+          "docker.io/liqo/secret-creation:latest": "5",
+          "docker.io/liqo/secret-creation@sha256:078c52666c737cef2575d7fad681b3b296297d2b2a6f73a69b67f85435f7f7ac": "5",
+          "docker.io/rancher/local-path-provisioner:v0.0.12": "5",
+          "memory": "2m"
+        },
+        "resourceQuota": {
+          "hard": {
+            "cpu": "2145m",
+            "memory": "5965988659",
+            "pods": "33"
+          }
+        }
       },
       "status": {
         "advertisementStatus": "ACCEPTED",
-        "foreignNetwork": {
-          "gatewayIP": "",
-          "gatewayPrivateIP": "",
-          "podCIDR": ""
-        },
-        "observedGeneration": 1,
-        "remoteRemappedPodCIDR": "",
+        "localRemappedPodCIDR": "10.22.0.0/16",
+        "remoteRemappedPodCIDR": "10.26.0.0/16",
         "tunnelEndpointKey": {
           "name": "",
           "namespace": ""
@@ -39,7 +243,7 @@
   "kind": "AdvertisementList",
   "metadata": {
     "continue": "",
-    "resourceVersion": "000000",
+    "resourceVersion": "00000",
     "selfLink": "/apis/protocol.liqo.io/v1/advertisements"
   }
 }

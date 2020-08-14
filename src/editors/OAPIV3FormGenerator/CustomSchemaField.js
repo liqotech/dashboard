@@ -46,7 +46,7 @@ function getFieldComponent(schema, uiSchema, idSchema, fields) {
       );
     };
 }
-
+/*
 function Label(props) {
   const { label, required, id } = props;
   if (!label) {
@@ -73,17 +73,6 @@ function LabelInput(props) {
   );
 }
 
-function Help(props) {
-  const { help } = props;
-  if (!help) {
-    return null;
-  }
-  if (typeof help === "string") {
-    return <p className="help-block">{help}</p>;
-  }
-  return <div className="help-block">{help}</div>;
-}
-
 function ErrorList(props) {
   const { errors = [] } = props;
   if (errors.length === 0) {
@@ -106,6 +95,7 @@ function ErrorList(props) {
     </div>
   );
 }
+
 function DefaultTemplate(props) {
   const {
     id,
@@ -118,6 +108,7 @@ function DefaultTemplate(props) {
     required,
     displayLabel,
   } = props;
+
   if (hidden) {
     return <div className="hidden">{children}</div>;
   }
@@ -191,6 +182,7 @@ function WrapIfAdditional(props) {
     </div>
   );
 }
+*/
 
 function SchemaFieldRender(props, _this) {
   const {
@@ -207,7 +199,7 @@ function SchemaFieldRender(props, _this) {
   } = props;
   const { rootSchema, fields, formContext } = registry;
   const FieldTemplate =
-    uiSchema["ui:FieldTemplate"] || registry.FieldTemplate || DefaultTemplate;
+    uiSchema["ui:FieldTemplate"] || registry.FieldTemplate /*|| DefaultTemplate*/;
   let idSchema = props.idSchema;
   const schema = utils.retrieveSchema(props.schema, rootSchema, formData);
   idSchema = utils.mergeObjects(
@@ -289,9 +281,6 @@ function SchemaFieldRender(props, _this) {
       />
     ),
     rawDescription: description,
-    help: <Help help={help} />,
-    rawHelp: typeof help === "string" ? help : undefined,
-    errors: <ErrorList errors={errors} />,
     rawErrors: errors,
     id,
     label,
