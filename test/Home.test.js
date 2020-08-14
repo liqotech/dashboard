@@ -1,25 +1,11 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { generalHomeGET, loginTest, mockCRDAndViewsExtended } from './RTLUtils';
+import { mockCRDAndViewsExtended } from './RTLUtils';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import CRDmockResponse from '../__mocks__/crd_fetch.json';
-import ViewMockResponse from '../__mocks__/views.json';
-import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
-import LiqoDashModifiedMockResponse from '../__mocks__/liqodashtest_modifiedCRD.json';
-import LiqoDashAlteredMockResponse from '../__mocks__/liqodashtest_noSpec_noStatus.json';
-import PieMockResponse from '../__mocks__/piecharts.json';
-import NoAnnNoResNoSch from '../__mocks__/no_Ann_noRes_noSch.json';
-import ManyResources from '../__mocks__/manyResources.json';
 import ApiManager from '../src/services/__mocks__/ApiManager';
-import CRD from '../src/CRD/CRD';
 import { MemoryRouter } from 'react-router-dom';
 import Home from '../src/home/Home';
-import FCMockResponse from '../__mocks__/foreigncluster.json';
-import AdvMockResponse from '../__mocks__/advertisement.json';
-import PRMockResponse from '../__mocks__/peeringrequest.json';
-import ConfigMockResponse from '../__mocks__/configs.json';
 
 fetchMock.enableMocks();
 

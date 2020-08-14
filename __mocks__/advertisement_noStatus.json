@@ -18,21 +18,6 @@
         },
         "timeToLive": "",
         "timestamp": ""
-      },
-      "status": {
-        "advertisementStatus": "ACCEPTED",
-        "foreignNetwork": {
-          "gatewayIP": "",
-          "gatewayPrivateIP": "",
-          "podCIDR": ""
-        },
-        "observedGeneration": 1,
-        "remoteRemappedPodCIDR": "",
-        "tunnelEndpointKey": {
-          "name": "",
-          "namespace": ""
-        },
-        "vkCreated": true
       }
     }
   ],

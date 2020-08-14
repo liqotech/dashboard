@@ -20,7 +20,7 @@
         "timestamp": ""
       },
       "status": {
-        "advertisementStatus": "ACCEPTED",
+        "advertisementStatus": "REFUSED",
         "foreignNetwork": {
           "gatewayIP": "",
           "gatewayPrivateIP": "",

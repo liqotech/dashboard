@@ -1,5 +1,5 @@
 import React from 'react';
-import { findByRole, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import CRDmockLong from '../__mocks__/crd_fetch_long.json';
@@ -11,8 +11,6 @@ import GraphNet from '../src/templates/graph/GraphNet';
 import ApiManager from '../src/services/__mocks__/ApiManager';
 
 fetchMock.enableMocks();
-
-
 
 async function setup_Graph(){
   fetch.mockImplementation((url) => {
