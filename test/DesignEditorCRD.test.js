@@ -1,5 +1,5 @@
 import React from 'react';
-import { findByRole, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import ApiManager from '../src/services/__mocks__/ApiManager';

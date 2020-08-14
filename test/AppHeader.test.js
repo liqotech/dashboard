@@ -1,4 +1,4 @@
-import { findByLabelText, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';

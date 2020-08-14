@@ -1,0 +1,44 @@
+{
+  "apiVersion": "discovery.liqo.io/v1",
+  "items": [
+    {
+      "apiVersion": "discovery.liqo.io/v1",
+      "kind": "ForeignCluster",
+      "metadata": {
+        "labels": {
+          "cluster-id": "8d73c01a-f23a-45dc-822b-7d3232683f53",
+          "discovery-type": "LAN"
+        },
+        "name": "8d73c01a-f23a-45dc-822b-7d3232683f53",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/discovery.liqo.io/v1/foreignclusters/8d73c01a-f23a-45dc-822b-7d3232683f53"
+      },
+      "spec": {
+        "allowUntrustedCA": true,
+        "apiUrl": "https://1.1.1.1:1234",
+        "clusterID": "8d73c01a-f23a-45dc-822b-7d3232683f53",
+        "discoveryType": "LAN",
+        "join": true,
+        "namespace": "liqo"
+      },
+      "status": {
+        "incoming": {
+          "joined": true,
+          "peeringRequest": {
+            "name": "8d73c01a-f23a-45dc-822b-7d3232683f53"
+          }
+        },
+        "outgoing": {
+          "joined": false,
+          "remote-peering-request-name": "4317f039-e7b8-40d2-ae20-18d1c47e69f0"
+        },
+        "ttl": 3
+      }
+    }
+  ],
+  "kind": "ForeignClusterList",
+  "metadata": {
+    "resourceVersion": "000000",
+    "selfLink": "/apis/discovery.liqo.io/v1/foreignclusters"
+  }
+}
