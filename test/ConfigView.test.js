@@ -1,10 +1,13 @@
 import ViewMockResponse from '../__mocks__/views.json';
-import CRDmockResponse from '../__mocks__/crd_fetch_long.json';
+import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import ClusterConfigMockResponse from '../__mocks__/configs.json';
 import { screen } from '@testing-library/react';
 import Error409 from '../__mocks__/409.json';
 import { loginTest } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
+import FCMockResponse from '../__mocks__/foreigncluster.json';
+import AdvMockResponse from '../__mocks__/advertisement.json';
+import PRMockResponse from '../__mocks__/peeringrequest.json';
 
 async function setup_with_error(error) {
   fetch.mockResponse(req => {
@@ -12,6 +15,12 @@ async function setup_with_error(error) {
       return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
     } else if (req.url === 'http://localhost:3001/clustercustomobject/views') {
       return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
+    } else if (req.url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
+      return Promise.resolve(new Response(JSON.stringify({body: FCMockResponse})));
+    } else if (req.url === 'http://localhost:3001/clustercustomobject/advertisements') {
+      return Promise.resolve(new Response(JSON.stringify({body: AdvMockResponse})));
+    } else if (req.url === 'http://localhost:3001/clustercustomobject/peeringrequests') {
+      return Promise.resolve(new Response(JSON.stringify({body: PRMockResponse})));
     } else if (req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
       if (req.method === 'GET') {
         return Promise.resolve(new Response(JSON.stringify({ body: ClusterConfigMockResponse })))

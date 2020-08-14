@@ -2,7 +2,7 @@ import { findByLabelText, render, screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { loginTest, mockCRDAndViews, mockCRDAndViewsExtended } from './RTLUtils';
+import { loginTest, mockCRDAndViewsExtended } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import CRDmockEmpty from '../__mocks__/crd_fetch.json';
 import ViewMockResponse from '../__mocks__/views.json';
@@ -46,17 +46,18 @@ async function setup() {
 
 describe('Header', () => {
   test('Header main menus item and search bar are showed', async () => {
-    mockCRDAndViews();
+    mockCRDAndViewsExtended();
     await loginTest();
 
     expect(await screen.findByLabelText('notification')).toBeInTheDocument();
     expect(await screen.findByLabelText('question-circle')).toBeInTheDocument();
     expect(await screen.findByLabelText('logout')).toBeInTheDocument();
-    expect(await screen.findByRole('combobox')).toHaveAttribute('placeholder', 'input CRD');
+    const CRDInput = await screen.findAllByRole('combobox');
+    expect(CRDInput[0]).toHaveAttribute('placeholder', 'input CRD');
   })
 
   test('Logout works', async () => {
-    mockCRDAndViews();
+    mockCRDAndViewsExtended();
     await loginTest();
 
     const logout = await screen.findByLabelText('logout');
@@ -69,7 +70,7 @@ describe('Header', () => {
     await loginTest();
 
     await screen.findByLabelText('autocompletesearch');
-    userEvent.type(screen.getByRole('combobox'), 'LiqoDashTest@liqodashtests.crd-template.liqo.com');
+    userEvent.type(screen.getAllByRole('combobox')[0], 'LiqoDashTest@liqodashtests.crd-template.liqo.com');
     userEvent.click(await screen.findByLabelText('search'));
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();

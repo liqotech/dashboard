@@ -124,7 +124,7 @@ export default class ApiManager {
    */
   getCustomResourcesAllNamespaces(item) {
     return fetch('http://localhost:3001/clustercustomobject/' + item.spec.names.plural)
-      .then(res => res.json())
+      .then(res => res.json());
   }
 
   /**
@@ -137,14 +137,20 @@ export default class ApiManager {
    * @returns a promise
    */
   deleteCustomResource(group, version, namespace, plural, name) {
-    return fetch('http://localhost:3001/clustercustomobject/' + plural, { method: 'DELETE'}).then(() => {
+    return fetch('http://localhost:3001/clustercustomobject/' + plural, { method: 'DELETE'})
+      .then(res => res.json())
+      .then((res) => {
       if(plural === 'views'){
         this.customViews = this.customViews.filter(item => {
           return item.metadata.name !== name
         });
         this.manageCallbackCVs(this.customViews);
       }
-      return Promise.resolve();
+
+      this.watchers.forEach(w => {
+        if (w.plural === plural)
+          w.callback('DELETED', res);
+      })
     })
   }
 
@@ -196,7 +202,7 @@ export default class ApiManager {
       itemDC.metadata.resourceVersion++;
       this.CVsNotifyEvent('MODIFIED', itemDC);
       return Promise.resolve(new Response(JSON.stringify(item)))
-    } else if (plural === 'liqodashtests' || plural === 'clusterconfigs') {
+    } else if (plural === 'liqodashtests' || plural === 'clusterconfigs' || plural === 'foreignclusters') {
       return fetch('http://localhost:3001/clustercustomobject/' + plural, { method: 'PUT', body: item})
         .then(res => res.json())
         .then((res) => {
@@ -243,31 +249,31 @@ export default class ApiManager {
 
   /** is the param is true, also kill the CRDs watcher */
   abortAllWatchers(specificWatch) {
-    //if(specificWatch && specificWatch !== 'views' && specificWatch !== 'customresourcedefinitions') {
-    //  let w = this.watchers.find(item => {return item.plural === specificWatch});
-    //  /** Here if the watcher has already been aborted (because we wanted to), don't restart it */
-    //  if(!w)
-    //    return false;
-    //  /** else, abort it and it will be restarted */
-    //  w.controller.abort();
-    //  this.watchers = this.watchers.filter(item => {return item.plural !== specificWatch});
-    //  return true;
-    //}
-//
-    //let watchers = this.watchers;
-//
-    //this.watchers.forEach((watcher) => {
-    //  /** Don't kill the custom view watcher nor the CRD watcher */
-    //  if(watcher.plural !== 'views'){
-    //    if(watcher.plural !== 'customresourcedefinitions'){
-    //      watchers = watchers.filter(item => {return item !== watcher});
-    //      watcher.controller.abort();
-    //    }
-    //  }
-    //});
-//
-    //this.watchers = watchers;
-    //return true;
+    if(specificWatch && specificWatch !== 'views' && specificWatch !== 'customresourcedefinitions') {
+      let w = this.watchers.find(item => {return item.plural === specificWatch});
+      /** Here if the watcher has already been aborted (because we wanted to), don't restart it */
+      if(!w)
+        return false;
+      /** else, abort it and it will be restarted */
+      //w.controller.abort();
+      this.watchers = this.watchers.filter(item => {return item.plural !== specificWatch});
+      return true;
+    }
+
+    let watchers = this.watchers;
+
+    this.watchers.forEach((watcher) => {
+      /** Don't kill the custom view watcher nor the CRD watcher */
+      if(watcher.plural !== 'views'){
+        if(watcher.plural !== 'customresourcedefinitions'){
+          watchers = watchers.filter(item => {return item !== watcher});
+          //watcher.controller.abort();
+        }
+      }
+    });
+
+    this.watchers = watchers;
+    return true;
   }
 
   /**

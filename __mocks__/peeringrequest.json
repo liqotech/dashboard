@@ -1,0 +1,35 @@
+{
+  "apiVersion": "discovery.liqo.io/v1",
+  "items": [
+    {
+      "apiVersion": "discovery.liqo.io/v1",
+      "kind": "PeeringRequest",
+      "metadata": {
+        "name": "8d73c01a-f23a-45dc-822b-7d3232683f53",
+        "ownerReferences": [
+          {
+            "apiVersion": "discovery.liqo.io/v1",
+            "controller": true,
+            "kind": "ForeignCluster",
+            "name": "8d73c01a-f23a-45dc-822b-7d3232683f53"
+          }
+        ],
+        "resourceVersion": "00000",
+        "selfLink": "/apis/discovery.liqo.io/v1/peeringrequests/8d73c01a-f23a-45dc-822b-7d3232683f53"
+      },
+      "spec": {
+        "clusterID": "8d73c01a-f23a-45dc-822b-7d3232683f53",
+        "namespace": "liqo",
+        "originClusterSets": {
+          "allowUntrustedCA": true
+        }
+      },
+      "status": {}
+    }
+  ],
+  "kind": "PeeringRequestList",
+  "metadata": {
+    "resourceVersion": "000000",
+    "selfLink": "/apis/discovery.liqo.io/v1/peeringrequests"
+  }
+}

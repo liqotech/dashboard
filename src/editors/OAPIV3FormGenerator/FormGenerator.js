@@ -62,7 +62,7 @@ class FormGenerator extends Component {
       metadata.namespace = '';
     }
     return(
-      <div style={{marginLeft: 10, marginRight: 10, marginBottom: 10, minHeight: '80vh'}}>
+      <div style={{marginLeft: 10, marginRight: 10, marginBottom: 10}}>
         { !this.props.onUpdate ? (
           <Card size="small" type="inner"
                 title={<Typography.Text strong>Metadata</Typography.Text>}

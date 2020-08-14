@@ -147,7 +147,7 @@ describe('CR', () => {
   })
 
   test('CR deletion error catch works', async () => {
-    await setup_resource('404', 'DELETE');
+    await setup_resource('404', 'DELETE', 'liqodashtests');
 
     const del = await screen.findAllByLabelText('delete');
     expect(del).toHaveLength(2);

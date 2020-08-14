@@ -309,9 +309,9 @@ export default class ApiManager {
    */
   watchSingleCRD(group, version, plural, func){
     /** We don't want two of the same watcher */
-      if(this.watchers.find(item => {return item.plural === plural})){
-        return;
-      }
+    if(this.watchers.find(item => {return item.plural === plural})){
+      return;
+    }
 
     let controller = new AbortController();
 
