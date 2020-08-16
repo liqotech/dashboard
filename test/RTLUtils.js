@@ -48,9 +48,9 @@ function responseManager(req, error, method, crd, crd_v, res_get, res_post, res_
     if (error && method === 'POST') {
       if (error === '409') {
         return Promise.reject(Error409.body);
-      } else {
+      } /*else {
         return Promise.reject(Error401.body);
-      }
+      }*/
     } else {
       return Promise.resolve(new Response(JSON.stringify({ body: res_post })));
     }
@@ -58,9 +58,9 @@ function responseManager(req, error, method, crd, crd_v, res_get, res_post, res_
     if (error && method === 'PUT') {
       if (error === '409') {
         return Promise.reject(Error409.body);
-      } else {
+      } /*else {
         return Promise.reject(Error401.body);
-      }
+      }*/
     } else {
       return Promise.resolve(new Response(JSON.stringify({ body: res_put })));
     }

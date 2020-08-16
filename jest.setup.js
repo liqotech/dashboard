@@ -8,10 +8,9 @@ jest.mock('./src/services/ApiManager');
 jest.mock('./src/services/Authenticator');
 
 jest.mock('react-ace', () => {
-  const AceEditor = ({onChange}) => {
-    return <input aria-label={'editor'} onChange={e => onChange(e.target.value)} />
-  }
-  return AceEditor;
+  return ({ onChange }) => {
+    return <input aria-label={'editor'} onChange={e => onChange(e.target.value)}/>
+  };
 });
 
 jest.mock('ace-builds/src-noconflict/mode-json', () => { return null});
@@ -20,7 +19,8 @@ jest.mock('ace-builds/src-noconflict/theme-monokai', () => { return null});
 jest.mock('ace-builds/src-noconflict/theme-github', () => { return null});
 
 jest.mock('react-graph-vis', () => {
-  const Graph = ({graph}) => {
+
+  return ({ graph }) => {
     let nodesTot = [];
     graph.nodes.forEach(node => {
       nodesTot.push(
@@ -28,12 +28,11 @@ jest.mock('react-graph-vis', () => {
       )
     })
     return (
-      <div aria-label={'graph_mock'} >
+      <div aria-label={'graph_mock'}>
         {nodesTot}
       </div>
     )
-  }
-  return Graph;
+  };
 });
 
 Object.defineProperty(window, 'matchMedia', {

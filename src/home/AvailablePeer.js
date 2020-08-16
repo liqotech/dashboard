@@ -142,7 +142,7 @@ class AvailablePeer extends Component {
             }
             extra={
               <span aria-label={'dropdown-available'} onClick={event => {event.stopPropagation()}}>
-                <Dropdown.Button overlay={menu} trigger={['click']} icon={<EllipsisOutlined />}/>
+                <Dropdown.Button overlay={menu} trigger={['click']} icon={<EllipsisOutlined />} />
               </span>
             }
             showArrow={false}
