@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../src/app/App';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
+import ViewMockResponseLayout from '../__mocks__/views_withLayout.json';
 import ViewMockResponse from '../__mocks__/views.json';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
@@ -18,7 +19,6 @@ import PRMockResponse from '../__mocks__/peeringrequest.json';
 import ConfigMockResponse from '../__mocks__/configs.json';
 import ConfigMockResponseUpdated from '../__mocks__/configs_updated.json';
 import Error409 from '../__mocks__/409.json';
-import Error401 from '../__mocks__/401.json';
 import Error404 from '../__mocks__/404.json';
 
 export function setup_login() {
@@ -48,9 +48,7 @@ function responseManager(req, error, method, crd, crd_v, res_get, res_post, res_
     if (error && method === 'POST') {
       if (error === '409') {
         return Promise.reject(Error409.body);
-      } /*else {
-        return Promise.reject(Error401.body);
-      }*/
+      }
     } else {
       return Promise.resolve(new Response(JSON.stringify({ body: res_post })));
     }
@@ -58,9 +56,7 @@ function responseManager(req, error, method, crd, crd_v, res_get, res_post, res_
     if (error && method === 'PUT') {
       if (error === '409') {
         return Promise.reject(Error409.body);
-      } /*else {
-        return Promise.reject(Error401.body);
-      }*/
+      }
     } else {
       return Promise.resolve(new Response(JSON.stringify({ body: res_put })));
     }
@@ -73,12 +69,20 @@ function responseManager(req, error, method, crd, crd_v, res_get, res_post, res_
   }
 }
 
-export function mockCRDAndViewsExtended(error, method, crd) {
+export function mockCRDAndViewsExtended(error, method, crd, view) {
   fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
       return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
     } else if (req.url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
+      if(req.method === 'GET'){
+        if(view){
+          return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponseLayout})));
+        }else{
+          return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})));
+        }
+      } else if (req.method === 'PUT'){
+        return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})));
+      }
     }  else if (req.url === 'http://localhost:3001/clustercustomobject/liqodashtests') {
       return responseManager(req, error, method, crd, 'liqodashtests',
         LiqoDashMockResponse, LiqoDashNewMockResponse, LiqoDashUpdatedMockResponse);
@@ -90,8 +94,10 @@ export function mockCRDAndViewsExtended(error, method, crd) {
       return responseManager(req, error, method, crd, 'foreignclusters',
         FCMockResponse, FCMockNew, null);
     } else if (req.url === 'http://localhost:3001/clustercustomobject/advertisements') {
+      let advPut = AdvMockResponse.items[0];
+      advPut.metadata.resourceVersion++;
       return responseManager(req, error, method, crd, 'advertisements',
-        AdvMockResponse, null, null);
+        AdvMockResponse, null, advPut);
     } else if (req.url === 'http://localhost:3001/clustercustomobject/peeringrequests') {
       return responseManager(req, error, method, crd, 'peeringrequests',
         PRMockResponse, null, null);

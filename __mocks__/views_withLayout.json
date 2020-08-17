@@ -1,0 +1,49 @@
+{
+  "apiVersion": "test/v1",
+  "items": [
+    {
+      "apiVersion": "test/v1",
+      "kind": "View",
+      "metadata": {
+        "name": "awesome-view",
+        "resourceVersion": "000000",
+        "selfLink": "/apis/test/v1/namespaces/default/views/awesome-view"
+      },
+      "spec": {
+        "layout": {
+          "lg": [
+            {
+              "h": 1,
+              "i": "advertisements.protocol.liqo.io",
+              "w": 1,
+              "x": 0,
+              "y": 0,
+              "s": true
+            },
+            {
+              "h": 1,
+              "i": "foreignclusters.discovery.liqo.io",
+              "w": 1,
+              "x": 1,
+              "y": 0
+            }
+          ]
+        },
+        "templates": [
+          {
+            "kind": "advertisements.protocol.liqo.io"
+          },
+          {
+            "kind": "foreignclusters.discovery.liqo.io"
+          }
+        ]
+      }
+    }
+   ],
+  "kind": "ViewList",
+  "metadata": {
+    "continue": "",
+    "resourceVersion": "0000000"
+  }
+}
+

@@ -199,19 +199,22 @@ export default class ApiManager {
    * @returns a promise
    */
   updateCustomResource(group, version, namespace, plural, name, item){
-    if(plural === 'views'){
-      let itemDC = JSON.parse(JSON.stringify(item));
-      itemDC.metadata.resourceVersion++;
-      this.CVsNotifyEvent('MODIFIED', itemDC);
-      return Promise.resolve(new Response(JSON.stringify(item)))
-    } else if (plural === 'liqodashtests' ||
+    if (plural === 'liqodashtests' ||
       plural === 'clusterconfigs' ||
       plural === 'foreignclusters' ||
-      plural === 'searchdomains'
+      plural === 'searchdomains' ||
+      plural === 'advertisements' ||
+      plural === 'views'
     ) {
       return fetch('http://localhost:3001/clustercustomobject/' + plural, { method: 'PUT', body: item})
         .then(res => res.json())
         .then((res) => {
+          if(plural === 'views') {
+            let itemDC = JSON.parse(JSON.stringify(item));
+            itemDC.metadata.resourceVersion++;
+            this.CVsNotifyEvent('MODIFIED', itemDC);
+            return Promise.resolve(new Response(JSON.stringify(item)))
+          }
           //console.log(res)
           this.watchers.forEach(w => {
             if (w.plural === plural)

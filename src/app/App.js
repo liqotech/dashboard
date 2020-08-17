@@ -222,9 +222,9 @@ class App extends Component {
         api: api,
         user: user.profile
       });
-      this.state.api.loadCustomViewsCRs();
+      api.loadCustomViewsCRs();
       /** Get the CRDs at the start of the app */
-      this.state.api.getCRDs().catch(error => {
+      api.getCRDs().catch(error => {
         console.log(error);
         if(error.response._fetchResponse.status)
           this.props.history.push("/error/" + error.response._fetchResponse.status);

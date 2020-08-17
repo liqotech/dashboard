@@ -1,15 +1,19 @@
 import ViewMockResponse from '../__mocks__/views.json';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import ClusterConfigMockResponse from '../__mocks__/configs.json';
-import { screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import Error409 from '../__mocks__/409.json';
 import { loginTest } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import FCMockResponse from '../__mocks__/foreigncluster.json';
 import AdvMockResponse from '../__mocks__/advertisement.json';
 import PRMockResponse from '../__mocks__/peeringrequest.json';
+import ApiManager from '../src/services/__mocks__/ApiManager';
+import { MemoryRouter } from 'react-router-dom';
+import React from 'react';
+import ConfigView from '../src/views/ConfigView';
 
-async function setup_with_error(error) {
+function mocks(error, get){
   fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
       return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
@@ -23,7 +27,9 @@ async function setup_with_error(error) {
       return Promise.resolve(new Response(JSON.stringify({body: PRMockResponse})));
     } else if (req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
       if (req.method === 'GET') {
-        return Promise.resolve(new Response(JSON.stringify({ body: ClusterConfigMockResponse })))
+        if(!get)
+          return Promise.resolve(new Response(JSON.stringify({ body: ClusterConfigMockResponse })))
+        else return Promise.reject(Error409.body);
       } else if (req.method === 'PUT') {
         if (error) {
           if (error === '409') {
@@ -38,6 +44,10 @@ async function setup_with_error(error) {
       }
     }
   })
+}
+
+async function setup_with_error(error) {
+  mocks(error);
 
   await loginTest();
 
@@ -46,6 +56,22 @@ async function setup_with_error(error) {
 
   expect(await screen.findByText('Liqo configuration'));
 
+}
+
+let api;
+
+async function setup_from_ConfigView(error) {
+  api = new ApiManager();
+  api.getCRDs().then(() => {
+
+    if(error) api.CRDs = [];
+
+    render(
+      <MemoryRouter>
+        <ConfigView api={api} />
+      </MemoryRouter>
+    )
+  })
 }
 
 describe('ConfigView', () => {
@@ -96,5 +122,19 @@ describe('ConfigView', () => {
     userEvent.click(screen.getByText('Save configuration'));
 
     expect(await screen.findByText('Could not update the configuration'))
+  }, 30000)
+
+  test('ConfigView with no Config CRD', async () => {
+    mocks();
+    await setup_from_ConfigView(true);
+
+    expect(await screen.findByText('No configuration CRD has been found.'))
+  }, 30000)
+
+  test('ConfigView with error on Config CR', async () => {
+    mocks('409', true);
+    await setup_from_ConfigView();
+
+    expect(await screen.findByText('No configuration file has been found.'))
   }, 30000)
 })

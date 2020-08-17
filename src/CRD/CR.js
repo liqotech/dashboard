@@ -34,8 +34,6 @@ class CR extends Component {
     this.handleClick_show = this.handleClick_show.bind(this);
     this.handleClick_delete = this.handleClick_delete.bind(this);
     this.getChart = this.getChart.bind(this);
-    this.handleClick_Spec = this.handleClick_Spec.bind(this);
-    this.handleClick_Status = this.handleClick_Status.bind(this);
     this.onTabChange = this.onTabChange.bind(this);
 
     this.tabList = [];
@@ -122,14 +120,6 @@ class CR extends Component {
           description: 'Could not delete the resource'
         });
       });
-  }
-
-  handleClick_Spec() {
-    this.setState({ showSpec: !this.state.showSpec });
-  }
-
-  handleClick_Status() {
-    this.setState({ showStatus: !this.state.showStatus });
   }
 
   /** If the CRD has a template, show it as the first option */

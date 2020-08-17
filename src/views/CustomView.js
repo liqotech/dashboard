@@ -5,6 +5,7 @@ import LoadingIndicator from '../common/LoadingIndicator';
 import 'react-resizable/css/styles.css';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import ReactResizeDetector from 'react-resize-detector';
+import { onDrag, onResize, resizeDetector } from './CustomViewUtils';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -31,11 +32,19 @@ class CustomView extends Component {
     this.getCustomViews = this.getCustomViews.bind(this);
     this.props.api.CVArrayCallback.push(this.getCustomViews);
 
-    this.onDrag = this.onDrag.bind(this);
     this.generateLayout = this.generateLayout.bind(this);
-    this.onResize = this.onResize.bind(this);
     this.childLogic = this.childLogic.bind(this);
     this.onBreakpointChange = this.onBreakpointChange.bind(this);
+    this.updateCRD = this.updateCRD.bind(this);
+  }
+
+  updateCRD(customView){
+    this.state.customView = customView;
+    this.state.templates = customView.spec.templates;
+    if (this.state.customView.spec.layout) {
+      this.state.layout = this.state.customView.spec.layout;
+    }
+    this.loadCRD();
   }
 
   /** Update the custom views */
@@ -43,23 +52,12 @@ class CustomView extends Component {
     let customView = customViews.find(item => {
       return item.metadata.name === this.props.match.params.viewName;
     })
-
     if(!this.state.customView){
-      this.state.customView = customView;
-      this.state.templates = customView.spec.templates;
-      if (this.state.customView.spec.layout) {
-        this.state.layout = this.state.customView.spec.layout;
-      }
-      this.loadCRD();
+      this.updateCRD(customView);
     }else{
       /** Update layout only if something really changed */
       if(JSON.stringify(this.state.customView) !== JSON.stringify(customView)) {
-        this.state.customView = customView;
-        this.state.templates = customView.spec.templates;
-        if (this.state.customView.spec.layout) {
-          this.state.layout = this.state.customView.spec.layout;
-        }
-        this.loadCRD();
+        this.updateCRD(customView);
       }
     }
   }
@@ -156,11 +154,8 @@ class CustomView extends Component {
       if(this.state.CRDs[i].width){
         w = this.state.CRDs[i].width;
       }
-      if(this.state.CRDs[i].static){
-        s = this.state.CRDs[i].static;
-      }
       layout.push({
-        i: this.state.CRDs[i].metadata.name, x: x, y: y, w: w, h: h, isDraggable: true, static: s
+        i: this.state.CRDs[i].metadata.name, x: x, y: y, w: w, h: h, isDraggable: true
       });
     }
     let layouts = this.state.layout;
@@ -186,7 +181,7 @@ class CustomView extends Component {
   }
 
   /** Save layout to CR when exit */
-  componentWillUnmount() {
+  async componentWillUnmount() {
     /**
      * Cancel all callback for the CRDs
      * Cancel all watchers
@@ -202,16 +197,14 @@ class CustomView extends Component {
       delete this.state.customView.spec.layout[this.state.newBr][i].static;
     }
     let array = this.state.customView.metadata.selfLink.split('/');
-    this.props.api.updateCustomResource(
+    await this.props.api.updateCustomResource(
       array[2],
       array[3],
       this.state.customView.metadata.namespace,
       array[6],
       this.state.customView.metadata.name,
       this.state.customView
-    ).catch((error) => {
-      console.log(error);
-    })
+    )
   }
 
   childLogic(id){
@@ -232,39 +225,6 @@ class CustomView extends Component {
     this.setState({layout: newLayouts});
   }
 
-  onDrag(layout, oldLayoutItem, layoutItem){
-    if(JSON.stringify(oldLayoutItem) !== JSON.stringify(layoutItem)){
-      let CRDs = this.state.CRDs;
-      CRDs.forEach(CRD => {
-        let l = layout.find(item => {return item.i === CRD.metadata.name});
-        CRD.x = l.x;
-        CRD.y = l.y;
-      })
-
-      this.state.layout[this.state.newBr] = layout;
-      this.state.CRDs = CRDs;
-    }
-  }
-
-  onResize(layout, oldLayoutItem, layoutItem) {
-    if(!oldLayoutItem) return;
-    let CRDs = this.state.CRDs;
-    let index = CRDs.indexOf(CRDs.find(item => {return item.metadata.name === layoutItem.i}));
-
-    /** When changing width */
-    if(oldLayoutItem.w !== layoutItem.w){
-      CRDs[index].width = layoutItem.w;
-      this.state.CRDs = CRDs;
-    }
-    /** When changing height */
-    if(oldLayoutItem.h !== layoutItem.h){
-      CRDs[index].height = layoutItem.h;
-      this.state.CRDs = CRDs;
-    }
-
-    this.state.layout[this.state.newBr] = layout;
-  }
-
   onBreakpointChange(br){
     this.state.oldBr = this.state.newBr;
     this.state.newBr = br;
@@ -278,26 +238,15 @@ class CustomView extends Component {
 
     return (
       <div>
-        {
-          /**
-           * This is an ugly workaround but it's the best solution I found:
-           *  it is necessary because the ResponsiveGridLayout's WidthProvider
-           *  only detect width resize when the actual window is being resized,
-           *  so here I trigger the event to trick it
-           */
-        }
-        <ReactResizeDetector skipOnMount handleWidth
-                             refreshMode={'throttle'} refreshRate={150}
-                             onResize={() => {
-                               window.dispatchEvent(new Event('resize'));
-                             }} />
+        { resizeDetector() }
         <ResponsiveGridLayout className="react-grid-layout" layouts={this.state.layout} margin={[20, 20]}
                               breakpoints={{lg: 1000, md: 796, sm: 568, xs: 280, xxs: 0}}
                               cols={{lg: 3, md: 2, sm: 1, xs: 1, xxs: 1}}
-                              compactType={'vertical'} rowHeight={350} onResizeStop={this.onResize}
+                              compactType={'vertical'} rowHeight={350}
+                              onResizeStop={(layout, oldLayoutItem, layoutItem) => onResize(layout, oldLayoutItem, layoutItem, this)}
                               onBreakpointChange={this.onBreakpointChange}
-                              draggableHandle={'.draggable'} onDragStop={this.onDrag}
-        >
+                              onDragStop={(layout, oldLayoutItem, layoutItem) => onDrag(layout, oldLayoutItem, layoutItem, this)}
+                              draggableHandle={'.draggable'} >
           {this.state.CRDView}
         </ResponsiveGridLayout>
       </div>
