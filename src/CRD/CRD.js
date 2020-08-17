@@ -61,7 +61,6 @@ class CRD extends Component {
     this.reloadCRD = this.reloadCRD.bind(this);
     this.getCustomViews = this.getCustomViews.bind(this);
     //this.handleClick = this.handleClick.bind(this);
-    this.abortWatchers = this.abortWatchers.bind(this);
     this.loadCustomResources = this.loadCustomResources.bind(this);
     this.changeTemplate = this.changeTemplate.bind(this);
     this.paginationChange = this.paginationChange.bind(this);
@@ -72,6 +71,7 @@ class CRD extends Component {
   /** Update state if a CRD is loaded or changed */
   reloadCRD(CRDs){
     let CRD;
+
     if(CRDs){
       if(this.props.onCustomView){
         CRD = CRDs.find(item => {
@@ -160,10 +160,6 @@ class CRD extends Component {
       this.props.api.CVArrayCallback = this.props.api.CVArrayCallback.filter(func => {return func !== this.getCustomViews});
   }
 
-  abortWatchers() {
-    this.props.api.abortAllWatchers();
-  }
-
   /** @NOT_USED: if we want to implement the deletion of the CRD... */
   /*handleClick() {
     let promise = this.props.api.deleteCRD(this.name);
@@ -214,6 +210,7 @@ class CRD extends Component {
     });
     let index = -1;
 
+    /** Search if the CRD is in the view */
     if(cv.spec.templates){
       index = cv.spec.templates.indexOf(
         cv.spec.templates.find(item => {
@@ -224,6 +221,9 @@ class CRD extends Component {
       cv.spec.templates = [];
     }
 
+    /** If the CRD is in the view, remove it
+     *  or else, add it in the view
+     */
     if(index !== -1){
       cv.spec.templates[index] = null;
     } else {
@@ -243,21 +243,14 @@ class CRD extends Component {
     );
 
     promise
-      .then((res) => {
+      .then(() => {
         notification.success({
           message: APP_NAME,
           description: 'Resource updated'
         });
-        cv = res.body;
-        const i = this.state.customViews.indexOf(
-          this.state.customViews.find(item => {
-            return item.metadata.name === e.key
-        }));
-        this.state.customViews[i] = cv;
-        /** Not recommended, but it works */
-        this.forceUpdate();
       })
-      .catch(() => {
+      .catch((error) => {
+        console.log(error)
         notification.error({
           message: APP_NAME,
           description: 'Could not update the resource'
@@ -327,16 +320,23 @@ class CRD extends Component {
           {
             !this.props.onCustomView ? (
               <div style={{float: "right"}}>
-                <Tooltip title={'Add or Remove to View'} placement={'topLeft'}>
-                  <Dropdown overlay={menu} placement="bottomCenter" trigger={['click']}>
-                    <Button icon={<LayoutOutlined />}/>
-                  </Dropdown>
-                </Tooltip>
-                <Tooltip title={'Edit design'} placement={'top'}>
-                  <Button icon={<PictureOutlined />} type="primary"
-                          style={{marginLeft: 15}} onClick={() => {this.setState({showEditor: true})}}>
-                  </Button>
-                </Tooltip>
+                <Space align={'center'}>
+                  <Tooltip title={'Add or Remove to View'} placement={'topRight'}>
+                    <div aria-label={'dropdown-CRD'}>
+                      <Dropdown.Button overlay={menu} placement="bottomCenter"
+                                       style={{paddingTop: 6}}
+                                       trigger={['click']} icon={<LayoutOutlined />} />
+                    </div>
+                  </Tooltip>
+                  <Tooltip title={'Edit design'} placement={'top'}>
+                    <Button icon={<PictureOutlined />} type="primary"
+                            onClick={() => {this.setState({showEditor: true})}}/>
+                  </Tooltip>
+                  <Tooltip title={'Create new resource'} placement={'topRight'}>
+                    <Button icon={<PlusOutlined />} type="primary"
+                            onClick={() => {this.setState({showCreate: true});}} />
+                  </Tooltip>
+                </Space>
                 <Drawer
                   title={
                     <Badge status="processing"
@@ -347,22 +347,13 @@ class CRD extends Component {
                   visible={this.state.showEditor}
                   onClose={() => {this.setState({showEditor: false})}}
                   width={'40%'}
-                  destroyonClose
+                  destroyOnClose
                 >
                   <DesignEditorCRD CRD={this.state.CRD}
                                    this={this} api={this.props.api}
                                    CR={this.state.custom_resources}
                   />
                 </Drawer>
-                <Tooltip title={'Create new resource'} placement={'topRight'}>
-                  <Button icon={<PlusOutlined />} type="primary"
-                          style={{marginLeft: 15}}
-                          onClick={() => {
-                            this.setState({showCreate: true});
-                          }}
-                  >
-                  </Button>
-                </Tooltip>
                 <Drawer
                   title={
                     <Badge status="processing"
@@ -373,7 +364,7 @@ class CRD extends Component {
                   visible={this.state.showCreate}
                   onClose={() => {this.setState({showCreate: false})}}
                   width={'40%'}
-                  destroyonClose
+                  destroyOnClose
                 >
                   <NewCR CRD={this.state.CRD} this={this} api={this.props.api} />
                 </Drawer>

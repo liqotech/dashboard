@@ -18,8 +18,19 @@ jest.mock('ace-builds/src-noconflict/mode-yaml', () => { return null});
 jest.mock('ace-builds/src-noconflict/theme-monokai', () => { return null});
 jest.mock('ace-builds/src-noconflict/theme-github', () => { return null});
 
-jest.mock('react-graph-vis', () => {
+jest.mock('./src/views/CustomViewUtils', () => {
+  const onDrag = () => {}
+  const onResize = () => {}
+  const resizeDetector = () => {}
 
+  return {
+    onDrag,
+    onResize,
+    resizeDetector
+  }
+});
+
+jest.mock('react-graph-vis', () => {
   return ({ graph }) => {
     let nodesTot = [];
     graph.nodes.forEach(node => {

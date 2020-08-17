@@ -15,6 +15,7 @@ import ManyResources from '../__mocks__/manyResources.json';
 import ApiManager from '../src/services/__mocks__/ApiManager';
 import CRD from '../src/CRD/CRD';
 import { MemoryRouter } from 'react-router-dom';
+import Error404 from '../__mocks__/404.json';
 
 fetchMock.enableMocks();
 
@@ -28,8 +29,8 @@ async function setup() {
 }
 
 async function setup_extended() {
-  fetch.mockImplementation((url) => {
-    return mocks(url);
+  fetch.mockResponse(req => {
+    return mocks(req);
   })
 
   await setup();
@@ -38,31 +39,45 @@ async function setup_extended() {
   userEvent.click(kind);
 }
 
-function mocks(url) {
-  if (url === 'http://localhost:3001/customresourcedefinition') {
+function mocks(req, error, template) {
+  if (req.url === 'http://localhost:3001/customresourcedefinition') {
     return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-  } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-    return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
-  } else if (url === 'http://localhost:3001/clustercustomobject/liqodashtests') {
-    return Promise.resolve(new Response(JSON.stringify({ body: LiqoDashMockResponse })))
-  } else if (url === 'http://localhost:3001/clustercustomobject/piecharts') {
-    return Promise.resolve(new Response(JSON.stringify({ body: PieMockResponse })))
-  } else if (url === 'http://localhost:3001/clustercustomobject/noannnoresnoschemas') {
+  } else if (req.url === 'http://localhost:3001/clustercustomobject/views') {
+    if(req.method === 'GET')
+      return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
+    else if(error)
+      return Promise.reject(Error404.body);
+    else
+      return Promise.resolve();
+  } else if (req.url === 'http://localhost:3001/clustercustomobject/liqodashtests') {
+    if(req.method === 'DELETE'){
+      return Promise.resolve(new Response(JSON.stringify(LiqoDashMockResponse.items[0])));
+    } else {
+      return Promise.resolve(new Response(JSON.stringify({ body: LiqoDashMockResponse })))
+    }
+  } else if (req.url === 'http://localhost:3001/clustercustomobject/piecharts') {
+    if(error && template)
+      return Promise.reject(Error404.body);
+    else
+      return Promise.resolve(new Response(JSON.stringify({ body: PieMockResponse })))
+  } else if (req.url === 'http://localhost:3001/clustercustomobject/noannnoresnoschemas') {
     return Promise.resolve(new Response(JSON.stringify({ body: NoAnnNoResNoSch })))
-  } else if (url === 'http://localhost:3001/clustercustomobject/manyresources') {
+  } else if (req.url === 'http://localhost:3001/clustercustomobject/manyresources') {
     return Promise.resolve(new Response(JSON.stringify({ body: ManyResources })))
   } else {
-    return generalHomeGET(url);
+    return generalHomeGET(req.url);
   }
 }
 
-async function setup_only_CRD() {
-  fetch.mockImplementation((url) => {
-    return mocks(url);
+async function setup_only_CRD(error, template) {
+  fetch.mockResponse(req => {
+    return mocks(req, error, template);
   })
 
   api = new ApiManager();
   api.getCRDs().then(async () => {
+    await api.loadCustomViewsCRs();
+
     render(
       <MemoryRouter>
         <CRD api={api}
@@ -70,7 +85,9 @@ async function setup_only_CRD() {
                params: {
                  crdName: 'liqodashtests.crd-template.liqo.com'
                }
-             }}/>
+             }}
+             history={[]}
+        />
       </MemoryRouter>
     )
   });
@@ -91,8 +108,8 @@ async function alwaysPresent(kind, descr) {
 
 describe('CRD', () => {
   test('CRD card shows every general information in different cases', async () => {
-    fetch.mockImplementation((url) => {
-      return mocks(url);
+    fetch.mockResponse(req => {
+      return mocks(req);
     })
 
     await setup();
@@ -116,8 +133,8 @@ describe('CRD', () => {
   })
 
   test('Annotations tab works', async () => {
-    fetch.mockImplementation((url) => {
-      return mocks(url);
+    fetch.mockResponse(req => {
+      return mocks(req);
     })
 
     await setup();
@@ -147,8 +164,8 @@ describe('CRD', () => {
   })
 
   test('Resources tab works', async () => {
-    fetch.mockImplementation((url) => {
-      return mocks(url);
+    fetch.mockResponse(req => {
+      return mocks(req);
     })
 
     await setup();
@@ -183,8 +200,8 @@ describe('CRD', () => {
   })
 
   test('Schema tab works', async () => {
-    fetch.mockImplementation((url) => {
-      return mocks(url);
+    fetch.mockResponse(req => {
+      return mocks(req);
     })
 
     await setup();
@@ -263,8 +280,8 @@ describe('CRD', () => {
   })
 
   test('Templates are switched correctly', async () => {
-    fetch.mockImplementation((url) => {
-      return mocks(url);
+    fetch.mockResponse(req => {
+      return mocks(req);
     })
 
     await setup();
@@ -285,6 +302,10 @@ describe('CRD', () => {
 
     userEvent.click(screen.getByText('Status'));
     expect(await screen.findByLabelText('form_status'));
+
+    userEvent.click(switcher);
+    userEvent.click(screen.getByText('test-1'));
+    expect(await screen.findByLabelText('piechart')).toBeInTheDocument();
   })
 
   test('CR with no spec or status still works', async () => {
@@ -318,7 +339,7 @@ describe('CRD', () => {
     expect(screen.queryByText('Status')).not.toBeInTheDocument();
   })
 
-  test('CRD changes when external changes happen', async () => {
+  test('CRD changes when external changes happen, modify', async () => {
     await setup_only_CRD();
 
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
@@ -326,6 +347,80 @@ describe('CRD', () => {
     api.CRDsNotifyEvent('MODIFIED', LiqoDashModifiedMockResponse);
 
     expect(await screen.findByText('LiqoDashTestMod')).toBeInTheDocument();
+
+    api = null;
+  })
+
+  test('CR gets eliminated', async () => {
+    await setup_only_CRD();
+
+    expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
+
+    const deleted = screen.getAllByLabelText('delete');
+
+    userEvent.click(deleted[0]);
+
+    expect(await screen.findByText('Are you sure?')).toBeInTheDocument();
+
+    let no = await screen.findByText('No');
+    expect(no).toBeInTheDocument();
+
+    let yes = await screen.findByText('Yes');
+    expect(yes).toBeInTheDocument();
+
+    userEvent.click(yes);
+
+    userEvent.click(await screen.findByLabelText('delete'));
+
+    no = await screen.findByText('No');
+    expect(no).toBeInTheDocument();
+
+    yes = await screen.findByText('Yes');
+    expect(yes).toBeInTheDocument();
+
+    userEvent.click(no);
+
+    api = null;
+  })
+
+  test('CRD template error', async () => {
+    await setup_only_CRD(true, true);
+
+    expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
+
+    api = null;
+  })
+
+  test('CRD dropdown custom view', async () => {
+    await setup_only_CRD();
+
+    expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
+
+    let layout = await screen.findByLabelText('layout');
+
+    userEvent.click(layout);
+
+    userEvent.click(await screen.findByText('Liqo View'));
+
+    layout = await screen.findByLabelText('layout');
+
+    userEvent.click(layout);
+
+    userEvent.click(await screen.findByText('Liqo View'));
+
+    api = null;
+  })
+
+  test('CRD dropdown custom view failed add to custom view', async () => {
+    await setup_only_CRD(true);
+
+    expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
+
+    let layout = await screen.findByLabelText('layout');
+
+    userEvent.click(layout);
+
+    userEvent.click(await screen.findByText('Liqo View'));
 
     api = null;
   })
