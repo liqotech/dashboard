@@ -55,25 +55,44 @@ describe('ConfigView', () => {
     expect(screen.getByText(/Choose the best/i));
     expect(screen.getByText('Advertisement Config'));
     expect(screen.getByText('Discovery Config'));
+    userEvent.click(screen.getByText('Liqonet Config'));
+
+    userEvent.click(await screen.findByText('General'));
+    userEvent.click(await screen.findByText('Reserved Subnets'));
   })
 
   test('Config update works', async () => {
     await setup_with_error();
-    expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'true');
 
-    userEvent.click(screen.getByRole('switch'));
+    let switchButton = screen.getAllByRole('switch');
+
+    expect(switchButton[0]).toHaveAttribute('aria-checked', 'true');
+    userEvent.click(switchButton[0]);
+
+    let textbox = screen.getAllByRole('textbox');
+
+    await userEvent.type(textbox[0], '0');
+
+    textbox[1].setSelectionRange(0, 2);
+
+    await userEvent.type(textbox[1], '{backspace}50');
+
     userEvent.click(screen.getByText('Save configuration'));
 
     expect(await screen.findByText(/updated/i));
 
-    expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'false');
+    switchButton = screen.getAllByRole('switch');
+
+    expect(switchButton[0]).toHaveAttribute('aria-checked', 'false');
 
   }, 30000)
 
   test('Error notification when config not updated', async () => {
     await setup_with_error('409');
 
-    userEvent.click(screen.getByRole('switch'));
+    let switchButton = screen.getAllByRole('switch');
+
+    userEvent.click(switchButton[0]);
     userEvent.click(screen.getByText('Save configuration'));
 
     expect(await screen.findByText('Could not update the configuration'))

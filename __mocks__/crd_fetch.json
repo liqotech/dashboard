@@ -1028,8 +1028,10 @@
       "metadata": {
         "name": "clusterconfigs.policy.liqo.io",
         "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/clusterconfigs.policy.liqo.io",
-        "uid": "012e79f2-fe78-4ac3-9bd5-06c5d98f14b8",
-        "resourceVersion": "0000000"
+        "resourceVersion": "00000",
+        "annotations": {
+          "controller-gen.kubebuilder.io/version": "v0.2.5"
+        }
       },
       "spec": {
         "group": "policy.liqo.io",
@@ -1062,7 +1064,8 @@
                 "type": "object",
                 "required": [
                   "advertisementConfig",
-                  "discoveryConfig"
+                  "discoveryConfig",
+                  "liqonetConfig"
                 ],
                 "properties": {
                   "advertisementConfig": {
@@ -1072,17 +1075,16 @@
                     ],
                     "properties": {
                       "autoAccept": {
-                        "description": "This is a description",
+                        "type": "boolean"
+                      },
+                      "enableBroadcaster": {
                         "type": "boolean"
                       },
                       "maxAcceptableAdvertisement": {
-                        "description": "This is a description",
-                        "type": "integer",
-                        "format": "int32",
+                        "type": "number",
                         "minimum": 0
                       },
                       "resourceSharingPercentage": {
-                        "description": "This is a description",
                         "type": "integer",
                         "format": "int32",
                         "maximum": 100,
@@ -1094,66 +1096,154 @@
                     "type": "object",
                     "required": [
                       "autojoin",
+                      "autojoinUntrusted",
+                      "dnsServer",
                       "domain",
                       "enableAdvertisement",
                       "enableDiscovery",
                       "name",
                       "port",
+                      "allowUntrustedCA",
                       "service",
                       "updateTime",
                       "waitTime"
                     ],
                     "properties": {
-                      "autojoin": {
-                        "description": "This is a description",
+                      "allowUntrustedCA": {
                         "type": "boolean"
                       },
+                      "autojoin": {
+                        "type": "boolean"
+                      },
+                      "autojoinUntrusted": {
+                        "type": "boolean"
+                      },
+                      "dnsServer": {
+                        "type": "string"
+                      },
                       "domain": {
-                        "description": "This is a description",
                         "type": "string"
                       },
                       "enableAdvertisement": {
-                        "description": "This is a description",
                         "type": "boolean"
                       },
                       "enableDiscovery": {
-                        "description": "This is a description",
                         "type": "boolean"
                       },
                       "name": {
-                        "description": "This is a description",
                         "type": "string"
                       },
                       "port": {
-                        "description": "This is a description",
                         "type": "integer",
                         "maximum": 65355,
                         "minimum": 1
                       },
                       "service": {
-                        "description": "This is a description",
                         "type": "string"
                       },
                       "updateTime": {
-                        "description": "This is a description",
                         "type": "integer",
                         "minimum": 2
                       },
                       "waitTime": {
-                        "description": "This is a description",
                         "type": "integer",
                         "minimum": 1
+                      }
+                    }
+                  },
+                  "liqonetConfig": {
+                    "type": "object",
+                    "required": [
+                      "gatewayPrivateIP",
+                      "reservedSubnets"
+                    ],
+                    "properties": {
+                      "gatewayPrivateIP": {
+                        "type": "string"
+                      },
+                      "reservedSubnets": {
+                        "description": "contains a list of reserved subnets in CIDR notation used by the k8s cluster like the podCIDR and ClusterCIDR",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "vxlanNetConfig": {
+                        "type": "object",
+                        "required": [
+                          "DeviceName",
+                          "Network",
+                          "Port",
+                          "Vni"
+                        ],
+                        "properties": {
+                          "DeviceName": {
+                            "type": "string"
+                          },
+                          "Network": {
+                            "type": "string"
+                          },
+                          "Port": {
+                            "type": "string"
+                          },
+                          "Vni": {
+                            "type": "string"
+                          }
+                        }
                       }
                     }
                   }
                 }
               },
-              "status": {}
+              "status": {
+                "description": "ClusterConfigStatus defines the observed state of ClusterConfig",
+                "type": "object"
+              }
             }
           }
-        }
+        },
+        "subresources": {
+          "status": {}
+        },
+        "versions": [
+          {
+            "name": "v1",
+            "served": true,
+            "storage": true
+          }
+        ],
+        "conversion": {
+          "strategy": "None"
+        },
+        "preserveUnknownFields": true
       },
-      "status": {}
+      "status": {
+        "conditions": [
+          {
+            "type": "NamesAccepted",
+            "status": "True",
+            "lastTransitionTime": "2020-08-14T09:29:09Z",
+            "reason": "NoConflicts",
+            "message": "no conflicts found"
+          },
+          {
+            "type": "Established",
+            "status": "True",
+            "lastTransitionTime": "2020-08-14T09:29:09Z",
+            "reason": "InitialNamesAccepted",
+            "message": "the initial names have been accepted"
+          }
+        ],
+        "acceptedNames": {
+          "plural": "clusterconfigs",
+          "singular": "clusterconfig",
+          "kind": "ClusterConfig",
+          "listKind": "ClusterConfigList"
+        },
+        "storedVersions": [
+          "v1"
+        ]
+      }
     }
   ]
 }

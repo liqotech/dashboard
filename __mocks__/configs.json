@@ -25,6 +25,13 @@
           "service": "service-test",
           "updateTime": 3,
           "waitTime": 4
+        },
+        "liqonetConfig": {
+          "gatewayPrivateIP": "1.18.1.1",
+          "reservedSubnets": [
+            "10.244.0.0/16",
+            "10.96.0.0/12"
+          ]
         }
       }
     }

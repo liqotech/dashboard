@@ -1,11 +1,8 @@
 import {
   Col, Input, InputNumber, Row, Slider,
-  Space, Switch, Typography, Tooltip, Badge, Card
+  Switch
 } from 'antd';
 import React from 'react';
-import { splitCamelCaseAndUp } from '../../services/stringUtils';
-import QuestionOutlined from '@ant-design/icons/lib/icons/QuestionOutlined';
-import { QuestionCircleOutlined } from '@ant-design/icons';
 
 /** Custom widgets */
 
@@ -52,6 +49,7 @@ const CustomText = function(props) {
               <InputNumber
                 style={{float: 'right'}}
                 disabled={props.disabled}
+                role={'textbox'}
                 formatter={value => `${value}%`}
                 parser={value => value.replace('%', '')}
                 min={0}
@@ -70,7 +68,7 @@ const CustomText = function(props) {
     return CustomInputNumber(props);
   }
   return (
-    <Input id={props.id} defaultValue={props.value} value={props.value} disabled={props.disabled}
+    <Input id={props.id} defaultValue={props.value} value={props.value} disabled={props.disabled} role={'textbox'}
            onChange={({ target }) => {if(!props.readonly) props.onChange(target.value)}}/>
   )
 }
