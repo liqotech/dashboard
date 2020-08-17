@@ -15,6 +15,7 @@ import CloseOutlined from '@ant-design/icons/lib/icons/CloseOutlined';
 import ClusterOutlined from '@ant-design/icons/lib/icons/ClusterOutlined';
 
 import { updatePeeringStatus } from './HomeUtils';
+import { getPeerProperties } from './PeerProperties';
 
 class AvailablePeer extends Component {
   constructor(props) {
@@ -23,7 +24,8 @@ class AvailablePeer extends Component {
     this.state = {
       lan: false,
       loading: false,
-      backgroundColor: 'white'
+      backgroundColor: 'white',
+      showProperties: false
     }
 
     this.join = this.join.bind(this);
@@ -60,6 +62,22 @@ class AvailablePeer extends Component {
       this.state.loading = false;
     }
 
+    let advertisement;
+
+    if(this.props.foreignCluster.status && this.props.foreignCluster.status.outgoing.advertisement){
+      advertisement = this.props.advertisements.find(adv =>
+        {return adv.metadata.name === this.props.foreignCluster.status.outgoing.advertisement.name}
+      )
+    }
+
+    let peeringRequest;
+
+    if(this.props.foreignCluster.status && this.props.foreignCluster.status.incoming.peeringRequest){
+      peeringRequest = this.props.peeringRequests.find(pr =>
+        {return pr.metadata.name === this.props.foreignCluster.status.incoming.peeringRequest.name}
+      )
+    }
+
     const menu = (
       <Menu>
         {this.state.loading ? (
@@ -71,7 +89,9 @@ class AvailablePeer extends Component {
             Connect
           </Menu.Item>
         )}
-        <Menu.Item key={'properties'} icon={<ToolOutlined />}>
+        <Menu.Item key={'properties'} icon={<ToolOutlined />}
+                   onClick={() => {this.setState({showProperties: true})}}
+        >
           Properties
         </Menu.Item>
         <Menu.Item key={'favourite'} icon={<StarOutlined />}>
@@ -167,7 +187,9 @@ class AvailablePeer extends Component {
                   </Col>
                   <Col flex={3}>
                     <div style={{float: 'right'}}>
-                      <Button style={{marginRight: '1em'}}>
+                      <Button style={{marginRight: '1em'}}
+                              onClick={() => {this.setState({showProperties: true})}}
+                      >
                         Properties
                       </Button>
                       { this.state.loading ? (
@@ -185,6 +207,7 @@ class AvailablePeer extends Component {
               </div>
             </Collapse.Panel>
           </Collapse>
+          {getPeerProperties(advertisement, peeringRequest, this)}
         </div>
       </div>
     )

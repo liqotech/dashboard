@@ -20,16 +20,6 @@ class ListAvailable extends Component {
   submit(item){
     let CRD = this.props.api.getCRDfromKind(item.kind)
 
-    //let namespace = '';
-
-    /*if(CRD.spec.scope === 'Namespaced'){
-      namespace = 'default';
-    }
-
-    if(item.metadata.namespace) {
-      namespace = item.metadata.namespace;
-    }*/
-
     this.setState({isLoading: true});
 
     let promise = this.props.api.createCustomResource(

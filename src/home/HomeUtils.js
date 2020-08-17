@@ -1,8 +1,5 @@
-import { Input, Space, Button, Pagination, Progress, Table,  Alert, notification, Tabs, Tag } from 'antd';
+import { notification } from 'antd';
 import { APP_NAME } from '../constants';
-import ToolOutlined from '@ant-design/icons/lib/icons/ToolOutlined';
-import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
-import FormViewer from '../editors/OAPIV3FormGenerator/FormViewer';
 import React from 'react';
 
 /** Return the right color from the percentage given */
