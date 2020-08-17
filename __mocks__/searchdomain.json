@@ -1,0 +1,18 @@
+{
+  "apiVersion": "discovery.liqo.io/v1",
+  "items": [
+    {
+      "apiVersion": "discovery.liqo.io/v1",
+      "kind": "SearchDomain",
+      "metadata": {
+        "name": "search-domain-test",
+        "resourceVersion": "00000",
+        "selfLink": "/apis/discovery.liqo.io/v1/searchdomains/search-domain-test"
+      },
+      "spec": {
+        "autojoin": true,
+        "domain": ".test"
+      }
+    }
+  ]
+}

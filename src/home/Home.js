@@ -217,7 +217,9 @@ class Home extends Component {
       >
         <Alert.ErrorBoundary>
           <ListConnected api={this.props.api} config={this.state.config}
-                         foreignClusters={this.state.foreignClusters.filter(fc => {return ((fc.status.outgoing.joined || fc.status.incoming.joined) && fc.spec.join)})}
+                         foreignClusters={this.state.foreignClusters.filter(fc =>
+                          {return ( fc.spec.join && fc.status && (fc.status.outgoing.joined || fc.status.incoming.joined))}
+                         )}
                          advertisements={this.state.advertisements}
                          peeringRequests={this.state.peeringRequests}
           />

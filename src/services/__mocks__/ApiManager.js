@@ -178,10 +178,12 @@ export default class ApiManager {
     return fetch('http://localhost:3001/clustercustomobject/' + plural, { method: 'POST', body: item})
       .then(res => res.json())
       .then((res) => {
+
         this.watchers.forEach(w => {
           if (w.plural === plural)
             w.callback('ADDED', res.body);
         })
+
       });
   }
 
@@ -202,10 +204,15 @@ export default class ApiManager {
       itemDC.metadata.resourceVersion++;
       this.CVsNotifyEvent('MODIFIED', itemDC);
       return Promise.resolve(new Response(JSON.stringify(item)))
-    } else if (plural === 'liqodashtests' || plural === 'clusterconfigs' || plural === 'foreignclusters') {
+    } else if (plural === 'liqodashtests' ||
+      plural === 'clusterconfigs' ||
+      plural === 'foreignclusters' ||
+      plural === 'searchdomains'
+    ) {
       return fetch('http://localhost:3001/clustercustomobject/' + plural, { method: 'PUT', body: item})
         .then(res => res.json())
         .then((res) => {
+          //console.log(res)
           this.watchers.forEach(w => {
             if (w.plural === plural)
               w.callback('MODIFIED', res.body);

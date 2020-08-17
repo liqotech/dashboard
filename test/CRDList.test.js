@@ -20,7 +20,7 @@ async function setup() {
   const customview = screen.getByText('Custom Resources');
   userEvent.click(customview);
 
-  expect(screen.getAllByRole('row')).toHaveLength(CRDMockResponseShort.items.length);
+  expect(screen.getAllByRole('row')).toHaveLength(11);
 }
 
 describe('CRD List', () => {
@@ -40,7 +40,7 @@ describe('CRD List', () => {
     const customview = screen.getByText('Custom Resources');
     userEvent.click(customview);
 
-    expect(screen.getAllByRole('row')).toHaveLength(CRDMockResponseShort.items.length);
+    expect(screen.getAllByRole('row')).toHaveLength(11);
 
     userEvent.click(screen.getByText('2'));
 
@@ -53,7 +53,7 @@ describe('CRD List', () => {
 
     expect(screen.getByText('protocol.liqo.io'));
     expect(screen.getByText('Advertisement'));
-    expect(screen.getAllByText('This CRD has no description')).toHaveLength(CRDMockResponseShort.items.length - 4);
+    expect(screen.getAllByText('This CRD has no description')).toHaveLength(11 - 4);
 
     expect(screen.getByText('This CRD is used to create custom views from a set of CRDs'));
   })

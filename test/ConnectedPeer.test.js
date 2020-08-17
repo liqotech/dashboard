@@ -63,45 +63,42 @@ function mocks(advertisement, foreignCluster, peeringRequest, error) {
   })
 }
 
+async function OKCheck() {
+  await setup();
+
+  expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+  expect(await screen.findByText('No peer available at the moment')).toBeInTheDocument();
+}
+
 describe('ConnectedPeer', () => {
   test('List of connected peers shows', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
 
-    await setup();
-
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    await OKCheck();
   })
 
   test('List of connected peers shows not incoming', async () => {
     mocks(AdvMockResponse, FCMockResponseNoIn, PRMockResponse);
 
-    await setup();
-
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    await OKCheck();
   })
 
   test('List of connected peers shows not outgoing', async () => {
     mocks(AdvMockResponse, FCMockResponseNoOut, PRMockResponse);
 
-    await setup();
-
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    await OKCheck();
   })
 
   test('List of connected peers show if no advertisement', async () => {
     mocks({ items: [] }, FCMockResponse, PRMockResponse);
 
-    await setup();
-
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    await OKCheck();
   })
 
   test('List of connected peers show if no peering request', async () => {
     mocks(AdvMockResponse, FCMockResponse, { items: [] });
 
-    await setup();
-
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    await OKCheck();
   })
 
   test('List of connected peers doesn\'t show if no peering request and no advertisement', async () => {
@@ -109,39 +106,32 @@ describe('ConnectedPeer', () => {
 
     await setup();
 
-    expect(await screen.queryByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).not.toBeInTheDocument();
+    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    expect(await screen.findByText('No peer connected at the moment')).toBeInTheDocument();
   })
 
   test('Advertisement is refused', async () => {
     mocks(AdvMockResponseRefused, FCMockResponse, PRMockResponse);
 
-    await setup();
-
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    await OKCheck();
   })
 
   test('Advertisement status is not accepted', async () => {
     mocks(AdvMockResponseNotAccepted, FCMockResponse, PRMockResponse);
 
-    await setup();
-
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    await OKCheck();
   })
 
   test('Advertisement status is not accepted', async () => {
     mocks(AdvMockResponseNoStatus, FCMockResponse, PRMockResponse);
 
-    await setup();
-
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    await OKCheck();
   })
 
   test('Clicks work', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
 
-    await setup();
-
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    await OKCheck();
 
     userEvent.click(screen.getByLabelText('swap'));
 
@@ -153,9 +143,7 @@ describe('ConnectedPeer', () => {
   test('Disconnection error show', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
 
-    await setup();
-
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    await OKCheck();
 
     userEvent.click(screen.getByLabelText('swap'));
 
@@ -164,18 +152,16 @@ describe('ConnectedPeer', () => {
     userEvent.click(disconnect);
 
     expect(await screen.findByText(/Could not disconnect/i)).toBeInTheDocument();
-
-    expect(screen.getByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    expect(await screen.findByText('No peer available at the moment')).toBeInTheDocument();
   })
 
-  test('Disconnection works from dropdown menu', async () => {
+  test('Dropdown menu don\'t activate collapse', async () => {
     jest.clearAllMocks();
 
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
 
-    await setup();
-
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    await OKCheck();
 
     userEvent.click(screen.getByLabelText('dropdown-connected'));
   })
@@ -183,9 +169,7 @@ describe('ConnectedPeer', () => {
   test('Disconnection works', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
 
-    await setup();
-
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    await OKCheck();
 
     userEvent.click(screen.getByLabelText('swap'));
 
@@ -195,6 +179,7 @@ describe('ConnectedPeer', () => {
 
     expect(await screen.findByText(/Disconnected from/i)).toBeInTheDocument();
 
-    expect(await screen.queryByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).not.toBeInTheDocument();
+    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    expect(await screen.findByText('No peer connected at the moment')).toBeInTheDocument();
   })
 })

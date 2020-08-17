@@ -39,7 +39,7 @@ describe('Sidebar', () => {
     const customview = await screen.findByText('Custom Resources');
     userEvent.click(customview);
 
-    expect(await screen.findAllByRole('row')).toHaveLength(CRDmockResponse.items.length);
+    expect(await screen.findAllByRole('row')).toHaveLength(11);
   })
 
   test('Sidebar favourite redirect is ok', async () => {
