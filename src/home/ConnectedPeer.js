@@ -15,6 +15,7 @@ import SwapOutlined from '@ant-design/icons/lib/icons/SwapOutlined';
 import SwapRightOutlined from '@ant-design/icons/lib/icons/SwapRightOutlined';
 import SwapLeftOutlined from '@ant-design/icons/lib/icons/SwapLeftOutlined';
 import { getColor, updatePeeringStatus } from './HomeUtils';
+import { getPeerProperties } from './PeerProperties';
 
 class ConnectedPeer extends Component {
   constructor(props) {
@@ -26,7 +27,8 @@ class ConnectedPeer extends Component {
      */
     this.state = {
       loading: false,
-      backgroundColor: 'white'
+      backgroundColor: 'white',
+      showProperties: false
     }
 
     this.disconnect = this.disconnect.bind(this);
@@ -60,7 +62,9 @@ class ConnectedPeer extends Component {
 
     const menu = (
       <Menu>
-        <Menu.Item key={'properties'} icon={<ToolOutlined />}>
+        <Menu.Item key={'properties'} icon={<ToolOutlined />}
+                   onClick={() => {this.setState({showProperties: true})}}
+        >
           Properties
         </Menu.Item>
         <Menu.Item key={'details'} icon={<SnippetsOutlined />}>
@@ -177,6 +181,7 @@ class ConnectedPeer extends Component {
                 <Col flex={3}>
                   <div style={{float: 'right'}}>
                     <Button style={{marginRight: '1em'}}
+                            onClick={() => {this.setState({showProperties: true})}}
                     >
                       Properties
                     </Button>
@@ -189,6 +194,9 @@ class ConnectedPeer extends Component {
             </div>
           </Collapse.Panel>
         </Collapse>
+
+        {getPeerProperties(this.props.client, this.props.server, this)}
+
       </div>
     )
   }
