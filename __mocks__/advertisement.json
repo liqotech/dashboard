@@ -236,7 +236,10 @@
           "name": "",
           "namespace": ""
         },
-        "vkCreated": true
+        "vkCreated": true,
+        "vkReference": {
+          "name": "vk-test"
+        }
       }
     }
   ],

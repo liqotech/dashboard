@@ -18,6 +18,7 @@ import FCMockNew from '../__mocks__/foreigncluster_new.json';
 import PRMockResponse from '../__mocks__/peeringrequest.json';
 import ConfigMockResponse from '../__mocks__/configs.json';
 import ConfigMockResponseUpdated from '../__mocks__/configs_updated.json';
+import PodsMockResponse from '../__mocks__/pods.json';
 import Error409 from '../__mocks__/409.json';
 import Error404 from '../__mocks__/404.json';
 
@@ -38,6 +39,8 @@ export function generalHomeGET(url) {
     return Promise.resolve(new Response(JSON.stringify({body: PRMockResponse})));
   } else if (url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
     return Promise.resolve(new Response(JSON.stringify({body: ConfigMockResponse})));
+  } else if (url === 'http://localhost:3001/pod/') {
+    return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
   }
 }
 
@@ -104,6 +107,8 @@ export function mockCRDAndViewsExtended(error, method, crd, view) {
     } else if (req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
       return responseManager(req, error, method, crd, 'clusterconfigs',
         ConfigMockResponse, null, ConfigMockResponseUpdated);
+    } else if (req.url === 'http://localhost:3001/pod/') {
+      return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
     }
   })
 }
