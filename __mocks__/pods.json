@@ -1,0 +1,331 @@
+{
+  "kind": "PodList",
+  "apiVersion": "v1",
+  "metadata": {
+    "selfLink": "/api/v1/pods",
+    "resourceVersion": "00000"
+  },
+  "items": [
+    {
+      "metadata": {
+        "name": "hello-world-deployment-6756549f5-x66v9",
+        "generateName": "hello-world-deployment-6756549f5-",
+        "namespace": "test",
+        "selfLink": "/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9",
+        "labels": {
+          "app": "hello-world",
+          "pod-template-hash": "6756549f5"
+        },
+        "ownerReferences": [
+          {
+            "apiVersion": "apps/v1",
+            "kind": "ReplicaSet",
+            "name": "hello-world-deployment-6756549f5",
+            "uid": "419b8224-d91f-4f83-b972-e0fe158d7500",
+            "controller": true,
+            "blockOwnerDeletion": true
+          }
+        ]
+      },
+      "spec": {
+        "volumes": [
+          {
+            "name": "default-token-mbjjj",
+            "secret": {
+              "secretName": "default-token-mbjjj",
+              "defaultMode": 420
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "hello-world",
+            "image": "bhargavshah86/kube-test:v0.1",
+            "ports": [
+              {
+                "containerPort": 80,
+                "protocol": "TCP"
+              }
+            ],
+            "resources": {
+              "limits": {
+                "cpu": "250m",
+                "memory": "256Mi"
+              },
+              "requests": {
+                "cpu": "80m",
+                "memory": "128Mi"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "default-token-mbjjj",
+                "readOnly": true,
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent"
+          }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 30,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "nodeName": "vk-test",
+        "securityContext": {
+
+        },
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+          {
+            "key": "virtual-node.liqo.io/not-allowed",
+            "operator": "Exists",
+            "effect": "NoExecute"
+          },
+          {
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          }
+        ],
+        "priority": 0,
+        "enableServiceLinks": true
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "hello-world-deployment-6756549f5-c7qzv",
+        "namespace": "test-c22b84e7-dcb9-483f-8009-29f16c911388",
+        "selfLink": "/api/v1/namespaces/test-c22b84e7-dcb9-483f-8009-29f16c911388/pods/hello-world-deployment-6756549f5-c7qzv",
+        "uid": "1cbea8ae-6298-42a6-8667-b75cdc7e26f8",
+        "resourceVersion": "14358",
+        "creationTimestamp": "2020-08-18T14:48:22Z",
+        "labels": {
+          "app": "hello-world",
+          "pod-template-hash": "6756549f5"
+        },
+        "annotations": {
+          "home_creationTimestamp": "2020-08-18 14:48:22 +0000 UTC",
+          "home_nodename": "vk-4317f039-e7b8-40d2-ae20-18d1c47e69f0",
+          "home_resourceVersion": "13731",
+          "home_uuid": "e1dce48a-60b0-4368-8d83-d2d2b9589cd1"
+        }
+      },
+      "spec": {
+        "volumes": [
+          {
+            "name": "default-token-l6gv9",
+            "secret": {
+              "secretName": "default-token-l6gv9",
+              "defaultMode": 420
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "hello-world",
+            "image": "bhargavshah86/kube-test:v0.1",
+            "ports": [
+              {
+                "containerPort": 80,
+                "protocol": "TCP"
+              }
+            ],
+            "resources": {
+              "limits": {
+                "cpu": "250m",
+                "memory": "256Mi"
+              },
+              "requests": {
+                "cpu": "80m",
+                "memory": "128Mi"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "default-token-l6gv9",
+                "readOnly": true,
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent"
+          }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 30,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "nodeName": "node0",
+        "securityContext": {
+
+        },
+        "affinity": {
+          "nodeAffinity": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "nodeSelectorTerms": [
+                {
+                  "matchExpressions": [
+                    {
+                      "key": "type",
+                      "operator": "NotIn",
+                      "values": [
+                        "virtual-node"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+          {
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          }
+        ],
+        "priority": 0,
+        "enableServiceLinks": true
+      },
+      "status": {
+        "phase": "Pending"
+      }
+    },
+    {
+      "metadata": {
+        "name": "hello-world-deployment-6756549f5-c7sx8",
+        "namespace": "test-c22b84e7-dcb9-483f-8009-29f16c911388",
+        "selfLink": "/api/v1/namespaces/test-c22b84e7-dcb9-483f-8009-29f16c911388/pods/hello-world-deployment-6756549f5-c7sx8",
+        "uid": "076aed36-8bf0-4855-b2bd-4902e55185c9",
+        "resourceVersion": "14367",
+        "creationTimestamp": "2020-08-18T14:48:24Z",
+        "labels": {
+          "app": "hello-world",
+          "pod-template-hash": "6756549f5"
+        },
+        "annotations": {
+          "home_creationTimestamp": "2020-08-18 14:48:22 +0000 UTC",
+          "home_nodename": "vk-4317f039-e7b8-40d2-ae20-18d1c47e69f0",
+          "home_resourceVersion": "13728",
+          "home_uuid": "16bc4174-b9d1-4fff-a994-bcba1aabfd24"
+        }
+      },
+      "spec": {
+        "volumes": [
+          {
+            "name": "default-token-l6gv9",
+            "secret": {
+              "secretName": "default-token-l6gv9",
+              "defaultMode": 420
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "hello-world",
+            "image": "bhargavshah86/kube-test:v0.1",
+            "ports": [
+              {
+                "containerPort": 80,
+                "protocol": "TCP"
+              }
+            ],
+            "resources": {
+              "limits": {
+                "cpu": "250m",
+                "memory": "256Mi"
+              },
+              "requests": {
+                "cpu": "80m",
+                "memory": "128Mi"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "default-token-l6gv9",
+                "readOnly": true,
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent"
+          }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 30,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "nodeName": "liqo1-control-plane",
+        "securityContext": {
+
+        },
+        "affinity": {
+          "nodeAffinity": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+              "nodeSelectorTerms": [
+                {
+                  "matchExpressions": [
+                    {
+                      "key": "type",
+                      "operator": "NotIn",
+                      "values": [
+                        "virtual-node"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+          {
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          }
+        ],
+        "priority": 0,
+        "enableServiceLinks": true
+      },
+      "status": {
+        "phase": "Running"
+      }
+    }
+  ]
+}

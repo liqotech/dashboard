@@ -159,6 +159,6 @@ describe('CR', () => {
     userEvent.click(yes);
 
     expect(await screen.findByText(/404/i)).toBeInTheDocument();
-  })
+  }, 30000)
 
 })

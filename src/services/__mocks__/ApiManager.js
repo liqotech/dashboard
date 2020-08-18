@@ -425,4 +425,13 @@ export default class ApiManager {
     })
   }
 
+  getNamespaces(label){
+    return Promise.resolve({body: { items: [{ metadata: { name: 'test' }}]}});
+  }
+
+  /** gets all the pods */
+  getPODs(namespace){
+    return fetch('http://localhost:3001/pod/').then(res => res.json());
+  }
+
 }
