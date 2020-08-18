@@ -33,7 +33,8 @@ class ListAvailable extends Component {
     promise
       .then(() => {
         this.setState({
-          isLoading: false
+          isLoading: false,
+          showAddPeer: false
         });
         notification.success({
           message: APP_NAME,

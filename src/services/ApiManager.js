@@ -21,6 +21,7 @@ export default class ApiManager {
     this.kcc = new Config(window.APISERVER_URL, user.id_token, user.token_type);
     this.apiExt = this.kcc.makeApiClient(ApiextensionsV1beta1Api);
     this.apiCRD = this.kcc.makeApiClient(CustomObjectsApi);
+    this.apiCore = this.kcc.makeApiClient(CoreV1Api);
     this.CRDs = [];
     this.customViews = [];
     this.watchers = [];
@@ -199,7 +200,7 @@ export default class ApiManager {
    * @returns a promise
    */
   createCustomResource(group, version, namespace, plural, item) {
-    if(namespace !== ''){
+    if(namespace !== '' && namespace){
       return this.apiCRD.createNamespacedCustomObject(
         group,
         version,
@@ -567,6 +568,16 @@ export default class ApiManager {
     this.CVArrayCallback.forEach(func => {
       func(customViews);
     })
+  }
+
+  /** gets all namespaces with label */
+  getNamespaces(label){
+    return this.apiCore.listNamespace(null, null, null, null, label)
+  }
+
+  /** gets all the pods with namespace (if specified) */
+  getPODs(namespace){
+    return this.apiCore.listPodForAllNamespaces(null, namespace ? 'metadata.namespace=' + namespace : null);
   }
 
 }

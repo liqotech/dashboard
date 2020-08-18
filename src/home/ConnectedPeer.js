@@ -16,6 +16,7 @@ import SwapRightOutlined from '@ant-design/icons/lib/icons/SwapRightOutlined';
 import SwapLeftOutlined from '@ant-design/icons/lib/icons/SwapLeftOutlined';
 import { getColor, updatePeeringStatus } from './HomeUtils';
 import { getPeerProperties } from './PeerProperties';
+import ConnectionDetails from './ConnectionDetails';
 
 class ConnectedPeer extends Component {
   constructor(props) {
@@ -28,10 +29,35 @@ class ConnectedPeer extends Component {
     this.state = {
       loading: false,
       backgroundColor: 'white',
-      showProperties: false
+      showProperties: false,
+      outgoingPods: [],
+      incomingPods: [],
+      showDetails: false
     }
 
     this.disconnect = this.disconnect.bind(this);
+  }
+
+  /**
+   * Search for pods offloaded to the foreign cluster
+   */
+  getClientPODs(){
+    let vk = this.props.advertisements.find(adv =>
+      {return adv.metadata.name === this.props.foreignCluster.status.outgoing.advertisement.name}
+    ).status.vkReference.name;
+    this.state.outgoingPods = this.props.outgoingPods.filter(po => { return po.spec.nodeName === vk });
+  }
+
+  /**
+   * Search for pods offloaded to the home cluster from a foreign one
+   */
+  getServerPODs(){
+    let vk = 'vk-' + this.props.foreignCluster.status.outgoing["remote-peering-request-name"];
+    this.state.incomingPods = this.props.incomingPods.filter(po => {
+        try {
+          return po.metadata.annotations.home_nodename === vk
+        }catch{return false}
+      })
   }
 
   clientPercentage() {
@@ -44,9 +70,10 @@ class ConnectedPeer extends Component {
     return 90;
   }
 
+  /** If there are pods offloaded, then there's sharing */
   checkSharing() {
-    //TODO: create sharing detect function
-    return true;
+    if(this.state.incomingPods.length !== 0 || this.state.outgoingPods.length !== 0 )
+      return true;
   }
 
   /** Disconnect from peer (it makes foreignCluster's spec join parameter false) */
@@ -59,6 +86,13 @@ class ConnectedPeer extends Component {
   }
 
   render(){
+    if(this.props.client && this.props.outgoingPods.length !== 0) {
+      this.getClientPODs();
+    }
+
+    if(this.props.server && this.props.incomingPods.length !== 0) {
+      this.getServerPODs();
+    }
 
     const menu = (
       <Menu>
@@ -67,7 +101,9 @@ class ConnectedPeer extends Component {
         >
           Properties
         </Menu.Item>
-        <Menu.Item key={'details'} icon={<SnippetsOutlined />}>
+        <Menu.Item key={'details'} icon={<SnippetsOutlined />}
+                   onClick={() => {this.setState({showDetails: true})}}
+        >
           Details
         </Menu.Item>
         <Menu.Item key={'rules'} icon={<AuditOutlined />}>
@@ -91,7 +127,7 @@ class ConnectedPeer extends Component {
     if(this.props.server)
       serverPercent = this.serverPercentage();
 
-    /** If there is resource sharing */
+    /** If there is resource sharing in general */
     let sharing = this.checkSharing();
 
     return(
@@ -118,8 +154,8 @@ class ConnectedPeer extends Component {
                       type="circle"
                       percent={serverPercent}
                       strokeWidth={10}
-                      trailColor={this.props.server ? null : this.state.backgroundColor}
-                      strokeColor={this.props.server ? getColor(serverPercent) : this.state.backgroundColor}
+                      trailColor={(this.props.server && sharing) ? null : this.state.backgroundColor}
+                      strokeColor={(this.props.server && sharing) ? getColor(serverPercent) : this.state.backgroundColor}
                       format={() => (
                         <Avatar
                           size="large"
@@ -141,8 +177,8 @@ class ConnectedPeer extends Component {
                       type="circle"
                       percent={clientPercent}
                       strokeWidth={10}
-                      trailColor={this.props.client ? null : this.state.backgroundColor}
-                      strokeColor={this.props.client ? getColor(clientPercent) : this.state.backgroundColor}
+                      trailColor={(this.props.client && sharing) ? null : this.state.backgroundColor}
+                      strokeColor={(this.props.client && sharing) ? getColor(clientPercent) : this.state.backgroundColor}
                       format={() => (
                         <Avatar
                           size="large"
@@ -195,7 +231,11 @@ class ConnectedPeer extends Component {
           </Collapse.Panel>
         </Collapse>
 
+        { /** This modal shows the properties of the clusters */ }
         {getPeerProperties(this.props.client, this.props.server, this)}
+
+        { /** This modal shows the detail of the connection */ }
+        <ConnectionDetails {...this.props} _this={this}/>
 
       </div>
     )

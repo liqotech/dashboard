@@ -1,13 +1,64 @@
 import React, { Component } from 'react';
-import { Alert, Button, Divider, PageHeader, Space, Switch, Tooltip, Typography } from 'antd';
+import { Alert, Button, Divider, notification, PageHeader, Space, Switch, Tooltip, Typography } from 'antd';
 import FilterOutlined from '@ant-design/icons/lib/icons/FilterOutlined';
 import ConnectedPeer from './ConnectedPeer';
 import { checkPeeringRequest, checkAdvertisement } from './HomeUtils';
+import { APP_NAME, LIQO_LABEL_ENABLED } from '../constants';
 
 class ListConnected extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      outgoingPods: [],
+      incomingPods: []
+    }
+
+  }
+
+  /**
+   * Searches for pods in namespaces labeled with the LIQO_LABEL_ENABLED
+   * The pods in these namespaces are the only one that can be
+   * offloaded to the foreign cluster
+   */
+  getClientPODs(){
+    let label = LIQO_LABEL_ENABLED;
+    this.props.api.getNamespaces(label)
+      .then(res => {
+        res.body.items.forEach(ns => {
+          this.props.api.getPODs(ns.metadata.name)
+            .then(res => {
+              res.body.items.forEach(po => {
+                this.state.outgoingPods.push(po);
+                this.setState({outgoingPods: this.state.outgoingPods});
+              })
+            })
+        })
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
+
+  /**
+   * For now, there in no way to restrict the field of pods
+   * scheduled in the vk (offloaded to the home cluster)
+   * so we take all pods
+   */
+  getServerPODs(){
+    this.props.api.getPODs().
+    then(res => {
+      let pods = res.body.items;
+      this.setState({incomingPods: pods})
+    })
+    .catch(error => {
+      console.log(error);
+    })
+  }
+
+  componentDidMount() {
+    this.getClientPODs();
+    this.getServerPODs();
   }
 
   render() {
@@ -35,7 +86,8 @@ class ListConnected extends Component {
       if(client || server){
         connectedPeers.push(
           <div key={fc.spec.clusterID}>
-            <ConnectedPeer {...this.props}
+            <ConnectedPeer {...this.props} incomingPods={this.state.incomingPods}
+                           outgoingPods={this.state.outgoingPods}
                            foreignCluster={fc} client={client} server={server} />
           </div>
         )
