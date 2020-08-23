@@ -1,4 +1,5 @@
 [![Coverage Status](https://coveralls.io/repos/github/LiqoTech/dashboard/badge.svg?branch=master)](https://coveralls.io/github/LiqoTech/dashboard?branch=master)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLiqoTech%2Fdashboard.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FLiqoTech%2Fdashboard?ref=badge_shield)
 
 # LiqoDash
 LiqoDash is a general purpose, dynamic dashboard that let you create your own
@@ -86,3 +87,7 @@ docker run --env APISERVER_URL=<APISERVER_IP>:<APISERVER_PORT> -p 8000:80 liqo/d
 Open a browser and visit `localhost:8000`.
 
 **NOTE: the command above uses the `--env` option to export the env variables needed to run the dashboard.**
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLiqoTech%2Fdashboard.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FLiqoTech%2Fdashboard?ref=badge_large)
