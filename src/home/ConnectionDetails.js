@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
   Modal, Tabs, Typography, Tag, Badge, Space,
-  Row, Col, Card, Progress, Input, Button, Table
+  Row, Col, Card, Progress, Input, Button, Table, Tooltip
 } from 'antd';
 import InfoCircleOutlined from '@ant-design/icons/lib/icons/InfoCircleOutlined';
 import HomeOutlined from '@ant-design/icons/lib/icons/HomeOutlined';
@@ -14,41 +14,25 @@ class ConnectionDetails extends Component {
     super(props);
 
     this.state = {
-      currentTab: '1'
+      currentTab: '1',
     }
   }
 
-  getUsedPODCPU(role){
-    //TODO: retrieve pod CPU consumption percentage
-    return 10;
-  }
-
-  getUsedPODRAM(role){
-    //TODO: retrieve pod RAM consumption percentage
-    return 10;
-  }
-
-  getUsedPODStorage(role){
-    //TODO: retrieve pod Storage consumption percentage
-    return 10;
-  }
-
   getUsedTotalCPU(role){
-    //TODO: retrieve pods total CPU consumption percentage
-    return 90;
+    if(!role)
+      return this.props.outgoingTotalPercentage.CPU;
+    else
+      return this.props.incomingTotalPercentage.CPU;
   }
 
   getUsedTotalRAM(role){
-    //TODO: retrieve pods total RAM consumption percentage
-    return 20;
+    if(!role)
+      return this.props.outgoingTotalPercentage.RAM;
+    else
+      return this.props.incomingTotalPercentage.RAM;
   }
 
-  getUsedTotalStorage(role){
-    //TODO: retrieve pods total Storage consumption percentage
-    return 75;
-  }
-
-  PODtoTable(pods){
+  PODtoTable(pods, role){
 
     let searchText = '';
     let searchedColumn = '';
@@ -105,7 +89,11 @@ class ConnectionDetails extends Component {
         dataIndex === 'Status' ? (
           text === 'Running' ? <Tag color={'blue'}>{text}</Tag> : <Tag color={'red'}>{text}</Tag>
         ) : (
-          text
+          dataIndex === 'Namespace' ? (
+            <Tooltip title={text}>
+              <Tag style={{ maxWidth: '5vw', overflow: 'hidden', textOverflow: 'ellipsis'}}>{text}</Tag>
+            </Tooltip>
+          ) : text
         ),
     });
 
@@ -126,53 +114,62 @@ class ConnectionDetails extends Component {
         title: 'CPU (%)',
         dataIndex: 'CPU',
         key: 'CPU',
-        render: text => <Progress percent={text}
-                                  status={'active'}
-                                  strokeColor={getColor(text)}
-        />,
+        render: text =>
+            <Progress percent={text}
+                      status={'active'}
+                      strokeColor={getColor(text)}
+            />,
         sorter: {
           compare: (a, b) => a.CPU - b.CPU
         },
       },
       {
-        title: 'RAM (MB)',
+        title: 'RAM (%)',
         dataIndex: 'RAM',
         key: 'RAM',
-        render: text => <Progress percent={(text/999)*100}
-                                  status={'active'}
-                                  format={() => text}
-                                  strokeColor={getColor((text/999)*100)}
-        />,
+        render: (text, record) => {
+          let podRAMmb = (role && this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name})) ?
+            this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name}).RAMmi : 0;
+
+          return(
+            <Tooltip title={podRAMmb + 'Mi'}>
+              <Progress percent={text}
+                        status={'active'}
+                        strokeColor={getColor(text)}
+              />
+            </Tooltip>
+          )
+        },
         sorter: {
           compare: (a, b) => a.RAM - b.RAM
         },
       },
       {
-        title: 'Storage (MB)',
-        dataIndex: 'Storage',
-        key: 'Storage',
-        render: text => <Progress percent={(text/999)*100}
-                                  status={'active'}
-                                  format={() => text}
-                                  strokeColor={getColor((text/999)*100)}
-        />,
-        sorter: {
-          compare: (a, b) => a.Storage - b.Storage
-        },
+        title: 'Namespace',
+        dataIndex: 'Namespace',
+        key: 'Namespace',
+        ...getColumnSearchProps('Namespace')
       },
     ];
 
     const data = [];
 
     pods.forEach(po => {
+
+      const pod = role ?
+        this.props.incomingPodsPercentage.find(pod => {return po.metadata.name === pod.name}) :
+        this.props.outgoingPodsPercentage.find(pod => {return po.metadata.name === pod.name})
+
+      //console.log(pod, this.state.incomingPodsPercentage, po)
+
       data.push(
         {
           key: po.metadata.name,
           Name: po.metadata.name,
           Status: po.status.phase,
-          CPU: this.getUsedPODCPU(),
-          RAM: this.getUsedPODRAM(),
-          Storage: this.getUsedPODStorage()
+          CPU: pod ? pod.CPU : 0,
+          RAM: pod ? pod.RAM : 0,
+          Namespace: po.metadata.namespace
         },
       )
     })
@@ -190,7 +187,6 @@ class ConnectionDetails extends Component {
   getUsedResources(role) {
     const totalCPU = this.getUsedTotalCPU(role);
     const totalRAM = this.getUsedTotalRAM(role);
-    const totalStorage = this.getUsedTotalStorage(role);
 
     return(
       <div>
@@ -222,25 +218,13 @@ class ConnectionDetails extends Component {
                     </Row>
                   </Col>
                 </Row>
-                <Row gutter={[20, 20]} align={'center'} justify={'center'}>
-                  <Col>
-                    <Row justify={'center'}>
-                      <Typography.Text strong>Storage</Typography.Text>
-                    </Row>
-                    <Row justify={'center'}>
-                      <Progress type={'dashboard'} percent={totalStorage}
-                                strokeColor={getColor(totalStorage)}
-                      />
-                    </Row>
-                  </Col>
-                </Row>
               </Card>
             </Col>
             <Col flex={23}>
-              <Card title={ role === 'foreign' ? 'Outgoing PODs' : 'Incoming PODs'}
+              <Card title={ !role ? 'Outgoing PODs' : 'Incoming PODs'}
                     bodyStyle={{padding: 0}}
               >
-                { role === 'foreign' ? this.PODtoTable(this.props._this.state.outgoingPods) : this.PODtoTable(this.props._this.state.incomingPods) }
+                { !role ? this.PODtoTable(this.props._this.state.outgoingPods, role) : this.PODtoTable(this.props._this.state.incomingPods, role) }
               </Card>
             </Col>
           </Row>
@@ -296,12 +280,12 @@ class ConnectionDetails extends Component {
           </Tabs.TabPane>
           { this.props.server ? (
             <Tabs.TabPane tab={<span><HomeOutlined />Home</span>} key={'2'}>
-              {this.getUsedResources('home')}
+              {this.getUsedResources(true)}
             </Tabs.TabPane>
           ) : null }
           { this.props.client ? (
             <Tabs.TabPane tab={<span><GlobalOutlined />Foreign</span>} key={'3'}>
-              {this.getUsedResources('foreign')}
+              {this.getUsedResources(false)}
             </Tabs.TabPane>
           ) : null }
         </Tabs>

@@ -33,10 +33,10 @@ class ListConnected extends Component {
                 this.setState({outgoingPods: this.state.outgoingPods});
               })
             })
+            .catch(error => {
+              console.log(error);
+            })
         })
-      })
-      .catch(error => {
-        console.log(error)
       })
   }
 

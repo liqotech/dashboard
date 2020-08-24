@@ -9,7 +9,6 @@ import Status from './Status';
 import LoadingIndicator from '../common/LoadingIndicator';
 import 'react-resizable/css/styles.css';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import ReactResizeDetector from 'react-resize-detector';
 import { resizeDetector } from '../views/CustomViewUtils';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -24,14 +23,31 @@ class Home extends Component {
       foreignClusters: [],
       advertisements: [],
       peeringRequests: [],
-      layouts: {}
+      layouts: {},
+      homeNodes: [],
+      foreignNodes: [],
+      fcMetricsIn: [],
+      fcMetricsOut: []
     }
 
+    this.updateFCMetrics = this.updateFCMetrics.bind(this);
     this.CRConfigNotifyEvent = this.CRConfigNotifyEvent.bind(this);
     this.CRForeignClusterNotifyEvent = this.CRForeignClusterNotifyEvent.bind(this);
     this.CRAdvertisementNotifyEvent = this.CRAdvertisementNotifyEvent.bind(this);
     this.CRPeeringRequestNotifyEvent = this.CRPeeringRequestNotifyEvent.bind(this);
     this.loadCRD = this.loadCRD.bind(this);
+  }
+
+  updateFCMetrics(incoming, update){
+    if(incoming){
+      let fcMetricsIn = this.state.fcMetricsIn.filter(metric => {return metric.fc !== update.fc});
+      fcMetricsIn.push(update);
+      this.setState({fcMetricsIn: fcMetricsIn});
+    } else {
+      let fcMetricsOut = this.state.fcMetricsOut.filter(metric => {return metric.fc !== update.fc});
+      fcMetricsOut.push(update);
+      this.setState({fcMetricsOut: fcMetricsOut});
+    }
   }
 
   componentDidMount() {
@@ -40,6 +56,21 @@ class Home extends Component {
     this.loadCRD(null, 'Advertisement');
     this.loadCRD(null, 'PeeringRequest');
     this.loadCRD(null, 'ClusterConfig');
+    this.props.api.getNodes()
+      .then(res => {
+        let nodes = res.body.items;
+        this.setState({
+          nodes: nodes
+        })
+        this.setState({
+          homeNodes: nodes.filter(no => {return no.metadata.labels.type !== 'virtual-node'}),
+          foreignNodes: nodes.filter(no => {return no.metadata.labels.type === 'virtual-node'}),
+          loading: false
+        })
+      })
+      .catch(error => {
+        console.log(error);
+      })
   }
 
   /**
@@ -68,26 +99,22 @@ class Home extends Component {
         if(kind === 'ForeignCluster') {
           notifyEvent = this.CRForeignClusterNotifyEvent;
           this.setState({
-            foreignClusters: res.body.items,
-            loading: false,
+            foreignClusters: res.body.items
           })
         } else if(kind === 'Advertisement') {
           notifyEvent = this.CRAdvertisementNotifyEvent;
           this.setState({
-            advertisements: res.body.items,
-            loading: false,
+            advertisements: res.body.items
           })
         } else if(kind === 'PeeringRequest') {
           notifyEvent = this.CRPeeringRequestNotifyEvent;
           this.setState({
-            peeringRequests: res.body.items,
-            loading: false,
+            peeringRequests: res.body.items
           })
         } else if(kind === 'ClusterConfig') {
           notifyEvent = this.CRConfigNotifyEvent;
           this.setState({
-            config: res.body.items[0],
-            loading: false,
+            config: res.body.items[0]
           })
         }
 
@@ -223,6 +250,9 @@ class Home extends Component {
                          )}
                          advertisements={this.state.advertisements}
                          peeringRequests={this.state.peeringRequests}
+                         homeNodes={this.state.homeNodes}
+                         foreignNodes={this.state.foreignNodes}
+                         updateFCMetrics={this.updateFCMetrics}
           />
         </Alert.ErrorBoundary>
       </div>,
@@ -241,7 +271,12 @@ class Home extends Component {
            data-grid={{ w: 2, h: 10, x: 4, y: 0, minW: 2, minH: 3 }}
       >
         <Alert.ErrorBoundary>
-          <Status api={this.props.api} config={this.state.config} foreignClusters={this.state.foreignClusters} />
+          <Status api={this.props.api} config={this.state.config} foreignClusters={this.state.foreignClusters}
+                  homeNodes={this.state.homeNodes}
+                  foreignNodes={this.state.foreignNodes}
+                  incomingMetrics={this.state.fcMetricsIn}
+                  outgoingMetrics={this.state.fcMetricsOut}
+          />
         </Alert.ErrorBoundary>
       </div>
     ])
