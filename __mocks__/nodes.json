@@ -1,0 +1,84 @@
+{
+  "kind": "NodeList",
+  "apiVersion": "v1",
+  "metadata": {
+    "selfLink": "/api/v1/nodes",
+    "resourceVersion": "000000"
+  },
+  "items": [
+    {
+      "metadata": {
+        "name": "liqo1-control-plane",
+        "selfLink": "/api/v1/nodes/liqo1-control-plane",
+        "resourceVersion": "000000",
+        "labels": {
+          "liqonet.liqo.io/gateway": "true"
+        },
+        "annotations": {
+          "kubeadm.alpha.kubernetes.io/cri-socket": "/run/containerd/containerd.sock",
+          "node.alpha.kubernetes.io/ttl": "0",
+          "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+        }
+      },
+      "spec": {
+        "podCIDR": "10.244.0.0/24",
+        "podCIDRs": [
+          "10.244.0.0/24"
+        ]
+      },
+      "status": {
+        "capacity": {
+          "cpu": "8",
+          "ephemeral-storage": "263174212Ki",
+          "hugepages-2Mi": "0",
+          "memory": "19615096Ki",
+          "pods": "110"
+        },
+        "allocatable": {
+          "cpu": "8",
+          "ephemeral-storage": "263174212Ki",
+          "hugepages-2Mi": "0",
+          "memory": "19615096Ki",
+          "pods": "110"
+        }
+      }
+    },
+    {
+      "metadata": {
+        "name": "vk-test",
+        "selfLink": "/api/v1/nodes/vk-test",
+        "resourceVersion": "000000",
+        "labels": {
+          "type": "virtual-node"
+        },
+        "annotations": {
+          "kubeadm.alpha.kubernetes.io/cri-socket": "/run/containerd/containerd.sock",
+          "node.alpha.kubernetes.io/ttl": "0",
+          "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+        }
+      },
+      "spec": {
+        "podCIDR": "10.244.0.0/24",
+        "podCIDRs": [
+          "10.244.0.0/24"
+        ]
+      },
+      "status": {
+        "capacity": {
+          "cpu": "8",
+          "ephemeral-storage": "263174212Ki",
+          "hugepages-2Mi": "0",
+          "memory": "19615096Ki",
+          "pods": "110"
+        },
+        "allocatable": {
+          "cpu": "8",
+          "ephemeral-storage": "263174212Ki",
+          "hugepages-2Mi": "0",
+          "memory": "19615096Ki",
+          "pods": "110"
+        }
+      }
+    }
+  ]
+}

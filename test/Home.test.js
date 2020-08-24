@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { mockCRDAndViewsExtended } from './RTLUtils';
+import { metricsPODs, mockCRDAndViewsExtended } from './RTLUtils';
 import { render, screen } from '@testing-library/react';
 import ApiManager from '../src/services/__mocks__/ApiManager';
 import { MemoryRouter } from 'react-router-dom';
@@ -11,6 +11,10 @@ import FCMockResponse from '../__mocks__/foreigncluster.json';
 import AdvMockResponse from '../__mocks__/advertisement.json';
 import PRMockResponse from '../__mocks__/peeringrequest.json';
 import Error404 from '../__mocks__/404.json';
+import NodesMockResponse from '../__mocks__/nodes.json';
+import Error409 from '../__mocks__/409.json';
+import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
+import PodsMockResponse from '../__mocks__/pods.json';
 
 fetchMock.enableMocks();
 
@@ -39,6 +43,14 @@ function mocks(){
       return Promise.resolve(new Response(JSON.stringify({body: PRMockResponse})));
     } else if (url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
       return Promise.reject(Error404.body);
+    } else if (url === 'http://localhost:3001/nodes') {
+        return Promise.resolve(new Response(JSON.stringify(NodesMockResponse)));
+    } else if (url === 'http://localhost:3001/metrics/nodes') {
+        return Promise.resolve(new Response(JSON.stringify({body: NodesMetricsMockResponse})));
+    } else if (url === 'http://localhost:3001/pod') {
+      return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+    } else {
+      return metricsPODs({req: url});
     }
   })
 }

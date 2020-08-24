@@ -431,7 +431,19 @@ export default class ApiManager {
 
   /** gets all the pods */
   getPODs(namespace){
-    return fetch('http://localhost:3001/pod/').then(res => res.json());
+    return fetch('http://localhost:3001/pod').then(res => res.json());
+  }
+
+  getNodes(){
+    return fetch('http://localhost:3001/nodes').then(res => res.json());
+  }
+
+  getMetricsPOD(namespace, name){
+    return fetch('http://localhost:3001/metrics/pods/' + name).then(res => res.json());
+  }
+
+  getMetricsNodes(){
+    return fetch('http://localhost:3001/metrics/nodes').then(res => res.json());
   }
 
 }

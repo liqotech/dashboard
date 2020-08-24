@@ -3,7 +3,7 @@ import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import ClusterConfigMockResponse from '../__mocks__/configs.json';
 import { render, screen } from '@testing-library/react';
 import Error409 from '../__mocks__/409.json';
-import { loginTest } from './RTLUtils';
+import { loginTest, metricsPODs } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import FCMockResponse from '../__mocks__/foreigncluster.json';
 import AdvMockResponse from '../__mocks__/advertisement.json';
@@ -12,6 +12,10 @@ import ApiManager from '../src/services/__mocks__/ApiManager';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import ConfigView from '../src/views/ConfigView';
+import NodesMockResponse from '../__mocks__/nodes.json';
+import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
+import ConfigMockResponse from '../__mocks__/configs.json';
+import PodsMockResponse from '../__mocks__/pods.json';
 
 function mocks(error, get){
   fetch.mockResponse(req => {
@@ -42,6 +46,14 @@ function mocks(error, get){
           return Promise.resolve(new Response(JSON.stringify({ body: ClusterConfigMockResponseMod })))
         }
       }
+    } else if (req.url === 'http://localhost:3001/nodes') {
+      return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+    } else if (req.url === 'http://localhost:3001/metrics/nodes') {
+      return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+    } else if (req.url === 'http://localhost:3001/pod') {
+      return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+    } else {
+      return metricsPODs(req);
     }
   })
 }

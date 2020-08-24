@@ -15,6 +15,8 @@ import ConfigMockResponse from '../__mocks__/configs.json';
 import CRDmockEmpty from '../__mocks__/crd_fetch.json';
 import Error409 from '../__mocks__/409.json';
 import PodsMockResponse from '../__mocks__/pods.json';
+import NodesMockResponse from '../__mocks__/nodes.json';
+import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 
 fetchMock.enableMocks();
 
@@ -68,8 +70,12 @@ function mocks(advertisement, foreignCluster, peeringRequest, error) {
       return Promise.resolve(new Response(JSON.stringify({ body: peeringRequest })));
     } else if (req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
       return Promise.resolve(new Response(JSON.stringify({ body: ConfigMockResponse })));
-    } else if (req.url === 'http://localhost:3001/pod/') {
+    } else if (req.url === 'http://localhost:3001/pod') {
       return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+    } else if (req.url === 'http://localhost:3001/nodes') {
+      return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+    } else if (req.url === 'http://localhost:3001/metrics/nodes') {
+      return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
     }
   })
 }
