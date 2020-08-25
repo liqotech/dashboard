@@ -45,8 +45,8 @@
     },
     {
       "metadata": {
-        "name": "vk-test",
-        "selfLink": "/api/v1/nodes/vk-test",
+        "name": "liqo-test",
+        "selfLink": "/api/v1/nodes/liqo-test",
         "resourceVersion": "000000",
         "labels": {
           "type": "virtual-node"
@@ -65,18 +65,18 @@
       },
       "status": {
         "capacity": {
-          "cpu": "8",
+          "cpu": "1689m",
           "ephemeral-storage": "263174212Ki",
           "hugepages-2Mi": "0",
-          "memory": "19615096Ki",
-          "pods": "110"
+          "memory": "5200947609",
+          "pods": "33"
         },
         "allocatable": {
-          "cpu": "8",
+          "cpu": "1689m",
           "ephemeral-storage": "263174212Ki",
           "hugepages-2Mi": "0",
-          "memory": "19615096Ki",
-          "pods": "110"
+          "memory": "5200947609",
+          "pods": "33"
         }
       }
     }

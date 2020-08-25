@@ -89,7 +89,7 @@ async function OKCheck() {
 
   let home = await screen.findAllByText('Home');
 
-  userEvent.click(home[0]);
+  userEvent.click(home[1]);
 
   expect(await screen.findByText(/POD/i)).toBeInTheDocument();
 }
