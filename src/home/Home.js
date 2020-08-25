@@ -128,9 +128,6 @@ class Home extends Component {
 
       }).catch(error => {
         console.log(error);
-        this.setState({
-          loading: false
-        })
       })
     } else {
       this.setState({

@@ -88,3 +88,10 @@ export function updatePeeringStatus(_this, messageOK, messageError) {
       _this.setState({loading: false});
     });
 }
+
+export function addZero(i) {
+  if (i < 10) {
+    i = "0" + i;
+  }
+  return i;
+}
