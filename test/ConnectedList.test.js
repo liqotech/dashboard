@@ -21,6 +21,7 @@ import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 fetchMock.enableMocks();
 
 let api;
+let counter = 0;
 
 async function setup() {
   api = new ApiManager();
@@ -33,7 +34,7 @@ async function setup() {
   });
 }
 
-function mocks(advertisement, foreignCluster, peeringRequest, error, errorPod, errorNodes) {
+function mocks(advertisement, foreignCluster, peeringRequest, error, errorPod, errorNodes, addPod) {
   fetch.mockResponse((req) => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
       return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
@@ -61,7 +62,18 @@ function mocks(advertisement, foreignCluster, peeringRequest, error, errorPod, e
     } else if (req.url === 'http://localhost:3001/pod') {
       if(errorPod)
         return Promise.reject(Error409.body);
-      else
+      else if(addPod){
+        if(counter === 0) {
+          counter++;
+          return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+        } else {
+          let pods = PodsMockResponse;
+          let pod = JSON.parse(JSON.stringify(pods.items[2]));
+          pod.metadata.name = 'hello-world-deployment-6756549f5-x66v8'
+          pods.items.push(pod);
+          return Promise.resolve(new Response(JSON.stringify({body: pods})));
+        }
+      } else
         return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
     } else if (req.url === 'http://localhost:3001/nodes') {
       if(errorNodes)
@@ -90,6 +102,31 @@ describe('ConnectedList', () => {
     await OKCheck();
   });
 
+  test('Pods are refreshed every 30 seconds', async () => {
+    mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, false, false, true);
+
+    await OKCheck();
+
+    await new Promise((r) => setTimeout(r, 31000));
+
+    userEvent.click(screen.getByLabelText('ellipsis'));
+
+    expect(screen.getByLabelText('snippets')).toBeInTheDocument();
+
+    userEvent.click(screen.getByLabelText('snippets'));
+
+    expect(await screen.findByText('General')).toBeInTheDocument();
+
+    let home = await screen.findAllByText('Home');
+
+    userEvent.click(home[1]);
+
+    expect(await screen.findByText(/POD/i)).toBeInTheDocument();
+
+    expect(await screen.findAllByText(/hello-world/i)).toHaveLength(4);
+
+  }, 35000)
+
   test('Disconnection error from dropdown show', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
 
@@ -97,7 +134,7 @@ describe('ConnectedList', () => {
 
     userEvent.click(screen.getByLabelText('ellipsis'));
 
-    await screen.getByLabelText('snippets');
+    expect(screen.getByLabelText('snippets')).toBeInTheDocument();
 
     const disconnect = await screen.findAllByLabelText('close');
 

@@ -42,7 +42,8 @@ export function metricsPODs(req, error){
     return Promise.resolve(new Response(JSON.stringify(PodsMetricsMockResponse.podMetrics[1])));
   } else if (req.url === 'http://localhost:3001/metrics/pods/hello-world-deployment-6756549f5-c7sx8') {
     return Promise.resolve(new Response(JSON.stringify(PodsMetricsMockResponse.podMetrics[2])));
-  }
+  } else
+    return Promise.resolve(new Response(JSON.stringify(PodsMetricsMockResponse.podMetrics[3])));
 }
 
 export function generalHomeGET(url) {
