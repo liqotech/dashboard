@@ -128,7 +128,7 @@ describe('DesignEditorCRD', () => {
     await fillFields(true);
 
     expect(await screen.findByText(/Please/i));
-  })
+  }, 30000)
 
   test('Definition of a new template works', async () => {
     await setup_resource();
@@ -150,7 +150,6 @@ describe('DesignEditorCRD', () => {
     expect(await screen.findByText('CRD modified')).toBeInTheDocument();
 
     await userEvent.click(await screen.findByText('test-1'));
-
   }, 30000)
 
   test('Default template overrides old template', async () => {

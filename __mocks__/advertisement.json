@@ -223,7 +223,7 @@
         "resourceQuota": {
           "hard": {
             "cpu": "2145m",
-            "memory": "5965988659",
+            "memory": "5665988659",
             "pods": "33"
           }
         }
@@ -238,7 +238,7 @@
         },
         "vkCreated": true,
         "vkReference": {
-          "name": "vk-test"
+          "name": "liqo-test"
         }
       }
     }

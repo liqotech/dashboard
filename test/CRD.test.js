@@ -381,7 +381,7 @@ describe('CRD', () => {
     userEvent.click(no);
 
     api = null;
-  })
+  }, 30000)
 
   test('CRD template error', async () => {
     await setup_only_CRD(true, true);

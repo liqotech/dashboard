@@ -10,17 +10,18 @@ import Home from '../src/home/Home';
 import FCMockResponse from '../__mocks__/foreigncluster_noJoin.json';
 import FCMockResponseJoin from '../__mocks__/foreigncluster.json';
 import FCMockResponseNoIn from '../__mocks__/foreigncluster_noIncoming.json';
-import FCMockResponseNoOut from '../__mocks__/foreigncluster_noOutgoing.json';
 import PRMockResponse from '../__mocks__/peeringrequest.json';
 import AdvMockResponse from '../__mocks__/advertisement.json';
 import SDMockResponse from '../__mocks__/searchdomain.json';
 import AdvMockResponseRefused from '../__mocks__/advertisement_refused.json';
 import AdvMockResponseNotAccepted from '../__mocks__/advertisement_notAccepted.json';
-import AdvMockResponseNoStatus from '../__mocks__/advertisement_noStatus.json';
 import ConfigMockResponse from '../__mocks__/configs.json';
 import CRDmockEmpty from '../__mocks__/crd_fetch.json';
 import Error409 from '../__mocks__/409.json';
 import PodsMockResponse from '../__mocks__/pods.json';
+import NodesMockResponse from '../__mocks__/nodes.json';
+import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
+import { metricsPODs } from './RTLUtils';
 
 fetchMock.enableMocks();
 
@@ -73,8 +74,14 @@ function mocks(advertisement, foreignCluster, peeringRequest, error) {
       return Promise.resolve(new Response(JSON.stringify({ body: peeringRequest })));
     } else if (req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
       return Promise.resolve(new Response(JSON.stringify({ body: ConfigMockResponse })));
-    } else if (req.url === 'http://localhost:3001/pod/') {
+    } else if (req.url === 'http://localhost:3001/pod') {
       return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+    } else if (req.url === 'http://localhost:3001/nodes') {
+      return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+    } else if (req.url === 'http://localhost:3001/metrics/nodes') {
+      return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+    } else {
+      return metricsPODs(req);
     }
   })
 }
@@ -104,6 +111,14 @@ async function addPeer() {
 describe('AvailablePeer', () => {
   test('List of available peers shows', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
+
+    await OKCheck();
+
+    userEvent.click(screen.getByLabelText('dropdown-available'));
+  })
+
+  test('List of available peers shows (with refused adv)', async () => {
+    mocks(AdvMockResponseRefused, FCMockResponseJoin, {items: []});
 
     await OKCheck();
 
@@ -158,8 +173,6 @@ describe('AvailablePeer', () => {
     await OKCheck();
 
     userEvent.click(screen.getByLabelText('ellipsis'));
-
-    screen.debug(await screen.findByLabelText('link'));
 
     userEvent.click(await screen.findByLabelText('link'));
 

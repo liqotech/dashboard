@@ -74,7 +74,7 @@
         "dnsPolicy": "ClusterFirst",
         "serviceAccountName": "default",
         "serviceAccount": "default",
-        "nodeName": "vk-test",
+        "nodeName": "liqo-test",
         "securityContext": {
 
         },
@@ -119,7 +119,7 @@
         },
         "annotations": {
           "home_creationTimestamp": "2020-08-18 14:48:22 +0000 UTC",
-          "home_nodename": "vk-4317f039-e7b8-40d2-ae20-18d1c47e69f0",
+          "home_nodename": "liqo-4317f039-e7b8-40d2-ae20-18d1c47e69f0",
           "home_resourceVersion": "13731",
           "home_uuid": "e1dce48a-60b0-4368-8d83-d2d2b9589cd1"
         }
@@ -230,7 +230,7 @@
         },
         "annotations": {
           "home_creationTimestamp": "2020-08-18 14:48:22 +0000 UTC",
-          "home_nodename": "vk-4317f039-e7b8-40d2-ae20-18d1c47e69f0",
+          "home_nodename": "liqo-4317f039-e7b8-40d2-ae20-18d1c47e69f0",
           "home_resourceVersion": "13728",
           "home_uuid": "16bc4174-b9d1-4fff-a994-bcba1aabfd24"
         }

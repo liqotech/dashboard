@@ -18,6 +18,7 @@ export default class ApiManager {
     if (window.APISERVER_URL === undefined) {
       window.APISERVER_URL = APISERVER_URL;
     }
+    this.user = user;
     this.kcc = new Config(window.APISERVER_URL, user.id_token, user.token_type);
     this.apiExt = this.kcc.makeApiClient(ApiextensionsV1beta1Api);
     this.apiCRD = this.kcc.makeApiClient(CustomObjectsApi);
@@ -578,6 +579,43 @@ export default class ApiManager {
   /** gets all the pods with namespace (if specified) */
   getPODs(namespace){
     return this.apiCore.listPodForAllNamespaces(null, namespace ? 'metadata.namespace=' + namespace : null);
+  }
+
+  /** gets the list of all the nodes in cluster */
+  getNodes(){
+    return this.apiCore.listNode();
+  }
+
+  /** gets the metrics of pods for a specific namespace */
+  getMetricsPOD(namespace, name){
+    let url = window.APISERVER_URL + '/apis/metrics.k8s.io/v1beta1/namespaces/' + namespace + '/pods/' + name;
+
+    let headers = new Headers();
+    headers.append("Authorization", "Bearer " + this.user.id_token);
+
+    let requestOptions = {
+      method: 'GET',
+      headers: headers,
+      redirect: 'follow'
+    };
+
+    return fetch(url, requestOptions).then(res => res.json());
+  }
+
+  /** gets the metrics of all the nodes on the cluster */
+  getMetricsNodes(){
+    let url = window.APISERVER_URL + '/apis/metrics.k8s.io/v1beta1/nodes'
+
+    let headers = new Headers();
+    headers.append("Authorization", "Bearer " + this.user.id_token);
+
+    let requestOptions = {
+      method: 'GET',
+      headers: headers,
+      redirect: 'follow'
+    };
+
+    return fetch(url, requestOptions).then(res => res.json());
   }
 
 }

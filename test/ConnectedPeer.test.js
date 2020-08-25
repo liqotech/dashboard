@@ -19,6 +19,9 @@ import ConfigMockResponse from '../__mocks__/configs.json';
 import CRDmockEmpty from '../__mocks__/crd_fetch.json';
 import Error409 from '../__mocks__/409.json';
 import PodsMockResponse from '../__mocks__/pods.json';
+import NodesMockResponse from '../__mocks__/nodes.json';
+import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
+import { metricsPODs } from './RTLUtils';
 
 fetchMock.enableMocks();
 
@@ -35,7 +38,7 @@ async function setup() {
   });
 }
 
-function mocks(advertisement, foreignCluster, peeringRequest, error) {
+function mocks(advertisement, foreignCluster, peeringRequest, error, errorMetrics) {
   fetch.mockResponse((req) => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
       return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
@@ -60,8 +63,14 @@ function mocks(advertisement, foreignCluster, peeringRequest, error) {
       return Promise.resolve(new Response(JSON.stringify({ body: peeringRequest })));
     } else if (req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
       return Promise.resolve(new Response(JSON.stringify({ body: ConfigMockResponse })));
-    } else if (req.url === 'http://localhost:3001/pod/') {
+    } else if (req.url === 'http://localhost:3001/pod') {
       return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+    }  else if (req.url === 'http://localhost:3001/nodes') {
+      return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+    } else if (req.url === 'http://localhost:3001/metrics/nodes') {
+      return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+    } else {
+      return metricsPODs(req, errorMetrics);
     }
   })
 }
@@ -78,7 +87,11 @@ describe('ConnectedPeer', () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
 
     await OKCheck();
-  })
+
+    await new Promise((r) => setTimeout(r, 31000));
+
+    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+  }, 35000)
 
   test('List of connected peers shows not incoming', async () => {
     mocks(AdvMockResponse, FCMockResponseNoIn, PRMockResponse);
@@ -115,6 +128,12 @@ describe('ConnectedPeer', () => {
 
   test('Advertisement is refused', async () => {
     mocks(AdvMockResponseRefused, FCMockResponse, PRMockResponse);
+
+    await OKCheck();
+  })
+
+  test('Error on pod metrics', async () => {
+    mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, true);
 
     await OKCheck();
   })

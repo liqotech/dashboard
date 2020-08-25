@@ -50,7 +50,7 @@ describe('Header', () => {
     await loginTest();
 
     expect(await screen.findByLabelText('notification')).toBeInTheDocument();
-    expect(await screen.findByLabelText('question-circle')).toBeInTheDocument();
+    expect(await screen.findAllByLabelText('question-circle')).toHaveLength(1);
     expect(await screen.findByLabelText('logout')).toBeInTheDocument();
     const CRDInput = await screen.findAllByRole('combobox');
     expect(CRDInput[0]).toHaveAttribute('placeholder', 'input CRD');

@@ -13,7 +13,7 @@ import Error409 from '../__mocks__/409.json';
 
 fetchMock.enableMocks();
 
-function mockFetch() {
+function mockFetch(error) {
   fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
       return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))

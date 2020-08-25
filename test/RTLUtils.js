@@ -21,6 +21,9 @@ import ConfigMockResponseUpdated from '../__mocks__/configs_updated.json';
 import PodsMockResponse from '../__mocks__/pods.json';
 import Error409 from '../__mocks__/409.json';
 import Error404 from '../__mocks__/404.json';
+import NodesMockResponse from '../__mocks__/nodes.json';
+import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json'
+import PodsMetricsMockResponse from '../__mocks__/pods_metrics.json';
 
 export function setup_login() {
   return render(
@@ -28,6 +31,18 @@ export function setup_login() {
       <App />
     </MemoryRouter>
   );
+}
+
+export function metricsPODs(req, error){
+  if(error){
+    return Promise.reject(Error409.body);
+  } else if (req.url === 'http://localhost:3001/metrics/pods/hello-world-deployment-6756549f5-x66v9') {
+    return Promise.resolve(new Response(JSON.stringify(PodsMetricsMockResponse.podMetrics[0])));
+  } else if (req.url === 'http://localhost:3001/metrics/pods/hello-world-deployment-6756549f5-c7qzv') {
+    return Promise.resolve(new Response(JSON.stringify(PodsMetricsMockResponse.podMetrics[1])));
+  } else if (req.url === 'http://localhost:3001/metrics/pods/hello-world-deployment-6756549f5-c7sx8') {
+    return Promise.resolve(new Response(JSON.stringify(PodsMetricsMockResponse.podMetrics[2])));
+  }
 }
 
 export function generalHomeGET(url) {
@@ -39,8 +54,14 @@ export function generalHomeGET(url) {
     return Promise.resolve(new Response(JSON.stringify({body: PRMockResponse})));
   } else if (url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
     return Promise.resolve(new Response(JSON.stringify({body: ConfigMockResponse})));
-  } else if (url === 'http://localhost:3001/pod/') {
+  } else if (url === 'http://localhost:3001/pod') {
     return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+  } else if (url === 'http://localhost:3001/nodes') {
+    return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+  } else if (url === 'http://localhost:3001/metrics/nodes') {
+    return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+  } else {
+    return metricsPODs({url : url});
   }
 }
 
@@ -107,8 +128,14 @@ export function mockCRDAndViewsExtended(error, method, crd, view) {
     } else if (req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
       return responseManager(req, error, method, crd, 'clusterconfigs',
         ConfigMockResponse, null, ConfigMockResponseUpdated);
-    } else if (req.url === 'http://localhost:3001/pod/') {
+    } else if (req.url === 'http://localhost:3001/pod') {
       return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+    } else if (req.url === 'http://localhost:3001/nodes') {
+      return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+    } else if (req.url === 'http://localhost:3001/metrics/nodes') {
+      return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+    } else {
+      return metricsPODs(req);
     }
   })
 }

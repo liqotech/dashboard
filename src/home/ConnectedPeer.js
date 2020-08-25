@@ -1,9 +1,5 @@
 import React, { Component } from 'react';
-import {
-  Col,
-  Avatar, Collapse, Dropdown, Menu, Typography,
-  Progress, Row, Space, Tag, Tooltip, Button
-} from 'antd';
+import { Avatar, Button, Col, Collapse, Dropdown, Menu, Progress, Row, Space, Tag, Tooltip, Typography } from 'antd';
 import ToolOutlined from '@ant-design/icons/lib/icons/ToolOutlined';
 import EllipsisOutlined from '@ant-design/icons/lib/icons/EllipsisOutlined';
 import SnippetsOutlined from '@ant-design/icons/lib/icons/SnippetsOutlined';
@@ -30,12 +26,165 @@ class ConnectedPeer extends Component {
       loading: false,
       backgroundColor: 'white',
       showProperties: false,
-      outgoingPods: [],
       incomingPods: [],
-      showDetails: false
+      incomingPodsPercentage: [],
+      incomingTotalPercentage: {
+        CPU: 0,
+        RAM: 0
+      },
+      outgoingPods: [],
+      outgoingPodsPercentage: [],
+      outgoingTotalPercentage: {
+        CPU: 0,
+        RAM: 0
+      },
+      showDetails: false,
+      sharing: false
     }
 
+    this.flagOut = false;
+    this.flagInc = false;
+
+    /**
+     * Every 30 seconds the metrics are retrieved and the view updated
+     */
+    this.interval = setInterval( () => {
+      console.log('hello')
+      this.updatePODPercentage();
+    }, 30000);
+
     this.disconnect = this.disconnect.bind(this);
+  }
+
+  getPODPercentage(po, res){
+    let allocatableCPU = 0;
+    let allocatableRAM = 0;
+    let usedCPU = 0;
+    let usedRAM = 0;
+    po.spec.containers.forEach(co => {
+      allocatableCPU += parseInt(co.resources.requests.cpu);
+      allocatableRAM += parseInt(co.resources.requests.memory);
+    })
+    res.containers.forEach(co => {
+      usedCPU += parseInt(co.usage.cpu);
+      usedRAM += parseInt(co.usage.memory)/1024;
+    })
+
+    return {
+      name: po.metadata.name,
+      CPU: Math.round(((usedCPU / allocatableCPU) * 100) * 10) / 10,
+      RAM: Math.round(((usedRAM / allocatableRAM) * 100) * 10) / 10,
+      RAMmi: Math.round(usedRAM * 10) / 10,
+      CPUmi: Math.round(usedCPU * 10) / 10
+    }
+  }
+
+  /** */
+  updatePODPercentage(){
+
+    if(this.props.server){
+      let home_podsPercentage = [];
+      let home_totalMemory = 0;
+      let home_totalCPU = 0;
+      let home_totalPodsRAM = 0;
+      let home_totalPodsCPU = 0;
+      let home_counter = 0;
+      this.props.homeNodes.forEach(no => {
+        home_totalMemory += parseInt(no.status.allocatable.memory);
+        home_totalCPU += parseInt(no.status.allocatable.cpu);
+      })
+      this.state.incomingPods.forEach(po => {
+        this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
+          .then(res => {
+            home_counter++;
+
+            let podPercentage = this.getPODPercentage(po, res);
+
+            home_podsPercentage.push(podPercentage);
+
+            home_totalPodsRAM += podPercentage.RAMmi * 1024;
+            home_totalPodsCPU += podPercentage.CPUmi * 1024;
+
+            let totalRAMPercentage = home_totalPodsRAM / (home_totalMemory * this.props.config.spec.advertisementConfig.resourceSharingPercentage / 100) * 100;
+            let totalCPUPercentage = home_totalPodsCPU / (home_totalCPU * this.props.config.spec.advertisementConfig.resourceSharingPercentage / 100) * 100;
+
+            if(home_counter === this.state.incomingPods.length){
+              this.setState({
+                  incomingPodsPercentage: home_podsPercentage,
+                  incomingTotalPercentage: {
+                    RAM: Math.round(totalRAMPercentage * 10) / 10,
+                    CPU: Math.round(totalCPUPercentage * 10) / 10
+                  }
+                }, this.props.updateFCMetrics(true, {
+                  fc: this.props.foreignCluster.spec.clusterID,
+                  RAM: home_totalPodsRAM,
+                  CPU: home_totalPodsCPU
+                })
+              )
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          })
+      })
+    }
+
+    if(this.props.client){
+      let foreign_podsPercentage = [];
+      let foreign_totalMemory = 0;
+      let foreign_totalCPU = 0;
+      let foreign_totalPodsRAM = 0;
+      let foreign_totalPodsCPU = 0;
+      let foreign_counter = 0;
+
+      let adv = this.props.advertisements.find(adv =>
+        {return adv.metadata.name === this.props.foreignCluster.status.outgoing.advertisement.name}
+      );
+
+      foreign_totalMemory = adv.spec.resourceQuota.hard.memory;
+      foreign_totalCPU = adv.spec.resourceQuota.hard.cpu;
+
+      this.state.outgoingPods.forEach(po => {
+        this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
+          .then(res => {
+            foreign_counter++;
+
+            let podPercentage = this.getPODPercentage(po, res);
+
+            foreign_podsPercentage.push(podPercentage);
+
+            foreign_totalPodsRAM += podPercentage.RAMmi * 1024;
+            foreign_totalPodsCPU += podPercentage.CPUmi * 1024;
+
+            let totalRAMPercentage = foreign_totalPodsRAM / adv.spec.resourceQuota.hard.memory * 100;
+            let totalCPUPercentage = foreign_totalPodsCPU / adv.spec.resourceQuota.hard.cpu * 100;
+
+            if(foreign_counter === this.state.outgoingPods.length){
+              this.setState({
+                  outgoingPodsPercentage: foreign_podsPercentage,
+                  outgoingTotalPercentage: {
+                    RAM: Math.round(totalRAMPercentage * 10) / 10,
+                    CPU: Math.round(totalCPUPercentage * 10) / 10
+                  }
+                }, this.props.updateFCMetrics(false, {
+                  fc: this.props.foreignCluster.spec.clusterID,
+                  RAM: foreign_totalPodsRAM,
+                  CPU: foreign_totalPodsCPU
+                })
+              )
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          })
+      })
+    }
+  }
+
+  checkFlag(flag){
+    if(!flag)
+      this.updatePODPercentage();
+    return true;
   }
 
   /**
@@ -45,35 +194,34 @@ class ConnectedPeer extends Component {
     let vk = this.props.advertisements.find(adv =>
       {return adv.metadata.name === this.props.foreignCluster.status.outgoing.advertisement.name}
     ).status.vkReference.name;
+
     this.state.outgoingPods = this.props.outgoingPods.filter(po => { return po.spec.nodeName === vk });
+    if(this.state.outgoingPods.length !== 0) this.state.sharing= true;
+    this.flagOut = this.checkFlag(this.flagOut);
   }
 
   /**
    * Search for pods offloaded to the home cluster from a foreign one
    */
   getServerPODs(){
-    let vk = 'vk-' + this.props.foreignCluster.status.outgoing["remote-peering-request-name"];
+    let vk = 'liqo-' + this.props.foreignCluster.status.outgoing["remote-peering-request-name"];
     this.state.incomingPods = this.props.incomingPods.filter(po => {
-        try {
-          return po.metadata.annotations.home_nodename === vk
-        }catch{return false}
-      })
+      try {
+        return po.metadata.annotations.home_nodename === vk
+      } catch {
+        return false
+      }
+    })
+    if(this.state.incomingPods.length !== 0) this.state.sharing= true;
+    this.flagInc = this.checkFlag(this.flagInc);
   }
 
   clientPercentage() {
-    //TODO: retrieve client consumption percentage
-    return 50;
+    return this.state.outgoingTotalPercentage.RAM;
   }
 
   serverPercentage() {
-    //TODO: retrieve server consumption percentage
-    return 90;
-  }
-
-  /** If there are pods offloaded, then there's sharing */
-  checkSharing() {
-    if(this.state.incomingPods.length !== 0 || this.state.outgoingPods.length !== 0 )
-      return true;
+    return this.state.incomingTotalPercentage.RAM;
   }
 
   /** Disconnect from peer (it makes foreignCluster's spec join parameter false) */
@@ -83,6 +231,10 @@ class ConnectedPeer extends Component {
     updatePeeringStatus(this,
       'Disconnected from ' + this.props.foreignCluster.metadata.name,
       'Could not disconnect');
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   render(){
@@ -127,9 +279,6 @@ class ConnectedPeer extends Component {
     if(this.props.server)
       serverPercent = this.serverPercentage();
 
-    /** If there is resource sharing in general */
-    let sharing = this.checkSharing();
-
     return(
       <div style={{ paddingTop: '1em', paddingBottom: '1em' }}>
         <Collapse accordion bordered={false}
@@ -154,12 +303,12 @@ class ConnectedPeer extends Component {
                       type="circle"
                       percent={serverPercent}
                       strokeWidth={10}
-                      trailColor={(this.props.server && sharing) ? null : this.state.backgroundColor}
-                      strokeColor={(this.props.server && sharing) ? getColor(serverPercent) : this.state.backgroundColor}
+                      trailColor={(this.props.server &&  this.state.sharing) ? null : this.state.backgroundColor}
+                      strokeColor={(this.props.server && this.state.sharing) ? getColor(serverPercent) : this.state.backgroundColor}
                       format={() => (
                         <Avatar
                           size="large"
-                          style={sharing ? { backgroundColor: '#1890ff' } : { backgroundColor: '#ccc' }}
+                          style={this.state.sharing ? { backgroundColor: '#1890ff' } : { backgroundColor: '#ccc' }}
                           icon={<UserOutlined />}
                         />
                       )}
@@ -177,12 +326,12 @@ class ConnectedPeer extends Component {
                       type="circle"
                       percent={clientPercent}
                       strokeWidth={10}
-                      trailColor={(this.props.client && sharing) ? null : this.state.backgroundColor}
-                      strokeColor={(this.props.client && sharing) ? getColor(clientPercent) : this.state.backgroundColor}
+                      trailColor={(this.props.client &&   this.state.sharing) ? null : this.state.backgroundColor}
+                      strokeColor={(this.props.client &&  this.state.sharing) ? getColor(clientPercent) : this.state.backgroundColor}
                       format={() => (
                         <Avatar
                           size="large"
-                          style={sharing ? { backgroundColor: '#1890ff' } : { backgroundColor: '#ccc' }}
+                          style={this.state.sharing ? { backgroundColor: '#1890ff' } : { backgroundColor: '#ccc' }}
                           icon={<ClusterOutlined />}
                         />
                       )}
@@ -211,7 +360,7 @@ class ConnectedPeer extends Component {
                 <Col flex={2}>
                   <Typography.Text type={'secondary'}>
                     { 'Connected on ' + this.props.foreignCluster.spec.discoveryType}
-                    { sharing ? ', sharing' : ', not sharing'}
+                    {  this.state.sharing ? ', sharing' : ', not sharing'}
                   </Typography.Text>
                 </Col>
                 <Col flex={3}>
@@ -235,7 +384,12 @@ class ConnectedPeer extends Component {
         {getPeerProperties(this.props.client, this.props.server, this)}
 
         { /** This modal shows the detail of the connection */ }
-        <ConnectionDetails {...this.props} _this={this}/>
+        <ConnectionDetails {...this.props} _this={this}
+                           outgoingPodsPercentage={this.state.outgoingPodsPercentage}
+                           incomingPodsPercentage={this.state.incomingPodsPercentage}
+                           outgoingTotalPercentage={this.state.outgoingTotalPercentage}
+                           incomingTotalPercentage={this.state.incomingTotalPercentage}
+        />
 
       </div>
     )
