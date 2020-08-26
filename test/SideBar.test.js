@@ -13,7 +13,7 @@ describe('Sidebar', () => {
     mockCRDAndViewsExtended();
     await loginTest();
 
-    expect(await screen.findAllByText(/Home/i)).toHaveLength(1);
+    expect(await screen.findAllByText(/Home/i)).toHaveLength(2);
 
     expect(await screen.findByText(/custom/i)).toBeInTheDocument();
 

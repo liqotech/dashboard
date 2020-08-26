@@ -50,7 +50,7 @@ function mocks(){
     } else if (url === 'http://localhost:3001/pod') {
       return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
     } else {
-      return metricsPODs({req: url});
+      return metricsPODs({url: url});
     }
   })
 }
@@ -111,6 +111,6 @@ describe('Home', () => {
     mocks();
     await setup();
 
-    expect(await screen.findByText('LIQO')).toBeInTheDocument();
+    expect(await screen.queryByText('LIQO')).not.toBeInTheDocument();
   })
 })

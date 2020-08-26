@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
@@ -8,6 +8,9 @@ import CRDmockResponse from '../__mocks__/crd_fetch_long.json';
 import CRDmockEmpty from '../__mocks__/crd_empty.json';
 import ViewMockResponse from '../__mocks__/views.json';
 import CRDMockResponseShort from '../__mocks__/crd_fetch.json';
+import ApiManager from '../src/services/__mocks__/ApiManager';
+import { MemoryRouter } from 'react-router-dom';
+import CRDList from '../src/CRD/CRDList';
 
 fetchMock.enableMocks();
 
@@ -77,18 +80,21 @@ describe('CRD List', () => {
         return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
       } else if (url === 'http://localhost:3001/clustercustomobject/views') {
         return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-      } else {
-        return generalHomeGET(url);
       }
     })
 
-    await loginTest();
+    let api = new ApiManager();
+    await api.getCRDs().then(async () => {
 
-    const customview = screen.getByText('Custom Resources');
-    userEvent.click(customview);
+      render(
+        <MemoryRouter>
+          <CRDList api={api} />
+        </MemoryRouter>
+      )
+    });
 
-    expect(screen.queryByLabelText('crd')).not.toBeInTheDocument();
+    expect(await screen.queryByLabelText('crd')).not.toBeInTheDocument();
 
-    expect(screen.getByText(/found/i)).toBeInTheDocument();
+    expect(await screen.getByText(/found/i)).toBeInTheDocument();
   })
 })

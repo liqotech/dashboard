@@ -49,7 +49,6 @@ class ConnectedPeer extends Component {
      * Every 30 seconds the metrics are retrieved and the view updated
      */
     this.interval = setInterval( () => {
-      console.log('hello')
       this.updatePODPercentage();
     }, 30000);
 

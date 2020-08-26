@@ -50,6 +50,23 @@
           }
         }
       ]
+    },
+    {
+      "kind": "PodMetrics",
+      "apiVersion": "metrics.k8s.io/v1beta1",
+      "metadata": {
+        "name": "hello-world-deployment-6756549f5-x66v8",
+        "namespace": "test-66b8128a-3fdf-4d78-bd8f-40b7ef860a8b"
+      },
+      "containers": [
+        {
+          "name": "hello-world",
+          "usage": {
+            "cpu": "3",
+            "memory": "7624Ki"
+          }
+        }
+      ]
     }
   ]
 }

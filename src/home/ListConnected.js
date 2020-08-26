@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Alert, Button, Divider, notification, PageHeader, Space, Switch, Tooltip, Typography } from 'antd';
+import { Alert, Button, Divider, PageHeader, Space, Tooltip, Typography } from 'antd';
 import FilterOutlined from '@ant-design/icons/lib/icons/FilterOutlined';
 import ConnectedPeer from './ConnectedPeer';
 import { checkPeeringRequest, checkAdvertisement } from './HomeUtils';
-import { APP_NAME, LIQO_LABEL_ENABLED } from '../constants';
+import { LIQO_LABEL_ENABLED } from '../constants';
 
 class ListConnected extends Component {
   constructor(props) {
@@ -13,6 +13,14 @@ class ListConnected extends Component {
       outgoingPods: [],
       incomingPods: []
     }
+
+    /**
+     * Every 30 seconds the metrics are retrieved and the view updated
+     */
+    this.interval = setInterval( () => {
+      this.getClientPODs();
+      this.getServerPODs();
+    }, 30000);
 
   }
 
@@ -28,6 +36,7 @@ class ListConnected extends Component {
         res.body.items.forEach(ns => {
           this.props.api.getPODs(ns.metadata.name)
             .then(res => {
+              //console.log(res.body.items);
               res.body.items.forEach(po => {
                 this.state.outgoingPods.push(po);
                 this.setState({outgoingPods: this.state.outgoingPods});
@@ -49,6 +58,7 @@ class ListConnected extends Component {
     this.props.api.getPODs().
     then(res => {
       let pods = res.body.items;
+      //console.log(res.body.items);
       this.setState({incomingPods: pods})
     })
     .catch(error => {
@@ -59,6 +69,10 @@ class ListConnected extends Component {
   componentDidMount() {
     this.getClientPODs();
     this.getServerPODs();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   render() {
