@@ -150,8 +150,8 @@
                 "memory": "256Mi"
               },
               "requests": {
-                "cpu": "80m",
-                "memory": "128Mi"
+                "cpu": "80000k",
+                "memory": "0.128Gi"
               }
             },
             "volumeMounts": [
@@ -261,7 +261,7 @@
                 "memory": "256Mi"
               },
               "requests": {
-                "cpu": "80m",
+                "cpu": "0.08g",
                 "memory": "128Mi"
               }
             },

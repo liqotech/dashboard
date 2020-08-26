@@ -215,7 +215,6 @@ export default class ApiManager {
             this.CVsNotifyEvent('MODIFIED', itemDC);
             return Promise.resolve(new Response(JSON.stringify(item)))
           }
-          //console.log(res)
           this.watchers.forEach(w => {
             if (w.plural === plural)
               w.callback('MODIFIED', res.body);

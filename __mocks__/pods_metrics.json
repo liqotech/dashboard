@@ -12,7 +12,7 @@
           "name": "hello-world",
           "usage": {
             "cpu": "1",
-            "memory": "5065970000Ki"
+            "memory": "5065970Ki"
           }
         }
       ]
@@ -28,7 +28,7 @@
         {
           "name": "hello-world",
           "usage": {
-            "cpu": "0",
+            "cpu": "1191721438n",
             "memory": "7624Ki"
           }
         }

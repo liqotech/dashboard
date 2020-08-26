@@ -9,6 +9,8 @@ import GlobalOutlined from '@ant-design/icons/lib/icons/GlobalOutlined';
 import { getColor } from './HomeUtils';
 import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
 
+const n = Math.pow(10, 6);
+
 class ConnectionDetails extends Component {
   constructor(props) {
     super(props);
@@ -129,7 +131,7 @@ class ConnectionDetails extends Component {
         key: 'RAM',
         render: (text, record) => {
           let podRAMmb = (role && this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name})) ?
-            this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name}).RAMmi : 0;
+            this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name}).RAMmi / n : 0;
 
           return(
             <Tooltip title={podRAMmb + 'Mi'}>
@@ -159,8 +161,6 @@ class ConnectionDetails extends Component {
       const pod = role ?
         this.props.incomingPodsPercentage.find(pod => {return po.metadata.name === pod.name}) :
         this.props.outgoingPodsPercentage.find(pod => {return po.metadata.name === pod.name})
-
-      //console.log(pod, this.state.incomingPodsPercentage, po)
 
       data.push(
         {

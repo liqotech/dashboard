@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import { Badge, Col, Collapse, Divider, PageHeader, Progress, Row, Space, Typography, Tooltip } from 'antd';
 import QuestionCircleOutlined from '@ant-design/icons/lib/icons/QuestionCircleOutlined';
-import { addZero } from './HomeUtils';
+import { addZero, convertCPU, convertRAM } from './HomeUtils';
 import LineChart from '../templates/line/LineChart';
 import Donut from '../templates/donut/Donut';
-
-const n = 1000000000;
 
 class Status extends Component {
   constructor(props) {
@@ -21,10 +19,6 @@ class Status extends Component {
         RAM: 0
       },
       consumedHome: {
-        CPU: 0,
-        RAM: 0
-      },
-      consumedForeign: {
         CPU: 0,
         RAM: 0
       },
@@ -75,23 +69,23 @@ class Status extends Component {
     let totalMemory = 0;
     let totalCPU = 0;
     nodes.forEach(no => {
-        totalMemory += parseInt(no.status.allocatable.memory);
-        totalCPU += parseInt(no.status.allocatable.cpu);
+        totalMemory += convertRAM(no.status.allocatable.memory);
+        totalCPU += convertCPU(no.status.allocatable.cpu);
     })
     if(home){
       this.setState({
         totalHome: {
           RAM: totalMemory,
-          CPU: totalCPU*n
+          CPU: totalCPU
         },
       }, this.getConsumedResources)
     } else {
       this.setState({
         totalForeign: {
-          RAM: Math.round(totalMemory/100),
-          CPU: totalCPU*1000000
+          RAM: totalMemory,
+          CPU: totalCPU
         },
-      }, this.getConsumedResources)
+      })
     }
   }
 
@@ -119,38 +113,37 @@ class Status extends Component {
    */
   getConsumedResources() {
     let consumedHome = {
-      CPU: 0,
-      RAM: 0
-    }
-
-    let consumedForeign = {
-      CPU: 0,
-      RAM: 0
+      CPU: this.state.consumedHome.CPU,
+      RAM: this.state.consumedHome.RAM
     }
 
     this.props.api.getMetricsNodes()
       .then(res => {
-        /**
-         * The virtual kubelet do not export metrics for now
-         */
-        res.items.forEach(no => {
-          /**
-           * It's assumed the nodes called liqo-<ClusterID>
-           * are the virtual nodes (so, foreign)
-           */
-          if(no.metadata.name.substring(0, 5) === 'liqo-'){
-            consumedForeign.CPU += parseInt(no.usage.cpu);
-            consumedForeign.RAM += parseInt(no.usage.memory);
-          }else{
-            consumedHome.CPU += parseInt(no.usage.cpu);
-            consumedHome.RAM += parseInt(no.usage.memory);
-          }
-        })
-
-        this.setState({consumedHome, consumedForeign});
-      })
-      .catch(error => {
-        console.log(error);
+        consumedHome.CPU = 0;
+        consumedHome.RAM = 0;
+        if(res.items.length !== 0){
+          res.items.forEach(no => {
+            consumedHome.CPU += convertCPU(no.usage.cpu);
+            consumedHome.RAM += convertRAM(no.usage.memory);
+          })
+        } else {
+          /** This means there are no metrics available */
+          this.props.api.getPODs().
+          then(res => {
+            let pods = res.body.items;
+            consumedHome.CPU = 0;
+            consumedHome.RAM = 0;
+            pods.forEach(po => {
+              po.spec.containers.forEach(co => {
+                if(co.resources.requests && co.resources.requests.cpu && co.resources.requests.memory){
+                  consumedHome.CPU += convertCPU(co.resources.requests.cpu);
+                  consumedHome.RAM += convertRAM(co.resources.requests.memory);
+                }
+              });
+            })
+          })
+        }
+        this.setState({consumedHome});
       })
   }
 
@@ -162,50 +155,77 @@ class Status extends Component {
   getPercentages(home) {
     let clusterRAMPercentage;
     let clusterCPUPercentage;
-    let totalRAMPercentage;
-    let totalCPUPercentage;
-    let totalConsumedResources = home ? this.state.consumedHome : this.state.consumedForeign;
+    let totalRAMPercentage = '';
+    let totalCPUPercentage = '';
+    let totalConsumedResources = home ? this.state.consumedHome : null;
     let totalAvailableResources = home ? this.state.totalHome : this.state.totalForeign;
     let externalMetrics = home ? this.props.incomingMetrics : this.props.outgoingMetrics;
 
     let dataRAM = [];
     let dataCPU = [];
 
-    totalRAMPercentage = parseFloat(((totalConsumedResources.RAM/totalAvailableResources.RAM)*100).toFixed(2));
-    totalCPUPercentage = parseFloat(((totalConsumedResources.CPU/totalAvailableResources.CPU)*100).toFixed(2));
+    if(home){
+      totalRAMPercentage = parseFloat(((totalConsumedResources.RAM/totalAvailableResources.RAM)*100).toFixed(2));
+      totalCPUPercentage = parseFloat(((totalConsumedResources.CPU/totalAvailableResources.CPU)*100).toFixed(2));
+    }
 
     clusterRAMPercentage = totalRAMPercentage;
     clusterCPUPercentage = totalCPUPercentage;
 
     externalMetrics.forEach(metrics => {
       let metricsPercentageRAM = parseFloat(((metrics.RAM/totalAvailableResources.RAM)*100).toFixed(2));
-      clusterRAMPercentage -= metricsPercentageRAM;
+      if(home)
+        clusterRAMPercentage -= metricsPercentageRAM;
+      else
+        totalRAMPercentage += metricsPercentageRAM.toFixed(2);
+
       dataRAM.push({
         fc: metrics.fc,
         value: metricsPercentageRAM
       })
 
       let metricsPercentageCPU = parseFloat(((metrics.CPU/totalAvailableResources.CPU)*100).toFixed(2));
-      clusterCPUPercentage -= metricsPercentageCPU;
+      if(home)
+        clusterCPUPercentage -= metricsPercentageCPU;
+      else
+        totalCPUPercentage += metricsPercentageCPU.toFixed(2);
+
       dataCPU.push({
         fc: metrics.fc,
         value: metricsPercentageCPU
       })
     })
 
-    dataRAM.unshift({
-      fc: 'You',
-      value: clusterRAMPercentage
-    })
+    /**
+     * When showing the home resources, it is interesting to show also how much
+     * the user is using their resources
+     */
+    if(home){
+      dataRAM.unshift({
+        fc: 'You',
+        value: parseFloat(clusterRAMPercentage.toFixed(2))
+      })
 
-    dataCPU.unshift({
-      fc: 'You',
-      value: clusterCPUPercentage
-    })
+      dataCPU.unshift({
+        fc: 'You',
+        value: parseFloat(clusterCPUPercentage.toFixed(2))
+      })
+    } else {
+      /** To maintain the color coding */
+      dataRAM.unshift({
+        fc: '',
+        value: 0
+      })
+
+      dataCPU.unshift({
+        fc: '',
+        value: 0
+      })
+    }
 
     return {
-      totRAM: totalRAMPercentage,
-      totCPU: totalCPUPercentage,
+      totRAM: parseFloat(totalRAMPercentage),
+      totCPU: parseFloat(totalCPUPercentage),
       CPU: dataCPU,
       RAM: dataRAM
     }
