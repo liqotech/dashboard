@@ -586,10 +586,7 @@ export default class ApiManager {
     return this.apiCore.listNode();
   }
 
-  /** gets the metrics of pods for a specific namespace */
-  getMetricsPOD(namespace, name){
-    let url = window.APISERVER_URL + '/apis/metrics.k8s.io/v1beta1/namespaces/' + namespace + '/pods/' + name;
-
+  fetchMetrics(url){
     let headers = new Headers();
     headers.append("Authorization", "Bearer " + this.user.id_token);
 
@@ -599,23 +596,27 @@ export default class ApiManager {
       redirect: 'follow'
     };
 
-    return fetch(url, requestOptions).then(res => res.json());
+    return fetch(url, requestOptions).then(res => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        return Promise.reject(res.status);
+      }
+    });
+  }
+
+  /** gets the metrics of pods for a specific namespace */
+  getMetricsPOD(namespace, name){
+    let url = window.APISERVER_URL + '/apis/metrics.k8s.io/v1beta1/namespaces/' + namespace + '/pods/' + name;
+
+    return this.fetchMetrics(url);
   }
 
   /** gets the metrics of all the nodes on the cluster */
   getMetricsNodes(){
     let url = window.APISERVER_URL + '/apis/metrics.k8s.io/v1beta1/nodes'
 
-    let headers = new Headers();
-    headers.append("Authorization", "Bearer " + this.user.id_token);
-
-    let requestOptions = {
-      method: 'GET',
-      headers: headers,
-      redirect: 'follow'
-    };
-
-    return fetch(url, requestOptions).then(res => res.json());
+    return this.fetchMetrics(url);
   }
 
 }

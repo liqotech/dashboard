@@ -10,7 +10,7 @@ import ClusterOutlined from '@ant-design/icons/lib/icons/ClusterOutlined';
 import SwapOutlined from '@ant-design/icons/lib/icons/SwapOutlined';
 import SwapRightOutlined from '@ant-design/icons/lib/icons/SwapRightOutlined';
 import SwapLeftOutlined from '@ant-design/icons/lib/icons/SwapLeftOutlined';
-import { getColor, updatePeeringStatus } from './HomeUtils';
+import { convertCPU, convertRAM, getColor, updatePeeringStatus } from './HomeUtils';
 import { getPeerProperties } from './PeerProperties';
 import ConnectionDetails from './ConnectionDetails';
 
@@ -45,6 +45,9 @@ class ConnectedPeer extends Component {
     this.flagOut = false;
     this.flagInc = false;
 
+    this.metricsNotAvailableIncoming = false;
+    this.metricsNotAvailableOutgoing = false;
+
     /**
      * Every 30 seconds the metrics are retrieved and the view updated
      */
@@ -61,13 +64,19 @@ class ConnectedPeer extends Component {
     let usedCPU = 0;
     let usedRAM = 0;
     po.spec.containers.forEach(co => {
-      allocatableCPU += parseInt(co.resources.requests.cpu);
-      allocatableRAM += parseInt(co.resources.requests.memory);
-    })
-    res.containers.forEach(co => {
-      usedCPU += parseInt(co.usage.cpu);
-      usedRAM += parseInt(co.usage.memory)/1024;
-    })
+      allocatableCPU += convertCPU(co.resources.requests.cpu);
+      allocatableRAM += convertRAM(co.resources.requests.memory);
+    });
+
+    if(res === 404){
+      usedCPU = allocatableCPU;
+      usedRAM = allocatableRAM;
+    } else {
+      res.containers.forEach(co => {
+        usedCPU += convertCPU(co.usage.cpu);
+        usedRAM += convertRAM(co.usage.memory);
+      });
+    }
 
     return {
       name: po.metadata.name,
@@ -78,9 +87,72 @@ class ConnectedPeer extends Component {
     }
   }
 
+  calculateIncomingMetricsPods(home_counter, po, res, home_podsPercentage, home_totalPodsRAM, home_totalPodsCPU, home_totalMemory, home_totalCPU){
+    let podPercentage = this.getPODPercentage(po, res);
+
+    home_podsPercentage.push(podPercentage);
+
+    home_totalPodsRAM += podPercentage.RAMmi;
+    home_totalPodsCPU += podPercentage.CPUmi;
+
+    let totalRAMPercentage = home_totalPodsRAM / (home_totalMemory * this.props.config.spec.advertisementConfig.resourceSharingPercentage / 100) * 100;
+    let totalCPUPercentage = home_totalPodsCPU / (home_totalCPU * this.props.config.spec.advertisementConfig.resourceSharingPercentage / 100) * 100;
+
+    if(home_counter === this.state.incomingPods.length){
+      this.setState({
+          incomingPodsPercentage: home_podsPercentage,
+          incomingTotalPercentage: {
+            RAM: Math.round(totalRAMPercentage * 10) / 10,
+            CPU: Math.round(totalCPUPercentage * 10) / 10
+          }
+        }, this.props.updateFCMetrics(true, {
+          fc: this.props.foreignCluster.spec.clusterID,
+          RAM: home_totalPodsRAM,
+          CPU: home_totalPodsCPU
+        })
+      )
+    }
+
+    return {
+      home_totalPodsRAM,
+      home_totalPodsCPU
+    }
+  }
+
+  calculateOutgoingMetricsPods(foreign_counter, po, res, foreign_podsPercentage, foreign_totalPodsRAM, foreign_totalPodsCPU, foreign_totalMemory, foreign_totalCPU){
+    let podPercentage = this.getPODPercentage(po, res);
+
+    foreign_podsPercentage.push(podPercentage);
+
+    foreign_totalPodsRAM += podPercentage.RAMmi;
+    foreign_totalPodsCPU += podPercentage.CPUmi;
+
+    let totalRAMPercentage = foreign_totalPodsRAM / foreign_totalMemory * 100;
+    let totalCPUPercentage = foreign_totalPodsCPU / foreign_totalCPU * 100;
+
+    if(foreign_counter === this.state.outgoingPods.length){
+      this.setState({
+          outgoingPodsPercentage: foreign_podsPercentage,
+          outgoingTotalPercentage: {
+            RAM: Math.round(totalRAMPercentage * 10) / 10,
+            CPU: Math.round(totalCPUPercentage * 10) / 10
+          }
+        }, this.props.updateFCMetrics(false, {
+          fc: this.props.foreignCluster.spec.clusterID,
+          RAM: foreign_totalPodsRAM,
+          CPU: foreign_totalPodsCPU
+        })
+      )
+    }
+
+    return {
+      foreign_totalPodsRAM,
+      foreign_totalPodsCPU
+    }
+  }
+
   /** */
   updatePODPercentage(){
-
     if(this.props.server){
       let home_podsPercentage = [];
       let home_totalMemory = 0;
@@ -89,42 +161,33 @@ class ConnectedPeer extends Component {
       let home_totalPodsCPU = 0;
       let home_counter = 0;
       this.props.homeNodes.forEach(no => {
-        home_totalMemory += parseInt(no.status.allocatable.memory);
-        home_totalCPU += parseInt(no.status.allocatable.cpu);
+        home_totalMemory += convertRAM(no.status.allocatable.memory);
+        home_totalCPU += convertCPU(no.status.allocatable.cpu);
       })
       this.state.incomingPods.forEach(po => {
-        this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
-          .then(res => {
-            home_counter++;
-
-            let podPercentage = this.getPODPercentage(po, res);
-
-            home_podsPercentage.push(podPercentage);
-
-            home_totalPodsRAM += podPercentage.RAMmi * 1024;
-            home_totalPodsCPU += podPercentage.CPUmi * 1024;
-
-            let totalRAMPercentage = home_totalPodsRAM / (home_totalMemory * this.props.config.spec.advertisementConfig.resourceSharingPercentage / 100) * 100;
-            let totalCPUPercentage = home_totalPodsCPU / (home_totalCPU * this.props.config.spec.advertisementConfig.resourceSharingPercentage / 100) * 100;
-
-            if(home_counter === this.state.incomingPods.length){
-              this.setState({
-                  incomingPodsPercentage: home_podsPercentage,
-                  incomingTotalPercentage: {
-                    RAM: Math.round(totalRAMPercentage * 10) / 10,
-                    CPU: Math.round(totalCPUPercentage * 10) / 10
-                  }
-                }, this.props.updateFCMetrics(true, {
-                  fc: this.props.foreignCluster.spec.clusterID,
-                  RAM: home_totalPodsRAM,
-                  CPU: home_totalPodsCPU
-                })
-              )
-            }
-          })
-          .catch(error => {
-            console.log(error);
-          })
+        if(!this.metricsNotAvailableIncoming) {
+          this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
+            .then(res => {
+              home_counter++;
+              let total = this.calculateIncomingMetricsPods(home_counter, po, res, home_podsPercentage, home_totalPodsRAM, home_totalPodsCPU, home_totalMemory, home_totalCPU);
+              home_totalPodsRAM = total.home_totalPodsRAM;
+              home_totalPodsCPU = total.home_totalPodsCPU;
+            })
+            .catch(error => {
+              if (error === 404) {
+                this.metricsNotAvailableIncoming = true;
+                home_counter++;
+                let total = this.calculateIncomingMetricsPods(home_counter, po, error, home_podsPercentage, home_totalPodsRAM, home_totalPodsCPU, home_totalMemory, home_totalCPU);
+                home_totalPodsRAM = total.home_totalPodsRAM;
+                home_totalPodsCPU = total.home_totalPodsCPU;
+              }
+            })
+        } else {
+          home_counter++;
+          let total = this.calculateIncomingMetricsPods(home_counter, po, 404, home_podsPercentage, home_totalPodsRAM, home_totalPodsCPU, home_totalMemory, home_totalCPU);
+          home_totalPodsRAM = total.home_totalPodsRAM;
+          home_totalPodsCPU = total.home_totalPodsCPU;
+        }
       })
     }
 
@@ -140,42 +203,33 @@ class ConnectedPeer extends Component {
         {return adv.metadata.name === this.props.foreignCluster.status.outgoing.advertisement.name}
       );
 
-      foreign_totalMemory = adv.spec.resourceQuota.hard.memory;
-      foreign_totalCPU = adv.spec.resourceQuota.hard.cpu;
+      foreign_totalMemory = convertRAM(adv.spec.resourceQuota.hard.memory);
+      foreign_totalCPU = convertCPU(adv.spec.resourceQuota.hard.cpu);
 
       this.state.outgoingPods.forEach(po => {
-        this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
-          .then(res => {
-            foreign_counter++;
-
-            let podPercentage = this.getPODPercentage(po, res);
-
-            foreign_podsPercentage.push(podPercentage);
-
-            foreign_totalPodsRAM += podPercentage.RAMmi * 1024;
-            foreign_totalPodsCPU += podPercentage.CPUmi * 1024;
-
-            let totalRAMPercentage = foreign_totalPodsRAM / adv.spec.resourceQuota.hard.memory * 100;
-            let totalCPUPercentage = foreign_totalPodsCPU / adv.spec.resourceQuota.hard.cpu * 100;
-
-            if(foreign_counter === this.state.outgoingPods.length){
-              this.setState({
-                  outgoingPodsPercentage: foreign_podsPercentage,
-                  outgoingTotalPercentage: {
-                    RAM: Math.round(totalRAMPercentage * 10) / 10,
-                    CPU: Math.round(totalCPUPercentage * 10) / 10
-                  }
-                }, this.props.updateFCMetrics(false, {
-                  fc: this.props.foreignCluster.spec.clusterID,
-                  RAM: foreign_totalPodsRAM,
-                  CPU: foreign_totalPodsCPU
-                })
-              )
-            }
-          })
-          .catch(error => {
-            console.log(error);
-          })
+        if(!this.metricsNotAvailableOutgoing){
+          this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
+            .then(res => {
+              foreign_counter++;
+              let total = this.calculateOutgoingMetricsPods(foreign_counter, po, res, foreign_podsPercentage, foreign_totalPodsRAM, foreign_totalPodsCPU, foreign_totalMemory, foreign_totalCPU);
+              foreign_totalPodsRAM = total.foreign_totalPodsRAM;
+              foreign_totalPodsCPU = total.foreign_totalPodsCPU;
+            })
+            .catch(error => {
+              if(error === 404){
+                this.metricsNotAvailableOutgoing = true;
+                foreign_counter++;
+                let total = this.calculateOutgoingMetricsPods(foreign_counter, po, error, foreign_podsPercentage, foreign_totalPodsRAM, foreign_totalPodsCPU, foreign_totalMemory, foreign_totalCPU);
+                foreign_totalPodsRAM = total.foreign_totalPodsRAM;
+                foreign_totalPodsCPU = total.foreign_totalPodsCPU;
+              }
+            })
+        } else {
+          foreign_counter++;
+          let total = this.calculateOutgoingMetricsPods(foreign_counter, po, 404, foreign_podsPercentage, foreign_totalPodsRAM, foreign_totalPodsCPU, foreign_totalMemory, foreign_totalCPU);
+          foreign_totalPodsRAM = total.foreign_totalPodsRAM;
+          foreign_totalPodsCPU = total.foreign_totalPodsCPU;
+        }
       })
     }
   }
@@ -195,8 +249,11 @@ class ConnectedPeer extends Component {
     ).status.vkReference.name;
 
     this.state.outgoingPods = this.props.outgoingPods.filter(po => { return po.spec.nodeName === vk });
-    if(this.state.outgoingPods.length !== 0) this.state.sharing= true;
-    this.flagOut = this.checkFlag(this.flagOut);
+
+    if(this.state.outgoingPods.length !== 0){
+      this.state.sharing = true;
+      this.flagOut = this.checkFlag(this.flagOut);
+    }
   }
 
   /**
@@ -211,8 +268,10 @@ class ConnectedPeer extends Component {
         return false
       }
     })
-    if(this.state.incomingPods.length !== 0) this.state.sharing= true;
-    this.flagInc = this.checkFlag(this.flagInc);
+    if(this.state.incomingPods.length !== 0){
+      this.state.sharing = true;
+      this.flagInc = this.checkFlag(this.flagInc);
+    }
   }
 
   clientPercentage() {
@@ -230,6 +289,21 @@ class ConnectedPeer extends Component {
     updatePeeringStatus(this,
       'Disconnected from ' + this.props.foreignCluster.metadata.name,
       'Could not disconnect');
+  }
+
+  componentDidMount() {
+    this.props.api.getMetricsNodes()
+      .then(res => {
+        /** That means there are no metrics available */
+        if(res.items.length === 0){
+          this.metricsNotAvailableIncoming = true;
+          this.metricsNotAvailableOutgoing = true;
+        } else {
+          /** That means there are no metrics available from the virtual node */
+          if(res.items.filter(no => { return no.metadata.name.slice(0, 5) === 'liqo-' }).length !== 0)
+            this.metricsNotAvailableOutgoing = true;
+        }
+      })
   }
 
   componentWillUnmount() {

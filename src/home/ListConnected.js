@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { Alert, Button, Divider, PageHeader, Space, Tooltip, Typography } from 'antd';
 import FilterOutlined from '@ant-design/icons/lib/icons/FilterOutlined';
 import ConnectedPeer from './ConnectedPeer';
-import { checkPeeringRequest, checkAdvertisement } from './HomeUtils';
+import { checkAdvertisement, checkPeeringRequest } from './HomeUtils';
 import { LIQO_LABEL_ENABLED } from '../constants';
+import LoadingIndicator from '../common/LoadingIndicator';
 
 class ListConnected extends Component {
   constructor(props) {
@@ -11,7 +12,9 @@ class ListConnected extends Component {
 
     this.state = {
       outgoingPods: [],
-      incomingPods: []
+      incomingPods: [],
+      loadingServer: true,
+      loadingClient: true
     }
 
     /**
@@ -30,22 +33,21 @@ class ListConnected extends Component {
    * offloaded to the foreign cluster
    */
   getClientPODs(){
-    let label = LIQO_LABEL_ENABLED;
-    this.props.api.getNamespaces(label)
-      .then(res => {
-        res.body.items.forEach(ns => {
-          this.props.api.getPODs(ns.metadata.name)
-            .then(res => {
-              //console.log(res.body.items);
-              res.body.items.forEach(po => {
+    this.props.api.getNamespaces(LIQO_LABEL_ENABLED)
+      .then(async (res) => {
+        this.state.outgoingPods = [];
+        await Promise.all(res.body.items.map(async (ns) => {
+          await this.props.api.getPODs(ns.metadata.name)
+            .then(async res => {
+              await Promise.all(res.body.items.map(po => {
                 this.state.outgoingPods.push(po);
-                this.setState({outgoingPods: this.state.outgoingPods});
-              })
+              }))
             })
             .catch(error => {
               console.log(error);
             })
-        })
+        }))
+        this.setState({outgoingPods: this.state.outgoingPods, loadingClient: false})
       })
   }
 
@@ -58,11 +60,11 @@ class ListConnected extends Component {
     this.props.api.getPODs().
     then(res => {
       let pods = res.body.items;
-      //console.log(res.body.items);
-      this.setState({incomingPods: pods})
+      this.setState({incomingPods: pods, loadingServer: false})
     })
     .catch(error => {
       console.log(error);
+      this.setState({loadingServer: false})
     })
   }
 
@@ -140,6 +142,7 @@ class ListConnected extends Component {
             />
           </div>
         ) : (
+          this.state.loadingServer || this.state.loadingClient ? <LoadingIndicator /> :
           <div>{connectedPeers}</div>
         )}
       </div>

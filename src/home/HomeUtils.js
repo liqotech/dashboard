@@ -95,3 +95,30 @@ export function addZero(i) {
   }
   return i;
 }
+
+export function convertRAM(string) {
+  let unit = string.slice(-2);
+
+  if(unit === 'Ki'){
+    return parseFloat(string) * Math.pow(10, 3);
+  } else if(unit === 'Mi'){
+    return parseFloat(string) * Math.pow(10, 6);
+  } else if (unit === 'Gi'){
+    return parseFloat(string) * Math.pow(10, 9);
+  } else
+    return parseFloat(string);
+}
+
+export function convertCPU(string) {
+  let unit = string.slice(-1);
+  if(unit === 'k'){
+    return parseFloat(string) * Math.pow(10, 3);
+  } else if(unit === 'm'){
+    return parseFloat(string) * Math.pow(10, 6);
+  } else if (unit === 'g'){
+    return parseFloat(string) * Math.pow(10, 9);
+  } else if (unit === 'n'){
+    return parseFloat(string);
+  } else
+    return parseFloat(string) * Math.pow(10, 9);
+}
