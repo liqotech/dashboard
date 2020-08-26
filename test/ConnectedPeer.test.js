@@ -68,7 +68,10 @@ function mocks(advertisement, foreignCluster, peeringRequest, error, errorMetric
     }  else if (req.url === 'http://localhost:3001/nodes') {
       return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
     } else if (req.url === 'http://localhost:3001/metrics/nodes') {
-      return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+      if(errorMetrics)
+        return Promise.resolve(new Response(JSON.stringify({ items: [] })));
+      else
+        return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
     } else {
       return metricsPODs(req, errorMetrics);
     }
@@ -132,11 +135,15 @@ describe('ConnectedPeer', () => {
     await OKCheck();
   })
 
-  test('Error on pod metrics', async () => {
+  test('Error on pod metrics (404)', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, true);
 
     await OKCheck();
-  })
+
+    await new Promise((r) => setTimeout(r, 31000));
+
+    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+  }, 35000)
 
   test('Advertisement status is not accepted', async () => {
     mocks(AdvMockResponseNotAccepted, FCMockResponse, PRMockResponse);

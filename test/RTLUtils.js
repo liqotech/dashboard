@@ -35,7 +35,7 @@ export function setup_login() {
 
 export function metricsPODs(req, error){
   if(error){
-    return Promise.reject(Error409.body);
+    return Promise.reject(404);
   } else if (req.url === 'http://localhost:3001/metrics/pods/hello-world-deployment-6756549f5-x66v9') {
     return Promise.resolve(new Response(JSON.stringify(PodsMetricsMockResponse.podMetrics[0])));
   } else if (req.url === 'http://localhost:3001/metrics/pods/hello-world-deployment-6756549f5-c7qzv') {
