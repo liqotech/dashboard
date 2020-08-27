@@ -50,7 +50,7 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: liqo/dashboard
-        tags: latest
+        tags: latest, ${{ github.sha }}
 
   release:
       runs-on: ubuntu-latest
