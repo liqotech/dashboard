@@ -229,7 +229,7 @@
         }
       },
       "status": {
-        "advertisementStatus": "ACCEPTED",
+        "advertisementStatus": "Accepted",
         "localRemappedPodCIDR": "10.22.0.0/16",
         "remoteRemappedPodCIDR": "10.26.0.0/16",
         "tunnelEndpointKey": {
