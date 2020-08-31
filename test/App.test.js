@@ -19,7 +19,6 @@ fetchMock.enableMocks();
 let api;
 
 async function setup() {
-  window.APISERVER_URL = true;
   window.OIDC_PROVIDER_URL = 'test-url';
   window.OIDC_CLIENT_ID = 'test-id';
 

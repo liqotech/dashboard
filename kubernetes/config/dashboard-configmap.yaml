@@ -1,11 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: liqo-dashboard-env-vars
+  name: liqo-dashboard-configmap
   namespace: liqo
 data:
   oidc_client_id: "__OIDC_CLIENT_ID__"
   oidc_provider_url: "__OIDC_PROVIDER_URL__"
   oidc_client_secret: "__OIDC_CLIENT_SERVER__"
   oidc_redirect_uri: "__DASHBOARD__URL__"
-  apiserver_url: "__APISERVER_URL__"

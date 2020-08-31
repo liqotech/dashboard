@@ -15,9 +15,6 @@ export default class ApiManager {
    *
    */
   constructor(user) {
-    if (window.APISERVER_URL === undefined) {
-      window.APISERVER_URL = APISERVER_URL;
-    }
     this.user = user;
     this.kcc = new Config(window.APISERVER_URL, user.id_token, user.token_type);
     this.apiExt = this.kcc.makeApiClient(ApiextensionsV1beta1Api);

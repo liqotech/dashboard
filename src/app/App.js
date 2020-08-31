@@ -35,6 +35,9 @@ class App extends Component {
       user: {}
     }
 
+    /** Set the URL to which we make the call to the proxy */
+    window.APISERVER_URL = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/apiserver';
+
     /** Manage the login via token */
     this.manageToken = this.manageToken.bind(this);
     /** Manage the logout via token */

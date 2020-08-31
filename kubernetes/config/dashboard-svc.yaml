@@ -10,7 +10,7 @@ spec:
   selector:
     app: liqo-dashboard
   ports:
-    - name: http
+    - name: https
       protocol: TCP
-      port: 80
-      targetPort: 80
+      port: 443
+      targetPort: 443
