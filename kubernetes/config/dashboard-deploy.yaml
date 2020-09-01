@@ -18,14 +18,14 @@ spec:
       volumes:
         - name: shared-data
           emptyDir: { }
-        initContainers:
-          - name: proxy-cert
-            image: nginx
-            volumeMounts:
-              - name: shared-data
-                mountPath: /etc/nginx/ssl/
-            command: [ "/bin/sh" ]
-            args: [ "-c", 'openssl req -x509 -subj "/C=IT/ST=Turin/O=Liqo" -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.cert' ]
+      initContainers:
+        - name: proxy-cert
+          image: nginx
+          volumeMounts:
+            - name: shared-data
+              mountPath: /etc/nginx/ssl/
+          command: [ "/bin/sh" ]
+          args: [ "-c", 'openssl req -x509 -subj "/C=IT/ST=Turin/O=Liqo" -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.cert' ]
       containers:
         - image: liqo/dashboard:latest
           volumeMounts:
