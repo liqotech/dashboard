@@ -41,7 +41,7 @@ export default class Authenticator {
     this.OIDC = false;
     this.token = '';
 
-    if (window.APISERVER_URL) {
+    if (window.OIDC_PROVIDER_URL) {
       this.OIDC = true;
       this.manager = getManager();
     }
