@@ -4,6 +4,7 @@ import QuestionCircleOutlined from '@ant-design/icons/lib/icons/QuestionCircleOu
 import { addZero, convertCPU, convertRAM } from './HomeUtils';
 import LineChart from '../templates/line/LineChart';
 import Donut from '../templates/donut/Donut';
+import ExclamationCircleTwoTone from '@ant-design/icons/lib/icons/ExclamationCircleTwoTone';
 
 class Status extends Component {
   constructor(props) {
@@ -28,6 +29,8 @@ class Status extends Component {
     };
 
     this.flag = false;
+    this.metricsNotAvailableIncoming = false;
+    this.metricsNotAvailableOutgoing = false;
 
     /**
      * Every 30 seconds the metrics are retrieved and the view updated
@@ -121,16 +124,23 @@ class Status extends Component {
       .then(res => {
         consumedHome.CPU = 0;
         consumedHome.RAM = 0;
-        if(res.items.length !== 0){
-          res.items.forEach(no => {
+        let home_nodes = res.items.filter(no => {return no.metadata.name.slice(0, 5) !== 'liqo-'});
+        let foreign_nodes = res.items.filter(no => {return no.metadata.name.slice(0, 5) === 'liqo-'});
+        if(foreign_nodes.length === 0){
+          this.metricsNotAvailableOutgoing = true;
+        }
+        if(home_nodes.length !== 0){
+          home_nodes.forEach(no => {
             consumedHome.CPU += convertCPU(no.usage.cpu);
             consumedHome.RAM += convertRAM(no.usage.memory);
           })
+          this.setState({consumedHome});
         } else {
           /** This means there are no metrics available */
+          this.metricsNotAvailableIncoming = true;
           this.props.api.getPODs().
           then(res => {
-            let pods = res.body.items;
+            let pods = res.body.items.filter(po => {return po.spec.nodeName.slice(0, 5) !== 'liqo-'});
             consumedHome.CPU = 0;
             consumedHome.RAM = 0;
             pods.forEach(po => {
@@ -138,12 +148,12 @@ class Status extends Component {
                 if(co.resources.requests && co.resources.requests.cpu && co.resources.requests.memory){
                   consumedHome.CPU += convertCPU(co.resources.requests.cpu);
                   consumedHome.RAM += convertRAM(co.resources.requests.memory);
+                  this.setState({consumedHome});
                 }
               });
             })
           })
         }
-        this.setState({consumedHome});
       })
   }
 
@@ -245,7 +255,7 @@ class Status extends Component {
         <Row gutter={[20, 20]} align={'center'} justify={'center'}>
           <Col>
             <Row justify={'center'}>
-              <Typography.Text strong>CPU ({resources.totCPU}%)</Typography.Text>
+              <Typography.Text strong>CPU ({isNaN(resources.totCPU) ? 0 : resources.totCPU}%)</Typography.Text>
             </Row>
             <Row justify={'center'}>
               <Donut data={resources.CPU} />
@@ -253,7 +263,7 @@ class Status extends Component {
           </Col>
           <Col>
             <Row justify={'center'}>
-              <Typography.Text strong>RAM ({resources.totRAM}%)</Typography.Text>
+              <Typography.Text strong>RAM ({isNaN(resources.totRAM) ? 0 : resources.totRAM}%)</Typography.Text>
             </Row>
             <Row justify={'center'}>
               <Donut data={resources.RAM} />
@@ -285,7 +295,10 @@ class Status extends Component {
         <div style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}>
           <Collapse defaultActiveKey={['1']} className={'crd-collapse'} style={{backgroundColor: '#fafafa'}}>
             <Collapse.Panel style={{ borderBottomColor: '#f0f0f0' }}
-                            header={<span>Home</span>} key="1"
+                            header={<span>Home  {this.metricsNotAvailableIncoming ? (
+                              <Tooltip title={'Precise metrics not available in your cluster'}>
+                              <ExclamationCircleTwoTone twoToneColor="#f5222d" />
+                              </Tooltip>) : null}</span>} key="1"
                             extra={
                               <Tooltip title={'Consumption on your cluster'}
                                        placement={'left'}
@@ -299,7 +312,10 @@ class Status extends Component {
           </Collapse>
           <Collapse defaultActiveKey={['1']} className={'crd-collapse'} style={{backgroundColor: '#fafafa', marginTop: 16}}>
             <Collapse.Panel style={{ borderBottomColor: '#f0f0f0' }}
-                            header={<span>Foreign (Total)</span>} key="1"
+                            header={<span>Foreign (Total)  {this.metricsNotAvailableIncoming ? (
+                              <Tooltip title={'Precise metrics not available in some of the foreign clusters'}>
+                                <ExclamationCircleTwoTone twoToneColor="#f5222d" />
+                              </Tooltip>) : null}</span>} key="1"
                             extra={
                               <Tooltip title={'Consumption on others\' cluster'}
                                        placement={'left'}

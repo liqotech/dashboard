@@ -8,6 +8,7 @@ import HomeOutlined from '@ant-design/icons/lib/icons/HomeOutlined';
 import GlobalOutlined from '@ant-design/icons/lib/icons/GlobalOutlined';
 import { getColor } from './HomeUtils';
 import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
+import ExclamationCircleTwoTone from '@ant-design/icons/lib/icons/ExclamationCircleTwoTone';
 
 const n = Math.pow(10, 6);
 
@@ -130,8 +131,10 @@ class ConnectionDetails extends Component {
         dataIndex: 'RAM',
         key: 'RAM',
         render: (text, record) => {
-          let podRAMmb = (role && this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name})) ?
-            this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name}).RAMmi / n : 0;
+          let podRAMmb = role ? (this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name}) ?
+            this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name}).RAMmi / n : 0) :
+            (this.props.outgoingPodsPercentage.find(pod => {return record.key === pod.name}) ?
+            this.props.outgoingPodsPercentage.find(pod => {return record.key === pod.name}).RAMmi / n : 0)
 
           return(
             <Tooltip title={podRAMmb + 'Mi'}>
@@ -193,7 +196,17 @@ class ConnectionDetails extends Component {
         <div style={{marginTop: 10}}>
           <Row>
             <Col flex={1}>
-              <Card title={'Resources Used'} style={{marginRight: 20}}>
+              <Card title={'Resources Used'} style={{marginRight: 20}}
+                    extra={role ? (this.props.metricsNotAvailableIncoming ? (
+                      <Tooltip title={'Precise metrics not available in your cluster'}>
+                        <ExclamationCircleTwoTone twoToneColor="#f5222d" />
+                      </Tooltip>
+                    ) : null) : (this.props.metricsNotAvailableOutgoing ? (
+                      <Tooltip title={'Precise metrics not available in this cluster'}>
+                        <ExclamationCircleTwoTone twoToneColor="#f5222d" />
+                      </Tooltip>
+                    ) : null)}
+              >
                 <Row gutter={[20, 20]} align={'center'} justify={'center'}>
                   <Col>
                     <Row justify={'center'}>
