@@ -19,17 +19,17 @@ export function getColor(percent) {
  * Search an advertisement from a pool of advertisements
  * @advertisements: the total of advertisements in the cluster
  * @advertisement: the foreign cluster's advertisement
- * @returns true if the advertisement exist and is ACCEPTED, false if not
+ * @returns true if the advertisement exist and is Accepted, false if not
  * if false it also returns a reason why (the advertisement do not exists,
- * the advertisement is REFUSED or is not ACCEPTED)
+ * the advertisement is Refused or is not Accepted)
  */
 export function checkAdvertisement(advertisements, advertisement) {
   let adv = advertisements.find(adv => {return adv.metadata.name === advertisement.name});
   if(adv){
     if(adv.status){
-      if(adv.status.advertisementStatus === 'ACCEPTED'){
+      if(adv.status.advertisementStatus === 'Accepted'){
         return {adv: true}
-      } else if(adv.status.advertisementStatus === 'REFUSED'){
+      } else if(adv.status.advertisementStatus === 'Refused'){
         return {adv: false, reason: 'Advertisement Refused'}
       } else {
         return {adv: false, reason: 'Adv. not accepted yet'}
