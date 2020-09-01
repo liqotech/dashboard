@@ -458,6 +458,8 @@ class ConnectedPeer extends Component {
 
         { /** This modal shows the detail of the connection */ }
         <ConnectionDetails {...this.props} _this={this}
+                           metricsNotAvailableIncoming={this.metricsNotAvailableIncoming}
+                           metricsNotAvailableOutgoing={this.metricsNotAvailableOutgoing}
                            outgoingPodsPercentage={this.state.outgoingPodsPercentage}
                            incomingPodsPercentage={this.state.incomingPodsPercentage}
                            outgoingTotalPercentage={this.state.outgoingTotalPercentage}
