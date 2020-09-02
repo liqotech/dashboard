@@ -226,7 +226,9 @@
             "memory": "5665988659",
             "pods": "33"
           }
-        }
+        },
+        "timeToLive": "2020-09-02T18:53:58Z",
+        "timestamp": "2020-09-02T18:23:58Z"
       },
       "status": {
         "advertisementStatus": "Accepted",

@@ -13,6 +13,7 @@ import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import LiqoDashAlteredMockResponse from '../__mocks__/liqodashtest_noSpec_noStatus.json';
 import { setup_resource } from './RTLUtils';
 import { MemoryRouter } from 'react-router-dom';
+import AdvMockResponse from '../__mocks__/advertisement.json';
 
 fetchMock.enableMocks();
 
@@ -26,11 +27,13 @@ function mockFetch() {
       return Promise.resolve(new Response(JSON.stringify({ body: LiqoDashMockResponse })))
     } else if (url === 'http://localhost:3001/clustercustomobject/piecharts') {
       return Promise.resolve(new Response(JSON.stringify({ body: PieMockResponse })))
+    } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
+      return Promise.resolve(new Response(JSON.stringify({ body: AdvMockResponse })));
     }
   })
 }
 
-async function setup() {
+async function setup(adv) {
   let api = new ApiManager();
   api.getCRDs().then(async () => {
 
@@ -39,15 +42,28 @@ async function setup() {
     let l = await api.getCustomResourcesAllNamespaces(liqo_crd);
     let p = await api.getCustomResourcesAllNamespaces(pie_crd);
 
-    render(
-      <MemoryRouter>
-        <CR api={api}
-            cr={l.body.items[0]}
-            crd={liqo_crd}
-            template={p.body.items[0]}
-        />
-      </MemoryRouter>
-    )
+    if(adv){
+      let adv_crd = await api.getCRDfromKind('Advertisement');
+      let a = await api.getCustomResourcesAllNamespaces(adv_crd);
+      render(
+        <MemoryRouter>
+          <CR api={api}
+              cr={a.body.items[0]}
+              crd={adv_crd}
+          />
+        </MemoryRouter>
+      )
+    } else {
+      render(
+        <MemoryRouter>
+          <CR api={api}
+              cr={l.body.items[0]}
+              crd={liqo_crd}
+              template={p.body.items[0]}
+          />
+        </MemoryRouter>
+      )
+    }
   });
 }
 
@@ -101,6 +117,21 @@ describe('CR', () => {
     expect(await screen.findByLabelText('json')).toBeInTheDocument();
   })
 
+  test('CR date-time picker works', async () => {
+    mockFetch();
+    await setup(true);
+
+    expect(await screen.findByLabelText('cr')).toBeInTheDocument();
+    userEvent.click(screen.getByText(/advertisement-/i));
+    userEvent.click(await screen.findByText('General'));
+    let date = screen.getAllByRole('date-picker');
+    let edit = screen.getAllByLabelText('edit');
+    userEvent.click(edit[3]);
+    userEvent.click(date[1]);
+    userEvent.click(await screen.findByText('Now'));
+    userEvent.click(await screen.findByText('Ok'));
+  }, 30000)
+
   test('CR JSON show no spec or status when there is none', async () => {
     fetch.mockImplementation((url) => {
       if (url === 'http://localhost:3001/customresourcedefinition') {
@@ -122,8 +153,6 @@ describe('CR', () => {
 
     const json = await screen.findByLabelText('json');
     expect(json).toBeInTheDocument();
-
-    expect(json.firstChild).toBeNull();
   })
 
   test('CR delete popup show on click and resource is deleted', async () => {
