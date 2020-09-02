@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Utils from '../../services/Utils';
 import { withTheme } from '@rjsf/core';
 import { Theme as AntDTheme } from '@rjsf/antd';
-import { Button, message, notification, Tabs, Typography } from 'antd';
+import { Button, notification } from 'antd';
 import { widgets } from './CustomWidget';
 import { CustomArrayFieldTemplate, fields, fieldsView } from './CustomField';
 import { json } from 'generate-schema';
@@ -36,8 +36,6 @@ class FormViewer extends Component {
       }catch{}
       this.schema = json(this.props.CR.spec);
       delete this.schema.$schema;
-
-      // console.log(this.schema);
 
       /**
        * This set the real schema properties to the leaves
