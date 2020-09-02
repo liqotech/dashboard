@@ -35,48 +35,6 @@ class CR extends Component {
     this.handleClick_delete = this.handleClick_delete.bind(this);
     this.getChart = this.getChart.bind(this);
     this.onTabChange = this.onTabChange.bind(this);
-
-    this.tabList = [];
-
-    if(this.props.cr.spec)
-      this.tabList.push({
-        key: 'Spec',
-        tab: <span>
-              <ToolOutlined />
-              Spec
-             </span>
-      })
-
-    if(this.props.cr.status)
-      this.tabList.push({
-        key: 'Status',
-        tab: <span>
-              <ToolOutlined />
-              Status
-             </span>
-      })
-
-    this.contentList = {
-      Spec: this.props.cr.spec ? (
-        <div key={'spec_' + this.props.cr.metadata.name}>
-          <Alert.ErrorBoundary>
-            <div aria-label={'form_spec'}>
-              <FormViewer CR={this.props.cr} CRD={this.props.crd} api={this.props.api} />
-              {/*<JsonToTableAntd json={this.props.cr.spec} />*/}
-            </div>
-          </Alert.ErrorBoundary>
-        </div>
-      ) : null,
-      Status: this.props.cr.status ? (
-        <div key={'status_' + this.props.cr.metadata.name}>
-          <Alert.ErrorBoundary>
-            <div aria-label={'form_status'}>
-              {/*<JsonToTableAntd json={this.props.cr.status} />*/}
-              <FormViewer CR={this.props.cr} CRD={this.props.crd} status={true} api={this.props.api} />
-            </div>
-          </Alert.ErrorBoundary>
-        </div>) : null,
-    };
   }
 
   onTabChange = (key) => {
@@ -144,6 +102,45 @@ class CR extends Component {
   }
 
   render() {
+    let tabList = [];
+
+    if(this.props.cr.spec)
+      tabList.push({
+        key: 'Spec',
+        tab: <span>
+              <ToolOutlined />
+              Spec
+             </span>
+      })
+
+    if(this.props.cr.status)
+      tabList.push({
+        key: 'Status',
+        tab: <span>
+              <ToolOutlined />
+              Status
+             </span>
+      })
+
+    this.contentList = {
+      Spec: this.props.cr.spec ? (
+        <div key={'spec_' + this.props.cr.metadata.name}>
+          <Alert.ErrorBoundary>
+            <div aria-label={'form_spec'}>
+              <FormViewer CR={this.props.cr} CRD={this.props.crd} api={this.props.api} />
+            </div>
+          </Alert.ErrorBoundary>
+        </div>
+      ) : null,
+      Status: this.props.cr.status ? (
+        <div key={'status_' + this.props.cr.metadata.name}>
+          <Alert.ErrorBoundary>
+            <div aria-label={'form_status'}>
+              <FormViewer CR={this.props.cr} CRD={this.props.crd} status={true} api={this.props.api} />
+            </div>
+          </Alert.ErrorBoundary>
+        </div>) : null,
+    };
 
     return (
       !this.state.deleted ? (
@@ -227,7 +224,7 @@ class CR extends Component {
                   ? this.getChart()
                   : null}
                 {!this.state.showJSON && !this.props.template ? (
-                  <Card tabList={this.tabList}
+                  <Card tabList={tabList}
                         tabProps={{
                           size: 'small'
                         }}
