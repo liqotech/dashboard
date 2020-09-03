@@ -178,13 +178,13 @@ class CRD extends Component {
   }*/
 
   /** Update CRD with the 'favourite' annotation */
-  handleClick_fav(){
+  async handleClick_fav(){
     if(!this.state.CRD.metadata.annotations || !this.state.CRD.metadata.annotations.favourite){
       this.state.CRD.metadata.annotations = {favourite: 'true'};
     } else {
       this.state.CRD.metadata.annotations.favourite = null;
     }
-    this.props.api.updateCustomResourceDefinition(
+    await this.props.api.updateCustomResourceDefinition(
       this.state.CRD.metadata.name,
       this.state.CRD
     )
