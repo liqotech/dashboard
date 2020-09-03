@@ -1,85 +1,32 @@
 import React, { Component } from 'react';
-import { Badge, Breadcrumb, Empty, notification, Rate, Tabs, Typography, Table } from 'antd';
+import { Empty, Rate, Typography, Table } from 'antd';
 import LoadingIndicator from '../common/LoadingIndicator';
 import { Link, withRouter } from 'react-router-dom';
 import './CRDList.css';
 import './CRD.css';
-import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-resizable/css/styles.css';
-const ResponsiveGridLayout = WidthProvider(Responsive);
 import { Pagination } from 'antd';
-import ReactResizeDetector from 'react-resize-detector';
 
 class CRDList extends Component {
   constructor(props) {
     super(props);
-    //this.onBreakpointChange = this.onBreakpointChange.bind(this);
     /**
      * @param: isLoading: boolean
-     * @param: CRDs: array of CRDs
+     * @param: CRDshown: array of CRDs in the current page
      */
     this.state = {
       pageSize: 10,
-      CRDs: this.props.api.CRDs,
       CRDshown: [],
       isLoading: true,
-      layout: {lg: []},
-      oldBr: null,
       currentPage: 1
     };
     this.loadCustomResourceDefinitions = this.loadCustomResourceDefinitions.bind(this);
-    if(this.props.api)
-      this.props.api.CRDListCallback = this.loadCustomResourceDefinitions;
+    this.props.api.CRDListCallback = this.loadCustomResourceDefinitions;
     this.paginationChange = this.paginationChange.bind(this);
-
-    this.columns = [
-      {
-        title: 'Kind',
-        dataIndex: 'kind',
-        render: (text, record) => (
-          <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
-                           pathname: '/customresources/' + this.state.CRDshown.find(item => {return item.metadata.name === record.key}).metadata.name,
-                           state: {
-                             CRD: this.state.CRDshown.find(item => {return item.metadata.name === record.key})
-                           }
-                         }} >
-            <Typography.Text strong>{text}</Typography.Text>
-          </Link>
-        )
-      },
-      {
-        title: 'Description',
-        dataIndex: 'description'
-      },
-      {
-        title: 'Group',
-        dataIndex: 'group'
-      },
-      {
-        title: 'Favourite',
-        dataIndex: 'favourite',
-        render: (text, record) => (
-          <>
-            {
-              <Rate className="crd-fav" count={1} defaultValue={text ? 1 : 0}
-                    onChange={() => {this.handleClick_fav(record.key)}}
-                    style={{marginLeft: 0}}
-              />
-            }
-          </>
-        )
-      }
-    ]
   }
 
-  loadCustomResourceDefinitions(CRDs) {
-    if(!CRDs){
-      CRDs = this.props.api.CRDs;
-    }
-    this.setState({
-      CRDs: CRDs
-    });
-    this.generateLayout(CRDs.slice(this.state.pageSize*(this.state.currentPage-1), this.state.pageSize*this.state.currentPage));
+  loadCustomResourceDefinitions() {
+    this.generateLayout(this.props.api.CRDs.slice(this.state.pageSize*(this.state.currentPage-1), this.state.pageSize*this.state.currentPage));
   }
 
   componentDidMount() {
@@ -94,7 +41,7 @@ class CRDList extends Component {
   paginationChange(current, size){
     if(current !== this.state.currentPage){
       this.state.currentPage = current;
-      let CRDsubset = this.state.CRDs.slice(size*(current-1), size*current);
+      let CRDsubset = this.props.api.CRDs.slice(size*(current-1), size*current);
       this.generateLayout(CRDsubset);
     }
   }
@@ -104,21 +51,14 @@ class CRDList extends Component {
    * @param CRDs a subset of the total of the CRDs
    */
   generateLayout(CRDs){
-    let layout = [];
-
     this.setState({
-      CRDshown: CRDs
-    });
-
-    this.setState({
-      layout: {lg: layout},
+      CRDshown: CRDs,
       isLoading: false
     });
-
   }
 
   /** Update CRD with the 'favourite' annotation */
-  handleClick_fav(CRD){
+  async handleClick_fav(CRD){
 
     CRD = this.state.CRDshown.find(item => {return item.metadata.name === CRD});
 
@@ -127,7 +67,7 @@ class CRDList extends Component {
     } else {
       CRD.metadata.annotations.favourite = null;
     }
-    this.props.api.updateCustomResourceDefinition(
+    await this.props.api.updateCustomResourceDefinition(
       CRD.metadata.name,
       CRD
     )
@@ -153,6 +93,46 @@ class CRDList extends Component {
       });
     });
 
+    this.columns = [
+      {
+        title: 'Kind',
+        dataIndex: 'kind',
+        render: (text, record) => (
+          <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
+            pathname: '/customresources/' + this.state.CRDshown.find(item => {return item.metadata.name === record.key}).metadata.name,
+            state: {
+              CRD: this.state.CRDshown.find(item => {return item.metadata.name === record.key})
+            }
+          }} >
+            <Typography.Text strong>{text}</Typography.Text>
+          </Link>
+        )
+      },
+      {
+        title: 'Description',
+        dataIndex: 'description'
+      },
+      {
+        title: 'Group',
+        dataIndex: 'group'
+      },
+      {
+        title: 'Favourite',
+        dataIndex: 'favourite',
+        render: (text, record) => (
+          <>
+            {
+              <Rate className="crd-fav" count={1} defaultValue={text ? 1 : 0}
+                    value={text ? 1 : 0}
+                    onChange={async () => {await this.handleClick_fav(record.key)}}
+                    style={{marginLeft: 0}}
+              />
+            }
+          </>
+        )
+      }
+    ]
+
     return (
       <div>
         {!this.state.isLoading && CRDViews.length > 0 ? (
@@ -166,7 +146,7 @@ class CRDList extends Component {
         {this.state.isLoading ? <LoadingIndicator /> : null}
         {!this.state.isLoading && CRDViews.length > 0 ? (
           <div className="no-crds-found" style={{marginTop: 30}}>
-            <Pagination defaultCurrent={this.state.currentPage} total={this.state.CRDs.length}
+            <Pagination defaultCurrent={this.state.currentPage} total={this.props.api.CRDs.length}
                         onChange={this.paginationChange} defaultPageSize={this.state.pageSize}
                         showSizeChanger={false} />
           </div>
