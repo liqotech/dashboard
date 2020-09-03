@@ -283,16 +283,18 @@ class Status extends Component {
 
     return(
       <div className="home-header">
-        <PageHeader style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}
-                    title={
-                      <Space>
-                        <Typography.Text strong style={{fontSize: 24}}>Cluster Status</Typography.Text>
-                      </Space>
-                    }
-                    className={'draggable'}
-        />
-        <Divider style={{marginTop: 0, marginBottom: 10}}/>
-        <div style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}>
+        <div style={{position: 'fixed', zIndex: 10, width: '100%', backgroundColor: 'white'}}>
+          <PageHeader style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}
+                      title={
+                        <Space>
+                          <Typography.Text strong style={{fontSize: 24}}>Cluster Status</Typography.Text>
+                        </Space>
+                      }
+                      className={'draggable'}
+          />
+          <Divider style={{marginTop: 0, marginBottom: 4}}/>
+        </div>
+        <div style={{paddingTop: '7vh', paddingBottom: 4, paddingLeft: 16, paddingRight: 16}} >
           <Collapse defaultActiveKey={['1']} className={'crd-collapse'} style={{backgroundColor: '#fafafa'}}>
             <Collapse.Panel style={{ borderBottomColor: '#f0f0f0' }}
                             header={<span>Home  {this.metricsNotAvailableIncoming ? (

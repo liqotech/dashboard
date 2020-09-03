@@ -237,44 +237,44 @@ class Home extends Component {
      * the general status of the clusters
      */
     let cards = ([
-      <div style={{overflow: 'auto', height: '100%'}} key={'list_connected'}
-           data-grid={{ w: 2, h: 10, x: 0, y: 0, minW: 2, minH: 3 }}
-      >
-        <Alert.ErrorBoundary>
-          <ListConnected api={this.props.api} config={this.state.config}
-                         foreignClusters={this.state.foreignClusters.filter(fc =>
-                          {return ( fc.spec.join && fc.status && (fc.status.outgoing.joined || fc.status.incoming.joined))}
-                         )}
-                         advertisements={this.state.advertisements}
-                         peeringRequests={this.state.peeringRequests}
-                         homeNodes={this.state.homeNodes}
-                         foreignNodes={this.state.foreignNodes}
-                         updateFCMetrics={this.updateFCMetrics}
-          />
-        </Alert.ErrorBoundary>
+      <div key={'list_connected'} data-grid={{ w: 2, h: 10, x: 0, y: 0, minW: 2, minH: 3 }} >
+        <div className={'scrollbar'} >
+          <Alert.ErrorBoundary>
+            <ListConnected api={this.props.api} config={this.state.config}
+                           foreignClusters={this.state.foreignClusters.filter(fc =>
+                             {return ( fc.spec.join && fc.status && (fc.status.outgoing.joined || fc.status.incoming.joined))}
+                           )}
+                           advertisements={this.state.advertisements}
+                           peeringRequests={this.state.peeringRequests}
+                           homeNodes={this.state.homeNodes}
+                           foreignNodes={this.state.foreignNodes}
+                           updateFCMetrics={this.updateFCMetrics}
+            />
+          </Alert.ErrorBoundary>
+        </div>
       </div>,
-      <div style={{overflow: 'auto', height: '100%'}} key={'list_available'}
-           data-grid={{ w: 2, h: 10, x: 2, y: 0, minW: 2, minH: 3 }}
-      >
-        <Alert.ErrorBoundary>
-          <ListAvailable api={this.props.api} config={this.state.config}
-                         foreignClusters={this.state.foreignClusters}
-                         advertisements={this.state.advertisements}
-                         peeringRequests={this.state.peeringRequests}
-          />
-        </Alert.ErrorBoundary>
+      <div key={'list_available'} data-grid={{ w: 2, h: 10, x: 2, y: 0, minW: 2, minH: 3 }} >
+        <div className={'scrollbar'} >
+          <Alert.ErrorBoundary>
+            <ListAvailable api={this.props.api} config={this.state.config}
+                           foreignClusters={this.state.foreignClusters}
+                           advertisements={this.state.advertisements}
+                           peeringRequests={this.state.peeringRequests}
+            />
+          </Alert.ErrorBoundary>
+        </div>
       </div>,
-      <div style={{overflow: 'auto', height: '100%'}} key={'status'}
-           data-grid={{ w: 2, h: 10, x: 4, y: 0, minW: 2, minH: 3 }}
-      >
-        <Alert.ErrorBoundary>
-          <Status api={this.props.api} config={this.state.config} foreignClusters={this.state.foreignClusters}
-                  homeNodes={this.state.homeNodes}
-                  foreignNodes={this.state.foreignNodes}
-                  incomingMetrics={this.state.fcMetricsIn}
-                  outgoingMetrics={this.state.fcMetricsOut}
-          />
-        </Alert.ErrorBoundary>
+      <div data-grid={{ w: 2, h: 10, x: 4, y: 0, minW: 2, minH: 3 }} key={'status'} >
+        <div className={'scrollbar'} >
+          <Alert.ErrorBoundary>
+            <Status api={this.props.api} config={this.state.config} foreignClusters={this.state.foreignClusters}
+                    homeNodes={this.state.homeNodes}
+                    foreignNodes={this.state.foreignNodes}
+                    incomingMetrics={this.state.fcMetricsIn}
+                    outgoingMetrics={this.state.fcMetricsOut}
+            />
+          </Alert.ErrorBoundary>
+        </div>
       </div>
     ])
 
