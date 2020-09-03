@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Popconfirm, Badge, Button, Col, Collapse, Row, Tooltip, Typography } from 'antd';
+import { Popconfirm, Badge, Button, Col, Row, Tooltip, Typography } from 'antd';
 import { rootSplitCamelCaseAndUp, splitCamelCaseAndUp } from '../../services/stringUtils';
 import { QuestionCircleOutlined, EditOutlined, CloseOutlined } from '@ant-design/icons';
 import { customFieldTemplateGeneral } from './CustomFieldTemplate';
@@ -16,7 +16,6 @@ class CustomFieldTemplateViewer extends Component{
     let render = customFieldTemplateGeneral(props);
 
     if(!render){
-      let value = props.children.props.children[0].props.formData;
       return (
         <div className={classNames} id={id} style={{ marginBottom: 5, marginTop: 5 }}>
           <Row align="middle">

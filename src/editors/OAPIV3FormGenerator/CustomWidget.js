@@ -1,8 +1,9 @@
-import {
+import  {
   Col, Input, InputNumber, Row, Slider,
-  Switch
+  Switch, DatePicker
 } from 'antd';
 import React from 'react';
+import dayjs from 'dayjs';
 
 /** Custom widgets */
 
@@ -73,7 +74,16 @@ const CustomText = function(props) {
   )
 }
 
+const CustomDateTime = function(props) {
+  return(
+    <DatePicker showTime  style={{marginTop: 5, marginBottom: 5, float: 'right', width: '100%'}}
+                id={props.id} value={dayjs(props.value)}  disabled={props.disabled} role={'date-picker'}
+                onChange={( value ) => {if(!props.readonly) props.onChange(value.toISOString())}} />
+  )
+}
+
 export const widgets = {
   CheckboxWidget: CustomCheckbox,
-  TextWidget: CustomText
+  TextWidget: CustomText,
+  DateTimeWidget: CustomDateTime
 };
