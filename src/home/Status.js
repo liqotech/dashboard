@@ -111,6 +111,26 @@ class Status extends Component {
     }
   }
 
+  /** This means there are no metrics available */
+  getConsumedMetricsNoMetricsServer(consumedHome){
+    this.metricsNotAvailableIncoming = true;
+    this.props.api.getPODs().
+    then(res => {
+      let pods = res.body.items.filter(po => {return po.spec.nodeName.slice(0, 5) !== 'liqo-'});
+      consumedHome.CPU = 0;
+      consumedHome.RAM = 0;
+      pods.forEach(po => {
+        po.spec.containers.forEach(co => {
+          if(co.resources.requests && co.resources.requests.cpu && co.resources.requests.memory){
+            consumedHome.CPU += convertCPU(co.resources.requests.cpu);
+            consumedHome.RAM += convertRAM(co.resources.requests.memory);
+            this.setState({consumedHome});
+          }
+        });
+      })
+    })
+  }
+
   /**
    * Get the total of consumed resources
    */
@@ -136,25 +156,12 @@ class Status extends Component {
           })
           this.setState({consumedHome});
         } else {
-          /** This means there are no metrics available */
-          this.metricsNotAvailableIncoming = true;
-          this.props.api.getPODs().
-          then(res => {
-            let pods = res.body.items.filter(po => {return po.spec.nodeName.slice(0, 5) !== 'liqo-'});
-            consumedHome.CPU = 0;
-            consumedHome.RAM = 0;
-            pods.forEach(po => {
-              po.spec.containers.forEach(co => {
-                if(co.resources.requests && co.resources.requests.cpu && co.resources.requests.memory){
-                  consumedHome.CPU += convertCPU(co.resources.requests.cpu);
-                  consumedHome.RAM += convertRAM(co.resources.requests.memory);
-                  this.setState({consumedHome});
-                }
-              });
-            })
-          })
+          this.getConsumedMetricsNoMetricsServer(consumedHome);
         }
-      })
+      }).catch(() => {
+        this.metricsNotAvailableOutgoing = true;
+        this.getConsumedMetricsNoMetricsServer(consumedHome);
+    })
   }
 
   /**
@@ -314,7 +321,7 @@ class Status extends Component {
           </Collapse>
           <Collapse defaultActiveKey={['1']} className={'crd-collapse'} style={{backgroundColor: '#fafafa', marginTop: 16}}>
             <Collapse.Panel style={{ borderBottomColor: '#f0f0f0' }}
-                            header={<span>Foreign (Total)  {this.metricsNotAvailableIncoming ? (
+                            header={<span>Foreign (Total)  {this.metricsNotAvailableOutgoing ? (
                               <Tooltip title={'Precise metrics not available in some of the foreign clusters'}>
                                 <ExclamationCircleTwoTone twoToneColor="#f5222d" />
                               </Tooltip>) : null}</span>} key="1"
