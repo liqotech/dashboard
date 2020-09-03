@@ -19,12 +19,12 @@ function mockFetch(error) {
       return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
     } else if (req.url === 'http://localhost:3001/clustercustomobject/advertisements') {
       if (req.method === 'GET') {
-        return Promise.resolve(new Response(JSON.stringify({ body: AdvMockResponse })))
+        let advertisement = AdvMockResponse;
+        advertisement.items[0].metadata.namespace = 'test';
+        return Promise.resolve(new Response(JSON.stringify({ body: advertisement })))
       } else if (req.method === 'PUT') {
         if (error) {
-          if (error === '409') {
-            return Promise.reject(Error409.body);
-          }
+          return Promise.reject(Error409.body);
         } else {
           let ClusterConfigMockResponseMod = ClusterConfigMockResponse.items[0];
           ClusterConfigMockResponseMod.resourceVersion++;
@@ -113,5 +113,30 @@ describe('FormViewer', () => {
     expect(screen.getByText('Save changes')).toBeInTheDocument();
 
     userEvent.click(screen.getByText('Save changes'));
+  }, 30000)
+
+  test('FormViewer changes parameters with errors', async () => {
+    mockFetch(true);
+
+    await setup();
+    await check();
+
+    userEvent.click(screen.getByText(/advertisement-/i));
+    userEvent.click(await screen.findByText('General'));
+    userEvent.click(await screen.findByText('Limit Range'));
+    userEvent.click(await screen.findByText('Limits'));
+    let general = await screen.findAllByText('General');
+    userEvent.click(general[1]);
+    userEvent.click(await screen.findByText('Max'));
+
+    await edit();
+
+    userEvent.click(await screen.findByText('No'));
+
+    expect(screen.getByText('Save changes')).toBeInTheDocument();
+
+    userEvent.click(screen.getByText('Save changes'));
+
+    expect(await screen.findByText(/Could not update the resource/i))
   }, 30000)
 })

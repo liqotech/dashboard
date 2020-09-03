@@ -112,39 +112,43 @@ class ListConnected extends Component {
 
     return (
       <div className="home-header">
-        <PageHeader style={{ paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16 }}
-                    title={
-                      <Space>
-                        <Typography.Text strong style={{ fontSize: 24 }}>Connected Peers</Typography.Text>
-                      </Space>
-                    }
-                    extra={
-                      <Space>
-                        <Tooltip title={'Add filter'}>
-                          {
-                            //TODO: add some filter option
-                          }
-                          <Button type={'text'} icon={<FilterOutlined/>}/>
-                        </Tooltip>
-                      </Space>
-                    }
-                    className={'draggable'}
-        />
-        <Divider style={{ marginTop: 0, marginBottom: 0 }}/>
-        { connectedPeers.length === 0 ? (
-          <div style={{ padding: '1em' }}>
-            <Alert
-              message="No peer connected at the moment"
-              description="Join one and start sharing!"
-              type="info"
-              showIcon
-              closable
-            />
-          </div>
-        ) : (
-          this.state.loadingServer || this.state.loadingClient ? <LoadingIndicator /> :
-          <div>{connectedPeers}</div>
-        )}
+        <div style={{position: 'fixed', zIndex: 10, width: '100%', backgroundColor: 'white'}}>
+          <PageHeader style={{ paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16 }}
+                      title={
+                        <Space>
+                          <Typography.Text strong style={{ fontSize: 24 }}>Connected Peers</Typography.Text>
+                        </Space>
+                      }
+                      extra={
+                        <Space>
+                          <Tooltip title={'Add filter'}>
+                            {
+                              //TODO: add some filter option
+                            }
+                            <Button type={'text'} icon={<FilterOutlined/>}/>
+                          </Tooltip>
+                        </Space>
+                      }
+                      className={'draggable'}
+          />
+          <Divider style={{ marginTop: 0, marginBottom: 0 }}/>
+        </div>
+        <div style={{paddingTop: '5.5vh'}} >
+          { connectedPeers.length === 0 ? (
+            <div style={{ padding: '1em' }}>
+              <Alert
+                message="No peer connected at the moment"
+                description="Join one and start sharing!"
+                type="info"
+                showIcon
+                closable
+              />
+            </div>
+          ) : (
+            this.state.loadingServer || this.state.loadingClient ? <LoadingIndicator /> :
+            <div>{connectedPeers}</div>
+          )}
+        </div>
       </div>
     )
   }

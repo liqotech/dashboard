@@ -92,40 +92,44 @@ class ListAvailable extends Component {
 
     const availablePeersCard = (
       <div>
-        <PageHeader style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}
-                    title={
-                      <div className={'draggable'}>
-                        <Typography.Text strong style={{fontSize: 24}}>Available Peers</Typography.Text>
-                      </div>
-                    }
-                    extra={
-                      <Tooltip title={'Add new peer'}>
-                        <Button type={'primary'}
-                                onClick={() => {
-                                  this.setState({showAddPeer: true});
-                                }}
-                                icon={<PlusOutlined />} style={{marginTop: 2}}/>
-                      </Tooltip>
-                    }
-        />
-        <Divider style={{marginTop: 0, marginBottom: 0}}/>
-        { availablePeers.length === 0 ? (
-          <div style={{ padding: '1em' }}>
-            <Alert
-              message="No peer available at the moment"
-              description={
-                <Typography.Link underline onClick={() => {this.setState({showAddPeer: true})}}>
-                  Search for one
-                </Typography.Link>
-              }
-              type="info"
-              showIcon
-              closable
-            />
-          </div>
-        ) : (
-          <div>{availablePeers}</div>
-        )}
+        <div style={{position: 'fixed', zIndex: 10, width: '100%', backgroundColor: 'white'}}>
+          <PageHeader style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}
+                      title={
+                        <div className={'draggable'}>
+                          <Typography.Text strong style={{fontSize: 24}}>Available Peers</Typography.Text>
+                        </div>
+                      }
+                      extra={
+                        <Tooltip title={'Add new peer'}>
+                          <Button type={'primary'}
+                                  onClick={() => {
+                                    this.setState({showAddPeer: true});
+                                  }}
+                                  icon={<PlusOutlined />} style={{marginTop: 2}}/>
+                        </Tooltip>
+                      }
+          />
+          <Divider style={{marginTop: 0, marginBottom: 0}}/>
+        </div>
+        <div style={{paddingTop: '5.5vh'}} >
+          { availablePeers.length === 0 ? (
+            <div style={{ padding: '1em' }}>
+              <Alert
+                message="No peer available at the moment"
+                description={
+                  <Typography.Link underline onClick={() => {this.setState({showAddPeer: true})}}>
+                    Search for one
+                  </Typography.Link>
+                }
+                type="info"
+                showIcon
+                closable
+              />
+            </div>
+          ) : (
+            <div>{availablePeers}</div>
+          )}
+        </div>
       </div>
     )
 

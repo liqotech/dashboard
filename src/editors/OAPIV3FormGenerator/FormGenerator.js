@@ -2,11 +2,6 @@ import React, { Component } from 'react';
 import Utils from '../../services/Utils';
 import { withTheme } from '@rjsf/core';
 import { Theme as AntDTheme } from '@rjsf/antd';
-import AceEditor from 'react-ace';
-import YAML from 'yaml';
-import 'ace-builds/src-noconflict/mode-json';
-import 'ace-builds/src-noconflict/mode-yaml';
-import 'ace-builds/src-noconflict/theme-github';
 import { Button, Card, message, Typography } from 'antd';
 import { widgets } from './CustomWidget';
 import {  fields } from './CustomField';
@@ -25,7 +20,6 @@ class FormGenerator extends Component {
     this.schema = this.util.OAPIV3toJSONSchema(this.props.CRD.spec.validation.openAPIV3Schema).properties.spec;
     this.currentMetadata = {};
     this.onSubmit = this.onSubmit.bind(this);
-    this.onChange = this.onChange.bind(this);
   }
 
   onSubmit(value) {
@@ -47,10 +41,6 @@ class FormGenerator extends Component {
     } else{
       this.props.submit(value.formData);
     }
-  }
-
-  onChange(value) {
-    this.value = value;
   }
 
   render() {
