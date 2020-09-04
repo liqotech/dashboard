@@ -13,7 +13,9 @@
         "advertisementConfig": {
           "autoAccept": true,
           "maxAcceptableAdvertisement": 10,
-          "resourceSharingPercentage": 63
+          "outgoingConfig": {
+            "resourceSharingPercentage": 63
+          }
         },
         "discoveryConfig": {
           "autojoin": true,
