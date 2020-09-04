@@ -95,8 +95,8 @@ class ConnectedPeer extends Component {
     home_totalPodsRAM += podPercentage.RAMmi;
     home_totalPodsCPU += podPercentage.CPUmi;
 
-    let totalRAMPercentage = home_totalPodsRAM / (home_totalMemory * this.props.config.spec.advertisementConfig.resourceSharingPercentage / 100) * 100;
-    let totalCPUPercentage = home_totalPodsCPU / (home_totalCPU * this.props.config.spec.advertisementConfig.resourceSharingPercentage / 100) * 100;
+    let totalRAMPercentage = home_totalPodsRAM / (home_totalMemory * this.props.config.spec.advertisementConfig.outgoingConfig.resourceSharingPercentage / 100) * 100;
+    let totalCPUPercentage = home_totalPodsCPU / (home_totalCPU * this.props.config.spec.advertisementConfig.outgoingConfig.resourceSharingPercentage / 100) * 100;
 
     if(home_counter === this.state.incomingPods.length){
       this.setState({
