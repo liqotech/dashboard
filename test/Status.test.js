@@ -57,7 +57,7 @@ function mocks(advertisement, foreignCluster, peeringRequest, error, errorMetric
       if(!errorMetrics)
         return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
       else
-        return Promise.reject(409);
+        return Promise.reject(404);
     } else if (req.url === 'http://localhost:3001/pod') {
       return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
     } else {
@@ -86,6 +86,14 @@ describe('Status', () => {
 
     await new Promise((r) => setTimeout(r, 31000));
   }, 40000)
+
+  test('404 on node metrics', async () => {
+    mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, true);
+
+    await OKCheck();
+
+    expect(await screen.findAllByLabelText('exclamation-circle')).toHaveLength(2);
+  })
 
   test('Line chart NaN data', async () => {
     render(

@@ -303,7 +303,10 @@ class ConnectedPeer extends Component {
           if(res.items.filter(no => { return no.metadata.name.slice(0, 5) === 'liqo-' }).length !== 0)
             this.metricsNotAvailableOutgoing = true;
         }
-      })
+      }).catch(() => {
+        this.metricsNotAvailableIncoming = true;
+        this.metricsNotAvailableOutgoing = true;
+    })
   }
 
   componentWillUnmount() {
