@@ -4,6 +4,7 @@ import fetchMock from 'jest-fetch-mock';
 import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import LineChart from '../src/templates/line/LineChart';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -15,5 +16,5 @@ describe('Status', () => {
           {"resource": "RAM", "date": "00:00:00", "value": NaN }]} />
       </MemoryRouter>
     )
-  })
+  }, testTimeout)
 })

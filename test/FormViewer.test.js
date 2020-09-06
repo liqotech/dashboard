@@ -10,6 +10,7 @@ import { MemoryRouter } from 'react-router-dom';
 import AdvMockResponse from '../__mocks__/advertisement.json';
 import ClusterConfigMockResponse from '../__mocks__/configs.json';
 import Error409 from '../__mocks__/409.json';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -90,7 +91,7 @@ describe('FormViewer', () => {
     await edit();
 
     userEvent.click(await screen.findByText('Yes'));
-  }, 30000)
+  }, testTimeout)
 
   test('FormViewer shows every information and changes parameters', async () => {
     mockFetch();
@@ -113,7 +114,7 @@ describe('FormViewer', () => {
     expect(screen.getByText('Save changes')).toBeInTheDocument();
 
     userEvent.click(screen.getByText('Save changes'));
-  }, 30000)
+  }, testTimeout)
 
   test('FormViewer changes parameters with errors', async () => {
     mockFetch(true);
@@ -138,5 +139,5 @@ describe('FormViewer', () => {
     userEvent.click(screen.getByText('Save changes'));
 
     expect(await screen.findByText(/Could not update the resource/i))
-  }, 30000)
+  }, testTimeout)
 })

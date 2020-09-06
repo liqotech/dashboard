@@ -20,7 +20,7 @@
             "kind": "tunnelendpoints.liqonet.liqo.io"
           },
           {
-            "kind": "liqodashtests.crd-template.liqo.com"
+            "kind": "liqodashtests.dashboard.liqo.com"
           }
         ]
       }

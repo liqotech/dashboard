@@ -13,6 +13,7 @@ import PRMockResponse from '../__mocks__/peeringrequest.json';
 import Error404 from '../__mocks__/404.json';
 import App from '../src/app/App';
 import ViewMockResponse from '../__mocks__/views.json';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -58,5 +59,5 @@ describe('App', () => {
 
     /** Assert that a success notification has spawned */
     expect(await screen.findByText(/liqo/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 })

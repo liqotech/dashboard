@@ -16,6 +16,7 @@ import ApiManager from '../src/services/__mocks__/ApiManager';
 import CRD from '../src/CRD/CRD';
 import { MemoryRouter } from 'react-router-dom';
 import Error404 from '../__mocks__/404.json';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -83,7 +84,7 @@ async function setup_only_CRD(error, template) {
         <CRD api={api}
              match={{
                params: {
-                 crdName: 'liqodashtests.crd-template.liqo.com'
+                 crdName: 'liqodashtests.dashboard.liqo.com'
                }
              }}
              history={[]}
@@ -130,7 +131,7 @@ describe('CRD', () => {
     /** This CRD contains a custom template and a description, so there has to be a switch and not the default description*/
     await alwaysPresent('LiqoDashTest','A test CRD for some implemetation on the liqo-dashboard');
     expect(screen.queryByRole('switch')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Annotations tab works', async () => {
     fetch.mockResponse(req => {
@@ -161,7 +162,7 @@ describe('CRD', () => {
     userEvent.click(annotations);
 
     expect(screen.getByText('No annotations'));
-  })
+  }, testTimeout)
 
   test('Resources tab works', async () => {
     fetch.mockResponse(req => {
@@ -197,7 +198,7 @@ describe('CRD', () => {
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
     expect(await screen.findAllByLabelText('cr')).toHaveLength(5);
     expect(screen.queryByLabelText('pagination')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Schema tab works', async () => {
     fetch.mockResponse(req => {
@@ -228,7 +229,7 @@ describe('CRD', () => {
     userEvent.click(schema);
 
     expect(await screen.findByLabelText('schema')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Favourite are updated accordingly', async () => {
     await setup_extended();
@@ -243,7 +244,7 @@ describe('CRD', () => {
     userEvent.click(favCRD);
 
     expect(await screen.findByText('Advertisement')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Edit design drawer opens', async () => {
     await setup_extended();
@@ -260,7 +261,7 @@ describe('CRD', () => {
     const close = screen.getAllByLabelText('close');
     userEvent.click(close[0]);
     userEvent.click(close[1]);
-  })
+  }, testTimeout)
 
   test('New CR drawer opens', async () => {
     await setup_extended();
@@ -276,8 +277,7 @@ describe('CRD', () => {
 
     const close = screen.getAllByLabelText('close');
     userEvent.click(close[0]);
-    userEvent.click(close[1]);
-  })
+  }, testTimeout)
 
   test('Templates are switched correctly', async () => {
     fetch.mockResponse(req => {
@@ -306,7 +306,7 @@ describe('CRD', () => {
     userEvent.click(switcher);
     userEvent.click(screen.getByText('test-1'));
     expect(await screen.findByLabelText('piechart')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('CR with no spec or status still works', async () => {
     fetch.mockImplementation((url) => {
@@ -337,7 +337,7 @@ describe('CRD', () => {
 
     expect(screen.queryByText('Spec')).not.toBeInTheDocument();
     expect(screen.queryByText('Status')).not.toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('CRD changes when external changes happen, modify', async () => {
     await setup_only_CRD();
@@ -349,7 +349,7 @@ describe('CRD', () => {
     expect(await screen.findByText('LiqoDashTestMod')).toBeInTheDocument();
 
     api = null;
-  })
+  }, testTimeout)
 
   test('CR gets eliminated', async () => {
     await setup_only_CRD();
@@ -381,7 +381,7 @@ describe('CRD', () => {
     userEvent.click(no);
 
     api = null;
-  }, 30000)
+  }, testTimeout)
 
   test('CRD template error', async () => {
     await setup_only_CRD(true, true);
@@ -389,7 +389,7 @@ describe('CRD', () => {
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
 
     api = null;
-  })
+  }, testTimeout)
 
   test('CRD dropdown custom view', async () => {
     await setup_only_CRD();
@@ -409,7 +409,7 @@ describe('CRD', () => {
     userEvent.click(await screen.findByText('Liqo View'));
 
     api = null;
-  })
+  }, testTimeout)
 
   test('CRD dropdown custom view failed add to custom view', async () => {
     await setup_only_CRD(true);
@@ -423,5 +423,5 @@ describe('CRD', () => {
     userEvent.click(await screen.findByText('Liqo View'));
 
     api = null;
-  })
+  }, testTimeout)
 })

@@ -17,6 +17,7 @@ import TunnMockResponse from '../__mocks__/tunnelendpoints.json';
 import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import PieMockResponse from '../__mocks__/piecharts.json';
 import HistoMockResponse from '../__mocks__/histocharts.json';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -75,7 +76,7 @@ describe('CustomView', () => {
     await api.updateCustomResourceDefinition(null, api.getCRDfromKind('Advertisement'));
 
     expect(await screen.findByText(/modified/i));
-  })
+  }, testTimeout)
 
   test('Custom view react if new CRD has been added', async () => {
     mocks(ViewMockResponse);
@@ -88,7 +89,7 @@ describe('CustomView', () => {
     api.manageCallbackCVs(api.customViews);
 
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Pinned card works', async () => {
     await setup_cv(ViewMockResponse);
@@ -96,7 +97,7 @@ describe('CustomView', () => {
     const pin = await screen.findAllByLabelText('pushpin');
 
     userEvent.click(pin[0]);
-  })
+  }, testTimeout)
 
   test('Custom view is empty if no Custom view', async () => {
     mocks(ViewMockResponseLayout);
@@ -111,7 +112,7 @@ describe('CustomView', () => {
     api.manageCallbackCVs(api.customViews);
 
     expect(await screen.findByText('Advertisement')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Custom view with layout', async () => {
     mocks(ViewMockResponseLayout);
@@ -122,7 +123,7 @@ describe('CustomView', () => {
     api.manageCallbackCVs(api.customViews);
 
     expect(await screen.findByText('Advertisement')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Change CR on custom view', async () => {
     mockCRDAndViewsExtended(null, 'PUT', 'advertisements', true);
@@ -136,12 +137,12 @@ describe('CustomView', () => {
     await api.updateCustomResource(null, null, null, 'advertisements', null, AdvMockResponse);
 
     expect(await screen.findByText(/resource/i));
-  })
+  }, testTimeout)
 
   test('Custom view shows alternative template', async () => {
     mocks(ViewMockAltTemplate);
     await setup();
 
     expect(await screen.findByText('Test')).toBeInTheDocument();
-  })
+  }, testTimeout)
 })

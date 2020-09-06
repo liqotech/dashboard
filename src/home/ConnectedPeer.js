@@ -28,18 +28,49 @@ class ConnectedPeer extends Component {
       showProperties: false,
       incomingPods: [],
       incomingPodsPercentage: [],
-      incomingTotalPercentage: {
-        CPU: 0,
-        RAM: 0
+      incomingTotal: {
+        percentage: {
+          CPU: 0,
+          RAM: 0
+        },
+        availablePercentage: {
+          CPU: 0,
+          RAM: 0
+        },
+        consumed: {
+          CPU: 0,
+          RAM: 0
+        },
+        available: {
+          CPU: 0,
+          RAM: 0
+        }
       },
       outgoingPods: [],
       outgoingPodsPercentage: [],
-      outgoingTotalPercentage: {
-        CPU: 0,
-        RAM: 0
+      outgoingTotal: {
+        percentage: {
+          CPU: 0,
+          RAM: 0
+        },
+        availablePercentage: {
+          CPU: 0,
+          RAM: 0
+        },
+        consumed: {
+          CPU: 0,
+          RAM: 0
+        },
+        available: {
+          CPU: 0,
+          RAM: 0
+        }
       },
       showDetails: false,
-      sharing: false
+      sharing: {
+        server: false,
+        client: false
+      }
     }
 
     this.flagOut = false;
@@ -83,154 +114,260 @@ class ConnectedPeer extends Component {
       CPU: Math.round(((usedCPU / allocatableCPU) * 100) * 10) / 10,
       RAM: Math.round(((usedRAM / allocatableRAM) * 100) * 10) / 10,
       RAMmi: Math.round(usedRAM * 10) / 10,
-      CPUmi: Math.round(usedCPU * 10) / 10
+      CPUmi: Math.round(usedCPU * 10) / 10,
+      CPUTot: Math.round(allocatableCPU * 10) / 10,
+      RAMTot:Math.round(allocatableRAM * 10) / 10
     }
   }
 
-  calculateIncomingMetricsPods(home_counter, po, res, home_podsPercentage, home_totalPodsRAM, home_totalPodsCPU, home_totalMemory, home_totalCPU){
+  calculateIncomingMetricsPods(home, po, res){
     let podPercentage = this.getPODPercentage(po, res);
 
-    home_podsPercentage.push(podPercentage);
+    home.podsPercentage.push(podPercentage);
 
-    home_totalPodsRAM += podPercentage.RAMmi;
-    home_totalPodsCPU += podPercentage.CPUmi;
+    home.totalPodsRAM += podPercentage.RAMmi;
+    home.totalPodsCPU += podPercentage.CPUmi;
+    
+    home.totalAllocatablePodsRAM += podPercentage.RAMTot;
+    home.totalAllocatablePodsCPU += podPercentage.CPUTot;
 
-    let totalRAMPercentage = home_totalPodsRAM / (home_totalMemory * this.props.config.spec.advertisementConfig.outgoingConfig.resourceSharingPercentage / 100) * 100;
-    let totalCPUPercentage = home_totalPodsCPU / (home_totalCPU * this.props.config.spec.advertisementConfig.outgoingConfig.resourceSharingPercentage / 100) * 100;
+    let totalRAMPercentage = home.totalPodsRAM / (home.totalMemory * this.props.config.spec.advertisementConfig.outgoingConfig.resourceSharingPercentage / 100) * 100;
+    let totalCPUPercentage = home.totalPodsCPU / (home.totalCPU * this.props.config.spec.advertisementConfig.outgoingConfig.resourceSharingPercentage / 100) * 100;
 
-    if(home_counter === this.state.incomingPods.length){
+    let totalAvailableRAMPercentage = home.totalAllocatablePodsRAM / (home.totalMemory * this.props.config.spec.advertisementConfig.outgoingConfig.resourceSharingPercentage / 100) * 100;
+    let totalAvailableCPUPercentage = home.totalAllocatablePodsCPU / (home.totalCPU * this.props.config.spec.advertisementConfig.outgoingConfig.resourceSharingPercentage / 100) * 100;
+
+    if(home.counter === this.state.incomingPods.length){
       this.setState({
-          incomingPodsPercentage: home_podsPercentage,
-          incomingTotalPercentage: {
-            RAM: Math.round(totalRAMPercentage * 10) / 10,
-            CPU: Math.round(totalCPUPercentage * 10) / 10
+          incomingPodsPercentage: home.podsPercentage,
+          incomingTotal: {
+            percentage: {
+              RAM: Math.round(totalRAMPercentage * 10) / 10,
+              CPU: Math.round(totalCPUPercentage * 10) / 10
+            },
+            availablePercentage: {
+              RAM: Math.round(totalAvailableRAMPercentage * 10) / 10,
+              CPU: Math.round(totalAvailableCPUPercentage * 10) / 10
+            },
+            consumed: {
+              RAM: home.totalPodsRAM,
+              CPU: home.totalPodsCPU
+            },
+            available: {
+              RAM: (home.totalMemory * this.props.config.spec.advertisementConfig.outgoingConfig.resourceSharingPercentage / 100),
+              CPU: (home.totalCPU * this.props.config.spec.advertisementConfig.outgoingConfig.resourceSharingPercentage / 100)
+            }
           }
         }, this.props.updateFCMetrics(true, {
           fc: this.props.foreignCluster.spec.clusterID,
-          RAM: home_totalPodsRAM,
-          CPU: home_totalPodsCPU
+          RAM: home.totalPodsRAM,
+          CPU: home.totalPodsCPU
         })
       )
     }
 
     return {
-      home_totalPodsRAM,
-      home_totalPodsCPU
+      home
     }
   }
 
-  calculateOutgoingMetricsPods(foreign_counter, po, res, foreign_podsPercentage, foreign_totalPodsRAM, foreign_totalPodsCPU, foreign_totalMemory, foreign_totalCPU){
+  calculateOutgoingMetricsPods(foreign, po, res){
     let podPercentage = this.getPODPercentage(po, res);
 
-    foreign_podsPercentage.push(podPercentage);
+    foreign.podsPercentage.push(podPercentage);
 
-    foreign_totalPodsRAM += podPercentage.RAMmi;
-    foreign_totalPodsCPU += podPercentage.CPUmi;
+    foreign.totalPodsRAM += podPercentage.RAMmi;
+    foreign.totalPodsCPU += podPercentage.CPUmi;
 
-    let totalRAMPercentage = foreign_totalPodsRAM / foreign_totalMemory * 100;
-    let totalCPUPercentage = foreign_totalPodsCPU / foreign_totalCPU * 100;
+    foreign.totalAllocatablePodsRAM += podPercentage.RAMTot;
+    foreign.totalAllocatablePodsCPU += podPercentage.CPUTot;
 
-    if(foreign_counter === this.state.outgoingPods.length){
+    let totalRAMPercentage = foreign.totalPodsRAM / foreign.totalMemory * 100;
+    let totalCPUPercentage = foreign.totalPodsCPU / foreign.totalCPU * 100;
+
+    let totalAvailableRAMPercentage = foreign.totalAllocatablePodsRAM / foreign.totalMemory * 100;
+    let totalAvailableCPUPercentage = foreign.totalAllocatablePodsCPU / foreign.totalCPU * 100;
+
+    if(foreign.counter === this.state.outgoingPods.length){
       this.setState({
-          outgoingPodsPercentage: foreign_podsPercentage,
-          outgoingTotalPercentage: {
-            RAM: Math.round(totalRAMPercentage * 10) / 10,
-            CPU: Math.round(totalCPUPercentage * 10) / 10
+          outgoingPodsPercentage: foreign.podsPercentage,
+          outgoingTotal: {
+            percentage: {
+              RAM: Math.round(totalRAMPercentage * 10) / 10,
+              CPU: Math.round(totalCPUPercentage * 10) / 10
+            },
+            availablePercentage: {
+              RAM: Math.round(totalAvailableRAMPercentage * 10) / 10,
+              CPU: Math.round(totalAvailableCPUPercentage * 10) / 10
+            },
+            consumed: {
+              RAM: foreign.totalPodsRAM,
+              CPU: foreign.totalPodsCPU
+            },
+            available: {
+              RAM: foreign.totalMemory,
+              CPU: foreign.totalCPU
+            }
           }
         }, this.props.updateFCMetrics(false, {
           fc: this.props.foreignCluster.spec.clusterID,
-          RAM: foreign_totalPodsRAM,
-          CPU: foreign_totalPodsCPU
+          RAM: foreign.totalPodsRAM,
+          CPU: foreign.totalPodsCPU
         })
       )
     }
 
     return {
-      foreign_totalPodsRAM,
-      foreign_totalPodsCPU
+      foreign
     }
   }
 
   /** */
   updatePODPercentage(){
     if(this.props.server){
-      let home_podsPercentage = [];
-      let home_totalMemory = 0;
-      let home_totalCPU = 0;
-      let home_totalPodsRAM = 0;
-      let home_totalPodsCPU = 0;
-      let home_counter = 0;
+      let home = {
+        podsPercentage : [],
+        totalMemory : 0,
+        totalCPU : 0,
+        totalPodsRAM : 0,
+        totalPodsCPU : 0,
+        totalAllocatablePodsRAM : 0,
+        totalAllocatablePodsCPU : 0,
+        counter : 0
+      }
       this.props.homeNodes.forEach(no => {
-        home_totalMemory += convertRAM(no.status.allocatable.memory);
-        home_totalCPU += convertCPU(no.status.allocatable.cpu);
+        home.totalMemory += convertRAM(no.status.allocatable.memory);
+        home.totalCPU += convertCPU(no.status.allocatable.cpu);
       })
-      this.state.incomingPods.forEach(po => {
-        if(!this.metricsNotAvailableIncoming) {
-          this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
-            .then(res => {
-              home_counter++;
-              let total = this.calculateIncomingMetricsPods(home_counter, po, res, home_podsPercentage, home_totalPodsRAM, home_totalPodsCPU, home_totalMemory, home_totalCPU);
-              home_totalPodsRAM = total.home_totalPodsRAM;
-              home_totalPodsCPU = total.home_totalPodsCPU;
-            })
-            .catch(error => {
-              if (error === 404) {
-                this.metricsNotAvailableIncoming = true;
-                home_counter++;
-                let total = this.calculateIncomingMetricsPods(home_counter, po, error, home_podsPercentage, home_totalPodsRAM, home_totalPodsCPU, home_totalMemory, home_totalCPU);
-                home_totalPodsRAM = total.home_totalPodsRAM;
-                home_totalPodsCPU = total.home_totalPodsCPU;
+      if(this.state.incomingPods.length === 0){
+        this.setState({
+            incomingPodsPercentage: [],
+            incomingTotal: {
+              percentage: {
+                RAM: 0,
+                CPU: 0
+              },
+              availablePercentage: {
+                RAM: 0,
+                CPU: 0
+              },
+              consumed: {
+                RAM: 0,
+                CPU: 0
+              },
+              available: {
+                RAM: 0,
+                CPU: 0
               }
-            })
-        } else {
-          home_counter++;
-          let total = this.calculateIncomingMetricsPods(home_counter, po, 404, home_podsPercentage, home_totalPodsRAM, home_totalPodsCPU, home_totalMemory, home_totalCPU);
-          home_totalPodsRAM = total.home_totalPodsRAM;
-          home_totalPodsCPU = total.home_totalPodsCPU;
-        }
-      })
+            }
+          }, this.props.updateFCMetrics(true, {
+            fc: this.props.foreignCluster.spec.clusterID,
+            RAM: 0,
+            CPU: 0
+          })
+        )
+      } else {
+        this.state.incomingPods.forEach(po => {
+          if(!this.metricsNotAvailableIncoming) {
+            this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
+              .then(res => {
+                home.counter++;
+                let total = this.calculateIncomingMetricsPods(home, po, res);
+                home.totalPodsRAM = total.home.totalPodsRAM;
+                home.totalPodsCPU = total.home.totalPodsCPU;
+              })
+              .catch(error => {
+                if (error === 404) {
+                  this.metricsNotAvailableIncoming = true;
+                  home.counter++;
+                  let total = this.calculateIncomingMetricsPods(home, po, error);
+                  home.totalPodsRAM = total.home.totalPodsRAM;
+                  home.totalPodsCPU = total.home.totalPodsCPU;
+                }
+              })
+          } else {
+            home.counter++;
+            let total = this.calculateIncomingMetricsPods(home, po, 404);
+            home.totalPodsRAM = total.home.totalPodsRAM;
+            home.totalPodsCPU = total.home.totalPodsCPU;
+          }
+        })
+      }
     }
 
     if(this.props.client){
-      let foreign_podsPercentage = [];
-      let foreign_totalMemory = 0;
-      let foreign_totalCPU = 0;
-      let foreign_totalPodsRAM = 0;
-      let foreign_totalPodsCPU = 0;
-      let foreign_counter = 0;
+      let foreign = {
+        podsPercentage : [],
+        totalMemory : 0,
+        totalCPU : 0,
+        totalPodsRAM : 0,
+        totalPodsCPU : 0,
+        totalAllocatablePodsRAM : 0,
+        totalAllocatablePodsCPU : 0,
+        counter : 0
+      }
 
       let adv = this.props.advertisements.find(adv =>
         {return adv.metadata.name === this.props.foreignCluster.status.outgoing.advertisement.name}
       );
 
-      foreign_totalMemory = convertRAM(adv.spec.resourceQuota.hard.memory);
-      foreign_totalCPU = convertCPU(adv.spec.resourceQuota.hard.cpu);
+      foreign.totalMemory = convertRAM(adv.spec.resourceQuota.hard.memory);
+      foreign.totalCPU = convertCPU(adv.spec.resourceQuota.hard.cpu);
 
-      this.state.outgoingPods.forEach(po => {
-        if(!this.metricsNotAvailableOutgoing){
-          this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
-            .then(res => {
-              foreign_counter++;
-              let total = this.calculateOutgoingMetricsPods(foreign_counter, po, res, foreign_podsPercentage, foreign_totalPodsRAM, foreign_totalPodsCPU, foreign_totalMemory, foreign_totalCPU);
-              foreign_totalPodsRAM = total.foreign_totalPodsRAM;
-              foreign_totalPodsCPU = total.foreign_totalPodsCPU;
-            })
-            .catch(error => {
-              if(error === 404){
-                this.metricsNotAvailableOutgoing = true;
-                foreign_counter++;
-                let total = this.calculateOutgoingMetricsPods(foreign_counter, po, error, foreign_podsPercentage, foreign_totalPodsRAM, foreign_totalPodsCPU, foreign_totalMemory, foreign_totalCPU);
-                foreign_totalPodsRAM = total.foreign_totalPodsRAM;
-                foreign_totalPodsCPU = total.foreign_totalPodsCPU;
+      if(this.state.outgoingPods.length === 0){
+        this.setState({
+            outgoingPodsPercentage: [],
+            outgoingTotal: {
+              percentage: {
+                RAM: 0,
+                CPU: 0
+              },
+              availablePercentage: {
+                RAM: 0,
+                CPU: 0
+              },
+              consumed: {
+                RAM: 0,
+                CPU: 0
+              },
+              available: {
+                RAM: 0,
+                CPU: 0
               }
-            })
-        } else {
-          foreign_counter++;
-          let total = this.calculateOutgoingMetricsPods(foreign_counter, po, 404, foreign_podsPercentage, foreign_totalPodsRAM, foreign_totalPodsCPU, foreign_totalMemory, foreign_totalCPU);
-          foreign_totalPodsRAM = total.foreign_totalPodsRAM;
-          foreign_totalPodsCPU = total.foreign_totalPodsCPU;
-        }
-      })
+            }
+          }, this.props.updateFCMetrics(false, {
+            fc: this.props.foreignCluster.spec.clusterID,
+            RAM: 0,
+            CPU: 0
+          })
+        )
+      } else {
+        this.state.outgoingPods.forEach(po => {
+          if (!this.metricsNotAvailableOutgoing) {
+            this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
+              .then(res => {
+                foreign.counter++;
+                let total = this.calculateOutgoingMetricsPods(foreign, po, res);
+                foreign.totalPodsRAM = total.foreign.totalPodsRAM;
+                foreign.totalPodsCPU = total.foreign.totalPodsCPU;
+              })
+              .catch(error => {
+                if (error === 404) {
+                  this.metricsNotAvailableOutgoing = true;
+                  foreign.counter++;
+                  let total = this.calculateOutgoingMetricsPods(foreign, po, error);
+                  foreign.totalPodsRAM = total.foreign.totalPodsRAM;
+                  foreign.totalPodsCPU = total.foreign.totalPodsCPU;
+                }
+              })
+          } else {
+            foreign.counter++;
+            let total = this.calculateOutgoingMetricsPods(foreign, po, 404);
+            foreign.totalPodsRAM = total.foreign.totalPodsRAM;
+            foreign.totalPodsCPU = total.foreign.totalPodsCPU;
+          }
+        })
+      }
     }
   }
 
@@ -249,10 +386,11 @@ class ConnectedPeer extends Component {
     ).status.vkReference.name;
 
     this.state.outgoingPods = this.props.outgoingPods.filter(po => { return po.spec.nodeName === vk });
-
     if(this.state.outgoingPods.length !== 0){
-      this.state.sharing = true;
+      this.state.sharing.client = true;
       this.flagOut = this.checkFlag(this.flagOut);
+    } else {
+      this.state.sharing.client = false;
     }
   }
 
@@ -269,17 +407,19 @@ class ConnectedPeer extends Component {
       }
     })
     if(this.state.incomingPods.length !== 0){
-      this.state.sharing = true;
+      this.state.sharing.server = true;
       this.flagInc = this.checkFlag(this.flagInc);
+    } else {
+      this.state.sharing.server = false;
     }
   }
 
   clientPercentage() {
-    return this.state.outgoingTotalPercentage.RAM;
+    return this.state.outgoingTotal.percentage.RAM;
   }
 
   serverPercentage() {
-    return this.state.incomingTotalPercentage.RAM;
+    return this.state.incomingTotal.percentage.RAM;
   }
 
   /** Disconnect from peer (it makes foreignCluster's spec join parameter false) */
@@ -314,25 +454,25 @@ class ConnectedPeer extends Component {
   }
 
   render(){
-    if(this.props.client && this.props.outgoingPods.length !== 0) {
+    if(this.props.client) {
       this.getClientPODs();
     }
 
-    if(this.props.server && this.props.incomingPods.length !== 0) {
+    if(this.props.server) {
       this.getServerPODs();
     }
 
     const menu = (
       <Menu>
-        <Menu.Item key={'properties'} icon={<ToolOutlined />}
-                   onClick={() => {this.setState({showProperties: true})}}
-        >
-          Properties
-        </Menu.Item>
         <Menu.Item key={'details'} icon={<SnippetsOutlined />}
                    onClick={() => {this.setState({showDetails: true})}}
         >
           Details
+        </Menu.Item>
+        <Menu.Item key={'properties'} icon={<ToolOutlined />}
+                   onClick={() => {this.setState({showProperties: true})}}
+        >
+          Properties
         </Menu.Item>
         <Menu.Item key={'rules'} icon={<AuditOutlined />}>
           Rules
@@ -379,12 +519,12 @@ class ConnectedPeer extends Component {
                       type="circle"
                       percent={serverPercent}
                       strokeWidth={10}
-                      trailColor={(this.props.server &&  this.state.sharing) ? null : this.state.backgroundColor}
-                      strokeColor={(this.props.server && this.state.sharing) ? getColor(serverPercent) : this.state.backgroundColor}
+                      trailColor={(this.props.server && (this.state.sharing.client || this.state.sharing.server)) ? null : this.state.backgroundColor}
+                      strokeColor={(this.props.server && (this.state.sharing.client || this.state.sharing.server)) ? getColor(serverPercent) : this.state.backgroundColor}
                       format={() => (
                         <Avatar
                           size="large"
-                          style={this.state.sharing ? { backgroundColor: '#1890ff' } : { backgroundColor: '#ccc' }}
+                          style={this.state.sharing.client || this.state.sharing.server ? { backgroundColor: '#1890ff' } : { backgroundColor: '#ccc' }}
                           icon={<UserOutlined />}
                         />
                       )}
@@ -402,12 +542,12 @@ class ConnectedPeer extends Component {
                       type="circle"
                       percent={clientPercent}
                       strokeWidth={10}
-                      trailColor={(this.props.client &&   this.state.sharing) ? null : this.state.backgroundColor}
-                      strokeColor={(this.props.client &&  this.state.sharing) ? getColor(clientPercent) : this.state.backgroundColor}
+                      trailColor={(this.props.client && (this.state.sharing.client || this.state.sharing.server)) ? null : this.state.backgroundColor}
+                      strokeColor={(this.props.client && (this.state.sharing.client || this.state.sharing.server)) ? getColor(clientPercent) : this.state.backgroundColor}
                       format={() => (
                         <Avatar
                           size="large"
-                          style={this.state.sharing ? { backgroundColor: '#1890ff' } : { backgroundColor: '#ccc' }}
+                          style={this.state.sharing.client || this.state.sharing.server ? { backgroundColor: '#1890ff' } : { backgroundColor: '#ccc' }}
                           icon={<ClusterOutlined />}
                         />
                       )}
@@ -436,7 +576,7 @@ class ConnectedPeer extends Component {
                 <Col flex={2}>
                   <Typography.Text type={'secondary'}>
                     { 'Connected on ' + this.props.foreignCluster.spec.discoveryType}
-                    {  this.state.sharing ? ', sharing' : ', not sharing'}
+                    {  this.state.sharing.client || this.state.sharing.server ? ', sharing' : ', not sharing'}
                   </Typography.Text>
                 </Col>
                 <Col flex={3}>
@@ -465,8 +605,8 @@ class ConnectedPeer extends Component {
                            metricsNotAvailableOutgoing={this.metricsNotAvailableOutgoing}
                            outgoingPodsPercentage={this.state.outgoingPodsPercentage}
                            incomingPodsPercentage={this.state.incomingPodsPercentage}
-                           outgoingTotalPercentage={this.state.outgoingTotalPercentage}
-                           incomingTotalPercentage={this.state.incomingTotalPercentage}
+                           outgoingTotal={this.state.outgoingTotal}
+                           incomingTotal={this.state.incomingTotal}
         />
 
       </div>

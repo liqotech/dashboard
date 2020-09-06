@@ -17,6 +17,7 @@ import PodsMockResponse from '../__mocks__/pods.json';
 import { metricsPODs } from './RTLUtils';
 import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -34,7 +35,7 @@ async function setup() {
   });
 }
 
-function mocks(advertisement, foreignCluster, peeringRequest, error, errorPod, errorNodes, addPod) {
+function mocks(advertisement, foreignCluster, peeringRequest, error, errorPod, errorNodes, addPod, noPods) {
   fetch.mockResponse((req) => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
       return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
@@ -71,7 +72,10 @@ function mocks(advertisement, foreignCluster, peeringRequest, error, errorPod, e
           let pod = JSON.parse(JSON.stringify(pods.items[2]));
           pod.metadata.name = 'hello-world-deployment-6756549f5-x66v8'
           pods.items.push(pod);
-          return Promise.resolve(new Response(JSON.stringify({body: pods})));
+          if(noPods)
+            return Promise.resolve(new Response(JSON.stringify({body: { items: [] } })));
+          else
+            return Promise.resolve(new Response(JSON.stringify({body: pods})));
         }
       } else
         return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
@@ -100,7 +104,7 @@ describe('ConnectedList', () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, true);
 
     await OKCheck();
-  });
+  }, testTimeout);
 
   test('Pods are refreshed every 30 seconds', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, false, false, true);
@@ -121,11 +125,25 @@ describe('ConnectedList', () => {
 
     userEvent.click(home[1]);
 
-    expect(await screen.findByText(/POD/i)).toBeInTheDocument();
+    expect(await screen.findAllByText(/POD/i)).toHaveLength(2);
 
     expect(await screen.findAllByText(/hello-world/i)).toHaveLength(4);
 
-  }, 35000)
+    counter = 0;
+
+  }, 60000)
+
+  test('Show no metrics when there are no pods', async () => {
+    mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, false, false, true, true);
+
+    await OKCheck();
+
+    await new Promise((r) => setTimeout(r, 31000));
+
+    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+
+    counter = 0;
+  }, 60000)
 
   test('Disconnection error from dropdown show', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
@@ -143,5 +161,5 @@ describe('ConnectedList', () => {
 
     expect(await screen.findByText(/Could not disconnect/i)).toBeInTheDocument();
     expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
-  })
+  }, testTimeout)
 })

@@ -11,6 +11,7 @@ import userEvent from '@testing-library/user-event';
 import { setup_resource } from './RTLUtils';
 import DesignEditorCRD from '../src/editors/DesignEditorCRD';
 import { MemoryRouter } from 'react-router-dom';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -56,11 +57,11 @@ async function fillFields(noMetadata){
   expect(values).toBeInTheDocument();
 
   if(!noMetadata){
-    userEvent.type(name, 'test-2');
-    userEvent.type(namespace, 'test-ns');
+    await userEvent.type(name, 'test-2');
+    await userEvent.type(namespace, 'test-ns');
   }
-  userEvent.type(labels, 'item.name');
-  userEvent.type(values, 'item.cost');
+  await userEvent.type(labels, 'item.name');
+  await userEvent.type(values, 'item.cost');
 
   const submit = screen.getByRole('button', {name: 'Submit'});
   userEvent.click(submit);
@@ -81,7 +82,7 @@ describe('DesignEditorCRD', () => {
     expect(screen.getByText('Select design')).toBeInTheDocument();
     expect(screen.getByText('Submit values')).toBeInTheDocument();
     expect(screen.getByLabelText('steps').querySelector(`[class="ant-steps-item ant-steps-item-wait"]`)).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Design editor form and preview show correct information when manually selected', async () => {
     await setup();
@@ -93,7 +94,7 @@ describe('DesignEditorCRD', () => {
     const preview = screen.getByText('Preview');
     userEvent.click(preview);
     expect(await screen.findByText(/submit to see/i));
-  })
+  }, testTimeout)
 
   test('Design editor template tab show all information', async () => {
     await setup();
@@ -102,7 +103,7 @@ describe('DesignEditorCRD', () => {
 
     expect(screen.getByText('PieChart')).toBeInTheDocument();
     expect(screen.getByText('Default')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Design editor tabs change properly', async () => {
     await setup();
@@ -114,7 +115,7 @@ describe('DesignEditorCRD', () => {
     expect(await screen.findByText('Metadata')).toBeInTheDocument();
 
     await fillFields();
-  })
+  }, testTimeout)
 
   test('Form generator throws error when no valid values in required field', async () => {
     await setup();
@@ -128,7 +129,7 @@ describe('DesignEditorCRD', () => {
     await fillFields(true);
 
     expect(await screen.findByText(/Please/i));
-  }, 30000)
+  }, testTimeout)
 
   test('Definition of a new template works', async () => {
     await setup_resource();
@@ -150,7 +151,7 @@ describe('DesignEditorCRD', () => {
     expect(await screen.findByText('CRD modified')).toBeInTheDocument();
 
     await userEvent.click(await screen.findByText('test-1'));
-  }, 30000)
+  }, testTimeout)
 
   test('Default template overrides old template', async () => {
     await setup_resource();
@@ -169,5 +170,5 @@ describe('DesignEditorCRD', () => {
     expect(await screen.findByLabelText('form_spec')).toBeInTheDocument();
 
     expect(await screen.queryAllByText('Item')).toHaveLength(2);
-  }, 30000)
+  }, testTimeout)
 })

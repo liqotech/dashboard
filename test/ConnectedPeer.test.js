@@ -22,6 +22,7 @@ import PodsMockResponse from '../__mocks__/pods.json';
 import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import { metricsPODs } from './RTLUtils';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -94,31 +95,31 @@ describe('ConnectedPeer', () => {
     await new Promise((r) => setTimeout(r, 31000));
 
     expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
-  }, 35000)
+  }, 60000)
 
   test('List of connected peers shows not incoming', async () => {
     mocks(AdvMockResponse, FCMockResponseNoIn, PRMockResponse);
 
     await OKCheck();
-  })
+  }, testTimeout)
 
   test('List of connected peers shows not outgoing', async () => {
     mocks(AdvMockResponse, FCMockResponseNoOut, PRMockResponse);
 
     await OKCheck();
-  })
+  }, testTimeout)
 
   test('List of connected peers show if no advertisement', async () => {
     mocks({ items: [] }, FCMockResponse, PRMockResponse);
 
     await OKCheck();
-  })
+  }, testTimeout)
 
   test('List of connected peers show if no peering request', async () => {
     mocks(AdvMockResponse, FCMockResponse, { items: [] });
 
     await OKCheck();
-  })
+  }, testTimeout)
 
   test('List of connected peers doesn\'t show if no peering request and no advertisement', async () => {
     mocks({ items: [] }, FCMockResponse, { items: [] });
@@ -127,13 +128,13 @@ describe('ConnectedPeer', () => {
 
     expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
     expect(await screen.findByText('No peer connected at the moment')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Advertisement is refused', async () => {
     mocks(AdvMockResponseRefused, FCMockResponse, PRMockResponse);
 
     await OKCheck();
-  })
+  }, testTimeout)
 
   test('Error on pod metrics (404)', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, true);
@@ -143,19 +144,19 @@ describe('ConnectedPeer', () => {
     await new Promise((r) => setTimeout(r, 31000));
 
     expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
-  }, 35000)
+  }, 60000)
 
   test('Advertisement status is not accepted', async () => {
     mocks(AdvMockResponseNotAccepted, FCMockResponse, PRMockResponse);
 
     await OKCheck();
-  })
+  }, testTimeout)
 
   test('Advertisement status is not accepted', async () => {
     mocks(AdvMockResponseNoStatus, FCMockResponse, PRMockResponse);
 
     await OKCheck();
-  })
+  }, testTimeout)
 
   test('Clicks work', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
@@ -167,7 +168,7 @@ describe('ConnectedPeer', () => {
     expect(await screen.findByText('Properties')).toBeInTheDocument();
 
     userEvent.click(screen.getByLabelText('swap'));
-  })
+  }, testTimeout)
 
   test('Disconnection error show', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
@@ -183,7 +184,7 @@ describe('ConnectedPeer', () => {
     expect(await screen.findByText(/Could not disconnect/i)).toBeInTheDocument();
     expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
     expect(await screen.findByText('No peer available at the moment')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Dropdown menu don\'t activate collapse', async () => {
     jest.clearAllMocks();
@@ -193,7 +194,7 @@ describe('ConnectedPeer', () => {
     await OKCheck();
 
     userEvent.click(screen.getByLabelText('dropdown-connected'));
-  })
+  }, testTimeout)
 
   test('Disconnection works', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
@@ -210,5 +211,5 @@ describe('ConnectedPeer', () => {
 
     expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
     expect(await screen.findByText('No peer connected at the moment')).toBeInTheDocument();
-  })
+  }, testTimeout)
 })

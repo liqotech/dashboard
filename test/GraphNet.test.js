@@ -9,6 +9,7 @@ import GraphMockResponse from '../__mocks__/graph.json';
 import { MemoryRouter } from 'react-router-dom';
 import GraphNet from '../src/templates/graph/GraphNet';
 import ApiManager from '../src/services/__mocks__/ApiManager';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -46,5 +47,5 @@ describe('GraphNet', () => {
     await setup_Graph();
 
     expect(await screen.findByRole('button', {name: /cluster/i})).toHaveAttribute('disabled', '');
-  })
+  }, testTimeout)
 })

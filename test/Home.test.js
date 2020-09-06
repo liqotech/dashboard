@@ -15,6 +15,7 @@ import NodesMockResponse from '../__mocks__/nodes.json';
 import Error409 from '../__mocks__/409.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import PodsMockResponse from '../__mocks__/pods.json';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -64,7 +65,7 @@ describe('Home', () => {
     expect(await screen.findByText('LIQO')).toBeInTheDocument();
 
     await api.createCustomResource(null, null, null, 'foreignclusters', null, null);
-  })
+  }, testTimeout)
 
   test('Advertisement updates', async () => {
     mockCRDAndViewsExtended(null, 'DELETE', 'advertisements');
@@ -74,7 +75,7 @@ describe('Home', () => {
     expect(await screen.findByText('LIQO')).toBeInTheDocument();
 
     await api.deleteCustomResource(null, null, null, 'advertisements', null);
-  })
+  }, testTimeout)
 
   test('Peering request updates', async () => {
     mockCRDAndViewsExtended(null, 'DELETE', 'peeringrequests');
@@ -84,7 +85,7 @@ describe('Home', () => {
     expect(await screen.findByText('LIQO')).toBeInTheDocument();
 
     await api.deleteCustomResource(null, null, null, 'peeringrequests', null);
-  })
+  }, testTimeout)
 
   test('Cluster config updates', async () => {
     mockCRDAndViewsExtended(null, 'DELETE', 'clusterconfigs');
@@ -94,7 +95,7 @@ describe('Home', () => {
     expect(await screen.findByText('LIQO')).toBeInTheDocument();
 
     await api.updateCustomResource(null, null, null, 'clusterconfigs', null);
-  })
+  }, testTimeout)
 
   test('Change CRD on home view', async () => {
     mockCRDAndViewsExtended(null,  null, null, true);
@@ -105,12 +106,12 @@ describe('Home', () => {
     await api.updateCustomResourceDefinition(null, api.getCRDfromKind('Advertisement'));
 
     expect(await screen.findByText(/modified/i));
-  })
+  }, testTimeout)
 
   test('Error on getting CR in home view', async () => {
     mocks();
     await setup();
 
     expect(await screen.queryByText('LIQO')).not.toBeInTheDocument();
-  })
+  }, testTimeout)
 })

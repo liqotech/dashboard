@@ -10,6 +10,7 @@ import { setup_resource } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import LiqoDashUpdatedMockResponse from '../__mocks__/liqodashtest_update.json';
 import UpdateCR from '../src/editors/UpdateCR';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -50,7 +51,7 @@ describe('UpdateCR', () => {
     expect(await screen.findByText('Form Wizard')).toBeInTheDocument();
 
     expect(screen.getByText('Submit')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('CR is updated', async () => {
     await setup_resource();
@@ -78,11 +79,7 @@ describe('UpdateCR', () => {
 
     expect(await screen.findAllByText('Cost')).toHaveLength(2);
     expect(screen.getAllByText('Name')).toHaveLength(2);
-    //expect(screen.getByText('green'));
-    //expect(screen.getByText('purple'));
-    //expect(screen.getByText('13'));
-    //expect(screen.getByText('15'));
-  }, 30000)
+  }, testTimeout)
 
   test('Editor throws error when not valid body', async () => {
     await setup_resource();
@@ -96,7 +93,7 @@ describe('UpdateCR', () => {
     userEvent.click(screen.getByRole('button', {name: 'OK'}));
 
     expect(await screen.findByText('JSON or YAML not valid')).toBeInTheDocument();
-  }, 30000)
+  }, testTimeout)
 
   test('Error notification when 409', async () => {
     await setup_resource('409', 'PUT');
@@ -110,5 +107,5 @@ describe('UpdateCR', () => {
     userEvent.click(screen.getByRole('button', {name: 'OK'}));
 
     expect(await screen.findByText('Could not update the resource')).toBeInTheDocument();
-  }, 30000)
+  }, testTimeout)
 })

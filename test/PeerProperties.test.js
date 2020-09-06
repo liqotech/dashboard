@@ -19,6 +19,7 @@ import PodsMockResponse from '../__mocks__/pods.json';
 import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import { metricsPODs } from './RTLUtils';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -111,7 +112,7 @@ describe('PeerProperties', () => {
     expect(screen.getByText('Spec')).toBeInTheDocument();
     expect(screen.getByText('Status')).toBeInTheDocument();
 
-  }, 30000)
+  }, testTimeout)
 
   test('Available Peer show properties from dropdown', async () => {
     mocks(AdvMockResponse, FCMockResponseNoJoin, PRMockResponse);
@@ -127,7 +128,7 @@ describe('PeerProperties', () => {
     expect(screen.getByText('Spec')).toBeInTheDocument();
     expect(screen.getByText('Status')).toBeInTheDocument();
 
-  }, 30000)
+  }, testTimeout)
 
   test('Connected Peer show properties', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
@@ -143,7 +144,7 @@ describe('PeerProperties', () => {
     expect(screen.getByText('Spec')).toBeInTheDocument();
     expect(screen.getByText('Status')).toBeInTheDocument();
 
-  }, 30000)
+  }, testTimeout)
 
   test('Connected Peer show properties from dropdown', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
@@ -169,6 +170,6 @@ describe('PeerProperties', () => {
 
     userEvent.click(await screen.findByLabelText('plus'));
 
-  }, 30000)
+  }, 60000)
 
 })

@@ -106,6 +106,6 @@ describe('AvailableList', () => {
 
     userEvent.click(screen.getByLabelText('plus'));
 
-  }, 30000)
+  }, 60000)
 
 })

@@ -10,6 +10,7 @@ import NoAnnNoResNoSch from '../__mocks__/no_Ann_noRes_noSch.json';
 import userEvent from '@testing-library/user-event';
 import { setup_resource } from './RTLUtils';
 import NewCR from '../src/editors/NewCR';
+import { testTimeout } from '../src/constants';
 
 async function setup() {
   fetch.mockImplementation((url) => {
@@ -67,7 +68,7 @@ describe('NewCR', () => {
     expect(screen.getByText('Form Wizard')).toBeInTheDocument();
 
     expect(screen.getByText('Submit'));
-  })
+  }, testTimeout)
 
   test('CR form generator tab is not present when no schema', async () => {
     fetch.mockImplementation((url) => {
@@ -94,7 +95,7 @@ describe('NewCR', () => {
 
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
     expect(screen.queryByText('Form Wizard')).not.toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('CR second tab show the form generator properly', async () => {
     await setup();
@@ -113,7 +114,7 @@ describe('NewCR', () => {
 
     expect(await screen.findByText('Cost')).toBeInTheDocument();
     expect(await screen.findAllByText('Name')).toHaveLength(2);
-  })
+  }, testTimeout)
 
   test('Error message if no value inserted', async () => {
     await setup();
@@ -124,7 +125,7 @@ describe('NewCR', () => {
     userEvent.click(screen.getByText('OK'));
 
     expect(await screen.findByText(/errors/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Error message if no name in form generator', async () => {
     await setup();
@@ -135,7 +136,7 @@ describe('NewCR', () => {
     userEvent.click(screen.getByText('Submit'));
 
     expect(await screen.findByText(/Please/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Error message when wrong metadata', async () => {
     await setup();
@@ -148,7 +149,7 @@ describe('NewCR', () => {
     userEvent.click(screen.getByRole('button'));
 
     expect(await screen.findAllByText(/errors/i)).toHaveLength(2);
-  })
+  }, testTimeout)
 
   test('Correct creation of a CR from editor', async () => {
     await setup_resource();
@@ -162,7 +163,7 @@ describe('NewCR', () => {
     userEvent.click(screen.getByRole('button', {name: 'OK'}));
 
     await check_new_CR();
-  }, 30000)
+  }, testTimeout)
 
   test('Correct creation of a CR from form', async () => {
     await setup_resource();
@@ -200,7 +201,7 @@ describe('NewCR', () => {
     userEvent.click(screen.getByRole('button', {name: 'Submit'}));
 
     await check_new_CR();
-  }, 30000)
+  }, testTimeout)
 
   test('Error notification when 409', async () => {
     await setup_resource('409', 'POST');
@@ -214,5 +215,5 @@ describe('NewCR', () => {
     userEvent.click(screen.getByRole('button', {name: 'OK'}));
 
     expect(await screen.findByText(/Could not/i)).toBeInTheDocument();
-  }, 30000)
+  }, testTimeout)
 })

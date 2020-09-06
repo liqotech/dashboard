@@ -19,6 +19,7 @@ import userEvent from '@testing-library/user-event';
 import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import { metricsPODs } from './RTLUtils';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -91,7 +92,7 @@ async function OKCheck() {
 
   userEvent.click(home[1]);
 
-  expect(await screen.findByText(/POD/i)).toBeInTheDocument();
+  expect(await screen.findAllByText(/POD/i)).toHaveLength(2);
 }
 
 async function sort(){
@@ -110,7 +111,7 @@ describe('ConnectionDetails', () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
 
     await OKCheck();
-  })
+  }, testTimeout)
 
   test('Detail button works (only out)', async () => {
     mocks(AdvMockResponse, FCMockResponseNoIn, PRMockResponse);
@@ -128,14 +129,14 @@ describe('ConnectionDetails', () => {
 
     userEvent.click(await screen.findByText('Foreign'));
 
-    expect(await screen.findByText(/POD/i)).toBeInTheDocument();
-  })
+    expect(await screen.findAllByText(/POD/i)).toHaveLength(2);
+  }, testTimeout)
 
   test('Detail button works (only in)', async () => {
     mocks(AdvMockResponse, FCMockResponseNoOut, PRMockResponse);
 
     await OKCheck();
-  })
+  }, testTimeout)
 
   test('Search pods works (click)', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
@@ -149,7 +150,7 @@ describe('ConnectionDetails', () => {
     userEvent.click(searchButton);
 
     expect(screen.getAllByText(/hello/i)).toHaveLength(1);
-  }, 30000)
+  }, testTimeout)
 
   test('Search pods works (enter)', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
@@ -161,7 +162,7 @@ describe('ConnectionDetails', () => {
     await userEvent.type(screen.getByRole('textbox'), '{enter}');
 
     expect(screen.getAllByText(/hello/i)).toHaveLength(1);
-  })
+  }, testTimeout)
 
   test('Search reset pods works', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
@@ -175,7 +176,7 @@ describe('ConnectionDetails', () => {
     userEvent.click(resetButton);
 
     expect(screen.getAllByText(/hello/i)).toHaveLength(2);
-  })
+  }, testTimeout)
 
   test('Sorting pods works and close modal', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
@@ -195,5 +196,5 @@ describe('ConnectionDetails', () => {
     }, 1500);
 
     userEvent.click(await screen.findByLabelText('plus'));
-  }, 30000)
+  }, 60000)
 })
