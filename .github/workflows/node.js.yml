@@ -26,9 +26,11 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install
-    - run: npm run build --if-present
-    - run: npm test
+    - name: "Install Liqodash Dependencies"
+      run: npm install
+
+    - name: "Launch Liqodash Tests"
+      run: npm test
     
     - name: Coveralls
       if: success()
@@ -36,16 +38,16 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
       
-    - name: Publish Docker
+    - name: Publish Docker (Non-master branch)
       uses: docker/build-push-action@v1
-      if: github.ref != 'refs/heads/master'
+      if: github.ref != 'refs/heads/master' && !startsWith(github.ref, 'refs/tags/v')
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: liqo/dashboard-ci
         tags: latest, ${{ github.sha }}
       
-    - name: Publish Docker
+    - name: Publish Docker (Master Branch)
       uses: docker/build-push-action@v1
       if: github.ref == 'refs/heads/master'
       with:
@@ -59,7 +61,7 @@ jobs:
       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       if: startsWith(github.ref, 'refs/tags/v')
     
-    - name: Build and Publish Laboratory-Operator image
+    - name: Build and Publish Laboratory-Operator image (Repository)
       uses: docker/build-push-action@v1
       if: startsWith(github.ref, 'refs/tags/v')
       with:
