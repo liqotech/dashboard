@@ -94,9 +94,13 @@ class ConnectedPeer extends Component {
     let allocatableRAM = 0;
     let usedCPU = 0;
     let usedRAM = 0;
+    let resourcesRequestsPresent = 0;
     po.spec.containers.forEach(co => {
-      allocatableCPU += convertCPU(co.resources.requests.cpu);
-      allocatableRAM += convertRAM(co.resources.requests.memory);
+      if(co.resources.requests && co.resources.requests.cpu && co.resources.requests.memory){
+        resourcesRequestsPresent++;
+        allocatableCPU += convertCPU(co.resources.requests.cpu);
+        allocatableRAM += convertRAM(co.resources.requests.memory);
+      }
     });
 
     if(res === 404){
@@ -107,16 +111,21 @@ class ConnectedPeer extends Component {
         usedCPU += convertCPU(co.usage.cpu);
         usedRAM += convertRAM(co.usage.memory);
       });
+      if(resourcesRequestsPresent !== po.spec.containers.length){
+        allocatableRAM = usedRAM;
+        allocatableCPU = usedCPU
+      }
     }
 
     return {
       name: po.metadata.name,
-      CPU: Math.round(((usedCPU / allocatableCPU) * 100) * 10) / 10,
-      RAM: Math.round(((usedRAM / allocatableRAM) * 100) * 10) / 10,
+      CPU: (resourcesRequestsPresent === po.spec.containers.length) ? Math.round(((usedCPU / allocatableCPU) * 100) * 10) / 10 : 0,
+      RAM: (resourcesRequestsPresent === po.spec.containers.length) ? Math.round(((usedRAM / allocatableRAM) * 100) * 10) / 10 : 0,
       RAMmi: Math.round(usedRAM * 10) / 10,
       CPUmi: Math.round(usedCPU * 10) / 10,
-      CPUTot: Math.round(allocatableCPU * 10) / 10,
-      RAMTot:Math.round(allocatableRAM * 10) / 10
+      CPUTot: (resourcesRequestsPresent === po.spec.containers.length) ? Math.round(allocatableCPU * 10) / 10 : 0,
+      RAMTot: (resourcesRequestsPresent === po.spec.containers.length) ? Math.round(allocatableRAM * 10) / 10 : 0,
+      resourcesRequestsPresent: (resourcesRequestsPresent === po.spec.containers.length)
     }
   }
 
@@ -268,29 +277,23 @@ class ConnectedPeer extends Component {
         )
       } else {
         this.state.incomingPods.forEach(po => {
-          if(!this.metricsNotAvailableIncoming) {
-            this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
-              .then(res => {
+          this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
+            .then(res => {
+              this.metricsNotAvailableIncoming = false;
+              home.counter++;
+              let total = this.calculateIncomingMetricsPods(home, po, res);
+              home.totalPodsRAM = total.home.totalPodsRAM;
+              home.totalPodsCPU = total.home.totalPodsCPU;
+            })
+            .catch(error => {
+              if (error === 404) {
+                this.metricsNotAvailableIncoming = true;
                 home.counter++;
-                let total = this.calculateIncomingMetricsPods(home, po, res);
+                let total = this.calculateIncomingMetricsPods(home, po, error);
                 home.totalPodsRAM = total.home.totalPodsRAM;
                 home.totalPodsCPU = total.home.totalPodsCPU;
-              })
-              .catch(error => {
-                if (error === 404) {
-                  this.metricsNotAvailableIncoming = true;
-                  home.counter++;
-                  let total = this.calculateIncomingMetricsPods(home, po, error);
-                  home.totalPodsRAM = total.home.totalPodsRAM;
-                  home.totalPodsCPU = total.home.totalPodsCPU;
-                }
-              })
-          } else {
-            home.counter++;
-            let total = this.calculateIncomingMetricsPods(home, po, 404);
-            home.totalPodsRAM = total.home.totalPodsRAM;
-            home.totalPodsCPU = total.home.totalPodsCPU;
-          }
+              }
+            })
         })
       }
     }
@@ -343,29 +346,23 @@ class ConnectedPeer extends Component {
         )
       } else {
         this.state.outgoingPods.forEach(po => {
-          if (!this.metricsNotAvailableOutgoing) {
-            this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
-              .then(res => {
+          this.props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
+            .then(res => {
+              this.metricsNotAvailableOutgoing = false;
+              foreign.counter++;
+              let total = this.calculateOutgoingMetricsPods(foreign, po, res);
+              foreign.totalPodsRAM = total.foreign.totalPodsRAM;
+              foreign.totalPodsCPU = total.foreign.totalPodsCPU;
+            })
+            .catch(error => {
+              if (error === 404) {
+                this.metricsNotAvailableOutgoing = true;
                 foreign.counter++;
-                let total = this.calculateOutgoingMetricsPods(foreign, po, res);
+                let total = this.calculateOutgoingMetricsPods(foreign, po, error);
                 foreign.totalPodsRAM = total.foreign.totalPodsRAM;
                 foreign.totalPodsCPU = total.foreign.totalPodsCPU;
-              })
-              .catch(error => {
-                if (error === 404) {
-                  this.metricsNotAvailableOutgoing = true;
-                  foreign.counter++;
-                  let total = this.calculateOutgoingMetricsPods(foreign, po, error);
-                  foreign.totalPodsRAM = total.foreign.totalPodsRAM;
-                  foreign.totalPodsCPU = total.foreign.totalPodsCPU;
-                }
-              })
-          } else {
-            foreign.counter++;
-            let total = this.calculateOutgoingMetricsPods(foreign, po, 404);
-            foreign.totalPodsRAM = total.foreign.totalPodsRAM;
-            foreign.totalPodsCPU = total.foreign.totalPodsCPU;
-          }
+              }
+            })
         })
       }
     }
