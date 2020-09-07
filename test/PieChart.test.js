@@ -9,6 +9,7 @@ import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import PieMockResponse from '../__mocks__/piecharts.json';
 import PieMockResponseWrong from '../__mocks__/piecharts_wrong.json';
 import PieChart from '../src/templates/piechart/PieChart';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -42,10 +43,10 @@ async function setup(pie) {
 describe('PieChart', () => {
   test('Pie chart is well formed', async () => {
     await setup(PieMockResponse);
-  })
+  }, testTimeout)
 
   test('Pie chart show error when wrong input', async () => {
     await setup(PieMockResponseWrong);
     expect(await screen.findByText(/Something/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 })

@@ -3,6 +3,7 @@ import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import { loginTest, mockCRDAndViewsExtended } from './RTLUtils';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -12,5 +13,5 @@ describe('Footer', () => {
     await loginTest();
 
     expect(await screen.findByText('Liqo @2020'));
-  })
+  }, testTimeout)
 })

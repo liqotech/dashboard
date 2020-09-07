@@ -11,6 +11,7 @@ import CRDMockResponseShort from '../__mocks__/crd_fetch.json';
 import ApiManager from '../src/services/__mocks__/ApiManager';
 import { MemoryRouter } from 'react-router-dom';
 import CRDList from '../src/CRD/CRDList';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -59,7 +60,7 @@ describe('CRD List', () => {
     expect(screen.getAllByText('This CRD has no description')).toHaveLength(11 - 4);
 
     expect(screen.getByText('This CRD is used to create custom views from a set of CRDs'));
-  })
+  }, testTimeout)
 
   test('Sidebar updates when a CRD is added/removed to favourites', async () => {
     await setup();
@@ -72,7 +73,7 @@ describe('CRD List', () => {
     userEvent.click(favCRD);
 
     expect(screen.findByText('Advertisement'));
-  })
+  }, testTimeout)
 
   test('Empty notification when no CRDs', async () => {
     fetch.mockImplementation((url) => {
@@ -96,5 +97,5 @@ describe('CRD List', () => {
     expect(await screen.queryByLabelText('crd')).not.toBeInTheDocument();
 
     expect(await screen.getByText(/found/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 })

@@ -10,6 +10,7 @@ import Error404 from '../__mocks__/404.json';
 import Error409 from '../__mocks__/409.json';
 import { generalHomeGET, loginTest } from './RTLUtils';
 import ViewMockResponse from '../__mocks__/views.json';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -47,17 +48,17 @@ describe('ErrorRedirect', () => {
   test('401 redirect works', async  () => {
     await setup(401);
     expect(await screen.findByText(/401/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('403 redirect works', async  () => {
     await setup(403);
     expect(await screen.findByText(/403/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('404 redirect works', async  () => {
     await setup(404);
     expect(await screen.findByText(/404/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Default redirect works', async  () => {
     await setup(409);
@@ -66,5 +67,5 @@ describe('ErrorRedirect', () => {
     userEvent.click(screen.getByText(/logout/i));
 
     expect(await screen.findByLabelText('lab')).toBeInTheDocument();
-  })
+  }, testTimeout)
 })

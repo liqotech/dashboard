@@ -18,6 +18,7 @@ import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import PodsMockResponse from '../__mocks__/pods.json';
 import LineChart from '../src/templates/line/LineChart';
 import { metricsPODs } from './RTLUtils';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -85,7 +86,7 @@ describe('Status', () => {
     await OKCheck();
 
     await new Promise((r) => setTimeout(r, 31000));
-  }, 40000)
+  }, 60000)
 
   test('404 on node metrics', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, true);
@@ -93,7 +94,7 @@ describe('Status', () => {
     await OKCheck();
 
     expect(await screen.findAllByLabelText('exclamation-circle')).toHaveLength(2);
-  })
+  }, testTimeout)
 
   test('Line chart NaN data', async () => {
     render(
@@ -102,5 +103,5 @@ describe('Status', () => {
           {"resource": "RAM", "date": "00:00:00", "value": NaN }]} />
       </MemoryRouter>
     )
-  })
+  }, testTimeout)
 })

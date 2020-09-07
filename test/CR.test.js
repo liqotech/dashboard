@@ -14,6 +14,7 @@ import LiqoDashAlteredMockResponse from '../__mocks__/liqodashtest_noSpec_noStat
 import { setup_resource } from './RTLUtils';
 import { MemoryRouter } from 'react-router-dom';
 import AdvMockResponse from '../__mocks__/advertisement.json';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -89,7 +90,7 @@ describe('CR', () => {
     userEvent.click(edit);
 
     expect(await screen.findByText(/update/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('CR edit drawer closes', async () => {
     mockFetch();
@@ -103,7 +104,7 @@ describe('CR', () => {
     const close = await screen.findByLabelText('Close');
     expect(close).toBeInTheDocument();
     userEvent.click(close);
-  })
+  }, testTimeout)
 
   test('CR JSON show on click', async () => {
     mockFetch();
@@ -115,7 +116,7 @@ describe('CR', () => {
     userEvent.click(screen.getByText('JSON'));
 
     expect(await screen.findByLabelText('json')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('CR date-time picker works', async () => {
     mockFetch();
@@ -130,7 +131,7 @@ describe('CR', () => {
     userEvent.click(date[1]);
     userEvent.click(await screen.findByText('Now'));
     userEvent.click(await screen.findByText('Ok'));
-  }, 30000)
+  }, testTimeout)
 
   test('CR JSON show no spec or status when there is none', async () => {
     fetch.mockImplementation((url) => {
@@ -153,7 +154,7 @@ describe('CR', () => {
 
     const json = await screen.findByLabelText('json');
     expect(json).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('CR delete popup show on click and resource is deleted', async () => {
     mockFetch();
@@ -173,7 +174,7 @@ describe('CR', () => {
 
     userEvent.click(yes);
     expect(await screen.queryByAltText('test-1')).not.toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('CR deletion error catch works', async () => {
     await setup_resource('404', 'DELETE', 'liqodashtests');
@@ -188,6 +189,6 @@ describe('CR', () => {
     userEvent.click(yes);
 
     expect(await screen.findByText(/404/i)).toBeInTheDocument();
-  }, 30000)
+  }, testTimeout)
 
 })

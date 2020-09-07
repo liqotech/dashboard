@@ -16,6 +16,7 @@ import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import ConfigMockResponse from '../__mocks__/configs.json';
 import PodsMockResponse from '../__mocks__/pods.json';
+import { testTimeout } from '../src/constants';
 
 function mocks(error, get){
   fetch.mockResponse(req => {
@@ -97,7 +98,7 @@ describe('ConfigView', () => {
 
     userEvent.click(await screen.findByText('General'));
     userEvent.click(await screen.findByText('Reserved Subnets'));
-  })
+  }, testTimeout)
 
   test('Config update works', async () => {
     await setup_with_error();
@@ -123,7 +124,7 @@ describe('ConfigView', () => {
 
     expect(switchButton[0]).toHaveAttribute('aria-checked', 'false');
 
-  }, 30000)
+  }, testTimeout)
 
   test('Error notification when config not updated', async () => {
     await setup_with_error('409');
@@ -134,19 +135,19 @@ describe('ConfigView', () => {
     userEvent.click(screen.getByText('Save configuration'));
 
     expect(await screen.findByText('Could not update the configuration'))
-  }, 30000)
+  }, testTimeout)
 
   test('ConfigView with no Config CRD', async () => {
     mocks();
     await setup_from_ConfigView(true);
 
     expect(await screen.findByText('No configuration CRD has been found.'))
-  }, 30000)
+  }, testTimeout)
 
   test('ConfigView with error on Config CR', async () => {
     mocks('409', true);
     await setup_from_ConfigView();
 
     expect(await screen.findByText('No configuration file has been found.'))
-  }, 30000)
+  }, testTimeout)
 })

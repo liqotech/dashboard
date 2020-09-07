@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import fetchMock from 'jest-fetch-mock';
 import ErrorMockResponse from '../__mocks__/401.json';
 import { loginTest, mockCRDAndViewsExtended, setup_login } from './RTLUtils';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -16,7 +17,7 @@ describe('Login', () => {
 
     /** Assert that a success notification has spawned */
     expect(await screen.findByText(/successfully/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Login works when the token is invalid', async  () => {
     fetch.mockImplementation((url) => {
@@ -37,5 +38,5 @@ describe('Login', () => {
 
     /** Assert that the token has been rejected */
     expect(await screen.findByText(/valid/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 })

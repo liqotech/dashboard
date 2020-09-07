@@ -11,6 +11,7 @@ import PieMockResponse from '../__mocks__/piecharts.json';
 import ApiManager from '../src/services/__mocks__/ApiManager';
 import { MemoryRouter } from 'react-router-dom';
 import CRD from '../src/CRD/CRD';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -36,7 +37,7 @@ async function setup() {
         <CRD api={api}
              match={{
                params: {
-                 crdName: 'liqodashtests.crd-template.liqo.com'
+                 crdName: 'liqodashtests.dashboard.liqo.com'
                }
              }}/>
       </MemoryRouter>
@@ -54,7 +55,7 @@ describe('Header', () => {
     expect(await screen.findByLabelText('logout')).toBeInTheDocument();
     const CRDInput = await screen.findAllByRole('combobox');
     expect(CRDInput[0]).toHaveAttribute('placeholder', 'input CRD');
-  })
+  }, testTimeout)
 
   test('Logout works', async () => {
     mockCRDAndViewsExtended();
@@ -63,16 +64,16 @@ describe('Header', () => {
     const logout = await screen.findByLabelText('logout');
     userEvent.click(logout);
     expect(screen.getByText('Liqo Login'));
-  })
+  }, testTimeout)
 
   test('Search works', async () => {
     mockCRDAndViewsExtended();
     await loginTest();
 
     await screen.findByLabelText('autocompletesearch');
-    userEvent.type(screen.getAllByRole('combobox')[0], 'LiqoDashTest@liqodashtests.crd-template.liqo.com');
+    userEvent.type(screen.getAllByRole('combobox')[0], 'LiqoDashTest@liqodashtests.dashboard.liqo.com');
     userEvent.click(await screen.findByLabelText('search'));
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
-  })
+  }, testTimeout)
 })

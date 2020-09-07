@@ -9,6 +9,7 @@ import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import HistoMockResponse from '../__mocks__/histocharts.json';
 import HistoMockResponseWrong from '../__mocks__/histocharts_wrong.json';
 import HistoChart from '../src/templates/histogram/HistoChart';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -42,10 +43,10 @@ async function setup(histo) {
 describe('HistoChart', () => {
   test('Histogram chart is well formed', async () => {
     await setup(HistoMockResponse);
-  })
+  }, testTimeout)
 
   test('Histogram chart shows error when wrong input', async () => {
     await setup(HistoMockResponseWrong);
     expect(await screen.findByText(/Something/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 })

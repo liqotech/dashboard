@@ -482,20 +482,19 @@
     },
     {
       "metadata": {
-        "name": "liqodashtests.crd-template.liqo.com",
-        "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/liqodashtests.crd-template.liqo.com",
+        "name": "liqodashtests.dashboard.liqo.com",
+        "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/liqodashtests.dashboard.liqo.com",
         "uid": "22332251-e719-463d-b4a0-be3835e0f04b",
         "resourceVersion": "000000",
         "generation": 1,
         "creationTimestamp": "2020-06-01T10:13:44Z",
         "annotations": {
           "description": "A test CRD for some implemetation on the liqo-dashboard",
-          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apiextensions.k8s.io/v1beta1\",\"kind\":\"CustomResourceDefinition\",\"metadata\":{\"annotations\":{\"description\":\"A test CRD for some implemetation on the liqo-dashboard\"},\"name\":\"liqodashtests.crd-template.liqo.com\"},\"spec\":{\"group\":\"crd-template.liqo.com\",\"names\":{\"kind\":\"LiqoDashTest\",\"listKind\":\"LiqoDashTestList\",\"plural\":\"liqodashtests\",\"singular\":\"liqodashtest\"},\"scope\":\"Namespaced\",\"subresources\":{\"status\":{}},\"validation\":{\"openAPIV3Schema\":{\"properties\":{\"apiVersion\":{\"type\":\"string\"},\"kind\":{\"type\":\"string\"},\"metadata\":{\"type\":\"object\"},\"spec\":{\"properties\":{\"item\":{\"description\":\"Collection of items\",\"items\":{\"properties\":{\"cost\":{\"description\":\"Cost of the item\",\"type\":\"integer\"},\"name\":{\"description\":\"Name of the item\",\"type\":\"string\"}},\"type\":\"object\"},\"type\":\"array\"}}}},\"type\":\"object\"}},\"version\":\"v1\",\"versions\":[{\"name\":\"v1\",\"served\":true,\"storage\":true}]},\"status\":{\"acceptedNames\":{\"kind\":\"\",\"plural\":\"\"},\"conditions\":[],\"storedVersions\":[]}}\n",
-          "template": "crd-template.liqo.com/v1/piecharts/pie-test-123455"
+          "template": "dashboard.liqo.com/v1/piecharts/pie-test-123455"
         }
       },
       "spec": {
-        "group": "crd-template.liqo.com",
+        "group": "dashboard.liqo.com",
         "version": "v1",
         "names": {
           "plural": "liqodashtests",
@@ -534,15 +533,15 @@
     },
     {
       "metadata": {
-        "name": "piecharts.crd-template.liqo.com",
-        "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/piecharts.crd-template.liqo.com",
+        "name": "piecharts.dashboard.liqo.com",
+        "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/piecharts.dashboard.liqo.com",
         "resourceVersion": "000000",
         "annotations": {
           "description": "This CRD is used to create generic pie chart designs"
         }
       },
       "spec": {
-        "group": "crd-template.liqo.com",
+        "group": "dashboard.liqo.com",
         "version": "v1",
         "names": {
           "plural": "piecharts",
@@ -699,20 +698,19 @@
     },
     {
       "metadata": {
-        "name": "views.crd-template.liqo.com",
-        "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/views.crd-template.liqo.com",
+        "name": "views.dashboard.liqo.com",
+        "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/views.dashboard.liqo.com",
         "uid": "abbe7932-6c03-424f-b762-ee1daa73776c",
         "resourceVersion": "75319642",
         "generation": 2,
         "creationTimestamp": "2020-05-26T09:05:56Z",
         "annotations": {
           "description": "This CRD is used to create custom views from a set of CRDs",
-          "favourite": "true",
-          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apiextensions.k8s.io/v1beta1\",\"kind\":\"CustomResourceDefinition\",\"metadata\":{\"annotations\":{\"description\":\"This CRD is used to create custom views from a set of CRDs\"},\"name\":\"views.crd-template.liqo.com\"},\"spec\":{\"group\":\"crd-template.liqo.com\",\"names\":{\"kind\":\"View\",\"listKind\":\"ViewList\",\"plural\":\"views\",\"singular\":\"view\"},\"scope\":\"Namespaced\",\"subresources\":{\"status\":{}},\"validation\":{\"openAPIV3Schema\":{\"properties\":{\"apiVersion\":{\"description\":\"APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources\",\"type\":\"string\"},\"kind\":{\"description\":\"Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds\",\"type\":\"string\"},\"metadata\":{\"type\":\"object\"},\"spec\":{\"properties\":{\"layout\":{\"description\":\"Layout that will be displayed\",\"type\":\"object\"},\"name\":{\"description\":\"The name showed in the sidebar\",\"type\":\"string\"},\"templates\":{\"description\":\"Collection of CR template views\",\"items\":{\"properties\":{\"kind\":{\"description\":\"The kind of a CRD we want to put in the view\",\"type\":\"string\"},\"name\":{\"description\":\"The name showed in the custom view for this CRD\",\"type\":\"string\"},\"template\":{\"description\":\"The path of a type template CRD custom resource (if default use the template in the CRD)\",\"type\":\"string\"}},\"type\":\"object\"},\"type\":\"array\"}},\"type\":\"object\"}},\"type\":\"object\"}},\"version\":\"v1\",\"versions\":[{\"name\":\"v1\",\"served\":true,\"storage\":true}]},\"status\":{\"acceptedNames\":{\"kind\":\"\",\"plural\":\"\"},\"conditions\":[],\"storedVersions\":[]}}\n"
+          "favourite": "true"
         }
       },
       "spec": {
-        "group": "crd-template.liqo.com",
+        "group": "dashboard.liqo.com",
         "version": "v1",
         "names": {
           "plural": "views",
@@ -762,11 +760,11 @@
     },
     {
       "metadata": {
-        "name": "histocharts.crd-template.liqo.com",
-        "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/histocharts.crd-template.liqo.com"
+        "name": "histocharts.dashboard.liqo.com",
+        "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/histocharts.dashboard.liqo.com"
       },
       "spec": {
-        "group": "crd-template.liqo.com",
+        "group": "dashboard.liqo.com",
         "names": {
           "plural": "histocharts",
           "singular": "histochart",

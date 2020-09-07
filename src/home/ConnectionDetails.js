@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
-  Modal, Tabs, Typography, Tag, Badge, Space,
-  Row, Col, Card, Progress, Input, Button, Table, Tooltip
+  Modal, Tabs, Typography, Tag, Badge, Space, Statistic,
+  Row, Col, Card, Progress, Input, Button, Table, Tooltip, Divider
 } from 'antd';
 import InfoCircleOutlined from '@ant-design/icons/lib/icons/InfoCircleOutlined';
 import HomeOutlined from '@ant-design/icons/lib/icons/HomeOutlined';
@@ -21,18 +21,11 @@ class ConnectionDetails extends Component {
     }
   }
 
-  getUsedTotalCPU(role){
+  getUsedTotal(role){
     if(!role)
-      return this.props.outgoingTotalPercentage.CPU;
+      return this.props.outgoingTotal;
     else
-      return this.props.incomingTotalPercentage.CPU;
-  }
-
-  getUsedTotalRAM(role){
-    if(!role)
-      return this.props.outgoingTotalPercentage.RAM;
-    else
-      return this.props.incomingTotalPercentage.RAM;
+      return this.props.incomingTotal;
   }
 
   PODtoTable(pods, role){
@@ -117,11 +110,21 @@ class ConnectionDetails extends Component {
         title: 'CPU (%)',
         dataIndex: 'CPU',
         key: 'CPU',
-        render: text =>
-            <Progress percent={text}
-                      status={'active'}
-                      strokeColor={getColor(text)}
-            />,
+        render: (text, record) => {
+          let podCPUmb = role ? (this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name}) ?
+            this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name}).CPUmi / n : 0) :
+            (this.props.outgoingPodsPercentage.find(pod => {return record.key === pod.name}) ?
+              this.props.outgoingPodsPercentage.find(pod => {return record.key === pod.name}).CPUmi / n : 0)
+
+          return(
+            <Tooltip title={podCPUmb + 'm'}>
+              <Progress percent={text}
+                        status={'active'}
+                        strokeColor={getColor(text, 0)}
+              />
+            </Tooltip>
+          )
+        },
         sorter: {
           compare: (a, b) => a.CPU - b.CPU
         },
@@ -140,7 +143,7 @@ class ConnectionDetails extends Component {
             <Tooltip title={podRAMmb + 'Mi'}>
               <Progress percent={text}
                         status={'active'}
-                        strokeColor={getColor(text)}
+                        strokeColor={getColor(text, 0)}
               />
             </Tooltip>
           )
@@ -179,7 +182,7 @@ class ConnectionDetails extends Component {
 
     return(
       <Table size={'small'} columns={column} dataSource={data}
-             pagination={{ size: 'small', position: ['bottomCenter'], pageSize: 11 }} />
+             pagination={{ size: 'small', position: ['bottomCenter'], pageSize: 14 }} />
     )
   }
 
@@ -188,8 +191,12 @@ class ConnectionDetails extends Component {
    * @role: can be home or foreign
    */
   getUsedResources(role) {
-    const totalCPU = this.getUsedTotalCPU(role);
-    const totalRAM = this.getUsedTotalRAM(role);
+    const total = this.getUsedTotal(role);
+
+    let reserved = {
+      CPU: (total.available.CPU * (total.availablePercentage.CPU / 100)).toFixed(2),
+      RAM: (total.available.RAM * (total.availablePercentage.RAM / 100)).toFixed(2),
+    }
 
     return(
       <div>
@@ -207,34 +214,99 @@ class ConnectionDetails extends Component {
                       </Tooltip>
                     ) : null)}
               >
-                <Row gutter={[20, 20]} align={'center'} justify={'center'}>
+                <Row gutter={[20, 0]} align={'center'} justify={'center'}>
                   <Col>
-                    <Row justify={'center'}>
+                    <Row justify={'center'} gutter={[0, 20]}>
                       <Typography.Text strong>CPU</Typography.Text>
                     </Row>
                     <Row justify={'center'}>
-                      <Progress type={'dashboard'} percent={totalCPU}
-                                strokeColor={getColor(totalCPU)}
+                      <Progress
+                        width={140}
+                        type="dashboard"
+                        percent={total.availablePercentage.CPU}
+                        strokeWidth={5}
+                        strokeColor={getColor(total.availablePercentage.CPU, 1)}
+                        format={(totPercent) => (
+                          <Progress type={'dashboard'} percent={total.percentage.CPU}
+                                    strokeColor={getColor(total.percentage.CPU, 0)}
+                                    format={(percent) =>
+                                      (<div>
+                                        <div>
+                                          <Tooltip title={'Consumed'} placement={'right'}>
+                                            <Typography.Text>{percent + '%'}</Typography.Text>
+                                          </Tooltip>
+                                        </div>
+                                        <div>
+                                          <Tooltip title={'Reserved'} placement={'right'}>
+                                            <Typography.Text type={'secondary'} style={{fontSize: '0.7em'}}>{totPercent + '%'}</Typography.Text>
+                                          </Tooltip>
+                                        </div>
+                                      </div>)
+                                    }
+                          />
+                        )}
                       />
+                    </Row>
+                    <Row>
+                      <Statistic title={<div><Badge color={getColor(total.percentage.CPU, 0)}/> Consumed</div>}
+                                 value={Math.round(total.consumed.CPU/n) + 'm'} suffix={'/ ' + Math.round(total.available.CPU/n) + 'm'} />
+                    </Row>
+                    <Row>
+                      <Statistic title={<div><Badge color={getColor(total.availablePercentage.CPU, 1)}/> Reserved</div>}
+                                 value={Math.round(reserved.CPU/n) + 'm'} suffix={'/ ' + Math.round(total.available.CPU/n) + 'm'} />
                     </Row>
                   </Col>
                 </Row>
-                <Row gutter={[20, 20]} align={'center'} justify={'center'}>
+                <Divider />
+                <Row gutter={[20, 0]} align={'center'} justify={'center'}>
                   <Col>
-                    <Row justify={'center'}>
+                    <Row justify={'center'} gutter={[0, 20]}>
                       <Typography.Text strong>RAM</Typography.Text>
                     </Row>
                     <Row justify={'center'}>
-                      <Progress type={'dashboard'} percent={totalRAM}
-                                strokeColor={getColor(totalRAM)}
+                      <Progress
+                        width={142}
+                        type="dashboard"
+                        percent={total.availablePercentage.RAM}
+                        strokeWidth={5}
+                        strokeColor={getColor(total.availablePercentage.RAM, 1)}
+                        format={(totPercent) => (
+                          <Progress type={'dashboard'} percent={total.percentage.RAM}
+                                    strokeColor={getColor(total.percentage.RAM, 0)}
+                                    format={(percent) =>
+                                      (<div>
+                                        <div>
+                                          <Tooltip title={'Consumed'} placement={'right'}>
+                                            <Typography.Text>{percent + '%'}</Typography.Text>
+                                          </Tooltip>
+                                        </div>
+                                        <div>
+                                          <Tooltip title={'Reserved'} placement={'right'}>
+                                            <Typography.Text type={'secondary'} style={{fontSize: '0.7em'}}>{totPercent + '%'}</Typography.Text>
+                                          </Tooltip>
+                                        </div>
+                                      </div>)
+                                    }
+                          />
+                        )}
                       />
+                    </Row>
+                    <Row>
+                      <Statistic title={<div><Badge color={getColor(total.percentage.RAM, 0)}/> Consumed</div>}
+                                 value={Math.round(total.consumed.RAM/n) + 'Mi'} suffix={'/ ' + Math.round(total.available.RAM/n) + 'Mi'} />
+                    </Row>
+                    <Row>
+                      <Statistic title={<div><Badge color={getColor(total.availablePercentage.RAM, 1)}/> Reserved</div>}
+                                 value={Math.round(reserved.RAM/n) + 'Mi'} suffix={'/ ' + Math.round(total.available.RAM/n) + 'Mi'} />
                     </Row>
                   </Col>
                 </Row>
               </Card>
             </Col>
             <Col flex={23}>
-              <Card title={ !role ? 'Outgoing PODs' : 'Incoming PODs'}
+              <Card title={ !role ?
+                (<div>Outgoing PODs <Typography.Text type={'secondary'}>(your offloaded PODs)</Typography.Text></div>) :
+                (<div>Incoming PODs <Typography.Text type={'secondary'}>(foreign hosted PODs)</Typography.Text></div>)}
                     bodyStyle={{padding: 0}}
               >
                 { !role ? this.PODtoTable(this.props._this.state.outgoingPods, role) : this.PODtoTable(this.props._this.state.incomingPods, role) }
@@ -249,6 +321,8 @@ class ConnectionDetails extends Component {
   render(){
     return(
       <Modal
+        centered
+        style={{ marginTop: 10 }}
         title={'Details'}
         width={'50vw'}
         visible={this.props._this.state.showDetails}

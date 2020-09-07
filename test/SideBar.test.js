@@ -5,6 +5,7 @@ import fetchMock from 'jest-fetch-mock';
 import { loginTest, mockCRDAndViewsExtended, setup_cv } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -24,13 +25,13 @@ describe('Sidebar', () => {
     expect(await screen.findByText('Liqo View')).toBeInTheDocument();
 
     expect(await screen.findByText('View')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Sidebar custom view redirect is ok', async () => {
     await setup_cv();
 
     expect(await screen.findAllByLabelText('crd_custom_view')).toHaveLength(2);
-  })
+  }, testTimeout)
 
   test('Sidebar custom resource redirect is ok', async () => {
     mockCRDAndViewsExtended();
@@ -40,7 +41,7 @@ describe('Sidebar', () => {
     userEvent.click(customview);
 
     expect(await screen.findAllByRole('row')).toHaveLength(11);
-  })
+  }, testTimeout)
 
   test('Sidebar favourite redirect is ok', async () => {
     mockCRDAndViewsExtended();
@@ -50,7 +51,7 @@ describe('Sidebar', () => {
     userEvent.click(customview);
 
     expect(await screen.findByLabelText('crd'));
-  })
+  }, testTimeout)
 
   test('Sidebar collapse works', async () => {
     await setup_cv();
@@ -60,6 +61,6 @@ describe('Sidebar', () => {
     userEvent.click(await screen.findByLabelText('left'));
 
     expect(await screen.queryByLabelText('left')).not.toBeInTheDocument();
-  }, 30000)
+  }, testTimeout)
 })
 

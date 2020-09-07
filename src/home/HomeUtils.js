@@ -3,15 +3,16 @@ Progress, Input, Tag } from 'antd';
 import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
 import { APP_NAME } from '../constants';
 import React from 'react';
+import { colors } from '../services/Colors';
 
 /** Return the right color from the percentage given */
-export function getColor(percent) {
+export function getColor(percent, allocatable) {
   if(percent < 70) {
-    return '#1890ff';
+    return colors[allocatable];
   } else if (percent >= 70 && percent < 90) {
-    return '#faad14';
+    return colors[31 + allocatable];
   } else if (percent >=90) {
-    return '#f5222d';
+    return colors[33 + allocatable];
   }
 }
 

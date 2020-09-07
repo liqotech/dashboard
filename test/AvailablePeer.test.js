@@ -22,6 +22,7 @@ import PodsMockResponse from '../__mocks__/pods.json';
 import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import { metricsPODs } from './RTLUtils';
+import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
@@ -115,7 +116,7 @@ describe('AvailablePeer', () => {
     await OKCheck();
 
     userEvent.click(screen.getByLabelText('dropdown-available'));
-  })
+  }, testTimeout)
 
   test('List of available peers shows (with refused adv)', async () => {
     mocks(AdvMockResponseRefused, FCMockResponseJoin, {items: []});
@@ -123,7 +124,7 @@ describe('AvailablePeer', () => {
     await OKCheck();
 
     userEvent.click(screen.getByLabelText('dropdown-available'));
-  })
+  }, testTimeout)
 
   test('Add manual peer works', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
@@ -133,7 +134,7 @@ describe('AvailablePeer', () => {
     await addPeer();
 
     expect(await screen.findByText(/Peer Added/i)).toBeInTheDocument();
-  }, 30000)
+  }, testTimeout)
 
   test('Add manual peer with error shows notification', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
@@ -143,7 +144,7 @@ describe('AvailablePeer', () => {
     await addPeer();
 
     expect(await screen.findByText(/Could not add peer/i)).toBeInTheDocument();
-  }, 30000)
+  }, testTimeout)
 
   test('Modal opens when click on search for domain', async () => {
     mocks(AdvMockResponse, FCMockResponseJoin, PRMockResponse);
@@ -153,7 +154,7 @@ describe('AvailablePeer', () => {
     expect(await screen.findByText(/No peer available/i)).toBeInTheDocument();
 
     userEvent.click(await screen.findByText(/search/i));
-  })
+  }, testTimeout)
 
   test('Connect with a cluster', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
@@ -166,7 +167,7 @@ describe('AvailablePeer', () => {
     userEvent.click(screen.getByText('Connect'));
 
     expect(await screen.findByText(/No peer available/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Connect with a cluster from dropdown', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
@@ -176,7 +177,7 @@ describe('AvailablePeer', () => {
 
     userEvent.click(await screen.findByLabelText('link'));
 
-  }, 30000)
+  }, testTimeout)
 
   test('Connect through WAN', async () => {
     let fcRes = FCMockResponse;
@@ -188,7 +189,7 @@ describe('AvailablePeer', () => {
     userEvent.click(screen.getByLabelText('cluster'));
 
     expect(await screen.findByText(/No peer available/i)).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Connect with a cluster then disconnect', async () => {
     mocks(AdvMockResponseNotAccepted, FCMockResponse, PRMockResponse);
@@ -205,7 +206,7 @@ describe('AvailablePeer', () => {
     userEvent.click(await screen.findByText('Stop Connecting'));
 
     expect(await screen.findByText('Connect')).toBeInTheDocument();
-  })
+  }, testTimeout)
 
   test('Connect with a cluster then disconnect from dropdown', async () => {
     mocks(AdvMockResponseNotAccepted, FCMockResponse, PRMockResponse);
@@ -219,7 +220,7 @@ describe('AvailablePeer', () => {
 
     userEvent.click(await screen.findByLabelText('link'));
 
-  }, 30000)
+  }, testTimeout)
 
   test('Connect with a cluster with error', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
@@ -234,6 +235,6 @@ describe('AvailablePeer', () => {
     expect(await screen.findByText(/No peer connected/i)).toBeInTheDocument();
 
     userEvent.click(screen.getAllByText('8d73c01a-f23a-45dc-822b-7d3232683f53')[0]);
-  })
+  }, testTimeout)
 
 })
