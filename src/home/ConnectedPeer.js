@@ -381,11 +381,11 @@ class ConnectedPeer extends Component {
    * Search for pods offloaded to the foreign cluster
    */
   getClientPODs(){
-    let vk = this.props.advertisements.find(adv =>
+    let vNode = this.props.advertisements.find(adv =>
       {return adv.metadata.name === this.props.foreignCluster.status.outgoing.advertisement.name}
-    ).status.vkReference.name;
+    ).status.vnodeReference.name;
 
-    this.state.outgoingPods = this.props.outgoingPods.filter(po => { return po.spec.nodeName === vk });
+    this.state.outgoingPods = this.props.outgoingPods.filter(po => { return po.spec.nodeName === vNode });
     if(this.state.outgoingPods.length !== 0){
       this.state.sharing.client = true;
       this.flagOut = this.checkFlag(this.flagOut);
@@ -398,10 +398,10 @@ class ConnectedPeer extends Component {
    * Search for pods offloaded to the home cluster from a foreign one
    */
   getServerPODs(){
-    let vk = 'liqo-' + this.props.foreignCluster.status.outgoing["remote-peering-request-name"];
+    let vNode = 'liqo-' + this.props.foreignCluster.status.outgoing["remote-peering-request-name"];
     this.state.incomingPods = this.props.incomingPods.filter(po => {
       try {
-        return po.metadata.annotations.home_nodename === vk
+        return po.metadata.annotations.home_nodename === vNode
       } catch {
         return false
       }
