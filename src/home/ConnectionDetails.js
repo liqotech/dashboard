@@ -81,16 +81,40 @@ class ConnectionDetails extends Component {
           setTimeout(() => searchText.select());
         }
       },
-      render: text =>
-        dataIndex === 'Status' ? (
-          text === 'Running' ? <Tag color={'blue'}>{text}</Tag> : <Tag color={'red'}>{text}</Tag>
-        ) : (
-          dataIndex === 'Namespace' ? (
-            <Tooltip title={text}>
-              <Tag style={{ maxWidth: '5vw', overflow: 'hidden', textOverflow: 'ellipsis'}}>{text}</Tag>
-            </Tooltip>
-          ) : text
-        ),
+      render: text => {
+
+        let podNoRes = role ? this.props.incomingPodsPercentage.find(pod => {return text === pod.name}) :
+          this.props.outgoingPodsPercentage.find(pod => {return text === pod.name})
+
+        return (
+          dataIndex === 'Status' ? (
+            text === 'Running' ? <Tag color={'blue'}>{text}</Tag> : <Tag color={'red'}>{text}</Tag>
+          ) : (
+            dataIndex === 'Namespace' ? (
+              <Tooltip title={text}>
+                <Tag style={{ maxWidth: '5vw', overflow: 'hidden', textOverflow: 'ellipsis'}}>{text}</Tag>
+              </Tooltip>
+            ) : (
+              <Row>
+                <Col>
+                  <Tooltip title={text}>
+                    <div style={{ maxWidth: '10vw', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+                      {text}
+                    </div>
+                  </Tooltip>
+                </Col>
+                { podNoRes && !podNoRes.resourcesRequestsPresent ? (
+                  <Col>
+                    <Tooltip title={'POD doesn\'t have a resource limit'}>
+                      <ExclamationCircleTwoTone style={{marginLeft: 4}} twoToneColor="#f5222d" />
+                    </Tooltip>
+                  </Col>
+                ) : null }
+              </Row>
+            )
+          )
+        )
+      }
     });
 
     const column = [
@@ -182,7 +206,7 @@ class ConnectionDetails extends Component {
 
     return(
       <Table size={'small'} columns={column} dataSource={data}
-             pagination={{ size: 'small', position: ['bottomCenter'], pageSize: 14 }} />
+             pagination={{ size: 'small', position: ['bottomCenter'], pageSize: 13 }} />
     )
   }
 

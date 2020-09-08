@@ -152,7 +152,7 @@ describe('ConnectedPeer', () => {
     await OKCheck();
   }, testTimeout)
 
-  test('Advertisement status is not accepted', async () => {
+  test('Advertisement has no status', async () => {
     mocks(AdvMockResponseNoStatus, FCMockResponse, PRMockResponse);
 
     await OKCheck();
