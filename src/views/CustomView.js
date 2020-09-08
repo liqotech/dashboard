@@ -18,7 +18,7 @@ class CustomView extends Component {
     this.flag = true;
 
     this.state = {
-      templates: [],
+      crdsCV: [],
       customView: null,
       CRDs: [],
       isLoading: true,
@@ -40,7 +40,7 @@ class CustomView extends Component {
 
   updateCRD(customView){
     this.state.customView = customView;
-    this.state.templates = customView.spec.templates;
+    this.state.crdsCV = customView.spec.crds;
     if (this.state.customView.spec.layout) {
       this.state.layout = this.state.customView.spec.layout;
     }
@@ -66,8 +66,8 @@ class CustomView extends Component {
     this.state.CRDs = [];
     this.setState({isLoading: true});
 
-    this.state.templates.forEach(item => {
-      let res = {metadata: {name: item.kind}}
+    this.state.crdsCV.forEach(item => {
+      let res = {metadata: {name: item.crdName}}
 
       let CRDs = this.state.CRDs;
       /** If a template is defined in the CR, use that one */
@@ -75,8 +75,8 @@ class CustomView extends Component {
         res.altTemplate = item.template;
       }
       /** If a custom name is defined, use that one */
-      if(item.name){
-        res.altName = item.name;
+      if(item.crdAltName){
+        res.altName = item.crdAltName;
       }
       CRDs.push(res);
       this.setState({CRDs: CRDs});
@@ -95,7 +95,7 @@ class CustomView extends Component {
       }
 
       this.generateCRDView();
-      if(CRDs.length === this.state.templates.length)
+      if(CRDs.length === this.state.crdsCV.length)
         this.generateLayout();
 
     });
@@ -131,7 +131,7 @@ class CustomView extends Component {
   generateLayout(){
     let layout = [];
 
-    if(this.state.CRDs.length !== this.state.templates.length) return;
+    if(this.state.CRDs.length !== this.state.crdsCV.length) return;
 
     for(let i = 0; i < this.state.CRDs.length; i++) {
       let h = 1;
@@ -175,7 +175,7 @@ class CustomView extends Component {
       if(this.state.customView.spec.layout){
         this.state.layout = this.state.customView.spec.layout;
       }
-      this.state.templates = this.state.customView.spec.templates;
+      this.state.crdsCV = this.state.customView.spec.crds;
       this.loadCRD();
     }
   }

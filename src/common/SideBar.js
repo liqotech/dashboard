@@ -65,8 +65,8 @@ class SideBar extends Component {
               }}>
               <LayoutOutlined style={{ fontSize: '20px' }} />
               {
-                item.spec.name ? (
-                  <span>{ item.spec.name }</span>
+                item.spec.viewName ? (
+                  <span>{ item.spec.viewName }</span>
                 ) : (
                   <span>{ item.metadata.name }</span>
                 )

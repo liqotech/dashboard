@@ -29,12 +29,12 @@
             }
           ]
         },
-        "templates": [
+        "crds": [
           {
-            "kind": "advertisements.protocol.liqo.io"
+            "crdName": "advertisements.protocol.liqo.io"
           },
           {
-            "kind": "foreignclusters.discovery.liqo.io"
+            "crdName": "foreignclusters.discovery.liqo.io"
           }
         ]
       }
