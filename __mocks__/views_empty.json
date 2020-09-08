@@ -10,8 +10,8 @@
         "selfLink": "/apis/test/v1/namespaces/default/views/awesome-view"
       },
       "spec": {
-        "name": "Liqo View",
-        "templates": []
+        "viewName": "Liqo View",
+        "crds": []
       }
     }
   ],

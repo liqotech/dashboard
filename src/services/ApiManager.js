@@ -78,7 +78,7 @@ export default class ApiManager {
     });
   }
 
-  /** Get the CRDs for the group crd-template.liqo.com */
+  /** Get the CRDs for the group dashboard.liqo.com */
   getTemplates() {
     let templates = [];
     this.CRDs.forEach(CRD => {
@@ -91,31 +91,26 @@ export default class ApiManager {
 
   /** Load Custom Views CRs */
   loadCustomViewsCRs() {
-    let CRD = {
-      spec: {
-        group: 'crd-template.liqo.com',
-        version: 'v1',
-        names: {
-          plural: 'views'
-        }
-      }
+    let CRD = this.getCRDfromKind('View');
+
+    if(CRD){
+      /** First get all the CR */
+      this.getCustomResourcesAllNamespaces(CRD)
+        .then((res) => {
+            this.customViews = res.body.items;
+
+            /** update CVs in the views */
+            this.manageCallbackCVs(this.customViews);
+
+            /** Then set up a watch to watch changes in the CR of the CRD */
+            this.watchSingleCRD(
+              CRD.spec.group,
+              CRD.spec.version,
+              CRD.spec.names.plural,
+              this.CVsNotifyEvent);
+          }
+        );
     }
-    /** First get all the CR */
-    this.getCustomResourcesAllNamespaces(CRD)
-      .then((res) => {
-        this.customViews = res.body.items;
-
-        /** update CVs in the views */
-        this.manageCallbackCVs(this.customViews);
-
-        /** Then set up a watch to watch changes in the CR of the CRD */
-        this.watchSingleCRD(
-          CRD.spec.group,
-          CRD.spec.version,
-          CRD.spec.names.plural,
-          this.CVsNotifyEvent);
-        }
-      );
   }
 
   /**

@@ -3,9 +3,9 @@ import './CRD.css';
 import './CRDList.css';
 import {
   Space,
-  Badge, Breadcrumb, Button, Layout, Dropdown,
-  notification, Tabs, Tag, Typography, Popover, Row, Tooltip,
-  Col, Descriptions, Switch, Pagination, Empty, Rate, message, Drawer, Card, Divider
+  Badge, Button, Layout, Dropdown,
+  notification, Tag, Typography, Tooltip,
+  Descriptions, Switch, Pagination, Empty, Rate, Drawer, Card, Divider
 } from 'antd';
 import CR from './CR';
 import { Link } from 'react-router-dom';
@@ -195,10 +195,10 @@ class CRD extends Component {
     let cv = this.state.customViews.find(item => {
       return item.metadata.name === e;
     });
-    if(cv.spec.templates){
-      return !!cv.spec.templates.find(item => {
+    if(cv.spec.crds){
+      return !!cv.spec.crds.find(item => {
         if(item)
-          return item.kind === this.state.CRD.metadata.name;
+          return item.crdName === this.state.CRD.metadata.name;
       });
     }
   }
@@ -211,24 +211,24 @@ class CRD extends Component {
     let index = -1;
 
     /** Search if the CRD is in the view */
-    if(cv.spec.templates){
-      index = cv.spec.templates.indexOf(
-        cv.spec.templates.find(item => {
+    if(cv.spec.crds){
+      index = cv.spec.crds.indexOf(
+        cv.spec.crds.find(item => {
           if(item)
-            return item.kind === this.state.CRD.metadata.name;
+            return item.crdName === this.state.CRD.metadata.name;
         }));
     } else {
-      cv.spec.templates = [];
+      cv.spec.crds = [];
     }
 
     /** If the CRD is in the view, remove it
      *  or else, add it in the view
      */
     if(index !== -1){
-      cv.spec.templates[index] = null;
+      cv.spec.crds[index] = null;
     } else {
-      cv.spec.templates.push({
-        kind: this.state.CRD.metadata.name
+      cv.spec.crds.push({
+        crdName: this.state.CRD.metadata.name
       });
     }
 
@@ -266,10 +266,10 @@ class CRD extends Component {
         items.push(
           <Menu.Item key={item.metadata.name} onClick={this.handleClick_addToView}>
             {
-              item.spec.name ? (
+              item.spec.viewName ? (
                 <span style={this.checkAlreadyInView(item.metadata.name) ? {
                   color: 'red'
-                } : null}>{ item.spec.name }</span>
+                } : null}>{ item.spec.viewName }</span>
               ) : (
                 <span style={this.checkAlreadyInView(item.metadata.name) ? {
                   color: 'red'
@@ -321,12 +321,10 @@ class CRD extends Component {
             !this.props.onCustomView ? (
               <div style={{float: "right"}}>
                 <Space align={'center'}>
-                  <Tooltip title={'Add or Remove to View'} placement={'topRight'}>
-                    <div aria-label={'dropdown-CRD'}>
+                  <Tooltip title={'Add or Remove to View'} placement={'topLeft'}>
                       <Dropdown.Button overlay={menu} placement="bottomCenter"
                                        style={{paddingTop: 6}}
                                        trigger={['click']} icon={<LayoutOutlined />} />
-                    </div>
                   </Tooltip>
                   <Tooltip title={'Edit design'} placement={'top'}>
                     <Button icon={<PictureOutlined />} type="primary"

@@ -871,14 +871,29 @@
                         "description": "Layout that will be displayed",
                         "type": "object"
                       },
-                      "name": {
+                      "viewName": {
                         "description": "The name showed in the sidebar",
                         "type": "string"
                       },
-                      "templates": {
+                      "crds": {
                         "description": "Collection of CR template views",
                         "type": "array",
-                        "items": {"type":"object","properties":{"kind":{"description":"The kind of a CRD we want to put in the view","type":"string"},"name":{"description":"The name showed in the custom view for this CRD","type":"string"},"template":{"description":"The path of a type template CRD custom resource (if default use the template in the CRD)","type":"string"}}}
+                        "items": {
+                          "type":"object",
+                          "properties":{
+                            "crdName":{
+                              "description":"The kind of a CRD we want to put in the view",
+                              "type":"string"
+                            },
+                            "crdAltName":{
+                              "description":"The name showed in the custom view for this CRD",
+                              "type":"string"
+                            },
+                            "template":{
+                              "description":"The path of a type template CRD custom resource (if default use the template in the CRD)",
+                              "type":"string"}
+                          }
+                        }
                       }
                     }
                   }

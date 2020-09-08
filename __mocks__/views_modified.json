@@ -10,17 +10,17 @@
         "selfLink": "/apis/test/v1/namespaces/default/views/awesome-view"
       },
       "spec": {
-        "name": "Liqo View",
-        "templates": [
+        "viewName": "Liqo View",
+        "crds": [
           {
-            "name": "Test",
-            "kind": "advertisements.protocol.liqo.io"
+            "crdAltName": "Test",
+            "crdName": "advertisements.protocol.liqo.io"
           },
           {
-            "kind": "tunnelendpoints.liqonet.liqo.io"
+            "crdName": "tunnelendpoints.liqonet.liqo.io"
           },
           {
-            "kind": "liqodashtests.dashboard.liqo.com"
+            "crdName": "liqodashtests.dashboard.liqo.com"
           }
         ]
       }
