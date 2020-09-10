@@ -20,10 +20,11 @@ import Login from '../login/Login';
 import { APP_NAME } from '../constants';
 import Cookies from 'js-cookie';
 import ConfigView from '../views/ConfigView';
+import LoadingIndicator from '../common/LoadingIndicator';
 
 function CallBackHandler(props) {
   props.func();
-  return <div/>
+  return <LoadingIndicator />
 }
 
 class App extends Component {
@@ -185,63 +186,28 @@ class App extends Component {
       });
       Cookies.set('token', token)
       this.props.history.push('/');
-    }).
-    catch(error => {
-      /** If this first api call fails, this means that the token is not valid */
-      notification.error({
-        message: APP_NAME,
-        description: 'Login failed: token not valid'
-      });
-      this.tokenLogout();
     })
   }
 
   manageOIDCSession() {
     /** Check if previously logged */
-    const retrievedSessionToken = JSON.parse(
-      sessionStorage.getItem(`oidc.user:${OIDC_PROVIDER_URL}:${OIDC_CLIENT_ID}`)
-    );
-    if (retrievedSessionToken) {
-      let api = new ApiManager({ id_token: retrievedSessionToken.id_token,
-        token_type: retrievedSessionToken.token_type || 'Bearer'});
-      this.state = {
-        user: retrievedSessionToken.profile,
-        logged: true,
-        api: api
-      };
-      /** Get the CRDs at the start of the app */
-      this.state.api.loadCustomViewsCRs();
-      this.state.api.getCRDs().catch(error => {
-        console.log(error);
-        if(error.response._fetchResponse.status)
-          this.props.history.push("/error/" + error.response._fetchResponse.status);
+    if(Cookies.get('token')){
+      this.manageToken(Cookies.get('token'));
+    } else {
+      this.authManager.manager.events.addUserLoaded(user => {
+        this.manageToken(user.id_token);
       });
     }
-
-    this.authManager.manager.events.addUserLoaded(user => {
-      let api = new ApiManager(user);
-      this.setState({
-        logged: true,
-        api: api,
-        user: user.profile
-      });
-      api.loadCustomViewsCRs();
-      /** Get the CRDs at the start of the app */
-      api.getCRDs().catch(error => {
-        console.log(error);
-        if(error.response._fetchResponse.status)
-          this.props.history.push("/error/" + error.response._fetchResponse.status);
-      });
-    });
 
     /** Refresh token (or logout is silent sign in is not enabled) */
     this.authManager.manager.events.addAccessTokenExpiring(() => {
       this.authManager.manager.signinSilent().then(user => {
         this.state.api.refreshConfig(user);
+        Cookies.set('token', user.id_token);
         this.setState({logged: true});
       }).catch((error) => {
         console.log(error);
-        localStorage.clear();
+        Cookies.remove('token');
         this.props.history.push("/logout");
       });
     });

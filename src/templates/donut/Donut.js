@@ -22,7 +22,8 @@ class Donut extends Component {
     }
 
     data.forEach(d => {
-      if(isNaN(d.value)) d.value = 0;
+      if(!isFinite(d.value))
+        d.value = 0;
       empty.value -= d.value;
     })
 

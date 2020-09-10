@@ -1,5 +1,6 @@
 import { UserManager } from 'oidc-client';
 import React from 'react';
+import Cookies from 'js-cookie';
 
 /**
  * Api class to manage authN
@@ -63,7 +64,7 @@ export default class Authenticator {
     if(this.OIDC) {
       return this.manager.signinRedirect().catch(error => {
         console.log('login', error);
-        this.logout();
+        this.logout().catch(error => console.log(error));
       });
     }
   }
@@ -76,7 +77,7 @@ export default class Authenticator {
     if(this.OIDC){
       return this.manager.signinRedirectCallback().catch(error => {
         console.log('completeLogin', error);
-        this.logout();
+        this.logout().catch(error => console.log(error));
       });
     }
   }
@@ -86,10 +87,9 @@ export default class Authenticator {
    * @return {Promise<void>}
    */
   logout() {
-    if(this.OIDC)
+    if(this.OIDC){
+      Cookies.remove('token');
       return this.manager.signoutRedirect();
-    else{
-
     }
   }
 }

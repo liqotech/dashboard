@@ -36,6 +36,7 @@ class Home extends Component {
     this.CRAdvertisementNotifyEvent = this.CRAdvertisementNotifyEvent.bind(this);
     this.CRPeeringRequestNotifyEvent = this.CRPeeringRequestNotifyEvent.bind(this);
     this.loadCRD = this.loadCRD.bind(this);
+    this.CRDCallback = this.CRDCallback.bind(this);
   }
 
   updateFCMetrics(incoming, update){
@@ -51,18 +52,16 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    this.props.api.CRDArrayCallback.push(this.loadCRD);
-    this.loadCRD(null, 'ForeignCluster');
-    this.loadCRD(null, 'Advertisement');
-    this.loadCRD(null, 'PeeringRequest');
-    this.loadCRD(null, 'ClusterConfig');
+    this.props.api.CRDArrayCallback.push(this.CRDCallback);
+    this.loadCRD('ForeignCluster');
+    this.loadCRD('Advertisement');
+    this.loadCRD('PeeringRequest');
+    this.loadCRD('ClusterConfig');
     this.props.api.getNodes()
       .then(res => {
         let nodes = res.body.items;
         this.setState({
-          nodes: nodes
-        })
-        this.setState({
+          nodes: nodes,
           homeNodes: nodes.filter(no => {return no.metadata.labels.type !== 'virtual-node'}),
           foreignNodes: nodes.filter(no => {return no.metadata.labels.type === 'virtual-node'}),
           loading: false
@@ -73,6 +72,17 @@ class Home extends Component {
       })
   }
 
+  CRDCallback(CRDs){
+    CRDs.forEach(item => {
+      if(item.spec.names.kind === 'ForeignCluster' ||
+        item.spec.names.kind === 'Advertisement' ||
+        item.spec.names.kind === 'ClusterConfig' ||
+        item.spec.names.kind === 'PeeringRequest'){
+        this.loadCRD(item.spec.names.kind);
+      }
+    });
+  }
+
   /**
    * This function is called once the component did mount and every time
    * a CRD gets an update. It loads the resources of the CRD and set up
@@ -80,18 +90,10 @@ class Home extends Component {
    * @CRDs: the list of updated CRD (only used when a CRD gets an update)
    * @kind: the kind of the questioned CRD
    */
-  loadCRD(CRDs, kind) {
-    this.setState({loading: true});
-
+  loadCRD(kind) {
     let CRD;
 
-    if(CRDs){
-      CRD = CRDs.find(item => {
-        return item.metadata.kind === kind;
-      });
-    } else {
-      CRD = this.props.api.getCRDfromKind(kind);
-    }
+    CRD = this.props.api.getCRDfromKind(kind);
 
     if(CRD){
       this.props.api.getCustomResourcesAllNamespaces(CRD).then( res => {
@@ -128,10 +130,6 @@ class Home extends Component {
 
       }).catch(error => {
         console.log(error);
-      })
-    } else {
-      this.setState({
-        loading: false
       })
     }
   }
@@ -229,7 +227,6 @@ class Home extends Component {
   }
 
   render() {
-
     /**
      * These are the three main component of the view, along with the header:
      * the list of connected peers
