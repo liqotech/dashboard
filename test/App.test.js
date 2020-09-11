@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { loginTest, mockCRDAndViewsExtended } from './RTLUtils';
+import { loginTest, metricsPODs, mockCRDAndViewsExtended } from './RTLUtils';
 import { render, screen } from '@testing-library/react';
 import ApiManager from '../src/services/__mocks__/ApiManager';
 import { MemoryRouter } from 'react-router-dom';
@@ -14,6 +14,9 @@ import Error404 from '../__mocks__/404.json';
 import App from '../src/app/App';
 import ViewMockResponse from '../__mocks__/views.json';
 import { testTimeout } from '../src/constants';
+import PodsMockResponse from '../__mocks__/pods.json';
+import NodesMockResponse from '../__mocks__/nodes.json';
+import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 
 fetchMock.enableMocks();
 
@@ -47,6 +50,14 @@ function mocks(){
       return Promise.reject(Error404.body);
     } else if (url === 'http://localhost:3001/clustercustomobject/views') {
       return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
+    } else if (url === 'http://localhost:3001/pod') {
+      return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+    } else if (url === 'http://localhost:3001/nodes') {
+      return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+    } else if (url === 'http://localhost:3001/metrics/nodes') {
+      return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+    } else {
+      return metricsPODs({url : url});
     }
   })
 }

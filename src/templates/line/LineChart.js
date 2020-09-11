@@ -10,9 +10,8 @@ class LineChart extends Component {
   render(){
     let data = [];
     this.props.data.forEach(res => {
-      if(isNaN(res.value)){
+      if(!isFinite(res.value))
         res.value = 0;
-      }
       data.push(res);
     })
 
