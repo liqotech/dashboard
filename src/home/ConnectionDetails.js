@@ -9,6 +9,7 @@ import GlobalOutlined from '@ant-design/icons/lib/icons/GlobalOutlined';
 import { getColor } from './HomeUtils';
 import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
 import ExclamationCircleTwoTone from '@ant-design/icons/lib/icons/ExclamationCircleTwoTone';
+import { getColumnSearchProps } from '../services/TableUtils';
 
 const n = Math.pow(10, 6);
 
@@ -30,105 +31,52 @@ class ConnectionDetails extends Component {
 
   PODtoTable(pods, role){
 
-    let searchText = '';
-    let searchedColumn = '';
+    const renderPODs = (text, record, dataIndex) => {
+      let podNoRes = role ? this.props.incomingPodsPercentage.find(pod => {return text === pod.name}) :
+        this.props.outgoingPodsPercentage.find(pod => {return text === pod.name})
 
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-      confirm();
-      searchText = selectedKeys[0];
-      searchedColumn = dataIndex;
-    };
-
-    const handleReset = clearFilters => {
-      clearFilters();
-      searchText = '' ;
-    };
-
-    const getColumnSearchProps = dataIndex => ({
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <Input
-            ref={node => {
-              searchText = node;
-            }}
-            placeholder={`Search ${dataIndex}`}
-            value={selectedKeys[0]}
-            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-            onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-            style={{ width: 188, marginBottom: 8, display: 'block' }}
-          />
-          <Space>
-            <Button
-              type="primary"
-              onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-              icon={<SearchOutlined />}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Search
-            </Button>
-            <Button onClick={() => handleReset(clearFilters)} size="small" style={{ width: 90 }}>
-              Reset
-            </Button>
-          </Space>
-        </div>
-      ),
-      filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
-      onFilter: (value, record) =>
-        record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : '',
-      onFilterDropdownVisibleChange: visible => {
-        if (visible) {
-          setTimeout(() => searchText.select());
-        }
-      },
-      render: text => {
-
-        let podNoRes = role ? this.props.incomingPodsPercentage.find(pod => {return text === pod.name}) :
-          this.props.outgoingPodsPercentage.find(pod => {return text === pod.name})
-
-        return (
-          dataIndex === 'Status' ? (
-            text === 'Running' ? <Tag color={'blue'}>{text}</Tag> : <Tag color={'red'}>{text}</Tag>
+      return (
+        dataIndex === 'Status' ? (
+          text === 'Running' ? <Tag color={'blue'}>{text}</Tag> : <Tag color={'red'}>{text}</Tag>
+        ) : (
+          dataIndex === 'Namespace' ? (
+            <Tooltip title={text}>
+              <Tag style={{ maxWidth: '5vw', overflow: 'hidden', textOverflow: 'ellipsis'}}>{text}</Tag>
+            </Tooltip>
           ) : (
-            dataIndex === 'Namespace' ? (
-              <Tooltip title={text}>
-                <Tag style={{ maxWidth: '5vw', overflow: 'hidden', textOverflow: 'ellipsis'}}>{text}</Tag>
-              </Tooltip>
-            ) : (
-              <Row>
+            <Row>
+              <Col>
+                <Tooltip title={text}>
+                  <div style={{ maxWidth: '10vw', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+                    {text}
+                  </div>
+                </Tooltip>
+              </Col>
+              { podNoRes && !podNoRes.resourcesRequestsPresent ? (
                 <Col>
-                  <Tooltip title={text}>
-                    <div style={{ maxWidth: '10vw', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                      {text}
-                    </div>
+                  <Tooltip title={'POD doesn\'t have a resource limit'}>
+                    <ExclamationCircleTwoTone style={{marginLeft: 4}} twoToneColor="#f5222d" />
                   </Tooltip>
                 </Col>
-                { podNoRes && !podNoRes.resourcesRequestsPresent ? (
-                  <Col>
-                    <Tooltip title={'POD doesn\'t have a resource limit'}>
-                      <ExclamationCircleTwoTone style={{marginLeft: 4}} twoToneColor="#f5222d" />
-                    </Tooltip>
-                  </Col>
-                ) : null }
-              </Row>
-            )
+              ) : null }
+            </Row>
           )
         )
-      }
-    });
+      )
+    }
 
     const column = [
       {
         title: 'Name',
         dataIndex: 'Name',
         key: 'Name',
-        ...getColumnSearchProps('Name')
+        ...getColumnSearchProps('Name', renderPODs)
       },
       {
         title: 'Status',
         dataIndex: 'Status',
         key: 'Status',
-        ...getColumnSearchProps('Status')
+        ...getColumnSearchProps('Status', renderPODs)
       },
       {
         title: 'CPU (%)',
@@ -180,7 +128,7 @@ class ConnectionDetails extends Component {
         title: 'Namespace',
         dataIndex: 'Namespace',
         key: 'Namespace',
-        ...getColumnSearchProps('Namespace')
+        ...getColumnSearchProps('Namespace', renderPODs)
       },
     ];
 

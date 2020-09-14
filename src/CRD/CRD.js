@@ -42,6 +42,9 @@ class CRD extends Component {
      * @param showEditor: boolean to display "editor" drawer
      */
     this.state = {
+      currentPageSizeChange: 0,
+      currentPage: 1,
+      pageSize: 5,
       isLoading: true,
       CRD: null,
       custom_resources: [],
@@ -64,6 +67,7 @@ class CRD extends Component {
     this.loadCustomResources = this.loadCustomResources.bind(this);
     this.changeTemplate = this.changeTemplate.bind(this);
     this.paginationChange = this.paginationChange.bind(this);
+    this.paginationSizeChange = this.paginationSizeChange.bind(this);
     this.handleClick_fav = this.handleClick_fav.bind(this);
     this.handleClick_addToView = this.handleClick_addToView.bind(this);
   }
@@ -100,7 +104,7 @@ class CRD extends Component {
       .then((res) => {
       this.setState({
         custom_resources: res.body.items,
-        CRshown: res.body.items.slice(0, 5)
+        CRshown: res.body.items.slice(0, this.state.pageSize)
       });
 
       this.setState({isLoading: false});
@@ -477,7 +481,7 @@ class CRD extends Component {
 
     this.setState({
       custom_resources: custom_resources,
-      CRshown: custom_resources.slice(0, 5)
+      CRshown: custom_resources.slice(0, this.state.pageSize)
     })
   }
 
@@ -530,9 +534,22 @@ class CRD extends Component {
 
   /** When going to another page, change the CRDs shown */
   paginationChange(current, size){
+    if(this.state.currentPageSizeChange !== 0){
+      current = this.state.currentPageSizeChange;
+      this.state.currentPageSizeChange = 0;
+    }
+    this.state.currentPage = current;
     this.setState({
       CRshown: this.state.custom_resources.slice(size*(current-1), size*current)
     });
+  }
+
+  /** When changing pagination size, change CRDs shown */
+  paginationSizeChange(current, size){
+    if(size > this.state.pageSize)
+      this.state.currentPageSizeChange = Math.ceil((this.state.pageSize*current)/size);
+    else this.state.currentPageSizeChange = Math.floor(((this.state.pageSize*(current-1))/size) + 1);
+    this.state.pageSize = size;
   }
 
   render() {
@@ -626,10 +643,12 @@ class CRD extends Component {
                       {CRViews}
                       { !this.state.multi && this.state.custom_resources.length > 5 ? (
                         <div className="no-crds-found" aria-label={'pagination'}>
-                          <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
-                                      defaultPageSize={5}
+                          <Pagination total={this.state.custom_resources.length}
+                                      current={this.state.currentPage} pageSize={this.state.pageSize}
                                       onChange={this.paginationChange}
-                                      showSizeChanger={false} />
+                                      showSizeChanger={true} onShowSizeChange={this.paginationSizeChange}
+                                      pageSizeOptions={[5, 10, 20, 50, 100]}
+                          />
                         </div>
                       ) : null}
                     </div>
@@ -648,10 +667,12 @@ class CRD extends Component {
                           {CRViews}
                           { !this.state.multi && this.state.custom_resources.length > 5 ? (
                             <div className="no-crds-found" aria-label={'pagination'}>
-                              <Pagination defaultCurrent={1} total={this.state.custom_resources.length}
-                                          defaultPageSize={5}
+                              <Pagination total={this.state.custom_resources.length}
+                                          current={this.state.currentPage} pageSize={this.state.pageSize}
                                           onChange={this.paginationChange}
-                                          showSizeChanger={false} />
+                                          showSizeChanger={true} onShowSizeChange={this.paginationSizeChange}
+                                          pageSizeOptions={[5, 10, 20, 50, 100]}
+                              />
                             </div>
                           ) : null}
                         </>
