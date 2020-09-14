@@ -201,7 +201,7 @@ describe('CRD', () => {
     expect(screen.queryByLabelText('pagination')).toBeInTheDocument();
     userEvent.click(await screen.findByText('2'));
     expect(await screen.findAllByLabelText('cr')).toHaveLength(3);
-    userEvent.click(screen.getByText('5'));
+    userEvent.click(await screen.findByText(/5/i));
     fireEvent.mouseOver(screen.getByText('10 / page'));
     fireEvent.click(screen.getByText('10 / page'));
     fireEvent.mouseOver(screen.getByText('5 / page'));
