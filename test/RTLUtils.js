@@ -4,6 +4,7 @@ import App from '../src/app/App';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import ViewMockResponseLayout from '../__mocks__/views_withLayout.json';
 import ViewMockResponse from '../__mocks__/views.json';
+import NewViewMockResponse from '../__mocks__/views_another.json';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import AdvMockResponse from '../__mocks__/advertisement.json';
@@ -107,6 +108,8 @@ export function mockCRDAndViewsExtended(error, method, crd, view) {
         }
       } else if (req.method === 'PUT'){
         return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})));
+      } else if (req.method === 'POST'){
+        return Promise.resolve(new Response(JSON.stringify({body: NewViewMockResponse})));
       }
     }  else if (req.url === 'http://localhost:3001/clustercustomobject/liqodashtests') {
       return responseManager(req, error, method, crd, 'liqodashtests',

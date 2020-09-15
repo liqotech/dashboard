@@ -432,4 +432,33 @@ describe('CRD', () => {
 
     api = null;
   }, testTimeout)
+
+  test('CRD dropdown custom view new custom view', async () => {
+    await setup_only_CRD(true);
+
+    expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
+
+    let layout = await screen.findByLabelText('layout');
+
+    userEvent.click(layout);
+
+    userEvent.click(await screen.findByText('New Custom View'));
+
+    expect(await screen.findAllByText('New Custom View')).toHaveLength(2);
+
+    const name = await screen.findByRole('input');
+    await userEvent.type(name, 'Test Custom View');
+    const crds = await screen.findAllByLabelText('select');
+    userEvent.click(crds[0]);
+    userEvent.click(crds[1]);
+    const adv = await screen.findAllByText('advertisements.protocol.liqo.io');
+
+    fireEvent.mouseOver(adv[0]);
+    fireEvent.click(adv[0]);
+
+    userEvent.click(await screen.findByText('OK'));
+
+    expect(await screen.findByText('Could not create custom view'));
+    api = null;
+  }, testTimeout)
 })

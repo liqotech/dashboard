@@ -50,7 +50,7 @@ describe('CRD List', () => {
 
     expect(await screen.findAllByRole('row')).toHaveLength(3);
 
-  })
+  }, testTimeout)
 
   test('CRD list cards show all the data and the right description', async () => {
     await setup();

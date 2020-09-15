@@ -8,6 +8,7 @@ import SettingOutlined from '@ant-design/icons/lib/icons/SettingOutlined';
 import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
 import StarOutlined from '@ant-design/icons/lib/icons/StarOutlined';
 import { APP_NAME } from '../constants';
+import AddCustomView from '../views/AddCustomView';
 
 const Sider = Layout.Sider;
 
@@ -125,7 +126,10 @@ class SideBar extends Component {
             </Menu.Item>
             <Menu.Divider/>
             {cv}
-            {cv.length ? <Menu.Divider/> : null}
+            <Menu.Item key="addCV" style={{ marginTop: 8}}>
+              <AddCustomView api={this.props.api} />
+            </Menu.Item>
+            <Menu.Divider/>
             <Menu.Item key="2" style={{ marginTop: 8}}>
               <Link to="/customresources">
                 <DesktopOutlined style={{ fontSize: '20px' }} />

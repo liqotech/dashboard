@@ -21,6 +21,7 @@ import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
 import { Menu } from 'antd';
 import NewCR from '../editors/NewCR';
 import DesignEditorCRD from '../editors/DesignEditorCRD';
+import AddCustomView from '../views/AddCustomView';
 
 class CRD extends Component {
   constructor(props) {
@@ -294,6 +295,9 @@ class CRD extends Component {
     const menu = (
       <Menu>
         {items}
+        <Menu.Item key="addCV" >
+          <AddCustomView api={this.props.api} selected={this.state.CRD.metadata.name} />
+        </Menu.Item>
       </Menu>
     );
 

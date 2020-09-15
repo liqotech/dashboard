@@ -166,12 +166,13 @@ export default class ApiManager {
     return fetch('http://localhost:3001/clustercustomobject/' + plural, { method: 'POST', body: item})
       .then(res => res.json())
       .then((res) => {
-
+        if(plural === 'views'){
+          this.manageCallbackCVs(res.body.items);
+        }
         this.watchers.forEach(w => {
           if (w.plural === plural)
             w.callback('ADDED', res.body);
         })
-
       });
   }
 
