@@ -5,28 +5,24 @@ import { Link, withRouter } from 'react-router-dom';
 import './CRDList.css';
 import './CRD.css';
 import 'react-resizable/css/styles.css';
-import { Pagination } from 'antd';
+import { getColumnSearchProps } from '../services/TableUtils';
 
 class CRDList extends Component {
   constructor(props) {
     super(props);
     /**
      * @param: isLoading: boolean
-     * @param: CRDshown: array of CRDs in the current page
      */
     this.state = {
-      pageSize: 10,
-      CRDshown: [],
-      isLoading: true,
-      currentPage: 1
+      CRD: this.props.api.CRD,
+      isLoading: false,
     };
     this.loadCustomResourceDefinitions = this.loadCustomResourceDefinitions.bind(this);
     this.props.api.CRDListCallback = this.loadCustomResourceDefinitions;
-    this.paginationChange = this.paginationChange.bind(this);
   }
 
   loadCustomResourceDefinitions() {
-    this.generateLayout(this.props.api.CRDs.slice(this.state.pageSize*(this.state.currentPage-1), this.state.pageSize*this.state.currentPage));
+    this.setState({CRD: this.props.api.CRD})
   }
 
   componentDidMount() {
@@ -37,30 +33,10 @@ class CRDList extends Component {
     this.props.api.CRDListCallback = null;
   }
 
-  /** When going to another page, change the CRDs shown */
-  paginationChange(current, size){
-    if(current !== this.state.currentPage){
-      this.state.currentPage = current;
-      let CRDsubset = this.props.api.CRDs.slice(size*(current-1), size*current);
-      this.generateLayout(CRDsubset);
-    }
-  }
-
-  /**
-   * Given a set (or subset) of CRD it generates the layout
-   * @param CRDs a subset of the total of the CRDs
-   */
-  generateLayout(CRDs){
-    this.setState({
-      CRDshown: CRDs,
-      isLoading: false
-    });
-  }
-
   /** Update CRD with the 'favourite' annotation */
   async handleClick_fav(CRD){
 
-    CRD = this.state.CRDshown.find(item => {return item.metadata.name === CRD});
+    CRD = this.props.api.CRDs.find(item => {return item.metadata.name === CRD});
 
     if(!CRD.metadata.annotations || !CRD.metadata.annotations.favourite){
       CRD.metadata.annotations = {favourite: 'true'};
@@ -73,9 +49,28 @@ class CRDList extends Component {
     )
   }
 
+  renderCRDs = (text, record, dataIndex) => {
+    let CRD = this.props.api.CRDs.find(item => {return item.metadata.name === record.key});
+    return (
+      dataIndex === 'Kind' ? (
+        <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
+          pathname: '/customresources/' + CRD.metadata.name,
+          state: {
+            CRD: CRD
+          }
+        }} >
+          <Typography.Text strong>{text}</Typography.Text>
+        </Link>
+      ) : (
+        <div>{text}</div>
+      )
+    )
+  }
+
   render() {
+
     const CRDViews = [];
-    this.state.CRDshown.forEach(CRD => {
+    this.props.api.CRDs.forEach(CRD => {
       let favourite = false;
       let description = 'This CRD has no description';
       if(CRD.metadata.annotations){
@@ -86,35 +81,31 @@ class CRDList extends Component {
       }
       CRDViews.push({
         key: CRD.metadata.name,
-        kind: CRD.spec.names.kind,
-        favourite: favourite,
-        group: CRD.spec.group,
-        description: description
+        Kind: CRD.spec.names.kind,
+        Favourite: favourite,
+        Group: CRD.spec.group,
+        Description: description
       });
     });
 
     this.columns = [
       {
         title: 'Kind',
-        dataIndex: 'kind',
-        render: (text, record) => (
-          <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
-            pathname: '/customresources/' + this.state.CRDshown.find(item => {return item.metadata.name === record.key}).metadata.name,
-            state: {
-              CRD: this.state.CRDshown.find(item => {return item.metadata.name === record.key})
-            }
-          }} >
-            <Typography.Text strong>{text}</Typography.Text>
-          </Link>
-        )
+        dataIndex: 'Kind',
+        key: 'Kind',
+        ...getColumnSearchProps('Kind', this.renderCRDs)
       },
       {
         title: 'Description',
-        dataIndex: 'description'
+        dataIndex: 'Description',
+        key: 'Description',
+        ...getColumnSearchProps('Description', this.renderCRDs)
       },
       {
         title: 'Group',
-        dataIndex: 'group'
+        dataIndex: 'Group',
+        key: 'Group',
+        ...getColumnSearchProps('Group', this.renderCRDs)
       },
       {
         title: 'Favourite',
@@ -136,7 +127,12 @@ class CRDList extends Component {
     return (
       <div>
         {!this.state.isLoading && CRDViews.length > 0 ? (
-          <Table columns={this.columns} dataSource={CRDViews} pagination={false}/>
+          <Table columns={this.columns} dataSource={CRDViews} tableLayout={'fixed'}
+                 pagination={{ position: ['bottomCenter'],
+                               hideOnSinglePage: this.props.api.CRDs.length < 11,
+                               showSizeChanger: true,
+                 }}
+          />
           ) : null}
         {!this.state.isLoading && CRDViews.length === 0 ? (
           <div className="no-crds-found">
@@ -144,13 +140,6 @@ class CRDList extends Component {
           </div>
         ) : null}
         {this.state.isLoading ? <LoadingIndicator /> : null}
-        {!this.state.isLoading && CRDViews.length > 0 ? (
-          <div className="no-crds-found" style={{marginTop: 30}}>
-            <Pagination defaultCurrent={this.state.currentPage} total={this.props.api.CRDs.length}
-                        onChange={this.paginationChange} defaultPageSize={this.state.pageSize}
-                        showSizeChanger={false} />
-          </div>
-        ) : null}
       </div>
     );
   }

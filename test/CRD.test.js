@@ -17,6 +17,7 @@ import CRD from '../src/CRD/CRD';
 import { MemoryRouter } from 'react-router-dom';
 import Error404 from '../__mocks__/404.json';
 import { testTimeout } from '../src/constants';
+import { fireEvent } from '@testing-library/dom';
 
 fetchMock.enableMocks();
 
@@ -198,6 +199,13 @@ describe('CRD', () => {
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
     expect(await screen.findAllByLabelText('cr')).toHaveLength(5);
     expect(screen.queryByLabelText('pagination')).toBeInTheDocument();
+    userEvent.click(await screen.findByText('2'));
+    expect(await screen.findAllByLabelText('cr')).toHaveLength(3);
+    userEvent.click(await screen.findByText(/5/i));
+    fireEvent.mouseOver(screen.getByText('10 / page'));
+    fireEvent.click(screen.getByText('10 / page'));
+    fireEvent.mouseOver(screen.getByText('5 / page'));
+    fireEvent.click(screen.getByText('5 / page'));
   }, testTimeout)
 
   test('Schema tab works', async () => {

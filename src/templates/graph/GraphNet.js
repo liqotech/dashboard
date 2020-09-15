@@ -37,6 +37,7 @@ class GraphNet extends Component {
                 contentModal: (
                   /** Just show the default information */
                   <FormViewer onEditor={true} CRD={_this.props.CRD}
+                              show={'spec'}
                     CR={ _this.props.custom_resources.find(item => {
                       return item.metadata.name === event.nodes[0];
                     }) }

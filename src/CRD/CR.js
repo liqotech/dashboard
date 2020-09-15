@@ -85,7 +85,7 @@ class CR extends Component {
     return (
       <div className="rep-container">
         {this.props.template.kind === 'PieChart' ? (
-          <div  aria-label={'piechart'}>
+          <div aria-label={'piechart'}>
             <PieChart CR={this.props.cr.spec} template={this.props.template} />
           </div>
         ) : null}
@@ -104,12 +104,21 @@ class CR extends Component {
   render() {
     let tabList = [];
 
+    if(this.props.cr.metadata)
+      tabList.push({
+        key: 'Metadata',
+        tab: <span>
+               <ToolOutlined />
+               Metadata
+             </span>
+      })
+
     if(this.props.cr.spec)
       tabList.push({
         key: 'Spec',
         tab: <span>
-              <ToolOutlined />
-              Spec
+               <ToolOutlined />
+               Spec
              </span>
       })
 
@@ -117,17 +126,26 @@ class CR extends Component {
       tabList.push({
         key: 'Status',
         tab: <span>
-              <ToolOutlined />
-              Status
+               <ToolOutlined />
+               Status
              </span>
       })
 
     this.contentList = {
+      Metadata: this.props.cr.metadata ? (
+        <div key={'metadata_' + this.props.cr.metadata.name}>
+          <Alert.ErrorBoundary>
+            <div aria-label={'form_metadata'}>
+              <FormViewer CR={this.props.cr} CRD={this.props.crd} api={this.props.api} show={'metadata'} />
+            </div>
+          </Alert.ErrorBoundary>
+        </div>
+      ) : null,
       Spec: this.props.cr.spec ? (
         <div key={'spec_' + this.props.cr.metadata.name}>
           <Alert.ErrorBoundary>
             <div aria-label={'form_spec'}>
-              <FormViewer CR={this.props.cr} CRD={this.props.crd} api={this.props.api} />
+              <FormViewer CR={this.props.cr} CRD={this.props.crd} api={this.props.api} show={'spec'} />
             </div>
           </Alert.ErrorBoundary>
         </div>
@@ -136,7 +154,7 @@ class CR extends Component {
         <div key={'status_' + this.props.cr.metadata.name}>
           <Alert.ErrorBoundary>
             <div aria-label={'form_status'}>
-              <FormViewer CR={this.props.cr} CRD={this.props.crd} status={true} api={this.props.api} />
+              <FormViewer CR={this.props.cr} CRD={this.props.crd} show={'status'} api={this.props.api} />
             </div>
           </Alert.ErrorBoundary>
         </div>) : null,

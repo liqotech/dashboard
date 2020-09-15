@@ -84,7 +84,7 @@ class DesignEditorCRD extends Component {
     if(CR_template === 'default' && this.state.example_CR[0]){
       this.setState({
         preview: (
-          <FormViewer CR={this.state.example_CR[0]} CRD={this.CRD} onEditor={true} />
+          <FormViewer CR={this.state.example_CR[0]} CRD={this.CRD} onEditor={true} show={'spec'} />
         )
       })
     }

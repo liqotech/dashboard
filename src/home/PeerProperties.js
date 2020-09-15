@@ -47,7 +47,21 @@ function createTabs(kind, CR, api) {
   let CRD = api.getCRDfromKind(kind);
 
   return (
-    <Tabs tabPosition={'left'} size={'small'} style={{marginLeft: '-1.5em'}}>
+    <Tabs tabPosition={'left'} size={'small'} style={{marginLeft: '-1.5em'}} defaultActiveKey={'spec'}>
+      <Tabs.TabPane tab={<span>
+                            <ToolOutlined />
+                            Metadata
+                           </span>}
+                    key={'metadata'}
+      >
+        <Alert.ErrorBoundary>
+          <FormViewer CRD={CRD}
+                      api={api}
+                      CR={CR}
+                      show={'metadata'}
+          />
+        </Alert.ErrorBoundary>
+      </Tabs.TabPane>
       <Tabs.TabPane tab={<span>
                             <ToolOutlined />
                             Spec
@@ -58,6 +72,7 @@ function createTabs(kind, CR, api) {
           <FormViewer CRD={CRD}
                       api={api}
                       CR={CR}
+                      show={'spec'}
           />
         </Alert.ErrorBoundary>
       </Tabs.TabPane>
@@ -71,7 +86,7 @@ function createTabs(kind, CR, api) {
           <FormViewer CRD={CRD}
                       api={api}
                       CR={CR}
-                      status={true}
+                      show={'status'}
           />
         </Alert.ErrorBoundary>
       </Tabs.TabPane>
