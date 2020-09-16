@@ -15,6 +15,13 @@ export function properCase(str) {
 }
 
 /**
+ * LOWERCASE and replace spaces with dashes
+ */
+export function dashLowercase(str) {
+  return lowerCase(str).replace(/\s+/g, '-');
+}
+
+/**
  * "Safer" String.toUpperCase()
  */
 export function upperCase(str) {
