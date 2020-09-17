@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ViewMockResponse from '../__mocks__/views.json';
 import ApiManager from '../src/services/__mocks__/ApiManager';
@@ -18,6 +18,7 @@ import { metricsPODs } from './RTLUtils';
 import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import { testTimeout } from '../src/constants';
+import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 
 fetchMock.enableMocks();
 
@@ -71,7 +72,8 @@ function mocks(advertisement, foreignCluster, peeringRequest, error, errorPod, e
           let pods = PodsMockResponse;
           let pod = JSON.parse(JSON.stringify(pods.items[2]));
           pod.metadata.name = 'hello-world-deployment-6756549f5-x66v8'
-          pods.items.push(pod);
+          if(pods.items.length < 4)
+            pods.items.push(pod);
           if(noPods)
             return Promise.resolve(new Response(JSON.stringify({body: { items: [] } })));
           else
@@ -86,6 +88,8 @@ function mocks(advertisement, foreignCluster, peeringRequest, error, errorPod, e
         return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
     } else if (req.url === 'http://localhost:3001/metrics/nodes') {
       return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+    } else if (req.url === 'http://localhost:3001/configmaps/liqo') {
+      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
     } else {
       return metricsPODs(req);
     }
@@ -111,7 +115,9 @@ describe('ConnectedList', () => {
 
     await OKCheck();
 
-    await new Promise((r) => setTimeout(r, 31000));
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 31000));
+    })
 
     userEvent.click(screen.getByLabelText('ellipsis'));
 
@@ -127,7 +133,7 @@ describe('ConnectedList', () => {
 
     expect(await screen.findAllByText(/POD/i)).toHaveLength(2);
 
-    expect(await screen.findAllByText(/hello-world/i)).toHaveLength(4);
+    expect(await screen.findAllByText(/hello-world/i)).toHaveLength(3);
 
     counter = 0;
 

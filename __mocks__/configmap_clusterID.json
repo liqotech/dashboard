@@ -1,0 +1,21 @@
+{
+  "kind": "ConfigMapList",
+  "apiVersion": "v1",
+  "metadata": {
+    "selfLink": "/api/v1/namespaces/liqo/configmaps",
+    "resourceVersion": "00000"
+  },
+  "items": [
+    {
+      "metadata": {
+        "name": "cluster-id",
+        "namespace": "liqo",
+        "selfLink": "/api/v1/namespaces/liqo/configmaps/cluster-id",
+        "resourceVersion": "00000"
+      },
+      "data": {
+        "cluster-id": "10e3e821-8194-4fb1-856f-d917d2fc54c0"
+      }
+    }
+  ]
+}

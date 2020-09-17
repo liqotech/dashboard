@@ -17,6 +17,7 @@ import { testTimeout } from '../src/constants';
 import PodsMockResponse from '../__mocks__/pods.json';
 import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
+import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 
 fetchMock.enableMocks();
 
@@ -56,6 +57,8 @@ function mocks(){
       return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
     } else if (url === 'http://localhost:3001/metrics/nodes') {
       return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+    } else if (url === 'http://localhost:3001/configmaps/liqo') {
+      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
     } else {
       return metricsPODs({url : url});
     }
