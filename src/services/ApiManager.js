@@ -16,6 +16,7 @@ export default class ApiManager {
    */
   constructor(user) {
     this.user = user;
+    window.APISERVER_URL = 'https://127.0.0.1:32917'
     this.kcc = new Config(window.APISERVER_URL, user.id_token, user.token_type);
     this.apiExt = this.kcc.makeApiClient(ApiextensionsV1beta1Api);
     this.apiCRD = this.kcc.makeApiClient(CustomObjectsApi);

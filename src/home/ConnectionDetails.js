@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import {
   Modal, Tabs, Typography, Tag, Badge, Space, Statistic,
   Row, Col, Card, Progress, Input, Button, Table, Tooltip, Divider
@@ -13,27 +13,22 @@ import { getColumnSearchProps } from '../services/TableUtils';
 
 const n = Math.pow(10, 6);
 
-class ConnectionDetails extends Component {
-  constructor(props) {
-    super(props);
+function ConnectionDetails(props) {
+  
+  const [currentTab, setCurrentTab] = useState('1');
 
-    this.state = {
-      currentTab: '1',
-    }
-  }
-
-  getUsedTotal(role){
+  const getUsedTotal = role => {
     if(!role)
-      return this.props.outgoingTotal;
+      return props.outgoingTotal;
     else
-      return this.props.incomingTotal;
+      return props.incomingTotal;
   }
 
-  PODtoTable(pods, role){
+  const PODtoTable = (pods, role) => {
 
     const renderPODs = (text, record, dataIndex) => {
-      let podNoRes = role ? this.props.incomingPodsPercentage.find(pod => {return text === pod.name}) :
-        this.props.outgoingPodsPercentage.find(pod => {return text === pod.name})
+      let podNoRes = role ? props.incomingPodsPercentage.find(pod => {return text === pod.name}) :
+        props.outgoingPodsPercentage.find(pod => {return text === pod.name})
 
       return (
         dataIndex === 'Status' ? (
@@ -83,10 +78,10 @@ class ConnectionDetails extends Component {
         dataIndex: 'CPU',
         key: 'CPU',
         render: (text, record) => {
-          let podCPUmb = role ? (this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name}) ?
-            this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name}).CPUmi / n : 0) :
-            (this.props.outgoingPodsPercentage.find(pod => {return record.key === pod.name}) ?
-              this.props.outgoingPodsPercentage.find(pod => {return record.key === pod.name}).CPUmi / n : 0)
+          let podCPUmb = role ? (props.incomingPodsPercentage.find(pod => {return record.key === pod.name}) ?
+            props.incomingPodsPercentage.find(pod => {return record.key === pod.name}).CPUmi / n : 0) :
+            (props.outgoingPodsPercentage.find(pod => {return record.key === pod.name}) ?
+              props.outgoingPodsPercentage.find(pod => {return record.key === pod.name}).CPUmi / n : 0)
 
           return(
             <Tooltip title={podCPUmb + 'm'}>
@@ -106,10 +101,10 @@ class ConnectionDetails extends Component {
         dataIndex: 'RAM',
         key: 'RAM',
         render: (text, record) => {
-          let podRAMmb = role ? (this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name}) ?
-            this.props.incomingPodsPercentage.find(pod => {return record.key === pod.name}).RAMmi / n : 0) :
-            (this.props.outgoingPodsPercentage.find(pod => {return record.key === pod.name}) ?
-            this.props.outgoingPodsPercentage.find(pod => {return record.key === pod.name}).RAMmi / n : 0)
+          let podRAMmb = role ? (props.incomingPodsPercentage.find(pod => {return record.key === pod.name}) ?
+            props.incomingPodsPercentage.find(pod => {return record.key === pod.name}).RAMmi / n : 0) :
+            (props.outgoingPodsPercentage.find(pod => {return record.key === pod.name}) ?
+            props.outgoingPodsPercentage.find(pod => {return record.key === pod.name}).RAMmi / n : 0)
 
           return(
             <Tooltip title={podRAMmb + 'Mi'}>
@@ -137,8 +132,8 @@ class ConnectionDetails extends Component {
     pods.forEach(po => {
 
       const pod = role ?
-        this.props.incomingPodsPercentage.find(pod => {return po.metadata.name === pod.name}) :
-        this.props.outgoingPodsPercentage.find(pod => {return po.metadata.name === pod.name})
+        props.incomingPodsPercentage.find(pod => {return po.metadata.name === pod.name}) :
+        props.outgoingPodsPercentage.find(pod => {return po.metadata.name === pod.name})
 
       data.push(
         {
@@ -162,8 +157,8 @@ class ConnectionDetails extends Component {
    * Get and show the used resources for a connection
    * @role: can be home or foreign
    */
-  getUsedResources(role) {
-    const total = this.getUsedTotal(role);
+  const getUsedResources = role => {
+    const total = getUsedTotal(role);
 
     let reserved = {
       CPU: (total.available.CPU * (total.availablePercentage.CPU / 100)).toFixed(2),
@@ -176,11 +171,11 @@ class ConnectionDetails extends Component {
           <Row>
             <Col flex={1}>
               <Card title={'Resources Used'} style={{marginRight: 20}}
-                    extra={role ? (this.props.metricsNotAvailableIncoming ? (
+                    extra={role ? (props.metricsNotAvailableIncoming ? (
                       <Tooltip title={'Precise metrics not available in your cluster'}>
                         <ExclamationCircleTwoTone twoToneColor="#f5222d" />
                       </Tooltip>
-                    ) : null) : (this.props.metricsNotAvailableOutgoing ? (
+                    ) : null) : (props.metricsNotAvailableOutgoing ? (
                       <Tooltip title={'Precise metrics not available in this cluster'}>
                         <ExclamationCircleTwoTone twoToneColor="#f5222d" />
                       </Tooltip>
@@ -281,7 +276,7 @@ class ConnectionDetails extends Component {
                 (<div>Incoming PODs <Typography.Text type={'secondary'}>(foreign hosted PODs)</Typography.Text></div>)}
                     bodyStyle={{padding: 0}}
               >
-                { !role ? this.PODtoTable(this.props._this.state.outgoingPods, role) : this.PODtoTable(this.props._this.state.incomingPods, role) }
+                { !role ? PODtoTable(props.outgoingPods, role) : PODtoTable(props.incomingPods, role) }
               </Card>
             </Col>
           </Row>
@@ -289,68 +284,66 @@ class ConnectionDetails extends Component {
       </div>
     )
   }
-  
-  render(){
-    return(
-      <Modal
-        centered
-        style={{ marginTop: 10 }}
-        title={'Details'}
-        width={'50vw'}
-        visible={this.props._this.state.showDetails}
-        onCancel={() => {this.props._this.setState({showDetails: false}); this.setState({currentTab: '1'})}}
-        bodyStyle={{paddingTop: 0}}
-        footer={null}
-        destroyOnClose
-      >
-        <Tabs activeKey={this.state.currentTab} onChange={key => this.setState({currentTab: key})}>
-          <Tabs.TabPane tab={<span><InfoCircleOutlined />General</span>} key={'1'}>
-            <div style={{minHeight: '40vh'}}>
-              <Space direction={'vertical'}>
-                <div>
-                  { this.props.client ? (
-                    <Badge text={
-                      <>
-                        Using
-                        <> </>
-                        <Tag style={{marginRight: 3}}>{this.props.foreignCluster.spec.clusterID}</Tag>
-                        's resources.
-                      </>
-                    }
-                           status={'processing'}
-                    />
-                  ) : null }
-                </div>
-                <div>
-                  { this.props.server ? (
-                    <Badge text={
-                      <>
-                        <Tag style={{marginRight: 3}}>{this.props.foreignCluster.spec.clusterID}</Tag>
-                        <> </>
-                        is using your resources.
-                      </>
-                    }
-                           status={'processing'}
-                    />
-                  ) : null }
-                </div>
-              </Space>
-            </div>
+
+  return(
+    <Modal
+      centered
+      style={{ marginTop: 10 }}
+      title={'Details'}
+      width={'50vw'}
+      visible={props.showDetails}
+      onCancel={() => {props.setShowDetails(false); setCurrentTab('1')}}
+      bodyStyle={{paddingTop: 0}}
+      footer={null}
+      destroyOnClose
+    >
+      <Tabs activeKey={currentTab} onChange={key => setCurrentTab(key)}>
+        <Tabs.TabPane tab={<span><InfoCircleOutlined />General</span>} key={'1'}>
+          <div style={{minHeight: '40vh'}}>
+            <Space direction={'vertical'}>
+              <div>
+                { props.client ? (
+                  <Badge text={
+                    <>
+                      Using
+                      <> </>
+                      <Tag style={{marginRight: 3}}>{props.foreignCluster.spec.clusterID}</Tag>
+                      's resources.
+                    </>
+                  }
+                         status={'processing'}
+                  />
+                ) : null }
+              </div>
+              <div>
+                { props.server ? (
+                  <Badge text={
+                    <>
+                      <Tag style={{marginRight: 3}}>{props.foreignCluster.spec.clusterID}</Tag>
+                      <> </>
+                      is using your resources.
+                    </>
+                  }
+                         status={'processing'}
+                  />
+                ) : null }
+              </div>
+            </Space>
+          </div>
+        </Tabs.TabPane>
+        { props.server ? (
+          <Tabs.TabPane tab={<span><HomeOutlined />Home</span>} key={'2'}>
+            {getUsedResources(true)}
           </Tabs.TabPane>
-          { this.props.server ? (
-            <Tabs.TabPane tab={<span><HomeOutlined />Home</span>} key={'2'}>
-              {this.getUsedResources(true)}
-            </Tabs.TabPane>
-          ) : null }
-          { this.props.client ? (
-            <Tabs.TabPane tab={<span><GlobalOutlined />Foreign</span>} key={'3'}>
-              {this.getUsedResources(false)}
-            </Tabs.TabPane>
-          ) : null }
-        </Tabs>
-      </Modal>
-    )
-  }
+        ) : null }
+        { props.client ? (
+          <Tabs.TabPane tab={<span><GlobalOutlined />Foreign</span>} key={'3'}>
+            {getUsedResources(false)}
+          </Tabs.TabPane>
+        ) : null }
+      </Tabs>
+    </Modal>
+  )
 }
 
 export default ConnectionDetails;
