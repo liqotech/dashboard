@@ -23,6 +23,7 @@ import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import { metricsPODs } from './RTLUtils';
 import { testTimeout } from '../src/constants';
+import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 
 fetchMock.enableMocks();
 
@@ -73,6 +74,8 @@ function mocks(advertisement, foreignCluster, peeringRequest, error, errorMetric
         return Promise.resolve(new Response(JSON.stringify({ items: [] })));
       else
         return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+    } else if (req.url === 'http://localhost:3001/configmaps/liqo') {
+      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
     } else {
       return metricsPODs(req, errorMetrics);
     }

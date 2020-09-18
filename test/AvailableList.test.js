@@ -17,6 +17,7 @@ import Error409 from '../__mocks__/409.json';
 import PodsMockResponse from '../__mocks__/pods.json';
 import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
+import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 
 fetchMock.enableMocks();
 
@@ -76,6 +77,8 @@ function mocks(advertisement, foreignCluster, peeringRequest, error) {
       return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
     } else if (req.url === 'http://localhost:3001/metrics/nodes') {
       return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+    } else if (req.url === 'http://localhost:3001/configmaps/liqo') {
+      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
     }
   })
 }

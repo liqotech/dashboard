@@ -23,8 +23,9 @@ import PodsMockResponse from '../__mocks__/pods.json';
 import Error409 from '../__mocks__/409.json';
 import Error404 from '../__mocks__/404.json';
 import NodesMockResponse from '../__mocks__/nodes.json';
-import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json'
+import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import PodsMetricsMockResponse from '../__mocks__/pods_metrics.json';
+import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 
 export function setup_login() {
   return render(
@@ -62,6 +63,8 @@ export function generalHomeGET(url) {
     return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
   } else if (url === 'http://localhost:3001/metrics/nodes') {
     return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+  } else if (url === 'http://localhost:3001/configmaps/liqo') {
+    return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
   } else {
     return metricsPODs({url : url});
   }
@@ -138,6 +141,8 @@ export function mockCRDAndViewsExtended(error, method, crd, view) {
       return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
     } else if (req.url === 'http://localhost:3001/metrics/nodes') {
       return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+    } else if (req.url === 'http://localhost:3001/configmaps/liqo') {
+      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
     } else {
       return metricsPODs(req);
     }

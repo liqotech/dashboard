@@ -16,6 +16,7 @@ export default class ApiManager {
    */
   constructor(user) {
     this.user = user;
+    window.APISERVER_URL = 'https://127.0.0.1:32917'
     this.kcc = new Config(window.APISERVER_URL, user.id_token, user.token_type);
     this.apiExt = this.kcc.makeApiClient(ApiextensionsV1beta1Api);
     this.apiCRD = this.kcc.makeApiClient(CustomObjectsApi);
@@ -119,11 +120,11 @@ export default class ApiManager {
    * @param item is the CRD
    * @returns a list of the custom resources
    */
-  getCustomResources(item) {
+  getCustomResources(item, namespace) {
     return this.apiCRD.listNamespacedCustomObject(
       item.spec.group,
       item.spec.version,
-      'default',
+      namespace,
       item.spec.names.plural
     );
   }
@@ -609,6 +610,10 @@ export default class ApiManager {
     let url = window.APISERVER_URL + '/apis/metrics.k8s.io/v1beta1/nodes'
 
     return this.fetchMetrics(url);
+  }
+
+  getConfigMaps(namespace, fieldSelector){
+    return this.apiCore.listNamespacedConfigMap(namespace, null, null, null, fieldSelector)
   }
 
 }

@@ -1,43 +1,60 @@
-import React, { Component } from 'react';
-import { Button, Input, PageHeader, Select, Space, Tag, Tooltip, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Alert, Row, Button, Input, PageHeader, Select, Space, Tag, Tooltip, Typography } from 'antd';
 import AuditOutlined from '@ant-design/icons/lib/icons/AuditOutlined';
+import CopyOutlined from '@ant-design/icons/lib/icons/CopyOutlined';
 import SettingOutlined from '@ant-design/icons/lib/icons/SettingOutlined';
 import { Link } from 'react-router-dom';
+import { LIQO_NAMESPACE } from '../constants';
 
-class LiqoHeader extends Component {
-  constructor(props) {
-    super(props);
-  }
+function LiqoHeader(props) {
 
-  render (){
+  const [clusterID, setClusterID] = useState('')
 
-    const running = true;
+  useEffect(() => {
+    props.api.getConfigMaps(LIQO_NAMESPACE, 'metadata.name=cluster-id').then(res => {
+      setClusterID(res.body.items[0].data['cluster-id']);
+    }).catch(error => {console.log(error)})
+  }, [])
 
-    //TODO: get the mode options from the config (not yet available)
-    const selectMode = (
-      <Select defaultValue={'Autonomous'}>
-        <Select.Option value="Autonomous">
-          <Tooltip placement={'left'} title={'Let LIQO decide who to share resources with'}>
-            Autonomous
-          </Tooltip>
-        </Select.Option>
-        <Select.Option value="Tethered">
-          <Tooltip placement={'left'} title={'Choose to connect to a single foreign LIQO peer'}>
-            Tethered
-          </Tooltip>
-        </Select.Option>
-      </Select>
-    )
+  const running = true;
 
-    return (
-      <div className="home-header" style={{marginBottom: 16, height: '100%'}}>
-        <PageHeader style={{paddingTop: 4, paddingBottom: 4}}
-                    title={
-                      <Typography.Text strong style={{fontSize: '2em'}}>LIQO</Typography.Text>
-                    }
-                    tags={ running ? <Tag color="blue">Running</Tag> : <Tag color="red">Stopped</Tag>}
-                    extra={
-                      <Space size={'large'} style={{fontSize: 25, marginBottom: 10}}>
+  //TODO: get the mode options from the config (not yet available)
+  const selectMode = (
+    <Select defaultValue={'Autonomous'}>
+      <Select.Option value="Autonomous">
+        <Tooltip placement={'left'} title={'Let LIQO decide who to share resources with'}>
+          Autonomous
+        </Tooltip>
+      </Select.Option>
+      <Select.Option value="Tethered">
+        <Tooltip placement={'left'} title={'Choose to connect to a single foreign LIQO peer'}>
+          Tethered
+        </Tooltip>
+      </Select.Option>
+    </Select>
+  )
+
+  return (
+    <div className="home-header" style={{marginBottom: 16, height: '100%'}}>
+      <PageHeader style={{paddingTop: '0.5em', paddingBottom: '0.5em'}}
+                  title={<Typography.Text strong style={{fontSize: '2em'}}>LIQO</Typography.Text>}
+                  tags={
+                    <Row align={'middle'}>
+                      {running ? <Tag color="blue">Running</Tag> : <Tag color="red">Stopped</Tag>}
+                      <Tag>
+                        <Row>
+                          <Space>
+                            <Typography.Text>Cluster ID:</Typography.Text>
+                            <Typography.Paragraph style={{margin: 0}} copyable>{clusterID}</Typography.Paragraph>
+                          </Space>
+
+                        </Row>
+                      </Tag>
+                    </Row>
+                  }
+                  extra={
+                    <Row align={'middle'} >
+                      <Space size={'large'} style={{fontSize: 24}}>
                         <Input.Group compact>
                           <Tooltip title={'Change LIQO functioning mode'}>
                             <Button type={'primary'}>MODE</Button>
@@ -57,11 +74,11 @@ class LiqoHeader extends Component {
                           </Link>
                         </Tooltip>
                       </Space>
-                    }
-        />
-      </div>
-    )
-  }
+                    </Row>
+                  }
+      />
+    </div>
+  )
 }
 
 export default LiqoHeader;

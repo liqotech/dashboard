@@ -1,66 +1,73 @@
-import React, { Component } from 'react';
-import { Badge, Col, Collapse, Divider, PageHeader, Progress, Row, Space, Typography, Tooltip } from 'antd';
+import React, { Component, useEffect, useRef, useState } from 'react';
+import { Badge, Col, Collapse, Divider, PageHeader, Row, Space, Typography, Tooltip } from 'antd';
 import QuestionCircleOutlined from '@ant-design/icons/lib/icons/QuestionCircleOutlined';
 import { addZero, convertCPU, convertRAM } from './HomeUtils';
 import LineChart from '../templates/line/LineChart';
 import Donut from '../templates/donut/Donut';
 import ExclamationCircleTwoTone from '@ant-design/icons/lib/icons/ExclamationCircleTwoTone';
+import useInterval from '@restart/hooks/cjs/useInterval';
 
-class Status extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      nodes: [],
-      totalHome: {
-        CPU: 0,
-        RAM: 0
-      },
-      totalForeign: {
-        CPU: 0,
-        RAM: 0
-      },
-      consumedHome: {
-        CPU: 0,
-        RAM: 0
-      },
-      historyHome: [],
-      historyForeign: [],
-      loading: false
-    };
+function Status(props){
 
-    this.flag = false;
-    this.metricsNotAvailableIncoming = false;
-    this.metricsNotAvailableOutgoing = false;
+  let [totalHome, setTotalHome] = useState({
+    CPU: 0,
+    RAM: 0
+  });
+  let [totalForeign, setTotalForeign] = useState({
+    CPU: 0,
+    RAM: 0
+  });
+  let [consumedHome, setConsumedHome] = useState({
+    CPU: 0,
+    RAM: 0
+  });
+  const [trendHome, setTrendHome] = useState([]);
+  const [trendForeign, setTrendForeign] = useState([]);
 
+  let metricsNotAvailableIncoming = useRef(false);
+  let metricsNotAvailableOutgoing = useRef(false);
+
+  useEffect(() => {
+    /**
+     * Get the total of the available resources on the home or foreign cluster
+     * only once, when the component is mounted
+     */
+    getTotalResources(props.homeNodes, true);
+    getTotalResources(props.foreignNodes);
+  }, [])
+
+  useEffect(() => {
     /**
      * Every 30 seconds the metrics are retrieved and the view updated
      */
-    this.interval = setInterval( () => {
-      this.updateHistory();
+    let interval = setInterval( () => {
+      setConsumedHome(prev => {consumedHome = prev; return prev});
+      setTotalHome(prev => {totalHome = prev; return prev});
+      updateTrend();
     }, 30000);
-  }
 
-  updateHistory(){
-    this.getConsumedResources();
+    return () => {
+      clearInterval(interval);
+    }
+  }, [])
+
+  const updateTrend = () => {
+    getConsumedResources();
     let date = new Date;
     let date_format = addZero(date.getHours()) + ':' + addZero(date.getMinutes()) + ':' + addZero(date.getSeconds());
 
-    const resourcesHome = this.getPercentages(true);
-    const resourcesForeign = this.getPercentages(false);
+    const resourcesHome = getPercentages(true);
+    const resourcesForeign = getPercentages(false);
 
-    this.state.historyHome.push(
+    setTrendHome(prev => [ ...prev,
       {"resource": "CPU", "date": date_format, "value": resourcesHome.totCPU },
       {"resource": "RAM", "date": date_format, "value": resourcesHome.totRAM }
-    )
+    ]);
 
-    this.state.historyForeign.push(
+    setTrendForeign(prev => [...prev,
       {"resource": "CPU", "date": date_format, "value": resourcesForeign.totCPU },
       {"resource": "RAM", "date": date_format, "value": resourcesForeign.totRAM }
-    )
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
+    ]);
   }
 
   /**
@@ -68,99 +75,87 @@ class Status extends Component {
    * @nodes the total of nodes (home or foreign)
    * @home if the cluster is the home one or a foreign
    */
-  getTotalResources(nodes, home){
-    let totalMemory = 0;
-    let totalCPU = 0;
+  const getTotalResources = (nodes, home) => {
     nodes.forEach(no => {
-        totalMemory += convertRAM(no.status.allocatable.memory);
-        totalCPU += convertCPU(no.status.allocatable.cpu);
+      if(home){
+        setTotalHome(prev => {
+          return {
+            RAM: prev.RAM + convertRAM(no.status.allocatable.memory),
+            CPU: prev.CPU + convertCPU(no.status.allocatable.cpu)
+          }
+        });
+      } else {
+        setTotalForeign(prev => {
+          return {
+            RAM: prev.RAM + convertRAM(no.status.allocatable.memory),
+            CPU: prev.CPU + convertCPU(no.status.allocatable.cpu)
+          }
+        });
+      }
     })
-    if(home){
-      this.setState({
-        totalHome: {
-          RAM: totalMemory,
-          CPU: totalCPU
-        },
-      }, this.getConsumedResources)
-    } else {
-      this.setState({
-        totalForeign: {
-          RAM: totalMemory,
-          CPU: totalCPU
-        },
-      })
-    }
   }
 
-  /**
-   * Get the total of the available resources on the home or foreign cluster
-   * only once, when the component is mounted
-   */
-  componentDidMount() {
-    this.getTotalResources(this.props.homeNodes, true);
-    this.getTotalResources(this.props.foreignNodes);
-  }
-
-  /**
-   * If the first time the nodes weren't available, retry
-   */
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if(prevProps.incomingMetrics.length === 0 && this.props.incomingMetrics.length > 0 ||
-      prevProps.outgoingMetrics.length === 0 && this.props.outgoingMetrics.length > 0){
-      this.updateHistory();
-    }
-  }
+  useEffect(() => {
+    getConsumedResources();
+  }, [totalHome])
 
   /** This means there are no metrics available */
-  getConsumedMetricsNoMetricsServer(consumedHome){
-    this.metricsNotAvailableIncoming = true;
-    this.props.api.getPODs().
+  const getConsumedMetricsNoMetricsServer = () => {
+    metricsNotAvailableIncoming.current = true;
+    props.api.getPODs().
     then(res => {
       let pods = res.body.items.filter(po => {return po.spec.nodeName.slice(0, 5) !== 'liqo-'});
-      consumedHome.CPU = 0;
-      consumedHome.RAM = 0;
+      let counter = 0;
+      let _consumedHome = {CPU: 0, RAM: 0};
       pods.forEach(po => {
         po.spec.containers.forEach(co => {
           if(co.resources.requests && co.resources.requests.cpu && co.resources.requests.memory){
-            consumedHome.CPU += convertCPU(co.resources.requests.cpu);
-            consumedHome.RAM += convertRAM(co.resources.requests.memory);
-            this.setState({consumedHome});
+            _consumedHome={
+              CPU: _consumedHome.CPU + convertCPU(co.resources.requests.cpu),
+              RAM: _consumedHome.RAM + convertRAM(co.resources.requests.memory)
+            }
           }
         });
+        counter++;
+        if(counter === pods.length)
+          setConsumedHome(_consumedHome);
       })
-    })
+    }).catch(error => console.log(error));
   }
 
   /**
    * Get the total of consumed resources
    */
-  getConsumedResources() {
-    let consumedHome = {
-      CPU: this.state.consumedHome.CPU,
-      RAM: this.state.consumedHome.RAM
-    }
+  const getConsumedResources = () => {
 
-    this.props.api.getMetricsNodes()
+    props.api.getMetricsNodes()
       .then(res => {
-        consumedHome.CPU = 0;
-        consumedHome.RAM = 0;
+        let _consumedHome = {
+          CPU: 0,
+          RAM: 0
+        };
         let home_nodes = res.items.filter(no => {return no.metadata.name.slice(0, 5) !== 'liqo-'});
         let foreign_nodes = res.items.filter(no => {return no.metadata.name.slice(0, 5) === 'liqo-'});
         if(foreign_nodes.length === 0){
-          this.metricsNotAvailableOutgoing = true;
+          metricsNotAvailableOutgoing.current = true;
         }
         if(home_nodes.length !== 0){
+          let counter = 0;
           home_nodes.forEach(no => {
-            consumedHome.CPU += convertCPU(no.usage.cpu);
-            consumedHome.RAM += convertRAM(no.usage.memory);
+            _consumedHome = {
+              CPU: prev.CPU + convertCPU(no.usage.cpu),
+              RAM: prev.RAM + convertRAM(no.usage.memory)
+            }
+            counter++;
+            if(counter === home_nodes.length)
+              setConsumedHome(_consumedHome);
           })
-          this.setState({consumedHome});
         } else {
-          this.getConsumedMetricsNoMetricsServer(consumedHome);
+          getConsumedMetricsNoMetricsServer();
         }
       }).catch(() => {
-        this.metricsNotAvailableOutgoing = true;
-        this.getConsumedMetricsNoMetricsServer(consumedHome);
+        metricsNotAvailableOutgoing.current = true;
+        getConsumedMetricsNoMetricsServer();
     })
   }
 
@@ -169,14 +164,14 @@ class Status extends Component {
    * @home: if the percentages refer to the home cluster or not
    * @returns percentages of CPU and RAM
    */
-  getPercentages(home) {
+  const getPercentages = home => {
     let clusterRAMPercentage;
     let clusterCPUPercentage;
     let totalRAMPercentage = '';
     let totalCPUPercentage = '';
-    let totalConsumedResources = home ? this.state.consumedHome : null;
-    let totalAvailableResources = home ? this.state.totalHome : this.state.totalForeign;
-    let externalMetrics = home ? this.props.incomingMetrics : this.props.outgoingMetrics;
+    let totalConsumedResources = home ? consumedHome : null;
+    let totalAvailableResources = home ? totalHome : totalForeign;
+    let externalMetrics = home ? props.incomingMetrics : props.outgoingMetrics;
 
     let dataRAM = [];
     let dataCPU = [];
@@ -215,7 +210,7 @@ class Status extends Component {
 
     /**
      * When showing the home resources, it is interesting to show also how much
-     * the user is using their resources
+     *  the user is using their resources
      */
     if(home){
       dataRAM.unshift({
@@ -248,98 +243,96 @@ class Status extends Component {
     }
   }
 
-  render() {
-    const resourcesHome = this.getPercentages(true);
-    const resourcesForeign = this.getPercentages(false);
+  const resourcesHome = getPercentages(true);
+  const resourcesForeign = getPercentages(false);
 
-    const resourcePanel = (resources, data) => (
-      <div style={{marginTop: 10}}>
-        <Row>
-          <Badge text={<Typography.Text strong>Consumption</Typography.Text>}
-                 status={'processing'} style={{marginLeft: '1em', marginBottom: '1em'}}
-          />
-        </Row>
-        <Row gutter={[20, 20]} align={'center'} justify={'center'}>
-          <Col>
-            <Row justify={'center'}>
-              <Typography.Text strong>CPU ({isNaN(resources.totCPU) ? 0 : resources.totCPU}%)</Typography.Text>
-            </Row>
-            <Row justify={'center'}>
-              <Donut data={resources.CPU} />
-            </Row>
-          </Col>
-          <Col>
-            <Row justify={'center'}>
-              <Typography.Text strong>RAM ({isNaN(resources.totRAM) ? 0 : resources.totRAM}%)</Typography.Text>
-            </Row>
-            <Row justify={'center'}>
-              <Donut data={resources.RAM} />
-            </Row>
-          </Col>
-        </Row>
-        <Row>
-          <Badge text={<Typography.Text strong>Consumption trend</Typography.Text>}
-                 status={'processing'} style={{marginLeft: '1em', marginBottom: '1em'}}
-          />
-        </Row>
-        <Row>
-          <LineChart data={data} />
-        </Row>
+  const resourcePanel = (resources, data) => (
+    <div style={{marginTop: 10}}>
+      <Row>
+        <Badge text={<Typography.Text strong>Consumption</Typography.Text>}
+               status={'processing'} style={{marginLeft: '1em', marginBottom: '1em'}}
+        />
+      </Row>
+      <Row gutter={[20, 20]} align={'center'} justify={'center'}>
+        <Col>
+          <Row justify={'center'}>
+            <Typography.Text strong>CPU ({isNaN(resources.totCPU) ? 0 : resources.totCPU}%)</Typography.Text>
+          </Row>
+          <Row justify={'center'}>
+            <Donut data={resources.CPU} />
+          </Row>
+        </Col>
+        <Col>
+          <Row justify={'center'}>
+            <Typography.Text strong>RAM ({isNaN(resources.totRAM) ? 0 : resources.totRAM}%)</Typography.Text>
+          </Row>
+          <Row justify={'center'}>
+            <Donut data={resources.RAM} />
+          </Row>
+        </Col>
+      </Row>
+      <Row>
+        <Badge text={<Typography.Text strong>Consumption trend</Typography.Text>}
+               status={'processing'} style={{marginLeft: '1em', marginBottom: '1em'}}
+        />
+      </Row>
+      <Row>
+        <LineChart data={data} />
+      </Row>
+    </div>
+  )
+
+  return(
+    <div className="home-header">
+      <div style={{position: 'fixed', zIndex: 10, width: '100%', backgroundColor: 'white'}}>
+        <PageHeader style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}
+                    title={
+                      <Space>
+                        <Typography.Text strong style={{fontSize: 24}}>Cluster Status</Typography.Text>
+                      </Space>
+                    }
+                    className={'draggable'}
+        />
+        <Divider style={{marginTop: 0, marginBottom: 4}}/>
       </div>
-    )
-
-    return(
-      <div className="home-header">
-        <div style={{position: 'fixed', zIndex: 10, width: '100%', backgroundColor: 'white'}}>
-          <PageHeader style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}
-                      title={
-                        <Space>
-                          <Typography.Text strong style={{fontSize: 24}}>Cluster Status</Typography.Text>
-                        </Space>
-                      }
-                      className={'draggable'}
-          />
-          <Divider style={{marginTop: 0, marginBottom: 4}}/>
-        </div>
-        <div style={{paddingTop: '7vh', paddingBottom: 4, paddingLeft: 16, paddingRight: 16}} >
-          <Collapse defaultActiveKey={['1']} className={'crd-collapse'} style={{backgroundColor: '#fafafa'}}>
-            <Collapse.Panel style={{ borderBottomColor: '#f0f0f0' }}
-                            header={<span>Home  {this.metricsNotAvailableIncoming ? (
-                              <Tooltip title={'Precise metrics not available in your cluster'}>
+      <div style={{paddingTop: '7vh', paddingBottom: 4, paddingLeft: 16, paddingRight: 16}} >
+        <Collapse defaultActiveKey={['1']} className={'crd-collapse'} style={{backgroundColor: '#fafafa'}}>
+          <Collapse.Panel style={{ borderBottomColor: '#f0f0f0' }}
+                          header={<span>Home  {metricsNotAvailableIncoming.current ? (
+                            <Tooltip title={'Precise metrics not available in your cluster'}>
+                            <ExclamationCircleTwoTone twoToneColor="#f5222d" />
+                            </Tooltip>) : null}</span>} key="1"
+                          extra={
+                            <Tooltip title={'Consumption on your cluster'}
+                                     placement={'left'}
+                            >
+                              <QuestionCircleOutlined />
+                            </Tooltip>
+                          }
+          >
+            {resourcePanel(resourcesHome, trendHome)}
+          </Collapse.Panel>
+        </Collapse>
+        <Collapse defaultActiveKey={['1']} className={'crd-collapse'} style={{backgroundColor: '#fafafa', marginTop: 16}}>
+          <Collapse.Panel style={{ borderBottomColor: '#f0f0f0' }}
+                          header={<span>Foreign (Total)  {metricsNotAvailableOutgoing.current ? (
+                            <Tooltip title={'Precise metrics not available in some of the foreign clusters'}>
                               <ExclamationCircleTwoTone twoToneColor="#f5222d" />
-                              </Tooltip>) : null}</span>} key="1"
-                            extra={
-                              <Tooltip title={'Consumption on your cluster'}
-                                       placement={'left'}
-                              >
-                                <QuestionCircleOutlined />
-                              </Tooltip>
-                            }
-            >
-              {resourcePanel(resourcesHome, this.state.historyHome)}
-            </Collapse.Panel>
-          </Collapse>
-          <Collapse defaultActiveKey={['1']} className={'crd-collapse'} style={{backgroundColor: '#fafafa', marginTop: 16}}>
-            <Collapse.Panel style={{ borderBottomColor: '#f0f0f0' }}
-                            header={<span>Foreign (Total)  {this.metricsNotAvailableOutgoing ? (
-                              <Tooltip title={'Precise metrics not available in some of the foreign clusters'}>
-                                <ExclamationCircleTwoTone twoToneColor="#f5222d" />
-                              </Tooltip>) : null}</span>} key="1"
-                            extra={
-                              <Tooltip title={'Consumption on others\' cluster'}
-                                       placement={'left'}
-                              >
-                                <QuestionCircleOutlined />
-                              </Tooltip>
-                            }
-            >
-              {resourcePanel(resourcesForeign, this.state.historyForeign)}
-            </Collapse.Panel>
-          </Collapse>
-        </div>
+                            </Tooltip>) : null}</span>} key="1"
+                          extra={
+                            <Tooltip title={'Consumption on others\' cluster'}
+                                     placement={'left'}
+                            >
+                              <QuestionCircleOutlined />
+                            </Tooltip>
+                          }
+          >
+            {resourcePanel(resourcesForeign, trendForeign)}
+          </Collapse.Panel>
+        </Collapse>
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 export default Status;

@@ -1,6 +1,4 @@
-import { Space, notification, Button, Table,
-Progress, Input, Tag } from 'antd';
-import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
+import { notification } from 'antd';
 import { APP_NAME } from '../constants';
 import React from 'react';
 import { colors } from '../services/Colors';
@@ -55,21 +53,21 @@ export function checkPeeringRequest(peeringRequests, peeringRequest) {
 }
 
 /** Updates the peering status: CR foreign cluster's joined true or false */
-export function updatePeeringStatus(_this, messageOK, messageError) {
+export function updatePeeringStatus(props, loading, setLoading, messageOK, messageError) {
   let item = {
-    spec: _this.props.foreignCluster.spec
+    spec: props.foreignCluster.spec
   }
 
-  _this.setState({loading: true});
+  setLoading(prev => !prev);
 
-  let foreignClusterCRD = _this.props.api.getCRDfromKind('ForeignCluster');
+  let foreignClusterCRD = props.api.getCRDfromKind('ForeignCluster');
 
-  let promise = _this.props.api.updateCustomResource(
+  let promise = props.api.updateCustomResource(
     foreignClusterCRD.spec.group,
     foreignClusterCRD.spec.version,
-    _this.props.foreignCluster.metadata.namespace,
+    props.foreignCluster.metadata.namespace,
     foreignClusterCRD.spec.names.plural,
-    _this.props.foreignCluster.metadata.name,
+    props.foreignCluster.metadata.name,
     item
   );
 
@@ -86,7 +84,7 @@ export function updatePeeringStatus(_this, messageOK, messageError) {
         description: messageError
       });
 
-      _this.setState({loading: false});
+      setLoading(prev => !prev);
     });
 }
 

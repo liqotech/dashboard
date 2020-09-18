@@ -19,6 +19,7 @@ import PodsMockResponse from '../__mocks__/pods.json';
 import LineChart from '../src/templates/line/LineChart';
 import { metricsPODs } from './RTLUtils';
 import { testTimeout } from '../src/constants';
+import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 
 fetchMock.enableMocks();
 
@@ -61,6 +62,8 @@ function mocks(advertisement, foreignCluster, peeringRequest, error, errorMetric
         return Promise.reject(404);
     } else if (req.url === 'http://localhost:3001/pod') {
       return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+    } else if (req.url === 'http://localhost:3001/configmaps/liqo') {
+      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
     } else {
       return metricsPODs(req);
     }

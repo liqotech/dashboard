@@ -434,4 +434,8 @@ export default class ApiManager {
     return fetch('http://localhost:3001/metrics/nodes').then(res => res.json());
   }
 
+  getConfigMaps(namespace){
+    return fetch('http://localhost:3001/configmaps/' + namespace).then(res => res.json());
+  }
+
 }
