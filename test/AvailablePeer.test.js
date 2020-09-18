@@ -91,7 +91,7 @@ function mocks(advertisement, foreignCluster, peeringRequest, error) {
 async function OKCheck() {
   await setup();
 
-  expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+  expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
   expect(await screen.findByText('No peer connected at the moment')).toBeInTheDocument();
 }
 
@@ -151,7 +151,7 @@ describe('AvailablePeer', () => {
     mocks(AdvMockResponse, FCMockResponseJoin, PRMockResponse);
     await setup();
 
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
     expect(await screen.findByText(/No peer available/i)).toBeInTheDocument();
 
     userEvent.click(await screen.findByText(/search/i));
@@ -161,7 +161,7 @@ describe('AvailablePeer', () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
     await OKCheck();
 
-    userEvent.click(screen.getByText('8d73c01a-f23a-45dc-822b-7d3232683f53'));
+    userEvent.click(screen.getByText('Cluster-Test'));
 
     expect(await screen.findByText('Connect')).toBeInTheDocument();
 
@@ -198,7 +198,7 @@ describe('AvailablePeer', () => {
     mocks(AdvMockResponseNotAccepted, FCMockResponse, PRMockResponse);
     await OKCheck();
 
-    userEvent.click(screen.getByText('8d73c01a-f23a-45dc-822b-7d3232683f53'));
+    userEvent.click(screen.getByText('Cluster-Test'));
 
     expect(await screen.findByText('Connect')).toBeInTheDocument();
 
@@ -233,7 +233,7 @@ describe('AvailablePeer', () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
     await OKCheck();
 
-    userEvent.click(screen.getAllByText('8d73c01a-f23a-45dc-822b-7d3232683f53')[0]);
+    userEvent.click(screen.getAllByText('Cluster-Test')[0]);
 
     expect(await screen.findByText('Connect')).toBeInTheDocument();
 
@@ -241,7 +241,7 @@ describe('AvailablePeer', () => {
 
     expect(await screen.findByText(/No peer connected/i)).toBeInTheDocument();
 
-    userEvent.click(screen.getAllByText('8d73c01a-f23a-45dc-822b-7d3232683f53')[0]);
+    userEvent.click(screen.getAllByText('Cluster-Test')[0]);
   }, testTimeout)
 
 })

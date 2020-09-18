@@ -19,6 +19,7 @@
       "domain": "domain-test",
       "enableAdvertisement": true,
       "enableDiscovery": true,
+      "clusterName": "LIQO",
       "name": "name-test",
       "port": 12345,
       "service": "service-test",

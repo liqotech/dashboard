@@ -873,9 +873,19 @@
                     "description": "URL where to contact foreign API server",
                     "type": "string"
                   },
-                  "clusterID": {
-                    "description": "Foreign Cluster ID",
-                    "type": "string"
+                  "clusterIdentity": {
+                    "type": "object",
+                    "description": "Foreign Cluster Identity",
+                    "properties": {
+                      "clusterID": {
+                        "type": "string",
+                        "description": "Foreign Cluster ID, this is a unique identifier of that cluster"
+                      },
+                      "clusterName": {
+                        "type": "string",
+                        "description": "Foreign Cluster Name to be shown in GUIs"
+                      }
+                    }
                   },
                   "discoveryType": {
                     "type": "string",

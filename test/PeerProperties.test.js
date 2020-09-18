@@ -86,14 +86,14 @@ function mocks(advertisement, foreignCluster, peeringRequest, error) {
 async function OKCheckAvailable() {
   await setup();
 
-  expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+  expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
   expect(await screen.findByText('No peer connected at the moment')).toBeInTheDocument();
 }
 
 async function OKCheckConnected() {
   await setup();
 
-  expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+  expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
   expect(await screen.findByText('No peer available at the moment')).toBeInTheDocument();
 }
 
@@ -103,7 +103,7 @@ describe('PeerProperties', () => {
 
     await OKCheckAvailable();
 
-    userEvent.click(screen.getByText('8d73c01a-f23a-45dc-822b-7d3232683f53'));
+    userEvent.click(screen.getByText('Cluster-Test'));
     userEvent.click(await screen.findByText('Properties'));
 
     expect(await screen.findByText('Foreign Cluster')).toBeInTheDocument();
@@ -135,7 +135,7 @@ describe('PeerProperties', () => {
 
     expect(await screen.queryByText('Foreign Cluster')).not.toBeInTheDocument();
 
-    userEvent.click(screen.getByText('8d73c01a-f23a-45dc-822b-7d3232683f53'));
+    userEvent.click(screen.getByText('Cluster-Test'));
     userEvent.click(await screen.findByText('Properties'));
 
     expect(await screen.findByText('Foreign Cluster')).toBeInTheDocument();

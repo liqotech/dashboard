@@ -37,7 +37,11 @@ function LiqoHeader(props) {
   return (
     <div className="home-header" style={{marginBottom: 16, height: '100%'}}>
       <PageHeader style={{paddingTop: '0.5em', paddingBottom: '0.5em'}}
-                  title={<Typography.Text strong style={{fontSize: '2em'}}>LIQO</Typography.Text>}
+                  title={
+                    <div>
+                      <Typography.Text strong style={{fontSize: '1.5em'}}>{props.config.spec.discoveryConfig.clusterName}</Typography.Text>
+                    </div>
+                  }
                   tags={
                     <Row align={'middle'}>
                       {running ? <Tag color="blue">Running</Tag> : <Tag color="red">Stopped</Tag>}
@@ -47,7 +51,6 @@ function LiqoHeader(props) {
                             <Typography.Text>Cluster ID:</Typography.Text>
                             <Typography.Paragraph style={{margin: 0}} copyable>{clusterID}</Typography.Paragraph>
                           </Space>
-
                         </Row>
                       </Tag>
                     </Row>

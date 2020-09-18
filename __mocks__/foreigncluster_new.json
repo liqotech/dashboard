@@ -13,7 +13,9 @@
   "spec": {
     "allowUntrustedCA": true,
     "apiUrl": "https://1.1.1.2:1234",
-    "clusterID": "9d73c01a-f23a-45dc-822b-7d3232683f53",
+    "clusterIdentity": {
+      "clusterID": "9d73c01a-f23a-45dc-822b-7d3232683f53"
+    },
     "discoveryType": "LAN",
     "join": true,
     "namespace": "liqo"

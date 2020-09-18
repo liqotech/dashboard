@@ -13,7 +13,9 @@ import { getColumnSearchProps } from '../services/TableUtils';
 const n = Math.pow(10, 6);
 
 function ConnectionDetails(props) {
-  
+
+  const foreignClusterName = props.foreignCluster.spec.clusterIdentity.clusterName;
+  const foreignClusterID = props.foreignCluster.spec.clusterIdentity.clusterID;
   const [currentTab, setCurrentTab] = useState('1');
 
   const getUsedTotal = role => {
@@ -303,7 +305,7 @@ function ConnectionDetails(props) {
                     <>
                       Using
                       <> </>
-                      <Tag style={{marginRight: 3}}>{props.foreignCluster.spec.clusterID}</Tag>
+                      <Tag style={{marginRight: 3}}>{foreignClusterName ? foreignClusterName : foreignClusterID}</Tag>
                       's resources.
                     </>
                   }
@@ -315,7 +317,7 @@ function ConnectionDetails(props) {
                 { props.server ? (
                   <Badge text={
                     <>
-                      <Tag style={{marginRight: 3}}>{props.foreignCluster.spec.clusterID}</Tag>
+                      <Tag style={{marginRight: 3}}>{foreignClusterName ? foreignClusterName : foreignClusterID}</Tag>
                       <> </>
                       is using your resources.
                     </>
