@@ -64,7 +64,7 @@ class DesignEditorCRD extends Component {
     }
 
     this.setState({
-      templates: this.props.api.getTemplates(),
+      templates: window.api.getTemplates(),
       isLoading: false
     });
   }
@@ -187,7 +187,7 @@ class DesignEditorCRD extends Component {
       this.setState({CR_chosen_template: 'default'},
         () => {this.preview('default')});
     } else {
-      this.setState({chosen_template: this.props.api.getCRDfromKind(value)},
+      this.setState({chosen_template: window.api.getCRDfromKind(value)},
         () => {this.content()});
       this.setState({
         currentStep: 1,
@@ -204,7 +204,7 @@ class DesignEditorCRD extends Component {
         this.state.chosen_template.spec.names.plural + '/' +
         this.state.CR_chosen_template.metadata.name;
 
-      this.props.api.createCustomResource(
+      window.api.createCustomResource(
         this.state.chosen_template.spec.group,
         this.state.chosen_template.spec.version,
         this.state.CR_chosen_template.metadata.namespace,
@@ -222,7 +222,7 @@ class DesignEditorCRD extends Component {
           description: 'Could not create the resource'
         });
       }).then(() => {
-          this.props.api.updateCustomResourceDefinition(
+          window.api.updateCustomResourceDefinition(
             this.CRD.metadata.name,
             this.CRD
           ).then(() => {
@@ -243,7 +243,7 @@ class DesignEditorCRD extends Component {
       )
     } else {
       this.CRD.metadata.annotations.template = null;
-      this.props.api.updateCustomResourceDefinition(
+      window.api.updateCustomResourceDefinition(
         this.CRD.metadata.name,
         this.CRD
       ).then(() => {

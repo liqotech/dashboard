@@ -35,11 +35,11 @@ function ListConnected(props){
    * offloaded to the foreign cluster
    */
   const getClientPODs = () => {
-    props.api.getNamespaces(LIQO_LABEL_ENABLED)
+    window.api.getNamespaces(LIQO_LABEL_ENABLED)
       .then(async (res) => {
         let _outgoingPods = [];
         await Promise.all(res.body.items.map(async (ns) => {
-          await props.api.getPODs(ns.metadata.name)
+          await window.api.getPODs(ns.metadata.name)
             .then(async res => {
               await Promise.all(res.body.items.map(po => {
                 _outgoingPods.push(po);
@@ -60,7 +60,7 @@ function ListConnected(props){
    * so we take all pods
    */
   const getServerPODs = () => {
-    props.api.getPODs().
+    window.api.getPODs().
     then(res => {
       let pods = res.body.items;
       setIncomingPods(pods);

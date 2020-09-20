@@ -62,7 +62,7 @@ class NewCR extends Component {
       namespace = item.metadata.namespace;
     }
 
-    let promise = this.props.api.createCustomResource(
+    let promise = window.api.createCustomResource(
       this.CRD.spec.group,
       this.CRD.spec.version,
       namespace,

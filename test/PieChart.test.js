@@ -26,13 +26,13 @@ async function setup(pie) {
     }
   })
 
-  let api = new ApiManager();
-  api.getCRDs().then(async () => {
+  window.api = new ApiManager({id_token: 'test'});
+  window.api.getCRDs().then(async () => {
 
-    let liqo_crd = await api.getCRDfromKind('LiqoDashTest');
-    let pie_crd = await api.getCRDfromKind('PieChart');
-    let liqo_cr = await api.getCustomResourcesAllNamespaces(liqo_crd);
-    let pie_cr = await api.getCustomResourcesAllNamespaces(pie_crd);
+    let liqo_crd = await window.api.getCRDfromKind('LiqoDashTest');
+    let pie_crd = await window.api.getCRDfromKind('PieChart');
+    let liqo_cr = await window.api.getCustomResourcesAllNamespaces(liqo_crd);
+    let pie_cr = await window.api.getCustomResourcesAllNamespaces(pie_crd);
 
     render(
       <PieChart CR={liqo_cr.body.items[0].spec} template={pie_cr.body.items[0]}/>

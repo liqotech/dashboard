@@ -15,7 +15,7 @@ export default class ApiManager {
    *
    */
   constructor(user) {
-
+    this.user = user;
     this.CRDs = [];
     this.customViews = [];
     this.watchers = [];
@@ -167,6 +167,7 @@ export default class ApiManager {
       .then(res => res.json())
       .then((res) => {
         if(plural === 'views'){
+          this.customViews=res.body.items;
           this.manageCallbackCVs(res.body.items);
         }
         this.watchers.forEach(w => {

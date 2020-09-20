@@ -102,7 +102,7 @@ function Status(props){
   /** This means there are no metrics available */
   const getConsumedMetricsNoMetricsServer = () => {
     metricsNotAvailableIncoming.current = true;
-    props.api.getPODs().
+    window.api.getPODs().
     then(res => {
       let pods = res.body.items.filter(po => {return po.spec.nodeName.slice(0, 5) !== 'liqo-'});
       let counter = 0;
@@ -128,7 +128,7 @@ function Status(props){
    */
   const getConsumedResources = () => {
 
-    props.api.getMetricsNodes()
+    window.api.getMetricsNodes()
       .then(res => {
         let _consumedHome = {
           CPU: 0,

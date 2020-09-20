@@ -28,17 +28,16 @@ async function setup() {
     }
   })
 
-  let api = new ApiManager();
-  api.getCRDs().then(async () => {
+  window.api = new ApiManager({id_token: 'test'});
+  window.api.getCRDs().then(async () => {
 
-    let crd = await api.getCRDfromKind('LiqoDashTest');
-    let cr = await api.getCustomResourcesAllNamespaces(crd);
+    let crd = await window.api.getCRDfromKind('LiqoDashTest');
+    let cr = await window.api.getCustomResourcesAllNamespaces(crd);
 
     render(
       <MemoryRouter>
         <DesignEditorCRD CR={cr.body.items[0]}
                          CRD={crd}
-                         api={api}
         />
       </MemoryRouter>
     )

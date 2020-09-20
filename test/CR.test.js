@@ -35,21 +35,20 @@ function mockFetch() {
 }
 
 async function setup(adv) {
-  let api = new ApiManager();
-  api.getCRDs().then(async () => {
+  window.api = new ApiManager({id_token: 'test'});
+  window.api.getCRDs().then(async () => {
 
-    let liqo_crd = await api.getCRDfromKind('LiqoDashTest');
-    let pie_crd = await api.getCRDfromKind('PieChart');
-    let l = await api.getCustomResourcesAllNamespaces(liqo_crd);
-    let p = await api.getCustomResourcesAllNamespaces(pie_crd);
+    let liqo_crd = await window.api.getCRDfromKind('LiqoDashTest');
+    let pie_crd = await window.api.getCRDfromKind('PieChart');
+    let l = await window.api.getCustomResourcesAllNamespaces(liqo_crd);
+    let p = await window.api.getCustomResourcesAllNamespaces(pie_crd);
 
     if(adv){
-      let adv_crd = await api.getCRDfromKind('Advertisement');
-      let a = await api.getCustomResourcesAllNamespaces(adv_crd);
+      let adv_crd = await window.api.getCRDfromKind('Advertisement');
+      let a = await window.api.getCustomResourcesAllNamespaces(adv_crd);
       render(
         <MemoryRouter>
-          <CR api={api}
-              cr={a.body.items[0]}
+          <CR cr={a.body.items[0]}
               crd={adv_crd}
           />
         </MemoryRouter>
@@ -57,8 +56,7 @@ async function setup(adv) {
     } else {
       render(
         <MemoryRouter>
-          <CR api={api}
-              cr={l.body.items[0]}
+          <CR cr={l.body.items[0]}
               crd={liqo_crd}
               template={p.body.items[0]}
           />

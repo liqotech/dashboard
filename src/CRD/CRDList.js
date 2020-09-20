@@ -14,15 +14,15 @@ class CRDList extends Component {
      * @param: isLoading: boolean
      */
     this.state = {
-      CRD: this.props.api.CRD,
+      CRD: window.api.CRDs,
       isLoading: false,
     };
     this.loadCustomResourceDefinitions = this.loadCustomResourceDefinitions.bind(this);
-    this.props.api.CRDListCallback = this.loadCustomResourceDefinitions;
+    window.api.CRDListCallback = this.loadCustomResourceDefinitions;
   }
 
   loadCustomResourceDefinitions() {
-    this.setState({CRD: this.props.api.CRD})
+    this.setState({CRD: window.api.CRDs})
   }
 
   componentDidMount() {
@@ -30,27 +30,27 @@ class CRDList extends Component {
   }
 
   componentWillUnmount() {
-    this.props.api.CRDListCallback = null;
+    window.api.CRDListCallback = null;
   }
 
   /** Update CRD with the 'favourite' annotation */
   async handleClick_fav(CRD){
 
-    CRD = this.props.api.CRDs.find(item => {return item.metadata.name === CRD});
+    CRD = window.api.CRDs.find(item => {return item.metadata.name === CRD});
 
     if(!CRD.metadata.annotations || !CRD.metadata.annotations.favourite){
       CRD.metadata.annotations = {favourite: 'true'};
     } else {
       CRD.metadata.annotations.favourite = null;
     }
-    await this.props.api.updateCustomResourceDefinition(
+    await window.api.updateCustomResourceDefinition(
       CRD.metadata.name,
       CRD
     )
   }
 
   renderCRDs = (text, record, dataIndex) => {
-    let CRD = this.props.api.CRDs.find(item => {return item.metadata.name === record.key});
+    let CRD = window.api.CRDs.find(item => {return item.metadata.name === record.key});
     return (
       dataIndex === 'Kind' ? (
         <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
@@ -70,7 +70,7 @@ class CRDList extends Component {
   render() {
 
     const CRDViews = [];
-    this.props.api.CRDs.forEach(CRD => {
+    window.api.CRDs.forEach(CRD => {
       let favourite = false;
       let description = 'This CRD has no description';
       if(CRD.metadata.annotations){
@@ -109,7 +109,7 @@ class CRDList extends Component {
       },
       {
         title: 'Favourite',
-        dataIndex: 'favourite',
+        dataIndex: 'Favourite',
         render: (text, record) => (
           <>
             {
@@ -129,7 +129,7 @@ class CRDList extends Component {
         {!this.state.isLoading && CRDViews.length > 0 ? (
           <Table columns={this.columns} dataSource={CRDViews} tableLayout={'fixed'}
                  pagination={{ position: ['bottomCenter'],
-                               hideOnSinglePage: this.props.api.CRDs.length < 11,
+                               hideOnSinglePage: window.api.CRDs.length < 11,
                                showSizeChanger: true,
                  }}
           />

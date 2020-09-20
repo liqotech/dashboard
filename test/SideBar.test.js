@@ -1,15 +1,41 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { act, fireEvent, screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import { loginTest, mockCRDAndViewsExtended, setup_cv } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
-import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
 describe('Sidebar', () => {
+  test('New Custom View works', async () => {
+    mockCRDAndViewsExtended();
+    await loginTest();
+
+    userEvent.click(await screen.findByText('New Custom View'));
+
+    expect(await screen.findAllByText('New Custom View')).toHaveLength(2);
+
+    const name = await screen.findByRole('input');
+    await userEvent.type(name, 'Test Custom View');
+    let crds = await screen.findAllByLabelText('select');
+    userEvent.click(crds[0]);
+    userEvent.click(crds[1]);
+    const adv = await screen.findAllByText('advertisements.protocol.liqo.io');
+
+    fireEvent.mouseOver(adv[1]);
+    fireEvent.click(adv[1]);
+
+    userEvent.click(await screen.findByText('OK'));
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 1000));
+    })
+
+    expect(await screen.findByText('Test Custom View')).toBeInTheDocument();
+  }, testTimeout)
+
   test('Sidebar main menus item and submenus item are showed', async () => {
     mockCRDAndViewsExtended();
     await loginTest();
@@ -61,29 +87,6 @@ describe('Sidebar', () => {
     userEvent.click(await screen.findByLabelText('left'));
 
     expect(await screen.queryByLabelText('left')).not.toBeInTheDocument();
-  }, testTimeout)
-
-  test('New Custom View works', async () => {
-    mockCRDAndViewsExtended();
-    await loginTest();
-
-    userEvent.click(await screen.findByText('New Custom View'));
-
-    expect(await screen.findAllByText('New Custom View')).toHaveLength(2);
-
-    const name = await screen.findByRole('input');
-    await userEvent.type(name, 'Test Custom View');
-    let crds = await screen.findAllByLabelText('select');
-    userEvent.click(crds[0]);
-    userEvent.click(crds[1]);
-    const adv = await screen.findAllByText('advertisements.protocol.liqo.io');
-
-    fireEvent.mouseOver(adv[1]);
-    fireEvent.click(adv[1]);
-
-    userEvent.click(await screen.findByText('OK'));
-
-    expect(await screen.findByText('Test Custom View')).toBeInTheDocument();
   }, testTimeout)
 
   test('New Custom View with no name throws error', async () => {

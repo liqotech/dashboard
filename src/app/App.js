@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import {
   Route,
@@ -27,131 +27,22 @@ function CallBackHandler(props) {
   return <LoadingIndicator />
 }
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      logged: false,
-      api: null,
-      user: {}
-    }
+function App(props) {
+  /** Set the URL to which we make the call to the proxy */
+  window.APISERVER_URL = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/apiserver';
 
-    /** Set the URL to which we make the call to the proxy */
-    window.APISERVER_URL = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/apiserver';
-
-    /** Manage the login via token */
-    this.manageToken = this.manageToken.bind(this);
-    /** Manage the logout via token */
-    this.tokenLogout = this.tokenLogout.bind(this);
-
-    /** set global configuration for notifications and alert*/
-    this.setGlobalConfig();
-
-    this.authManager = new Authenticator();
-
-    if (this.authManager.OIDC) {
-      /** all is needed to manage an OIDC session */
-      this.manageOIDCSession();
-    }
-  }
-
-
-  render() {
-    /** Always present routes */
-    let routes = [
-      <Route key={'login'}
-             exact path="/login"
-             render={() => this.authManager.OIDC ? (
-               <CallBackHandler func={this.authManager.login} />
-             ) : <Login func={this.manageToken} logged={this.state.logged} />}
-      />,
-      <Route key={'callback'}
-             path="/callback"
-             render={() => this.state.logged ? (
-               <Redirect to="/" />
-             ) : ( <CallBackHandler func={this.authManager.completeLogin} />)}
-      />,
-      <Route key={'logout'}
-             path="/logout">
-        <Redirect to="/login" />
-      </Route>,
-      <Route key={'error'}
-             path="/error/:statusCode"
-             component={(props) => <ErrorRedirect {...props} authManager={this.authManager} tokenLogout={this.tokenLogout} />}
-      />
-    ]
-
-    /** Routes present only if logged in and apiManager created */
-    if(this.state.api && this.state.logged){
-      routes.push(
-        <Route key={'/'}
-               exact path="/"
-               render={(props) =>
-                 <Home {...props} api={this.state.api} user={this.state.user}/>
-               }/>,
-        <Route key={'customresources'}
-               exact path="/customresources"
-               component={(props) =>
-                 <CRDList {...props} api={this.state.api} />
-               }/>,
-        <Route key={'crd'}
-               exact path="/customresources/:crdName"
-               component={(props) =>
-                 <CRD {...props} api={this.state.api} />
-               }/>,
-        <Route key={'customview'}
-               exact path="/customview/:viewName/"
-               component={(props) =>
-                 <CustomView {...props} api={this.state.api} />
-               }/>,
-        <Route key={'liqonfig'}
-               exact path="/settings"
-               component={(props) =>
-                 <ConfigView {...props} api={this.state.api} />
-               }/>
-      )
-    } else {
-      routes.push(
-      <Route key={'*'}
-             path="*">
-        <Redirect to={'/login'} />
-      </Route>)
-    }
-
-    return (
-        <Layout>
-          {this.state.api && this.state.logged ? (
-              <SideBar api={this.state.api} />
-          ) : null}
-          <Layout>
-            {this.state.api && this.state.logged ? (
-              <AppHeader
-                api={this.state.api}
-                tokenLogout={this.tokenLogout}
-                authManager={this.authManager}
-                logged={this.state.logged}
-              />) : null}
-              <Layout.Content className="app-content">
-                <Switch>
-                  {routes}
-                </Switch>
-              </Layout.Content>
-              <AppFooter />
-            </Layout>
-        </Layout>
-    );
-  }
+  const [api, setApi] = useState(new ApiManager({id_token: ''}));
+  const authManager = new Authenticator();
 
   /** Remove everything and redirect to the login page */
-  tokenLogout() {
-    this.state.logged = false;
-    this.state.api = null;
-    this.state.user = {};
+  const tokenLogout = () => {
+    window.api = new ApiManager({id_token: ''});
+    setApi(new ApiManager({id_token: ''}));
     Cookies.remove('token');
-    this.props.history.push('/login');
+    props.history.push('/login');
   }
 
-  setGlobalConfig() {
+  const setGlobalConfig = () => {
     /** global notification config */
     notification.config({
       placement: 'bottomLeft',
@@ -165,53 +56,139 @@ class App extends Component {
     });
   }
 
-  manageToken(token){
-    if(this.state.logged) return;
+  const manageToken = token => {
+    if(api.user.id_token !== '') return;
     let user = {
       id_token: token
     };
-    let api = new ApiManager(user);
+    let _api = new ApiManager(user);
     /** Get the CRDs at the start of the app */
-    api.getCRDs().
+    _api.getCRDs().
     then(() => {
-      api.loadCustomViewsCRs();
-      this.setState({
-        logged: true,
-        api: api,
-        user: user
-      });
+      _api.loadCustomViewsCRs();
+      window.api = _api;
+      setApi(_api);
       notification.success({
         message: APP_NAME,
         description: 'Successfully logged in'
       });
       Cookies.set('token', token)
-      this.props.history.push('/');
+      props.history.push('/');
     })
   }
 
-  manageOIDCSession() {
+  const manageOIDCSession = () => {
     /** Check if previously logged */
     if(Cookies.get('token')){
-      this.manageToken(Cookies.get('token'));
+      manageToken(Cookies.get('token'));
     } else {
-      this.authManager.manager.events.addUserLoaded(user => {
-        this.manageToken(user.id_token);
+      authManager.manager.events.addUserLoaded(user => {
+        manageToken(user.id_token);
       });
     }
 
     /** Refresh token (or logout is silent sign in is not enabled) */
-    this.authManager.manager.events.addAccessTokenExpiring(() => {
-      this.authManager.manager.signinSilent().then(user => {
-        this.state.api.refreshConfig(user);
+    authManager.manager.events.addAccessTokenExpiring(() => {
+      authManager.manager.signinSilent().then(user => {
+        api.refreshConfig(user);
         Cookies.set('token', user.id_token);
-        this.setState({logged: true});
       }).catch((error) => {
         console.log(error);
-        Cookies.remove('token');
-        this.props.history.push("/logout");
+        tokenLogout();
       });
     });
   }
+
+  /** set global configuration for notifications and alert*/
+  setGlobalConfig();
+
+  if(authManager.OIDC) {
+    /** all is needed to manage an OIDC session */
+    manageOIDCSession();
+  }
+
+  /** Always present routes */
+  let routes = [
+    <Route key={'login'}
+           exact path="/login"
+           render={() => authManager.OIDC ? (
+             <CallBackHandler func={authManager.login} />
+           ) : <Login func={manageToken} logged={api.user.id_token !== ''} />}
+    />,
+    <Route key={'callback'}
+           path="/callback"
+           render={() => api.user.id_token !== '' ? (
+             <Redirect to="/" />
+           ) : ( <CallBackHandler func={authManager.completeLogin} />)}
+    />,
+    <Route key={'logout'}
+           path="/logout">
+      <Redirect to="/login" />
+    </Route>,
+    <Route key={'error'}
+           path="/error/:statusCode"
+           component={(props) => <ErrorRedirect {...props} authManager={authManager} tokenLogout={tokenLogout} />}
+    />
+  ]
+
+  /** Routes present only if logged in and apiManager created */
+  if(api.user.id_token !== ''){
+    routes.push(
+      <Route key={'/'}
+             exact path="/"
+             render={(props) =>
+               <Home {...props} />
+             }/>,
+      <Route key={'customresources'}
+             exact path="/customresources"
+             component={(props) =>
+               <CRDList {...props} />
+             }/>,
+      <Route key={'crd'}
+             exact path="/customresources/:crdName"
+             component={(props) =>
+               <CRD {...props} />
+             }/>,
+      <Route key={'customview'}
+             exact path="/customview/:viewName/"
+             component={(props) =>
+               <CustomView {...props} />
+             }/>,
+      <Route key={'settings'}
+             exact path="/settings"
+             component={(props) =>
+               <ConfigView {...props} />
+             }/>
+    )
+  } else {
+    routes.push(
+      <Route key={'*'}
+             path="*">
+        <Redirect to={'/login'} />
+      </Route>)
+  }
+
+  return (
+    <Layout>
+      {api.user.id_token !== '' ? (
+        <SideBar api={api}/>
+      ) : null}
+      <Layout>
+        {api.user.id_token !== '' ? (
+          <AppHeader
+            tokenLogout={tokenLogout}
+            authManager={authManager}
+            logged={api.user.id_token !== ''}
+          />) : null}
+        <Layout.Content className="app-content">
+          <Switch>
+            {routes}
+          </Switch>
+        </Layout.Content>
+        <AppFooter />
+      </Layout>
+    </Layout>
+  );
 }
 
 export default withRouter(App);

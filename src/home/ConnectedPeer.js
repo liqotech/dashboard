@@ -77,7 +77,7 @@ function ConnectedPeer(props) {
   let metricsNotAvailableOutgoing = useRef(false);
 
   useEffect(() => {
-    props.api.getMetricsNodes()
+    window.api.getMetricsNodes()
       .then(res => {
         /** That means there are no metrics available */
         if(res.items.length === 0){
@@ -285,7 +285,7 @@ function ConnectedPeer(props) {
         });
       } else {
         incomingPods.current.forEach(po => {
-          props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
+          window.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
             .then(res => {
               metricsNotAvailableIncoming.current = false;
               home.counter++;
@@ -345,7 +345,7 @@ function ConnectedPeer(props) {
         });
       } else {
         outgoingPods.current.forEach(po => {
-          props.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
+          window.api.getMetricsPOD(po.metadata.namespace, po.metadata.name)
             .then(res => {
               metricsNotAvailableOutgoing.current = false;
               foreign.counter++;

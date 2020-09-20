@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../src/app/App';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
@@ -154,7 +154,7 @@ export const loginTest = async () => {
 
   /** Input mock password */
   const tokenInput = screen.getByLabelText('lab');
-  userEvent.type(tokenInput, 'password');
+  await userEvent.type(tokenInput, 'password');
 
   /** Click on login button */
   const submitButton = screen.getByRole('button');
@@ -196,5 +196,6 @@ export async function setup_cv(view) {
   await loginTest();
 
   const customview = await screen.findByText('Liqo View');
+
   userEvent.click(customview);
 }

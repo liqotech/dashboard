@@ -3,7 +3,7 @@ import ViewMockResponse from '../__mocks__/views.json';
 import ViewMockResponseLayout from '../__mocks__/views_withLayout.json';
 import ViewMockModified from '../__mocks__/views_modified.json';
 import ViewMockAltTemplate from '../__mocks__/views_alt_template.json';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockCRDAndViewsExtended, setup_cv } from './RTLUtils';
 import fetchMock from 'jest-fetch-mock';
@@ -20,8 +20,6 @@ import HistoMockResponse from '../__mocks__/histocharts.json';
 import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
-
-let api;
 
 function mocks(view){
   fetch.mockImplementation((url) => {
@@ -46,16 +44,15 @@ function mocks(view){
 }
 
 async function setup(error) {
-  api = new ApiManager();
-  api.getCRDs().then(() => {
-    api.loadCustomViewsCRs().then(() => {
+  window.api = new ApiManager({id_token: 'test'});
+  window.api.getCRDs().then(() => {
+    window.api.loadCustomViewsCRs().then(() => {
 
-      if(error) api.customViews = [];
+      if(error) window.api.customViews = [];
 
       render(
         <MemoryRouter>
-          <CustomView api={api}
-                      match={{params: {viewName: 'awesome-view'}}}
+          <CustomView match={{params: {viewName: 'awesome-view'}}}
           />
         </MemoryRouter>
       )
@@ -68,12 +65,12 @@ describe('CustomView', () => {
     mockCRDAndViewsExtended(null, 'PUT', 'advertisements', true);
     await setup();
 
-    api.customViews = JSON.parse(JSON.stringify(ViewMockResponse.items));
-    api.manageCallbackCVs(api.customViews);
+    window.api.customViews = JSON.parse(JSON.stringify(ViewMockResponse.items));
+    window.api.manageCallbackCVs(window.api.customViews);
 
     expect(await screen.findByText('Advertisement')).toBeInTheDocument();
 
-    await api.updateCustomResourceDefinition(null, api.getCRDfromKind('Advertisement'));
+    await window.api.updateCustomResourceDefinition(null, window.api.getCRDfromKind('Advertisement'));
 
     expect(await screen.findByText(/modified/i));
   }, testTimeout)
@@ -85,18 +82,18 @@ describe('CustomView', () => {
     expect(await screen.findByText('Test')).toBeInTheDocument();
 
     /** Modify the custom view */
-    api.customViews = JSON.parse(JSON.stringify(ViewMockModified.items));
-    api.manageCallbackCVs(api.customViews);
+    window.api.customViews = JSON.parse(JSON.stringify(ViewMockModified.items));
+    window.api.manageCallbackCVs(api.customViews);
 
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
   }, testTimeout)
 
   test('Pinned card works', async () => {
     await setup_cv(ViewMockResponse);
-
     const pin = await screen.findAllByLabelText('pushpin');
 
     userEvent.click(pin[0]);
+
   }, testTimeout)
 
   test('Custom view is empty if no Custom view', async () => {

@@ -1,22 +1,16 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Card } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Button } from 'antd';
 import './ErrorRedirect.css'
 import LogoutOutlined from '@ant-design/icons/lib/icons/LogoutOutlined';
 import Cookies from 'js-cookie';
 
-export default class ErrorRedirect extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      desc: ''
-    }
-    Cookies.remove('token');
-  }
+export default function ErrorRedirect(props) {
+  const [description, setDescription] = useState('');
 
-  componentDidMount() {
+  useEffect(() => {
+    Cookies.remove('token');
     let desc = '';
-    switch(this.props.match.params.statusCode){
+    switch(props.match.params.statusCode){
       case '401':
         desc = 'Forbidden, not valid authentication credentials';
         break;
@@ -29,30 +23,28 @@ export default class ErrorRedirect extends React.Component {
       default:
         desc = 'An error occurred, please login again';
     }
-    this.setState({desc: desc});
-  }
+    setDescription(desc);
+  }, []);
 
-  render() {
-    return(
-        <div className="error-red">
-          <h1 className="title">
-            {this.props.match.params.statusCode}
-          </h1>
-          <div className="desc">
-            {this.state.desc}
-          </div>
-            <Button className="go-back-btn"
-                    type="primary" size="large"
-                    icon={<LogoutOutlined />}
-                    onClick={() => {
-                      if(this.props.authManager.OIDC)
-                        this.props.authManager.logout();
-                      else
-                        this.props.tokenLogout();
-                    }}>
-              Logout
-            </Button>
+  return(
+      <div className="error-red">
+        <h1 className="title">
+          {props.match.params.statusCode}
+        </h1>
+        <div className="desc">
+          {description}
         </div>
-    )
-  }
+          <Button className="go-back-btn"
+                  type="primary" size="large"
+                  icon={<LogoutOutlined />}
+                  onClick={() => {
+                    if(props.authManager.OIDC)
+                      props.authManager.logout();
+                    else
+                      props.tokenLogout();
+                  }}>
+            Logout
+          </Button>
+      </div>
+  )
 }

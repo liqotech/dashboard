@@ -11,9 +11,9 @@ function ListAvailable(props) {
   const [showAddPeer, setShowAddPeer] = useState(false);
 
   const submit = item => {
-    let CRD = props.api.getCRDfromKind(item.kind)
+    let CRD = window.api.getCRDfromKind(item.kind)
 
-    let promise = props.api.createCustomResource(
+    let promise = window.api.createCustomResource(
       CRD.spec.group,
       CRD.spec.version,
       null,
@@ -131,10 +131,10 @@ function ListAvailable(props) {
         >
           <Tabs>
             <Tabs.TabPane tab={'Add domain'} key={1}>
-              <FormGenerator CRD={props.api.getCRDfromKind('SearchDomain')} submit={submit}/>
+              <FormGenerator CRD={window.api.getCRDfromKind('SearchDomain')} submit={submit}/>
             </Tabs.TabPane>
             <Tabs.TabPane tab={'Add remote peer'} key={2}>
-              <FormGenerator CRD={props.api.getCRDfromKind('ForeignCluster')} submit={submit}/>
+              <FormGenerator CRD={window.api.getCRDfromKind('ForeignCluster')} submit={submit}/>
             </Tabs.TabPane>
           </Tabs>
         </Modal>

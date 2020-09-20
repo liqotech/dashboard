@@ -11,7 +11,7 @@ function LiqoHeader(props) {
   const [clusterID, setClusterID] = useState('')
 
   useEffect(() => {
-    props.api.getConfigMaps(LIQO_NAMESPACE, 'metadata.name=cluster-id').then(res => {
+    window.api.getConfigMaps(LIQO_NAMESPACE, 'metadata.name=cluster-id').then(res => {
       setClusterID(res.body.items[0].data['cluster-id']);
     }).catch(error => {console.log(error)})
   }, [])

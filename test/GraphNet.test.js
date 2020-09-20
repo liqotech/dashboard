@@ -26,12 +26,12 @@ async function setup_Graph(){
     }
   })
 
-  let api = new ApiManager();
-  api.getCRDs().then(async () => {
-    let liqo_crd = await api.getCRDfromKind('SchedulingNode');
-    let pie_crd = await api.getCRDfromKind('Graph');
-    let l = await api.getCustomResourcesAllNamespaces(liqo_crd);
-    let p = await api.getCustomResourcesAllNamespaces(pie_crd);
+  window.api = new ApiManager({id_token: 'test'});
+  window.api.getCRDs().then(async () => {
+    let liqo_crd = await window.api.getCRDfromKind('SchedulingNode');
+    let pie_crd = await window.api.getCRDfromKind('Graph');
+    let l = await window.api.getCustomResourcesAllNamespaces(liqo_crd);
+    let p = await window.api.getCustomResourcesAllNamespaces(pie_crd);
 
     render (
       <MemoryRouter>
