@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import {
   Modal, Tabs, Typography, Tag, Badge, Space, Statistic,
-  Row, Col, Card, Progress, Input, Button, Table, Tooltip, Divider
+  Row, Col, Card, Progress, Table, Tooltip, Divider
 } from 'antd';
 import InfoCircleOutlined from '@ant-design/icons/lib/icons/InfoCircleOutlined';
 import HomeOutlined from '@ant-design/icons/lib/icons/HomeOutlined';
 import GlobalOutlined from '@ant-design/icons/lib/icons/GlobalOutlined';
 import { getColor } from './HomeUtils';
-import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
 import ExclamationCircleTwoTone from '@ant-design/icons/lib/icons/ExclamationCircleTwoTone';
 import { getColumnSearchProps } from '../services/TableUtils';
 
@@ -62,13 +61,11 @@ function ConnectionDetails(props) {
 
     const column = [
       {
-        title: 'Name',
         dataIndex: 'Name',
         key: 'Name',
         ...getColumnSearchProps('Name', renderPODs)
       },
       {
-        title: 'Status',
         dataIndex: 'Status',
         key: 'Status',
         ...getColumnSearchProps('Status', renderPODs)
@@ -120,7 +117,6 @@ function ConnectionDetails(props) {
         },
       },
       {
-        title: 'Namespace',
         dataIndex: 'Namespace',
         key: 'Namespace',
         ...getColumnSearchProps('Namespace', renderPODs)

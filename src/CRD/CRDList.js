@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Empty, Rate, Typography, Table } from 'antd';
 import LoadingIndicator from '../common/LoadingIndicator';
 import { Link, withRouter } from 'react-router-dom';
@@ -7,37 +7,35 @@ import './CRD.css';
 import 'react-resizable/css/styles.css';
 import { getColumnSearchProps } from '../services/TableUtils';
 
-class CRDList extends Component {
-  constructor(props) {
-    super(props);
-    /**
-     * @param: isLoading: boolean
-     */
-    this.state = {
-      CRD: window.api.CRDs,
-      isLoading: false,
-    };
-    this.loadCustomResourceDefinitions = this.loadCustomResourceDefinitions.bind(this);
-    window.api.CRDListCallback = this.loadCustomResourceDefinitions;
+function CRDList() {
+  /**
+   * @param: isLoading: boolean
+   * @param: CRDshown: array of CRDs in the current page
+   */
+
+  const [loading, setLoading] = useState(true);
+  const [CRDs, setCRDs] = useState([]);
+
+  /**
+   * Given a set (or subset) of CRD it generates the layout
+   */
+  const loadCustomResourceDefinitions = () => {
+    setCRDs(window.api.CRDs);
+    setLoading(false);
   }
 
-  loadCustomResourceDefinitions() {
-    this.setState({CRD: window.api.CRDs})
-  }
+  useEffect(() => {
+    window.api.CRDListCallback = loadCustomResourceDefinitions;
+    loadCustomResourceDefinitions();
 
-  componentDidMount() {
-    this.loadCustomResourceDefinitions();
-  }
-
-  componentWillUnmount() {
-    window.api.CRDListCallback = null;
-  }
+    return () => {
+      window.api.CRDListCallback = null;
+    }
+  }, []);
 
   /** Update CRD with the 'favourite' annotation */
-  async handleClick_fav(CRD){
-
-    CRD = window.api.CRDs.find(item => {return item.metadata.name === CRD});
-
+  const handleClick_fav = async (CRD) => {
+    CRD = CRDs.find(item => {return item.metadata.name === CRD});
     if(!CRD.metadata.annotations || !CRD.metadata.annotations.favourite){
       CRD.metadata.annotations = {favourite: 'true'};
     } else {
@@ -49,7 +47,7 @@ class CRDList extends Component {
     )
   }
 
-  renderCRDs = (text, record, dataIndex) => {
+  const renderCRDs = (text, record, dataIndex) => {
     let CRD = window.api.CRDs.find(item => {return item.metadata.name === record.key});
     return (
       dataIndex === 'Kind' ? (
@@ -67,82 +65,86 @@ class CRDList extends Component {
     )
   }
 
-  render() {
-
-    const CRDViews = [];
-    window.api.CRDs.forEach(CRD => {
-      let favourite = false;
-      let description = 'This CRD has no description';
-      if(CRD.metadata.annotations){
-        if(CRD.metadata.annotations.favourite)
-          favourite = true;
-        if(CRD.metadata.annotations.description)
-          description = CRD.metadata.annotations.description
-      }
-      CRDViews.push({
-        key: CRD.metadata.name,
-        Kind: CRD.spec.names.kind,
-        Favourite: favourite,
-        Group: CRD.spec.group,
-        Description: description
-      });
+  const CRDViews = [];
+  CRDs.forEach(CRD => {
+    let favourite = 0;
+    let description = 'This CRD has no description';
+    if(CRD.metadata.annotations){
+      if(CRD.metadata.annotations.favourite)
+        favourite = 1;
+      if(CRD.metadata.annotations.description)
+        description = CRD.metadata.annotations.description
+    }
+    CRDViews.push({
+      key: CRD.metadata.name,
+      Kind: CRD.spec.names.kind,
+      Favourite: favourite,
+      Group: CRD.spec.group,
+      Description: description
     });
+  });
 
-    this.columns = [
-      {
-        title: 'Kind',
-        dataIndex: 'Kind',
-        key: 'Kind',
-        ...getColumnSearchProps('Kind', this.renderCRDs)
+  const columns = [
+    {
+      title: '',
+      fixed: 'left',
+      dataIndex: 'Favourite',
+      width: '4em',
+      sortDirections: ['descend'],
+      sorter: {
+        compare: (a, b) => a.Favourite - b.Favourite,
       },
-      {
-        title: 'Description',
-        dataIndex: 'Description',
-        key: 'Description',
-        ...getColumnSearchProps('Description', this.renderCRDs)
-      },
-      {
-        title: 'Group',
-        dataIndex: 'Group',
-        key: 'Group',
-        ...getColumnSearchProps('Group', this.renderCRDs)
-      },
-      {
-        title: 'Favourite',
-        dataIndex: 'Favourite',
-        render: (text, record) => (
-          <>
-            {
-              <Rate className="crd-fav" count={1} defaultValue={text ? 1 : 0}
-                    value={text ? 1 : 0}
-                    onChange={async () => {await this.handleClick_fav(record.key)}}
-                    style={{marginLeft: 0}}
-              />
-            }
-          </>
-        )
-      }
-    ]
+      ellipsis: true,
+      render: (text, record) => (
+        <>
+          {
+            <Rate className="crd-fav" count={1} defaultValue={text === 1 ? 1 : 0}
+                  value={text === 1 ? 1 : 0}
+                  onChange={async () => {await handleClick_fav(record.key)}}
+                  style={{marginLeft: 0}}
+            />
+          }
+        </>
+      )
+    },
+    {
+      dataIndex: 'Kind',
+      key: 'Kind',
+      fixed: true,
+      ...getColumnSearchProps('Kind', renderCRDs)
+    },
+    {
+      dataIndex: 'Description',
+      key: 'Description',
+      fixed: true,
+      ...getColumnSearchProps('Description', renderCRDs)
+    },
+    {
+      dataIndex: 'Group',
+      key: 'Group',
+      fixed: true,
+      ...getColumnSearchProps('Group', renderCRDs)
+    }
+  ]
 
-    return (
-      <div>
-        {!this.state.isLoading && CRDViews.length > 0 ? (
-          <Table columns={this.columns} dataSource={CRDViews} tableLayout={'fixed'}
-                 pagination={{ position: ['bottomCenter'],
-                               hideOnSinglePage: window.api.CRDs.length < 11,
-                               showSizeChanger: true,
-                 }}
-          />
-          ) : null}
-        {!this.state.isLoading && CRDViews.length === 0 ? (
-          <div className="no-crds-found">
-            <Empty description={<strong>No CRDs found</strong>}/>
-          </div>
-        ) : null}
-        {this.state.isLoading ? <LoadingIndicator /> : null}
-      </div>
-    );
-  }
+  return (
+    <div>
+      {!loading && CRDViews.length > 0 ? (
+        <Table columns={columns} dataSource={CRDViews}
+               pagination={{ position: ['bottomCenter'],
+                 hideOnSinglePage: window.api.CRDs.length < 11,
+                 showSizeChanger: true,
+               }} showSorterTooltip={false}
+        />
+      ) : null}
+      {!loading && CRDViews.length === 0 ? (
+        <div className="no-crds-found">
+          <Empty description={<strong>No CRDs found</strong>}/>
+        </div>
+      ) : null}
+      {loading ? <LoadingIndicator /> : null}
+    </div>
+  );
 }
 
 export default withRouter(CRDList);

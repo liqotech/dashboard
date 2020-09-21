@@ -57,5 +57,10 @@ export const getColumnSearchProps = (dataIndex, renderFunc) => ({
   },
   render: (text, record) => {
     return renderFunc(text, record, dataIndex);
+  },
+  title: () => {
+    return (
+      <div style={{marginLeft: '2em'}}>{dataIndex}</div>
+    )
   }
 });
