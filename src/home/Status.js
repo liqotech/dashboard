@@ -104,7 +104,11 @@ function Status(props){
     metricsNotAvailableIncoming.current = true;
     window.api.getPODs().
     then(res => {
-      let pods = res.body.items.filter(po => {return po.spec.nodeName.slice(0, 5) !== 'liqo-'});
+      let pods = res.body.items.filter(po => {
+        if(po.spec.nodeName)
+          return po.spec.nodeName.slice(0, 5) !== 'liqo-'
+        else return true;
+      });
       let counter = 0;
       let _consumedHome = {CPU: 0, RAM: 0};
       pods.forEach(po => {
