@@ -98,6 +98,95 @@
     },
     {
       "metadata": {
+        "name": "hello-world-deployment-5756549f5-x65v9",
+        "generateName": "hello-world-deployment-5756549f5-",
+        "namespace": "test2",
+        "selfLink": "/api/v1/namespaces/test/pods/hello-world-deployment-5756549f5-x65v9",
+        "labels": {
+          "app": "hello-world",
+          "pod-template-hash": "6756549f5"
+        },
+        "ownerReferences": [
+          {
+            "apiVersion": "apps/v1",
+            "kind": "ReplicaSet",
+            "name": "hello-world-deployment-5756549f5",
+            "uid": "419b8224-d91f-4f83-b972-e0fe158d7500",
+            "controller": true,
+            "blockOwnerDeletion": true
+          }
+        ]
+      },
+      "spec": {
+        "volumes": [
+          {
+            "name": "default-token-mbjjj",
+            "secret": {
+              "secretName": "default-token-mbjjj",
+              "defaultMode": 420
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "hello-world",
+            "image": "bhargavshah86/kube-test:v0.1",
+            "ports": [
+              {
+                "containerPort": 80,
+                "protocol": "TCP"
+              }
+            ],
+            "resources": {},
+            "volumeMounts": [
+              {
+                "name": "default-token-mbjjj",
+                "readOnly": true,
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent"
+          }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 30,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "securityContext": {
+
+        },
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+          {
+            "key": "virtual-node.liqo.io/not-allowed",
+            "operator": "Exists",
+            "effect": "NoExecute"
+          },
+          {
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          }
+        ],
+        "priority": 0,
+        "enableServiceLinks": true
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
         "name": "hello-world-deployment-6756549f5-c7qzv",
         "namespace": "test-c22b84e7-dcb9-483f-8009-29f16c911388",
         "selfLink": "/api/v1/namespaces/test-c22b84e7-dcb9-483f-8009-29f16c911388/pods/hello-world-deployment-6756549f5-c7qzv",

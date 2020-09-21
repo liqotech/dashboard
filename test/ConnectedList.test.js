@@ -69,9 +69,9 @@ function mocks(advertisement, foreignCluster, peeringRequest, error, errorPod, e
           return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
         } else {
           let pods = PodsMockResponse;
-          let pod = JSON.parse(JSON.stringify(pods.items[2]));
+          let pod = JSON.parse(JSON.stringify(pods.items[3]));
           pod.metadata.name = 'hello-world-deployment-6756549f5-x66v8'
-          if(pods.items.length < 4)
+          if(pods.items.length < 5)
             pods.items.push(pod);
           if(noPods)
             return Promise.resolve(new Response(JSON.stringify({body: { items: [] } })));
