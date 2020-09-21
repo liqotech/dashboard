@@ -143,8 +143,8 @@ function Status(props){
           let counter = 0;
           home_nodes.forEach(no => {
             _consumedHome = {
-              CPU: prev.CPU + convertCPU(no.usage.cpu),
-              RAM: prev.RAM + convertRAM(no.usage.memory)
+              CPU: _consumedHome.CPU + convertCPU(no.usage.cpu),
+              RAM: _consumedHome.RAM + convertRAM(no.usage.memory)
             }
             counter++;
             if(counter === home_nodes.length)
