@@ -49,7 +49,7 @@ class CR extends Component {
 
   /** Delete the CR */
   handleClick_delete() {
-    let promise = this.props.api.deleteCustomResource(
+    let promise = window.api.deleteCustomResource(
       this.props.crd.spec.group,
       this.props.crd.spec.version,
       this.props.cr.metadata.namespace,
@@ -136,7 +136,7 @@ class CR extends Component {
         <div key={'metadata_' + this.props.cr.metadata.name}>
           <Alert.ErrorBoundary>
             <div aria-label={'form_metadata'}>
-              <FormViewer CR={this.props.cr} CRD={this.props.crd} api={this.props.api} show={'metadata'} />
+              <FormViewer CR={this.props.cr} CRD={this.props.crd}  show={'metadata'} />
             </div>
           </Alert.ErrorBoundary>
         </div>
@@ -145,7 +145,7 @@ class CR extends Component {
         <div key={'spec_' + this.props.cr.metadata.name}>
           <Alert.ErrorBoundary>
             <div aria-label={'form_spec'}>
-              <FormViewer CR={this.props.cr} CRD={this.props.crd} api={this.props.api} show={'spec'} />
+              <FormViewer CR={this.props.cr} CRD={this.props.crd}  show={'spec'} />
             </div>
           </Alert.ErrorBoundary>
         </div>
@@ -154,7 +154,7 @@ class CR extends Component {
         <div key={'status_' + this.props.cr.metadata.name}>
           <Alert.ErrorBoundary>
             <div aria-label={'form_status'}>
-              <FormViewer CR={this.props.cr} CRD={this.props.crd} show={'status'} api={this.props.api} />
+              <FormViewer CR={this.props.cr} CRD={this.props.crd} show={'status'}  />
             </div>
           </Alert.ErrorBoundary>
         </div>) : null,
@@ -197,7 +197,7 @@ class CR extends Component {
                               version={this.props.crd.spec.version}
                               plural={this.props.crd.spec.names.plural}
                               this={this}
-                              api={this.props.api}
+
                     />
                   </Drawer>
                   <Tooltip title={'Show JSON'}>

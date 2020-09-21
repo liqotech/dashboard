@@ -28,6 +28,19 @@ async function setup() {
 }
 
 describe('CRD List', () => {
+  test('Sidebar updates when a CRD is added/removed to favourites', async () => {
+    await setup();
+
+    const favCRD = screen.getAllByLabelText('star')[2];
+    userEvent.click(favCRD);
+
+    expect(await screen.findAllByText('Advertisement')).toHaveLength(2);
+
+    userEvent.click(favCRD);
+
+    expect(screen.findByText('Advertisement'));
+  }, testTimeout)
+
   test('CRD list is correctly paginated and updated when page is changed', async () => {
     fetch.mockImplementation((url) => {
       if (url === 'http://localhost:3001/customresourcedefinition') {
@@ -62,19 +75,6 @@ describe('CRD List', () => {
     expect(screen.getByText('This CRD is used to create custom views from a set of CRDs'));
   }, testTimeout)
 
-  test('Sidebar updates when a CRD is added/removed to favourites', async () => {
-    await setup();
-
-    const favCRD = screen.getAllByLabelText('star')[2];
-    userEvent.click(favCRD);
-
-    expect(await screen.findAllByText('Advertisement')).toHaveLength(2);
-
-    userEvent.click(favCRD);
-
-    expect(screen.findByText('Advertisement'));
-  }, testTimeout)
-
   test('Empty notification when no CRDs', async () => {
     fetch.mockImplementation((url) => {
       if (url === 'http://localhost:3001/customresourcedefinition') {
@@ -84,12 +84,12 @@ describe('CRD List', () => {
       }
     })
 
-    let api = new ApiManager();
-    await api.getCRDs().then(async () => {
+    window.api = new ApiManager({id_token: 'test'});
+    await window.api.getCRDs().then(async () => {
 
       render(
         <MemoryRouter>
-          <CRDList api={api} />
+          <CRDList />
         </MemoryRouter>
       )
     });

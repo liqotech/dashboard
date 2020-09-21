@@ -60,9 +60,9 @@ export function updatePeeringStatus(props, loading, setLoading, messageOK, messa
 
   setLoading(prev => !prev);
 
-  let foreignClusterCRD = props.api.getCRDfromKind('ForeignCluster');
+  let foreignClusterCRD = window.api.getCRDfromKind('ForeignCluster');
 
-  let promise = props.api.updateCustomResource(
+  let promise = window.api.updateCustomResource(
     foreignClusterCRD.spec.group,
     foreignClusterCRD.spec.version,
     props.foreignCluster.metadata.namespace,

@@ -23,14 +23,13 @@ async function setup() {
     }
   })
 
-  let api = new ApiManager();
-  api.getCRDs().then(async () => {
+  window.api = new ApiManager({id_token: 'test'});
+  window.api.getCRDs().then(async () => {
 
-    let liqo_crd = await api.getCRDfromKind('LiqoDashTest');
+    let liqo_crd = await window.api.getCRDfromKind('LiqoDashTest');
 
     render(
-      <NewCR api={api}
-             CRD={liqo_crd}
+      <NewCR CRD={liqo_crd}
       />
     )
   });
@@ -81,14 +80,13 @@ describe('NewCR', () => {
       }
     })
 
-    let api = new ApiManager();
-    api.getCRDs().then(async () => {
+    window.api = new ApiManager({id_token: 'test'});
+    window.api.getCRDs().then(async () => {
 
-      let noschema_crd = await api.getCRDfromKind('NoAnnNoResNoSchema');
+      let noschema_crd = await window.api.getCRDfromKind('NoAnnNoResNoSchema');
 
       render(
-        <NewCR api={api}
-               CRD={noschema_crd}
+        <NewCR CRD={noschema_crd}
         />
       )
     });

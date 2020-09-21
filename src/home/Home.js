@@ -27,12 +27,12 @@ function Home(props){
   const [fcMetricsOut, setFcMetricsOut] = useState([]);
 
   useEffect(() => {
-    props.api.CRDArrayCallback.push(CRDCallback);
+    window.api.CRDArrayCallback.push(CRDCallback);
     loadCRD('ForeignCluster');
     loadCRD('Advertisement');
     loadCRD('PeeringRequest');
     loadCRD('ClusterConfig');
-    props.api.getNodes()
+    window.api.getNodes()
       .then(res => {
         let nodes = res.body.items;
         setHomeNodes(nodes.filter(no => {return no.metadata.labels.type !== 'virtual-node'}));
@@ -48,11 +48,11 @@ function Home(props){
      * Avoid no-op and memory leaks
      */
     return () => {
-      props.api.abortAllWatchers('foreignclusters');
-      props.api.abortAllWatchers('clusterconfigs');
-      props.api.abortAllWatchers('advertisements');
-      props.api.abortAllWatchers('peeringrequests');
-      props.api.CRDArrayCallback = props.api.CRDArrayCallback.filter(func => {return func !== CRDCallback});
+      window.api.abortAllWatchers('foreignclusters');
+      window.api.abortAllWatchers('clusterconfigs');
+      window.api.abortAllWatchers('advertisements');
+      window.api.abortAllWatchers('peeringrequests');
+      window.api.CRDArrayCallback = window.api.CRDArrayCallback.filter(func => {return func !== CRDCallback});
     }
   }, []);
 
@@ -93,10 +93,10 @@ function Home(props){
   const loadCRD = kind => {
     let CRD;
 
-    CRD = props.api.getCRDfromKind(kind);
+    CRD = window.api.getCRDfromKind(kind);
 
     if(CRD){
-      props.api.getCustomResourcesAllNamespaces(CRD).then( res => {
+      window.api.getCustomResourcesAllNamespaces(CRD).then( res => {
         let notifyEvent = null;
         if(kind === 'ForeignCluster') {
           notifyEvent = CRForeignClusterNotifyEvent;
@@ -113,7 +113,7 @@ function Home(props){
         }
 
         /** Then set up a watch to watch changes of the config */
-        props.api.watchSingleCRD(
+        window.api.watchSingleCRD(
           CRD.spec.group,
           CRD.spec.version,
           CRD.spec.names.plural,
@@ -204,7 +204,7 @@ function Home(props){
       ) : (
         <div>
           <div className="home-container">
-            <LiqoHeader api={props.api} config={config[0]} />
+            <LiqoHeader  config={config[0]} />
             { resizeDetector() }
             <ResponsiveGridLayout className="react-grid-layout" layouts={layouts} margin={[20, 20]}
                                   breakpoints={{lg: 1000, md: 796, sm: 568, xs: 280, xxs: 0}}
@@ -216,7 +216,7 @@ function Home(props){
               <div key={'list_connected'} data-grid={{ w: 2, h: 10, x: 0, y: 0, minW: 2, minH: 3 }} >
                 <div className={'scrollbar'} >
                   <Alert.ErrorBoundary>
-                    <ListConnected api={props.api} config={config[0]}
+                    <ListConnected  config={config[0]}
                                    foreignClusters={foreignClusters.filter(fc =>
                                      {return ( fc.spec.join && fc.status && (fc.status.outgoing.joined || fc.status.incoming.joined))}
                                    )}
@@ -232,7 +232,7 @@ function Home(props){
               <div key={'list_available'} data-grid={{ w: 2, h: 10, x: 2, y: 0, minW: 2, minH: 3 }} >
                 <div className={'scrollbar'} >
                   <Alert.ErrorBoundary>
-                    <ListAvailable api={props.api} config={config[0]}
+                    <ListAvailable  config={config[0]}
                                    foreignClusters={foreignClusters}
                                    advertisements={advertisements}
                                    peeringRequests={peeringRequests}
@@ -243,7 +243,7 @@ function Home(props){
               <div data-grid={{ w: 2, h: 10, x: 4, y: 0, minW: 2, minH: 3 }} key={'status'} >
                 <div className={'scrollbar'} >
                   <Alert.ErrorBoundary>
-                    <Status api={props.api} config={config[0]} foreignClusters={foreignClusters}
+                    <Status  config={config[0]} foreignClusters={foreignClusters}
                             homeNodes={homeNodes}
                             foreignNodes={foreignNodes}
                             incomingMetrics={fcMetricsIn}

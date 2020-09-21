@@ -50,7 +50,7 @@ class UpdateCR extends Component {
 
     this.setState({isLoading: true});
 
-    let promise = this.props.api.updateCustomResource(
+    let promise = window.api.updateCustomResource(
       this.props.group,
       this.props.version,
       this.CR.metadata.namespace,

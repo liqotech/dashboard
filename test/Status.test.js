@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ViewMockResponse from '../__mocks__/views.json';
 import ApiManager from '../src/services/__mocks__/ApiManager';
@@ -23,14 +23,12 @@ import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 
 fetchMock.enableMocks();
 
-let api;
-
 async function setup() {
-  api = new ApiManager();
-  api.getCRDs().then(async () => {
+  window.api = new ApiManager();
+  window.api.getCRDs().then(async () => {
     render(
       <MemoryRouter>
-        <Home api={api} />
+        <Home />
       </MemoryRouter>
     )
   });
@@ -88,7 +86,9 @@ describe('Status', () => {
 
     await OKCheck();
 
-    await new Promise((r) => setTimeout(r, 31000));
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 31000));
+    })
   }, 60000)
 
   test('404 on node metrics', async () => {

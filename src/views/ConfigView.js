@@ -19,7 +19,7 @@ class ConfigView extends Component {
 
     this.state = {
       loading: true,
-      CRD: this.props.api.getCRDfromKind('ClusterConfig'),
+      CRD: window.api.getCRDfromKind('ClusterConfig'),
       prevConfig: null,
       currentConfig: null
     }
@@ -29,7 +29,7 @@ class ConfigView extends Component {
 
   componentDidMount() {
     if(this.state.CRD){
-      this.props.api.getCustomResourcesAllNamespaces(this.state.CRD).then( res => {
+      window.api.getCustomResourcesAllNamespaces(this.state.CRD).then( res => {
         this.setState({
           prevConfig: res.body.items[0],
           loading: false,
@@ -57,7 +57,7 @@ class ConfigView extends Component {
 
     this.setState({isLoading: true});
 
-    let promise = this.props.api.updateCustomResource(
+    let promise = window.api.updateCustomResource(
       this.state.CRD.spec.group,
       this.state.CRD.spec.version,
       this.state.CRD.metadata.namespace,

@@ -62,7 +62,7 @@ class FormViewer extends Component {
       namespace = this.props.CR.metadata.namespace;
     }
 
-    let promise = this.props.api.updateCustomResource(
+    let promise = window.api.updateCustomResource(
       this.props.CRD.spec.group,
       this.props.CRD.spec.version,
       namespace,

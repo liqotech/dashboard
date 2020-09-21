@@ -2,7 +2,7 @@ import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import { metricsPODs, mockCRDAndViewsExtended } from './RTLUtils';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import ApiManager from '../src/services/__mocks__/ApiManager';
 import { MemoryRouter } from 'react-router-dom';
 import Home from '../src/home/Home';
@@ -20,14 +20,12 @@ import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 
 fetchMock.enableMocks();
 
-let api;
-
 async function setup() {
-  api = new ApiManager();
-  api.getCRDs().then(async () => {
+  window.api = new ApiManager({id_token: 'test'});
+  window.api.getCRDs().then(async () => {
     render(
       <MemoryRouter>
-        <Home api={api} />
+        <Home />
       </MemoryRouter>
     )
   });
@@ -67,7 +65,9 @@ describe('Home', () => {
 
     expect(await screen.findByText('LIQO')).toBeInTheDocument();
 
-    await api.createCustomResource(null, null, null, 'foreignclusters', null, null);
+    await act(async () => {
+      await window.api.createCustomResource(null, null, null, 'foreignclusters', null, null);
+    });
   }, testTimeout)
 
   test('Advertisement updates', async () => {
@@ -77,7 +77,9 @@ describe('Home', () => {
 
     expect(await screen.findByText('LIQO')).toBeInTheDocument();
 
-    await api.deleteCustomResource(null, null, null, 'advertisements', null);
+    await act(async () => {
+      await window.api.deleteCustomResource(null, null, null, 'advertisements', null);
+    });
   }, testTimeout)
 
   test('Peering request updates', async () => {
@@ -87,7 +89,9 @@ describe('Home', () => {
 
     expect(await screen.findByText('LIQO')).toBeInTheDocument();
 
-    await api.deleteCustomResource(null, null, null, 'peeringrequests', null);
+    await act(async () => {
+      await window.api.deleteCustomResource(null, null, null, 'peeringrequests', null);
+    })
   }, testTimeout)
 
   test('Cluster config updates', async () => {
@@ -97,7 +101,9 @@ describe('Home', () => {
 
     expect(await screen.findByText('LIQO')).toBeInTheDocument();
 
-    await api.updateCustomResource(null, null, null, 'clusterconfigs', null);
+    await act(async () => {
+      await window.api.updateCustomResource(null, null, null, 'clusterconfigs', null);
+    })
   }, testTimeout)
 
   test('Change CRD on home view', async () => {
@@ -106,15 +112,19 @@ describe('Home', () => {
 
     expect(await screen.findByText('LIQO')).toBeInTheDocument();
 
-    await api.updateCustomResourceDefinition(null, api.getCRDfromKind('Advertisement'));
+    await window.api.updateCustomResourceDefinition(null, api.getCRDfromKind('Advertisement'));
 
-    expect(await screen.findByText(/modified/i));
+    await act(async () => {
+      expect(await screen.findByText(/modified/i));
+    })
   }, testTimeout)
 
   test('Error on getting CR in home view', async () => {
     mocks();
     await setup();
 
-    expect(await screen.queryByText('LIQO')).not.toBeInTheDocument();
+    await act(async () => {
+      expect(await screen.queryByText('LIQO')).not.toBeInTheDocument();
+    })
   }, testTimeout)
 })

@@ -21,14 +21,12 @@ import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 
 fetchMock.enableMocks();
 
-let api;
-
 async function setup() {
-  api = new ApiManager();
-  api.getCRDs().then(async () => {
+  window.api = new ApiManager({id_token: 'test'});
+  window.api.getCRDs().then(async () => {
     render(
       <MemoryRouter>
-        <Home api={api} />
+        <Home />
       </MemoryRouter>
     )
   });

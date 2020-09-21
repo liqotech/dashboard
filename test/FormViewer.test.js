@@ -38,16 +38,15 @@ function mockFetch(error) {
 }
 
 async function setup() {
-  let api = new ApiManager();
-  api.getCRDs().then(async () => {
+  window.api = new ApiManager({id_token: 'test'});
+  window.api.getCRDs().then(async () => {
 
-    let adv_crd = await api.getCRDfromKind('Advertisement');
-    let adv = await api.getCustomResourcesAllNamespaces(adv_crd);
+    let adv_crd = await window.api.getCRDfromKind('Advertisement');
+    let adv = await window.api.getCustomResourcesAllNamespaces(adv_crd);
 
     render(
       <MemoryRouter>
-        <CR api={api}
-            cr={adv.body.items[0]}
+        <CR cr={adv.body.items[0]}
             crd={adv_crd}
         />
       </MemoryRouter>

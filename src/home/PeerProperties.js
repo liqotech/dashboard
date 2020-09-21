@@ -22,20 +22,20 @@ export function getPeerProperties(client, server, props, showProperties, setShow
     >
       <Tabs>
         <Tabs.TabPane tab={'Foreign Cluster'} key={1}>
-          {createTabs('ForeignCluster', props.foreignCluster, props.api)}
+          {createTabs('ForeignCluster', props.foreignCluster)}
         </Tabs.TabPane>
         { client ? (
           <Tabs.TabPane tab={'Advertisement'} key={2}>
             {createTabs('Advertisement', props.advertisements.find(adv =>
               {return adv.metadata.name === props.foreignCluster.status.outgoing.advertisement.name}
-            ), props.api)}
+            ))}
           </Tabs.TabPane>
         ) : null }
         { server ? (
           <Tabs.TabPane tab={'Peering Request'} key={4}>
             {createTabs('PeeringRequest', props.peeringRequests.find(pr =>
               {return pr.metadata.name === props.foreignCluster.status.incoming.peeringRequest.name}
-            ), props.api)}
+            ))}
           </Tabs.TabPane>
         ) : null }
       </Tabs>
@@ -43,8 +43,8 @@ export function getPeerProperties(client, server, props, showProperties, setShow
   )
 }
 
-function createTabs(kind, CR, api) {
-  let CRD = api.getCRDfromKind(kind);
+function createTabs(kind, CR) {
+  let CRD = window.api.getCRDfromKind(kind);
 
   return (
     <Tabs tabPosition={'left'} size={'small'} style={{marginLeft: '-1.5em'}} defaultActiveKey={'spec'}>
@@ -56,7 +56,6 @@ function createTabs(kind, CR, api) {
       >
         <Alert.ErrorBoundary>
           <FormViewer CRD={CRD}
-                      api={api}
                       CR={CR}
                       show={'metadata'}
           />
@@ -70,7 +69,6 @@ function createTabs(kind, CR, api) {
       >
         <Alert.ErrorBoundary>
           <FormViewer CRD={CRD}
-                      api={api}
                       CR={CR}
                       show={'spec'}
           />
@@ -84,7 +82,6 @@ function createTabs(kind, CR, api) {
       >
         <Alert.ErrorBoundary>
           <FormViewer CRD={CRD}
-                      api={api}
                       CR={CR}
                       show={'status'}
           />

@@ -30,7 +30,7 @@ class CustomView extends Component {
 
     this.loadCRD = this.loadCRD.bind(this);
     this.getCustomViews = this.getCustomViews.bind(this);
-    this.props.api.CVArrayCallback.push(this.getCustomViews);
+    window.api.CVArrayCallback.push(this.getCustomViews);
 
     this.generateLayout = this.generateLayout.bind(this);
     this.childLogic = this.childLogic.bind(this);
@@ -106,7 +106,7 @@ class CustomView extends Component {
     let CRDView = [];
 
     this.state.CRDs.forEach(item => {
-      if(this.props.api.getCRDfromName(item.metadata.name)){
+      if(window.api.getCRDfromName(item.metadata.name)){
         CRDView.push(
           <div key={item.metadata.name} className="crd-content" aria-label={'crd_custom_view'} >
             <div style={{overflow: 'auto', height: '100%'}}>
@@ -114,7 +114,7 @@ class CustomView extends Component {
                 CRD={item.metadata.name}
                 altName={item.altName}
                 altTemplate={item.altTemplate}
-                api={this.props.api}
+
                 onCustomView={true}
                 func={this.childLogic}
               />
@@ -168,7 +168,7 @@ class CustomView extends Component {
   }
 
   componentDidMount() {
-    this.state.customView = this.props.api.customViews.find(item => {
+    this.state.customView = window.api.customViews.find(item => {
       return item.metadata.name === this.props.match.params.viewName;
     })
     if(this.state.customView){
@@ -187,17 +187,17 @@ class CustomView extends Component {
      * Cancel all watchers
      * Then save the layout
      */
-    this.props.api.CVArrayCallback = this.props.api.CVArrayCallback.filter(func => {
+    window.api.CVArrayCallback = window.api.CVArrayCallback.filter(func => {
       return func !== this.getCustomViews;
     });
-    this.props.api.abortAllWatchers();
+    window.api.abortAllWatchers();
     this.state.customView.spec.layout = this.state.layout;
     for(let i = 0; i < this.state.customView.spec.layout[this.state.newBr].length; i++){
       delete this.state.customView.spec.layout[this.state.newBr][i].isDraggable;
       delete this.state.customView.spec.layout[this.state.newBr][i].static;
     }
     let array = this.state.customView.metadata.selfLink.split('/');
-    await this.props.api.updateCustomResource(
+    await window.api.updateCustomResource(
       array[2],
       array[3],
       this.state.customView.metadata.namespace,

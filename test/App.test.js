@@ -1,11 +1,9 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { loginTest, metricsPODs, mockCRDAndViewsExtended } from './RTLUtils';
+import { metricsPODs } from './RTLUtils';
 import { render, screen } from '@testing-library/react';
-import ApiManager from '../src/services/__mocks__/ApiManager';
 import { MemoryRouter } from 'react-router-dom';
-import Home from '../src/home/Home';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import FCMockResponse from '../__mocks__/foreigncluster.json';
 import AdvMockResponse from '../__mocks__/advertisement.json';
@@ -21,20 +19,15 @@ import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 
 fetchMock.enableMocks();
 
-let api;
-
 async function setup() {
   window.OIDC_PROVIDER_URL = 'test-url';
   window.OIDC_CLIENT_ID = 'test-id';
 
-  api = new ApiManager();
-  api.getCRDs().then(async () => {
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    )
-  });
+  return render(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>
+  )
 }
 
 function mocks(){
@@ -72,6 +65,6 @@ describe('App', () => {
     await setup();
 
     /** Assert that a success notification has spawned */
-    expect(await screen.findByText(/liqo/i)).toBeInTheDocument();
+    expect(await screen.findByText(/custom resources/i)).toBeInTheDocument();
   }, testTimeout)
 })

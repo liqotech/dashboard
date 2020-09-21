@@ -14,7 +14,6 @@ import React from 'react';
 import ConfigView from '../src/views/ConfigView';
 import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
-import ConfigMockResponse from '../__mocks__/configs.json';
 import PodsMockResponse from '../__mocks__/pods.json';
 import { testTimeout } from '../src/constants';
 import CMMockResponse from '../__mocks__/configmap_clusterID.json';
@@ -74,17 +73,15 @@ async function setup_with_error(error) {
 
 }
 
-let api;
-
 async function setup_from_ConfigView(error) {
-  api = new ApiManager();
-  api.getCRDs().then(() => {
+  window.api = new ApiManager({id_token: 'test'});
+  window.api.getCRDs().then(() => {
 
-    if(error) api.CRDs = [];
+    if(error) window.api.CRDs = [];
 
     render(
       <MemoryRouter>
-        <ConfigView api={api} />
+        <ConfigView />
       </MemoryRouter>
     )
   })

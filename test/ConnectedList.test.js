@@ -22,15 +22,14 @@ import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 
 fetchMock.enableMocks();
 
-let api;
 let counter = 0;
 
 async function setup() {
-  api = new ApiManager();
-  api.getCRDs().then(async () => {
+  window.api = new ApiManager({id_token: 'test'});
+  window.api.getCRDs().then(async () => {
     render(
       <MemoryRouter>
-        <Home api={api} />
+        <Home />
       </MemoryRouter>
     )
   });
@@ -144,7 +143,9 @@ describe('ConnectedList', () => {
 
     await OKCheck();
 
-    await new Promise((r) => setTimeout(r, 31000));
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 31000));
+    })
 
     expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
 

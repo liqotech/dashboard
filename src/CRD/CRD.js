@@ -101,7 +101,7 @@ class CRD extends Component {
   loadCustomResources() {
 
     /** First get all the CR */
-    this.props.api.getCustomResourcesAllNamespaces(this.state.CRD)
+    window.api.getCustomResourcesAllNamespaces(this.state.CRD)
       .then((res) => {
       this.setState({
         custom_resources: res.body.items,
@@ -111,7 +111,7 @@ class CRD extends Component {
       this.setState({isLoading: false});
 
       /** Then set up a watch to watch changes in the CR of the CRD */
-      this.props.api.watchSingleCRD(
+      window.api.watchSingleCRD(
           this.state.CRD.spec.group,
           this.state.CRD.spec.version,
           this.state.CRD.spec.names.plural,
@@ -129,20 +129,20 @@ class CRD extends Component {
   }
 
   componentDidMount() {
-    this.props.api.CRDArrayCallback.push(this.reloadCRD);
+    window.api.CRDArrayCallback.push(this.reloadCRD);
 
     /** In case we are not on a custom view */
     if(!this.props.onCustomView){
       /** Set a callback to keep track of custom view's update */
-      this.props.api.CVArrayCallback.push(this.getCustomViews);
+      window.api.CVArrayCallback.push(this.getCustomViews);
       /** Get the custom views */
-      this.state.customViews = this.props.api.customViews;
+      this.state.customViews = window.api.customViews;
       /** Get the CRD */
-      this.state.CRD = this.props.api.getCRDfromName(this.props.match.params.crdName);
+      this.state.CRD = window.api.getCRDfromName(this.props.match.params.crdName);
     }
     /** In case we are in a custom view */
     else {
-      this.state.CRD = this.props.api.getCRDfromName(this.props.CRD);
+      this.state.CRD = window.api.getCRDfromName(this.props.CRD);
     }
     if(this.state.CRD){
       this.loadCustomResources();
@@ -159,15 +159,15 @@ class CRD extends Component {
 
   /** When unmounting, eliminate every callback and watch */
   componentWillUnmount() {
-    this.props.api.abortAllWatchers(this.state.CRD.spec.names.plural);
-    this.props.api.CRDArrayCallback = this.props.api.CRDArrayCallback.filter(func => {return func !== this.reloadCRD});
+    window.api.abortAllWatchers(this.state.CRD.spec.names.plural);
+    window.api.CRDArrayCallback = window.api.CRDArrayCallback.filter(func => {return func !== this.reloadCRD});
     if(!this.props.onCustomView)
-      this.props.api.CVArrayCallback = this.props.api.CVArrayCallback.filter(func => {return func !== this.getCustomViews});
+      window.api.CVArrayCallback = window.api.CVArrayCallback.filter(func => {return func !== this.getCustomViews});
   }
 
   /** @NOT_USED: if we want to implement the deletion of the CRD... */
   /*handleClick() {
-    let promise = this.props.api.deleteCRD(this.name);
+    let promise = window.api.deleteCRD(this.name);
 
     promise
       .then(() => {
@@ -189,7 +189,7 @@ class CRD extends Component {
     } else {
       this.state.CRD.metadata.annotations.favourite = null;
     }
-    await this.props.api.updateCustomResourceDefinition(
+    await window.api.updateCustomResourceDefinition(
       this.state.CRD.metadata.name,
       this.state.CRD
     )
@@ -238,7 +238,7 @@ class CRD extends Component {
     }
 
     let array = cv.metadata.selfLink.split('/');
-    let promise = this.props.api.updateCustomResource(
+    let promise = window.api.updateCustomResource(
       array[2],
       array[3],
       array[5],
@@ -266,7 +266,7 @@ class CRD extends Component {
   header() {
     const items = [];
 
-    if(this.props.api.customViews){
+    if(window.api.customViews){
       this.state.customViews.forEach(item => {
         items.push(
           <Menu.Item key={item.metadata.name} onClick={this.handleClick_addToView}>
@@ -296,7 +296,7 @@ class CRD extends Component {
       <Menu>
         {items}
         <Menu.Item key="addCV" >
-          <AddCustomView api={this.props.api} selected={this.state.CRD.metadata.name} />
+          <AddCustomView  selected={this.state.CRD.metadata.name} />
         </Menu.Item>
       </Menu>
     );
@@ -356,7 +356,7 @@ class CRD extends Component {
                   destroyOnClose
                 >
                   <DesignEditorCRD CRD={this.state.CRD}
-                                   this={this} api={this.props.api}
+                                   this={this}
                                    CR={this.state.custom_resources}
                   />
                 </Drawer>
@@ -372,7 +372,7 @@ class CRD extends Component {
                   width={'40%'}
                   destroyOnClose
                 >
-                  <NewCR CRD={this.state.CRD} this={this} api={this.props.api} />
+                  <NewCR CRD={this.state.CRD} this={this}  />
                 </Drawer>
               </div>
               ) : (
@@ -503,7 +503,7 @@ class CRD extends Component {
         array = CRD.metadata.annotations.template.split('/');
       }
 
-      this.props.api.getCustomResourcesAllNamespaces({
+      window.api.getCustomResourcesAllNamespaces({
         spec: {
           group: array[0],
           version: array[1],
@@ -595,7 +595,7 @@ class CRD extends Component {
            * @param template: CR of the template design for this CRD CRs
            */
           <CR key={item.metadata.namespace + '/' + item.metadata.name}
-              api={this.props.api}
+
               cr={item}
               crd={this.state.CRD}
               template={this.state.template}

@@ -21,8 +21,6 @@ import { fireEvent } from '@testing-library/dom';
 
 fetchMock.enableMocks();
 
-let api;
-
 async function setup() {
   await loginTest();
 
@@ -76,14 +74,13 @@ async function setup_only_CRD(error, template) {
     return mocks(req, error, template);
   })
 
-  api = new ApiManager();
-  api.getCRDs().then(async () => {
-    await api.loadCustomViewsCRs();
+  window.api = new ApiManager({id_token: 'test'});
+  window.api.getCRDs().then(async () => {
+    await window.api.loadCustomViewsCRs();
 
     render(
       <MemoryRouter>
-        <CRD api={api}
-             match={{
+        <CRD match={{
                params: {
                  crdName: 'liqodashtests.dashboard.liqo.com'
                }
@@ -109,6 +106,21 @@ async function alwaysPresent(kind, descr) {
 }
 
 describe('CRD', () => {
+  test('Favourite are updated accordingly', async () => {
+    await setup_extended();
+
+    expect(await screen.findByLabelText('crd')).toBeInTheDocument();
+
+    const favCRD = screen.getAllByLabelText('star')[2];
+    userEvent.click(favCRD);
+
+    expect(await screen.findAllByText('Advertisement')).toHaveLength(2);
+
+    userEvent.click(favCRD);
+
+    expect(await screen.findByText('Advertisement')).toBeInTheDocument();
+  }, testTimeout)
+
   test('CRD card shows every general information in different cases', async () => {
     fetch.mockResponse(req => {
       return mocks(req);
@@ -239,21 +251,6 @@ describe('CRD', () => {
     expect(await screen.findByLabelText('schema')).toBeInTheDocument();
   }, testTimeout)
 
-  test('Favourite are updated accordingly', async () => {
-    await setup_extended();
-
-    expect(await screen.findByLabelText('crd')).toBeInTheDocument();
-
-    const favCRD = screen.getAllByLabelText('star')[2];
-    userEvent.click(favCRD);
-
-    expect(await screen.findAllByText('Advertisement')).toHaveLength(2);
-
-    userEvent.click(favCRD);
-
-    expect(await screen.findByText('Advertisement')).toBeInTheDocument();
-  }, testTimeout)
-
   test('Edit design drawer opens', async () => {
     await setup_extended();
 
@@ -352,11 +349,9 @@ describe('CRD', () => {
 
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
 
-    api.CRDsNotifyEvent('MODIFIED', LiqoDashModifiedMockResponse);
+    window.api.CRDsNotifyEvent('MODIFIED', LiqoDashModifiedMockResponse);
 
     expect(await screen.findByText('LiqoDashTestMod')).toBeInTheDocument();
-
-    api = null;
   }, testTimeout)
 
   test('CR gets eliminated', async () => {
@@ -387,16 +382,12 @@ describe('CRD', () => {
     expect(yes).toBeInTheDocument();
 
     userEvent.click(no);
-
-    api = null;
   }, testTimeout)
 
   test('CRD template error', async () => {
     await setup_only_CRD(true, true);
 
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
-
-    api = null;
   }, testTimeout)
 
   test('CRD dropdown custom view', async () => {
@@ -415,8 +406,6 @@ describe('CRD', () => {
     userEvent.click(layout);
 
     userEvent.click(await screen.findByText('Liqo View'));
-
-    api = null;
   }, testTimeout)
 
   test('CRD dropdown custom view failed add to custom view', async () => {
@@ -429,8 +418,6 @@ describe('CRD', () => {
     userEvent.click(layout);
 
     userEvent.click(await screen.findByText('Liqo View'));
-
-    api = null;
   }, testTimeout)
 
   test('CRD dropdown custom view new custom view', async () => {
@@ -459,6 +446,5 @@ describe('CRD', () => {
     userEvent.click(await screen.findByText('OK'));
 
     expect(await screen.findByText('Could not create custom view'));
-    api = null;
   }, testTimeout)
 })

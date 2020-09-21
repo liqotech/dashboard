@@ -15,8 +15,6 @@ import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
-let api;
-
 async function setup() {
   fetch.mockImplementation((url) => {
     if (url === 'http://localhost:3001/customresourcedefinition') {
@@ -30,12 +28,11 @@ async function setup() {
     }
   })
 
-  api = new ApiManager();
-  api.getCRDs().then(async () => {
+  window.api = new ApiManager({id_token: 'test'});
+  window.api.getCRDs().then(async () => {
     render(
       <MemoryRouter>
-        <CRD api={api}
-             match={{
+        <CRD match={{
                params: {
                  crdName: 'liqodashtests.dashboard.liqo.com'
                }
