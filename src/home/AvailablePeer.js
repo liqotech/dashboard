@@ -19,6 +19,8 @@ import { getPeerProperties } from './PeerProperties';
 
 function AvailablePeer(props) {
 
+  const foreignClusterName = props.foreignCluster.spec.clusterIdentity.clusterName;
+  const foreignClusterID = props.foreignCluster.spec.clusterIdentity.clusterID;
   let lan = props.foreignCluster.spec.discoveryType === 'LAN';
   let [loading, setLoading] = useState(props.foreignCluster.spec.join);
   let [backgroundColor, setBackgroundColor] = useState('white');
@@ -140,9 +142,9 @@ function AvailablePeer(props) {
                   </Tooltip>
                 </Row>
               </div>
-              <Tooltip placement={'top'} title={props.foreignCluster.spec.clusterID}>
+              <Tooltip placement={'top'} title={foreignClusterID}>
                 <Tag color="blue" style={{ maxWidth: '13vw', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {props.foreignCluster.spec.clusterID}
+                  {foreignClusterName ? foreignClusterName : foreignClusterID}
                 </Tag>
               </Tooltip>
             </Space>

@@ -20,6 +20,8 @@ function ConnectedPeer(props) {
    * @loading: if is connecting
    * @backgroundColor: if selected
    */
+  const foreignClusterName = props.foreignCluster.spec.clusterIdentity.clusterName;
+  const foreignClusterID = props.foreignCluster.spec.clusterIdentity.clusterID;
 
   const [loading, setLoading] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState('white');
@@ -109,7 +111,7 @@ function ConnectedPeer(props) {
 
   useEffect(() => {
     props.updateFCMetrics(true, {
-      fc: props.foreignCluster.spec.clusterID,
+      fc: foreignClusterName ? foreignClusterName : foreignClusterID,
       RAM: incomingTotal.consumed.RAM,
       CPU: incomingTotal.consumed.CPU
     });
@@ -117,7 +119,7 @@ function ConnectedPeer(props) {
 
   useEffect(() => {
     props.updateFCMetrics(false, {
-      fc: props.foreignCluster.spec.clusterID,
+      fc: foreignClusterName ? foreignClusterName : foreignClusterID,
       RAM: outgoingTotal.consumed.RAM,
       CPU: outgoingTotal.consumed.CPU
     });
@@ -526,9 +528,9 @@ function ConnectedPeer(props) {
                   />
                 </Tooltip>
               </div>
-              <Tooltip placement={'top'} title={props.foreignCluster.spec.clusterID}>
+              <Tooltip placement={'top'} title={foreignClusterID}>
                 <Tag style={{ maxWidth: '10vw', overflow: 'hidden', textOverflow: 'ellipsis'}}
-                     color="blue">{props.foreignCluster.spec.clusterID}
+                     color="blue">{foreignClusterName ? foreignClusterName : foreignClusterID}
                 </Tag>
               </Tooltip>
             </Space>

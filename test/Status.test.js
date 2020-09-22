@@ -71,7 +71,7 @@ function mocks(advertisement, foreignCluster, peeringRequest, error, errorMetric
 async function OKCheck() {
   await setup();
 
-  expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+  expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
   expect(await screen.findByText('No peer available at the moment')).toBeInTheDocument();
   expect(await screen.findByText('Home')).toBeInTheDocument();
   expect(await screen.findByText(/Foreign/i)).toBeInTheDocument();

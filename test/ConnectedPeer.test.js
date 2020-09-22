@@ -83,7 +83,7 @@ function mocks(advertisement, foreignCluster, peeringRequest, error, errorMetric
 async function OKCheck() {
   await setup();
 
-  expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+  expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
   expect(await screen.findByText('No peer available at the moment')).toBeInTheDocument();
 }
 
@@ -97,7 +97,7 @@ describe('ConnectedPeer', () => {
       await new Promise((r) => setTimeout(r, 31000));
     })
 
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
   }, 60000)
 
   test('List of connected peers shows not incoming', async () => {
@@ -129,7 +129,7 @@ describe('ConnectedPeer', () => {
 
     await setup();
 
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
     expect(await screen.findByText('No peer connected at the moment')).toBeInTheDocument();
   }, testTimeout)
 
@@ -148,7 +148,7 @@ describe('ConnectedPeer', () => {
       await new Promise((r) => setTimeout(r, 31000));
     })
 
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
   }, 60000)
 
   test('Advertisement status is not accepted', async () => {
@@ -187,7 +187,7 @@ describe('ConnectedPeer', () => {
     userEvent.click(disconnect);
 
     expect(await screen.findByText(/Could not disconnect/i)).toBeInTheDocument();
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
     expect(await screen.findByText('No peer available at the moment')).toBeInTheDocument();
   }, testTimeout)
 
@@ -214,7 +214,7 @@ describe('ConnectedPeer', () => {
 
     expect(await screen.findByText(/Disconnected from/i)).toBeInTheDocument();
 
-    expect(await screen.findByText('8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+    expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
     expect(await screen.findByText('No peer connected at the moment')).toBeInTheDocument();
   }, testTimeout)
 })
