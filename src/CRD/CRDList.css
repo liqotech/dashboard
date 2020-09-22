@@ -8,3 +8,12 @@
     max-width: 80%;
     margin: 0 auto 0;
 }
+
+.ant-table-filter-trigger-container {
+    width: 3em;
+    right: unset;
+}
+
+.ant-table-filter-trigger {
+    width: 3.5em;
+}

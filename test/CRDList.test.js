@@ -31,8 +31,12 @@ describe('CRD List', () => {
   test('Sidebar updates when a CRD is added/removed to favourites', async () => {
     await setup();
 
+    expect(await screen.findByLabelText('caret-down'));
+
     const favCRD = screen.getAllByLabelText('star')[2];
     userEvent.click(favCRD);
+
+    userEvent.click(await screen.findByLabelText('caret-down'));
 
     expect(await screen.findAllByText('Advertisement')).toHaveLength(2);
 
