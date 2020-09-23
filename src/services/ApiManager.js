@@ -439,9 +439,11 @@ export default class ApiManager {
      *  To avoid the computational overhead of that, filter out the CRD that
      *  are in fact not changed (field resourceVersion)
      */
-    if(type === 'ADDED' && this.CRDs.find((item) => {
+    let CRD = this.CRDs.find((item) => {
       return item.metadata.name === object.metadata.name;
-    }).metadata.resourceVersion === object.metadata.resourceVersion){
+    });
+    if(type === 'ADDED' && CRD &&
+      CRD.metadata.resourceVersion === object.metadata.resourceVersion){
       return;
     }
 
