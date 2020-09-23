@@ -2,7 +2,6 @@ import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import { act, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import ViewMockResponse from '../__mocks__/views.json';
 import ApiManager from '../src/services/__mocks__/ApiManager';
 import { MemoryRouter } from 'react-router-dom';

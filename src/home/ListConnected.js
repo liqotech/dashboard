@@ -95,7 +95,7 @@ function ListConnected(props){
 
     if(client || server){
       connectedPeers.push(
-        <div key={fc.spec.clusterID}>
+        <div key={fc.spec.clusterIdentity.clusterID}>
           <ConnectedPeer {...props} incomingPods={incomingPods}
                          outgoingPods={outgoingPods}
                          foreignCluster={fc} client={client} server={server} />

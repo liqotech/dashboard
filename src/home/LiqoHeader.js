@@ -8,13 +8,30 @@ import { LIQO_NAMESPACE } from '../constants';
 
 function LiqoHeader(props) {
 
-  const [clusterID, setClusterID] = useState('')
+  const [clusterID, setClusterID] = useState('');
+  const [clusterName, setClusterName] = useState(props.config.spec.discoveryConfig.clusterName);
+  const [onEdit, setOnEdit] = useState(false);
 
   useEffect(() => {
     window.api.getConfigMaps(LIQO_NAMESPACE, 'metadata.name=cluster-id').then(res => {
       setClusterID(res.body.items[0].data['cluster-id']);
     }).catch(error => {console.log(error)})
   }, [])
+
+  const saveClusterName = () => {
+    setOnEdit(false);
+    let item = JSON.parse(JSON.stringify(props.config));
+    item.spec.discoveryConfig.clusterName = clusterName;
+    let array = props.config.metadata.selfLink.split('/');
+    window.api.updateCustomResource(
+      array[2],
+      array[3],
+      null,
+      array[4],
+      array[5],
+      item
+    ).catch(() => setClusterName(props.config.spec.discoveryConfig.clusterName));
+  }
 
   const running = true;
 
@@ -39,7 +56,15 @@ function LiqoHeader(props) {
       <PageHeader style={{paddingTop: '0.5em', paddingBottom: '0.5em'}}
                   title={
                     <div>
-                      <Typography.Text strong style={{fontSize: '1.5em'}}>{props.config.spec.discoveryConfig.clusterName}</Typography.Text>
+                      { onEdit ? <Input size={'small'} value={clusterName} style={{fontSize: '1em'}}
+                                        onBlur={saveClusterName} autoFocus
+                                        onChange={(value) => {setClusterName(value.target.value)}}
+                                        onPressEnter={saveClusterName}
+                        /> :
+                        <div onClick={() => setOnEdit(true)}>
+                          <Typography.Text strong style={{fontSize: '1.5em'}}>{clusterName ? clusterName : 'LIQO'}</Typography.Text>
+                        </div>
+                      }
                     </div>
                   }
                   tags={

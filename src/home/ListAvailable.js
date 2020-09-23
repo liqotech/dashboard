@@ -64,7 +64,7 @@ function ListAvailable(props) {
 
     if(visibleA && visibleP){
       availablePeers.push(
-        <div key={fc.spec.clusterID}>
+        <div key={fc.spec.clusterIdentity.clusterID}>
           <AvailablePeer {...props} foreignCluster={fc}
                          refused={refused} reason={reason}
           />
