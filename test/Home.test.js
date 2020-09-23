@@ -12,7 +12,6 @@ import AdvMockResponse from '../__mocks__/advertisement.json';
 import PRMockResponse from '../__mocks__/peeringrequest.json';
 import Error404 from '../__mocks__/404.json';
 import NodesMockResponse from '../__mocks__/nodes.json';
-import Error409 from '../__mocks__/409.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import PodsMockResponse from '../__mocks__/pods.json';
 import { testTimeout } from '../src/constants';
