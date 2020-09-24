@@ -447,121 +447,105 @@ export default class ApiManager {
       return;
     }
 
-    /** This deepcopy is the thread killer */
-    let CRDs = JSON.parse(JSON.stringify(this.CRDs));
-
-    let index = CRDs.indexOf(CRDs.find((item) => {
-      return item.metadata.name === object.metadata.name;
-    }));
-
     if ((type === 'ADDED' || type === 'MODIFIED')) {
       // Object creation succeeded
-      if(index !== -1) {
-        if(CRDs[index].metadata.resourceVersion !== object.metadata.resourceVersion){
-          CRDs[index] = object;
+      if(CRD) {
+        if(CRD.metadata.resourceVersion !== object.metadata.resourceVersion){
+          this.CRDs = this.CRDs.filter(item => {return item.metadata.resourceVersion !== CRD.metadata.resourceVersion});
+          this.CRDs.push(object);
+          this.CRDs.sort((a, b) => a.metadata.name.localeCompare(b.metadata.name));
           notification.success({
             message: APP_NAME,
             description: 'CRD ' + object.metadata.name + ' modified'
           });
+          return this.manageCallbackCRDs(object, type);
         }
       } else {
-        CRDs.push(object);
-        CRDs.sort((a, b) => a.spec.names.kind.localeCompare(b.spec.names.kind));
+        this.CRDs.push(object);
+        this.CRDs.sort((a, b) => a.metadata.name.localeCompare(b.metadata.name));
         notification.success({
           message: APP_NAME,
           description: 'CRD ' + object.metadata.name + ' added'
         });
+        return this.manageCallbackCRDs(object, type);
       }
     } else if (type === 'DELETED') {
-      if(index !== -1) {
-        CRDs.splice(index, 1);
-
+      if(CRD) {
+        this.CRDs = this.CRDs.filter(item => {return item.metadata.name !== CRD.metadata.name});
         notification.success({
           message: APP_NAME,
           description: 'CRD ' + object.metadata.name + ' deleted'
         });
-      } else {
-        return;
+        return this.manageCallbackCRDs(object, type);
       }
-    }
-
-    if(JSON.stringify(this.CRDs) !== JSON.stringify(CRDs)){
-      this.CRDs = CRDs;
-      /** update CRDs in the views */
-      this.manageCallbackCRDs(CRDs, object, type);
     }
   }
 
-  manageCallbackCRDs(CRDs, object, type){
+  manageCallbackCRDs(object, type){
     /** update CRDs in the search bar */
     if(this.autoCompleteCallback)
-      this.autoCompleteCallback(CRDs);
+      this.autoCompleteCallback(this.CRDs);
 
     /** update CRDs in the CRD view*/
     if(this.CRDListCallback)
-      this.CRDListCallback(CRDs);
+      this.CRDListCallback(this.CRDs);
 
     /** update CRDs in the CRD views */
     this.CRDArrayCallback.forEach(func => {
-      func(CRDs, object, type);
+      func(this.CRDs, object, type);
     })
 
     /** update CRDs in the sidebar */
     if(this.sidebarCallback)
-      this.sidebarCallback(CRDs.filter(item => {
+      this.sidebarCallback(this.CRDs.filter(item => {
         return item.metadata.annotations && item.metadata.annotations.favourite;
       }));
   }
 
   CVsNotifyEvent(type, object) {
-    let customViews = JSON.parse(JSON.stringify(this.customViews));
 
-    let index = customViews.indexOf(customViews.find((item) => {
+    let CV = this.customViews.find(item => {
       return item.metadata.name === object.metadata.name;
-    }));
+    });
 
     if ((type === 'ADDED' || type === 'MODIFIED')) {
       // Object creation succeeded
-      if(index !== -1) {
-        if(customViews[index].metadata.resourceVersion !== object.metadata.resourceVersion){
-          customViews[index] = object;
+      if(CV) {
+        if(CV.metadata.resourceVersion !== object.metadata.resourceVersion){
+          this.customViews = this.customViews.filter(item => {return item.metadata.resourceVersion !== CV.metadata.resourceVersion});
+          this.customViews.push(object);
+          this.customViews.sort((a, b) => a.metadata.name.localeCompare(b.metadata.name));
           notification.success({
             message: APP_NAME,
             description: 'CR ' + object.metadata.name + ' modified'
           });
+          this.manageCallbackCVs();
         }
       } else {
-        customViews.push(object);
-        customViews.sort((a, b) => a.kind.localeCompare(b.kind));
+        this.customViews.push(object);
+        this.customViews.sort((a, b) => a.metadata.name.localeCompare(b.metadata.name));
         notification.success({
           message: APP_NAME,
           description: 'CR ' + object.metadata.name + ' added'
         });
+        this.manageCallbackCVs();
       }
     } else if (type === 'DELETED') {
-      if(index !== -1) {
-        customViews.splice(index, 1);
-
+      if(CV) {
+        this.customViews = this.customViews.filter(item => {return item.metadata.resourceVersion !== CV.metadata.resourceVersion});
         notification.success({
           message: APP_NAME,
           description: 'CR ' + object.metadata.name + ' deleted'
         });
-      } else {
-        return;
+        this.manageCallbackCVs();
       }
-    }
-
-    if(JSON.stringify(this.customViews) !== JSON.stringify(customViews)){
-      this.customViews = customViews;
-      /** update customViews in the views */
-      this.manageCallbackCVs(customViews);
     }
   }
 
-  manageCallbackCVs(customViews){
+  manageCallbackCVs(){
     /** update custom views */
     this.CVArrayCallback.forEach(func => {
-      func(customViews);
+      func(this.customViews);
     })
   }
 

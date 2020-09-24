@@ -1,37 +1,37 @@
 import ReactResizeDetector from 'react-resize-detector';
 import React from 'react';
 
-export function onDrag(layout, oldLayoutItem, layoutItem, _this){
+export function onDrag(_layout, oldLayoutItem, layoutItem, CRDs, setCRDs, layout, setLayout, newBr){
   if(JSON.stringify(oldLayoutItem) !== JSON.stringify(layoutItem)){
-    let CRDs = _this.state.CRDs;
     CRDs.forEach(CRD => {
-      let l = layout.find(item => {return item.i === CRD.metadata.name});
+      let l = _layout.find(item => {return item.i === CRD.metadata.name});
       CRD.x = l.x;
       CRD.y = l.y;
     })
-
-    _this.state.layout[_this.state.newBr] = layout;
-    _this.state.CRDs = CRDs;
+    setLayout(prev => {
+      prev[newBr] = _layout;
+      return {...prev}
+    });
   }
 }
 
-export function onResize(layout, oldLayoutItem, layoutItem, _this) {
+export function onResize(_layout, oldLayoutItem, layoutItem, CRDs, setCRDs, layout, setLayout, newBr) {
   if(!oldLayoutItem) return;
-  let CRDs = _this.state.CRDs;
   let index = CRDs.indexOf(CRDs.find(item => {return item.metadata.name === layoutItem.i}));
 
   /** When changing width */
   if(oldLayoutItem.w !== layoutItem.w){
     CRDs[index].width = layoutItem.w;
-    _this.state.CRDs = CRDs;
   }
   /** When changing height */
   if(oldLayoutItem.h !== layoutItem.h){
     CRDs[index].height = layoutItem.h;
-    _this.state.CRDs = CRDs;
   }
 
-  _this.state.layout[_this.state.newBr] = layout;
+  setLayout(prev => {
+    prev[newBr] = _layout;
+    return {...prev}
+  });
 }
 
 export function resizeDetector(){

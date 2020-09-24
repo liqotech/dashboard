@@ -10,21 +10,14 @@ import { json } from 'generate-schema';
 
 const Form = withTheme(AntDTheme);
 
-class FormGenerator extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      CRD: this.props.CRD
-    };
-    this.util = new Utils();
-    this.schema = this.util.OAPIV3toJSONSchema(this.props.CRD.spec.validation.openAPIV3Schema).properties.spec;
-    this.currentMetadata = {};
-    this.onSubmit = this.onSubmit.bind(this);
-  }
+function FormGenerator(props) {
+  const util = new Utils();
+  let schema = util.OAPIV3toJSONSchema(props.CRD.spec.validation.openAPIV3Schema).properties.spec;
+  let currentMetadata = {};
 
-  onSubmit(value) {
-    if(!this.props.onUpdate){
-      let metadata = this.currentMetadata;
+  const onSubmit = value => {
+    if(!props.onUpdate){
+      let metadata = currentMetadata;
 
       if(!metadata || !metadata.name || metadata.name === ''){
         message.error('Please insert a valid name');
@@ -34,54 +27,53 @@ class FormGenerator extends Component {
       let item = {
         spec: value.formData,
         metadata: metadata,
-        apiVersion: this.props.CRD.spec.group + '/' + this.props.CRD.spec.version,
-        kind: this.props.CRD.spec.names.kind
+        apiVersion: props.CRD.spec.group + '/' + props.CRD.spec.version,
+        kind: props.CRD.spec.names.kind
       }
-      this.props.submit(item);
+      props.submit(item);
     } else{
-      this.props.submit(value.formData);
+      props.submit(value.formData);
     }
   }
 
-  render() {
-    let metadata = {
-      name: ''
-    }
+  let metadata = {
+    name: ''
+  }
 
-    if(this.state.CRD.spec.scope !== 'Cluster'){
-      metadata.namespace = '';
-    }
-    return(
-      <div style={{marginLeft: 10, marginRight: 10, marginBottom: 10}}>
-        { !this.props.onUpdate ? (
-          <Card size="small" type="inner"
-                title={<Typography.Text strong>Metadata</Typography.Text>}
-                style={{marginBottom: 10}}
-          >
-            <Form
-              schema={json(metadata)}
-              fields={fields}
-              FieldTemplate={CustomFieldTemplate}
-              widgets={widgets}
-              onChange={(value) => {this.currentMetadata = value.formData}}
-              >
-              <div/>
-            </Form>
-          </Card>
-        ) : null}
-        <Form
-          schema={this.schema}
-          formData={this.props.onUpdate ? this.props.CR.spec : null}
-          fields={fields}
-          FieldTemplate={CustomFieldTemplate}
-          widgets={widgets}
-          onSubmit={this.onSubmit}
+  if(props.CRD.spec.scope !== 'Cluster'){
+    metadata.namespace = '';
+  }
+
+  return(
+    <div style={{marginLeft: 10, marginRight: 10, marginBottom: 10}}>
+      { !props.onUpdate ? (
+        <Card size="small" type="inner"
+              title={<Typography.Text strong>Metadata</Typography.Text>}
+              style={{marginBottom: 10}}
         >
-          <Button type="primary" htmlType={'submit'} style={{marginTop: 10}}>Submit</Button>
-        </Form>
-      </div>
-    )
-  }
+          <Form
+            schema={json(metadata)}
+            fields={fields}
+            FieldTemplate={CustomFieldTemplate}
+            widgets={widgets}
+            onChange={(value) => {currentMetadata = value.formData}}
+          >
+            <div/>
+          </Form>
+        </Card>
+      ) : null}
+      <Form
+        schema={schema}
+        formData={props.onUpdate ? props.CR.spec : null}
+        fields={fields}
+        FieldTemplate={CustomFieldTemplate}
+        widgets={widgets}
+        onSubmit={onSubmit}
+      >
+        <Button type="primary" htmlType={'submit'} style={{marginTop: 10}}>Submit</Button>
+      </Form>
+    </div>
+  )
 }
 
 export default FormGenerator;

@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Alert, Badge, Button, Layout, message, notification, Space, Tabs, Typography } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { Alert, Badge, Button, Layout, notification, Space, Tabs, Typography } from 'antd';
 import { withTheme } from '@rjsf/core';
 import { Theme as AntDTheme } from '@rjsf/antd';
 import Utils from '../services/Utils';
@@ -13,65 +13,48 @@ import { APP_NAME } from '../constants';
 
 const Form = withTheme(AntDTheme);
 
-class ConfigView extends Component {
-  constructor(props) {
-    super(props);
+function ConfigView() {
+  const [loading, setLoading] = useState(true);
+  const [CRD] = useState(window.api.getCRDfromKind('ClusterConfig'));
+  const [prevConfig, setPrevConfig] = useState();
+  const currentConfig = useRef('');
+  const util = new Utils();
 
-    this.state = {
-      loading: true,
-      CRD: window.api.getCRDfromKind('ClusterConfig'),
-      prevConfig: null,
-      currentConfig: null
-    }
-    this.util = new Utils();
-    this.onSubmit = this.onSubmit.bind(this);
-  }
-
-  componentDidMount() {
-    if(this.state.CRD){
-      window.api.getCustomResourcesAllNamespaces(this.state.CRD).then( res => {
-        this.setState({
-          prevConfig: res.body.items[0],
-          loading: false,
-          currentConfig: Object.keys(res.body.items[0].spec)[0]
-        })
+  useEffect(() => {
+    if(CRD){
+      window.api.getCustomResourcesAllNamespaces(CRD).then( res => {
+        setPrevConfig(res.body.items[0]);
+        setLoading(false);
+        currentConfig.current = Object.keys(res.body.items[0].spec)[0];
       }).catch(error => {
         console.log(error);
-        this.setState({
-          loading: false
-        })
+        setLoading(false);
       })
     } else {
-      this.setState({
-        loading: false
-      })
+      setLoading(false);
     }
-  }
+  }, [])
 
-  onSubmit(value) {
+
+  const onSubmit = value => {
     let item = { spec: {} };
 
-    if(this.state.currentConfig){
-      item.spec[this.state.currentConfig] = value.formData;
+    if(currentConfig.current){
+      item.spec[currentConfig.current] = value.formData;
     }
 
-    this.setState({isLoading: true});
-
     let promise = window.api.updateCustomResource(
-      this.state.CRD.spec.group,
-      this.state.CRD.spec.version,
-      this.state.CRD.metadata.namespace,
-      this.state.CRD.spec.names.plural,
-      this.state.prevConfig.metadata.name,
+      CRD.spec.group,
+      CRD.spec.version,
+      CRD.metadata.namespace,
+      CRD.spec.names.plural,
+      prevConfig.metadata.name,
       item
     );
 
     promise
       .then((res) => {
-        this.setState({
-          isLoading: false,
-          prevConfig: res.body
-        });
+        setPrevConfig(res.body);
         notification.success({
           message: APP_NAME,
           description: 'Configuration updated'
@@ -79,9 +62,6 @@ class ConfigView extends Component {
       })
       .catch((error) => {
         console.log(error)
-        this.setState({
-          isLoading: false
-        });
         notification.error({
           message: APP_NAME,
           description: 'Could not update the configuration'
@@ -89,81 +69,79 @@ class ConfigView extends Component {
       });
   }
 
-  render() {
-    const configs = [];
+  const configs = [];
 
-    if(this.state.prevConfig && this.state.CRD){
-      const schema = this.util.OAPIV3toJSONSchema(this.state.CRD.spec.validation.openAPIV3Schema).properties.spec.properties;
-      //this.util.setDefault(schema, this.state.prevConfig.spec);
-      Object.keys(this.state.CRD.spec.validation.openAPIV3Schema.properties.spec.properties).forEach(config => {
-        const sub_schema = schema[config];
-        configs.push(
-          <Tabs.TabPane tab={
-            <span>
-              <ToolOutlined />
-              {splitCamelCaseAndUp(config)}
-            </span>
-          } key={config}>
-            <div style={{paddingLeft: 10}}>
-              <Form
-                fields={fields}
-                formData={this.state.prevConfig.spec[config]}
-                schema={sub_schema}
-                FieldTemplate={CustomFieldTemplate}
-                widgets={widgets}
-                onSubmit={this.onSubmit}
-              >
-                <Button type="primary" htmlType={'submit'} style={{marginTop: 10}}>Save configuration</Button>
-              </Form>
-            </div>
-          </Tabs.TabPane>
-          )
-      })
-    }
+  if(prevConfig && CRD){
+    const schema = util.OAPIV3toJSONSchema(CRD.spec.validation.openAPIV3Schema).properties.spec.properties;
+    //this.util.setDefault(schema, prevConfig.spec);
+    Object.keys(CRD.spec.validation.openAPIV3Schema.properties.spec.properties).forEach(config => {
+      const sub_schema = schema[config];
+      configs.push(
+        <Tabs.TabPane tab={
+          <span>
+            <ToolOutlined />
+            {splitCamelCaseAndUp(config)}
+          </span>
+        } key={config}>
+          <div style={{paddingLeft: 10}}>
+            <Form
+              fields={fields}
+              formData={prevConfig.spec[config]}
+              schema={sub_schema}
+              FieldTemplate={CustomFieldTemplate}
+              widgets={widgets}
+              onSubmit={onSubmit}
+            >
+              <Button type="primary" htmlType={'submit'} style={{marginTop: 10}}>Save configuration</Button>
+            </Form>
+          </div>
+        </Tabs.TabPane>
+      )
+    })
+  }
 
-    return(
-      <div className="crds-container" style={{maxWidth: '60%'}}>
-        <div className={'crd-content'}>
-          <Layout style={{background: '#fff'}}>
-            <Space align="center">
-              <Badge color='#1890FF' />
-              <Typography.Title level={2} style={{marginTop: 15}}>
-                Liqo configuration
-              </Typography.Title>
-            </Space>
-            <Typography.Text type="secondary" style={{marginBottom: 20, marginLeft: 25}}>
-              Choose the best configuration for your system
-            </Typography.Text>
-          </Layout>
-          <Layout style={{background: '#fff'}}>
-            <Layout.Content>
-              { !this.state.loading ? (
-                this.state.CRD ? (
-                    this.state.prevConfig ? (
-                      <Tabs onChange={(key) => {this.state.currentConfig = key}}>
-                        {configs}
-                      </Tabs>
-                    ) : (
-                      <Alert
-                        message="Error"
-                        description="No configuration file has been found."
-                        type="error"
-                        showIcon
-                      />)
-                  ) : (
+  return(
+    <div className="crds-container" style={{maxWidth: '60%'}}>
+      <div className={'crd-content'}>
+        <Layout style={{background: '#fff'}}>
+          <Space align="center">
+            <Badge color='#1890FF' />
+            <Typography.Title level={2} style={{marginTop: 15}}>
+              Liqo configuration
+            </Typography.Title>
+          </Space>
+          <Typography.Text type="secondary" style={{marginBottom: 20, marginLeft: 25}}>
+            Choose the best configuration for your system
+          </Typography.Text>
+        </Layout>
+        <Layout style={{background: '#fff'}}>
+          <Layout.Content>
+            { !loading ? (
+              CRD ? (
+                prevConfig ? (
+                  <Tabs onChange={(key) => {currentConfig.current = key}}>
+                    {configs}
+                  </Tabs>
+                ) : (
                   <Alert
                     message="Error"
-                    description="No configuration CRD has been found."
+                    description="No configuration file has been found."
                     type="error"
                     showIcon
                   />)
-                ) : <LoadingIndicator/>}
-            </Layout.Content>
-          </Layout>
-        </div>
+              ) : (
+                <Alert
+                  message="Error"
+                  description="No configuration CRD has been found."
+                  type="error"
+                  showIcon
+                />)
+            ) : <LoadingIndicator/>}
+          </Layout.Content>
+        </Layout>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default ConfigView;

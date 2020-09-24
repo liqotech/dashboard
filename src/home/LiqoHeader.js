@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Row, Button, Input, PageHeader, Select, Space, Tag, Tooltip, Typography } from 'antd';
+import { Row, Button, Input, PageHeader, Select, Space, Tag, Tooltip, Typography } from 'antd';
 import AuditOutlined from '@ant-design/icons/lib/icons/AuditOutlined';
-import CopyOutlined from '@ant-design/icons/lib/icons/CopyOutlined';
 import SettingOutlined from '@ant-design/icons/lib/icons/SettingOutlined';
 import { Link } from 'react-router-dom';
 import { LIQO_NAMESPACE } from '../constants';
@@ -20,8 +19,8 @@ function LiqoHeader(props) {
 
   const saveClusterName = () => {
     setOnEdit(false);
-    let item = JSON.parse(JSON.stringify(props.config));
-    item.spec.discoveryConfig.clusterName = clusterName;
+    let prevClusterName = props.config.spec.discoveryConfig.clusterName;
+    props.config.spec.discoveryConfig.clusterName = clusterName;
     let array = props.config.metadata.selfLink.split('/');
     window.api.updateCustomResource(
       array[2],
@@ -29,8 +28,11 @@ function LiqoHeader(props) {
       null,
       array[4],
       array[5],
-      item
-    ).catch(() => setClusterName(props.config.spec.discoveryConfig.clusterName));
+      props.config
+    ).catch(() => {
+      props.config.spec.discoveryConfig.clusterName = prevClusterName;
+      setClusterName(props.config.spec.discoveryConfig.clusterName);
+    });
   }
 
   const running = true;
@@ -62,7 +64,9 @@ function LiqoHeader(props) {
                                         onPressEnter={saveClusterName}
                         /> :
                         <div onClick={() => setOnEdit(true)}>
-                          <Typography.Text strong style={{fontSize: '1.5em'}}>{clusterName ? clusterName : 'LIQO'}</Typography.Text>
+                          <Tooltip title={'Rename cluster'}>
+                            <Typography.Text strong style={{fontSize: '1.5em'}}>{clusterName ? clusterName : 'LIQO'}</Typography.Text>
+                          </Tooltip>
                         </div>
                       }
                     </div>

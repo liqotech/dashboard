@@ -74,6 +74,9 @@ function App(props) {
       });
       Cookies.set('token', token)
       props.history.push('/');
+    }).catch(error => {
+      if(error.response)
+        props.history.push("/error/" + error.response._fetchResponse.status);
     })
   }
 

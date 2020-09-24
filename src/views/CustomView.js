@@ -1,75 +1,111 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './CustomView.css';
 import CRD from '../CRD/CRD';
+import { isEmpty } from 'lodash';
 import LoadingIndicator from '../common/LoadingIndicator';
 import 'react-resizable/css/styles.css';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import ReactResizeDetector from 'react-resize-detector';
 import { onDrag, onResize, resizeDetector } from './CustomViewUtils';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-//TODO: offer possibility to save the layout via button (don't know where to put it)
+function CustomView(props) {
 
-class CustomView extends Component {
-  constructor(props) {
-    super(props);
+  const CRDsCV = useRef([]);
+  const customView = useRef();
+  const [CRDs, setCRDs] = useState([]);
+  const [loading, setLoading] = useState(true)
+  const [layout, setLayout] = useState({ lg: [] });
+  const [CRDView, setCRDView] = useState([]);
+  const [newBr, setNewBr] = useState('lg');
 
-    this.flag = true;
-
-    this.state = {
-      crdsCV: [],
-      customView: null,
-      CRDs: [],
-      isLoading: true,
-      layout: { lg: [] } ,
-      CRDView: [],
-      oldBr: 'lg',
-      newBr: 'lg'
+  useEffect(() => {
+    window.api.CVArrayCallback.push(getCustomViews);
+    customView.current = window.api.customViews.find(item => {
+      return item.metadata.name === props.match.params.viewName;
+    })
+    if(customView.current){
+      if(customView.current.spec.layout){
+        setLayout(customView.current.spec.layout);
+      }
+      CRDsCV.current = customView.current.spec.crds;
+      loadCRD();
     }
 
-    this.loadCRD = this.loadCRD.bind(this);
-    this.getCustomViews = this.getCustomViews.bind(this);
-    window.api.CVArrayCallback.push(this.getCustomViews);
-
-    this.generateLayout = this.generateLayout.bind(this);
-    this.childLogic = this.childLogic.bind(this);
-    this.onBreakpointChange = this.onBreakpointChange.bind(this);
-    this.updateCRD = this.updateCRD.bind(this);
-  }
-
-  updateCRD(customView){
-    this.state.customView = customView;
-    this.state.crdsCV = customView.spec.crds;
-    if (this.state.customView.spec.layout) {
-      this.state.layout = this.state.customView.spec.layout;
+    return () => {
+      /**
+       * Cancel all callback for the CRDs
+       * Cancel all watchers
+       */
+      window.api.CVArrayCallback = window.api.CVArrayCallback.filter(func => {
+        return func !== getCustomViews;
+      });
+      window.api.abortAllWatchers();
     }
-    this.loadCRD();
+  }, [])
+
+  const updateCRD = CV => {
+    customView.current = CV;
+
+    if(CV.spec.crds.length !== CRDsCV.current.length){
+      if (customView.current.spec.layout) {
+        setLayout(customView.current.spec.layout);
+      }
+      CRDsCV.current = customView.current.spec.crds;
+      loadCRD();
+    }
+
+    CRDsCV.current = customView.current.spec.crds;
   }
 
   /** Update the custom views */
-  getCustomViews(customViews){
-    let customView = customViews.find(item => {
-      return item.metadata.name === this.props.match.params.viewName;
+  const getCustomViews = customViews => {
+    let CV = customViews.find(item => {
+      return item.metadata.name === props.match.params.viewName;
     })
-    if(!this.state.customView){
-      this.updateCRD(customView);
+    if(!customView.current){
+      updateCRD(CV);
     }else{
       /** Update layout only if something really changed */
-      if(JSON.stringify(this.state.customView) !== JSON.stringify(customView)) {
-        this.updateCRD(customView);
+      if(JSON.stringify(customView.current) !== JSON.stringify(CV)) {
+        updateCRD(CV);
       }
     }
   }
 
-  loadCRD(){
-    this.state.CRDs = [];
-    this.setState({isLoading: true});
+  useEffect(() => {
+    generateCRDView();
+    generateLayout();
+  }, [CRDs, newBr])
 
-    this.state.crdsCV.forEach(item => {
+  useEffect(() => {
+    return () => {
+      /**
+       * Save the layout
+       */
+
+      if(!isEmpty(layout)){
+        customView.current.spec.layout = layout;
+        let array = customView.current.metadata.selfLink.split('/');
+        window.api.updateCustomResource(
+          array[2],
+          array[3],
+          customView.current.metadata.namespace,
+          array[6],
+          customView.current.metadata.name,
+          customView.current
+        ).catch(error => console.log(error))
+      }
+    }
+  }, [layout])
+
+  const loadCRD = () => {
+    setLoading(true);
+
+    let _CRDs = [];
+
+    CRDsCV.current.forEach(item => {
       let res = {metadata: {name: item.crdName}}
-
-      let CRDs = this.state.CRDs;
       /** If a template is defined in the CR, use that one */
       if(item.template){
         res.altTemplate = item.template;
@@ -78,45 +114,41 @@ class CustomView extends Component {
       if(item.crdAltName){
         res.altName = item.crdAltName;
       }
-      CRDs.push(res);
-      this.setState({CRDs: CRDs});
+      _CRDs.push(res);
 
       /** if there's a layout for this CRD, set it */
       let CRDlayout = null;
-      if (this.state.layout[this.state.newBr]) {
-        CRDlayout = this.state.layout[this.state.newBr].find(item => {return item.i === CRDs[CRDs.length - 1].metadata.name})
+      if (!isEmpty(customView.current.spec.layout) && customView.current.spec.layout[newBr]) {
+        CRDlayout = customView.current.spec.layout[newBr].find(item => {return item.i === _CRDs[_CRDs.length - 1].metadata.name})
         if(CRDlayout){
-          CRDs[CRDs.length - 1].x = CRDlayout.x;
-          CRDs[CRDs.length - 1].y = CRDlayout.y;
-          CRDs[CRDs.length - 1].height = CRDlayout.h;
-          CRDs[CRDs.length - 1].width = CRDlayout.w;
-          CRDs[CRDs.length - 1].static = false;
+          _CRDs[_CRDs.length - 1].x = CRDlayout.x;
+          _CRDs[_CRDs.length - 1].y = CRDlayout.y;
+          _CRDs[_CRDs.length - 1].height = CRDlayout.h;
+          _CRDs[_CRDs.length - 1].width = CRDlayout.w;
+          _CRDs[_CRDs.length - 1].static = false;
         }
       }
 
-      this.generateCRDView();
-      if(CRDs.length === this.state.crdsCV.length)
-        this.generateLayout();
-
+      if(_CRDs.length === CRDsCV.current.length)
+        setCRDs(_CRDs);
     });
   }
 
   /** Create the CRD cards */
-  generateCRDView(){
-    let CRDView = [];
+  const generateCRDView = () => {
+    let _CRDView = [];
 
-    this.state.CRDs.forEach(item => {
+    CRDs.forEach(item => {
       if(window.api.getCRDfromName(item.metadata.name)){
-        CRDView.push(
+        _CRDView.push(
           <div key={item.metadata.name} className="crd-content" aria-label={'crd_custom_view'} >
-            <div style={{overflow: 'auto', height: '100%'}}>
+            <div className="inner-crd" >
               <CRD
                 CRD={item.metadata.name}
                 altName={item.altName}
                 altTemplate={item.altTemplate}
-
                 onCustomView={true}
-                func={this.childLogic}
+                func={childLogic}
               />
             </div>
           </div>
@@ -124,134 +156,66 @@ class CustomView extends Component {
       }
     })
 
-    this.setState({CRDView: CRDView})
+    setCRDView(_CRDView);
   }
 
   /** (Re)Generate the layout based on the user preferences */
-  generateLayout(){
-    let layout = [];
+  const generateLayout = () => {
+    let _layout = [];
 
-    if(this.state.CRDs.length !== this.state.crdsCV.length) return;
+    if(CRDs.length !== CRDsCV.current.length || CRDsCV.current.length === 0) return;
 
-    for(let i = 0; i < this.state.CRDs.length; i++) {
-      let h = 1;
-      let w = 1;
-      let x = i;
-      let y = 0;
-      let s = false;
+    for(let i = 0; i < CRDs.length; i++) {
       let CRDlayout = null;
-      if (this.state.layout[this.state.newBr]) {
-        CRDlayout = this.state.layout[this.state.newBr].find(item => {return item.i === this.state.CRDs[i].metadata.name})
+      if (layout[newBr]) {
+        CRDlayout = layout[newBr].find(item => {return item.i === CRDs[i].metadata.name})
       }
       /** Stay where I put you even when the layout is regenerated */
-      if(CRDlayout){
-        x = CRDlayout.x;
-        y = CRDlayout.y;
-      }
-      if(this.state.CRDs[i].height){
-        h = this.state.CRDs[i].height;
-      }
-      if(this.state.CRDs[i].width){
-        w = this.state.CRDs[i].width;
-      }
-      layout.push({
-        i: this.state.CRDs[i].metadata.name, x: x, y: y, w: w, h: h, isDraggable: true
+      _layout.push({
+        i: CRDs[i].metadata.name,
+        x: CRDlayout ? CRDlayout.x : i,
+        y: CRDlayout ? CRDlayout.y : 0,
+        w: CRDs[i].width ? CRDs[i].width : 1,
+        h: CRDs[i].height ? CRDs[i].height : 1,
+        isDraggable: CRDs[i].static ? !CRDs[i].static : true,
+        static: CRDs[i].static ? CRDs[i].static : false
       });
     }
-    let layouts = this.state.layout;
-    layouts[this.state.newBr] = layout;
-    this.setState({
-      isLoading: false,
-      oldBr: this.state.newBr,
-      layout: layouts
+    let layouts = JSON.parse(JSON.stringify(layout));
+    layouts[newBr] = _layout;
+    setLoading(false);
+    setLayout(layouts);
+  }
+
+  const childLogic = id => {
+    setCRDs(prev => {
+      prev.find(item => {return item.metadata.name === id}).static = !prev.find(item => {return item.metadata.name === id}).static;
+      return [...prev];
     });
   }
 
-  componentDidMount() {
-    this.state.customView = window.api.customViews.find(item => {
-      return item.metadata.name === this.props.match.params.viewName;
-    })
-    if(this.state.customView){
-      if(this.state.customView.spec.layout){
-        this.state.layout = this.state.customView.spec.layout;
-      }
-      this.state.crdsCV = this.state.customView.spec.crds;
-      this.loadCRD();
-    }
+  const onBreakpointChange = br => {
+    setNewBr(br);
   }
 
-  /** Save layout to CR when exit */
-  async componentWillUnmount() {
-    /**
-     * Cancel all callback for the CRDs
-     * Cancel all watchers
-     * Then save the layout
-     */
-    window.api.CVArrayCallback = window.api.CVArrayCallback.filter(func => {
-      return func !== this.getCustomViews;
-    });
-    window.api.abortAllWatchers();
-    this.state.customView.spec.layout = this.state.layout;
-    for(let i = 0; i < this.state.customView.spec.layout[this.state.newBr].length; i++){
-      delete this.state.customView.spec.layout[this.state.newBr][i].isDraggable;
-      delete this.state.customView.spec.layout[this.state.newBr][i].static;
-    }
-    let array = this.state.customView.metadata.selfLink.split('/');
-    await window.api.updateCustomResource(
-      array[2],
-      array[3],
-      this.state.customView.metadata.namespace,
-      array[6],
-      this.state.customView.metadata.name,
-      this.state.customView
-    )
-  }
+  if(loading)
+    return <LoadingIndicator />
 
-  childLogic(id){
-    let CRDs = this.state.CRDs;
-    let index = CRDs.indexOf(CRDs.find(item => {return item.metadata.name === id}));
-    CRDs[index].static = !CRDs[index].static;
-    this.state.CRDs = CRDs;
-
-    /**
-     * This is a workaround for some kind of issue with the RGL:
-     *  updating directly the state layout doesn't work, so it is
-     *  necessary to deep copy it, modify the copy and set it as
-     *  the new layout
-     */
-    let newLayouts = JSON.parse(JSON.stringify(this.state.layout));
-    newLayouts[this.state.newBr].find(item => {return item.i === CRDs[index].metadata.name})
-      .static = CRDs[index].static;
-    this.setState({layout: newLayouts});
-  }
-
-  onBreakpointChange(br){
-    this.state.oldBr = this.state.newBr;
-    this.state.newBr = br;
-    this.generateLayout();
-  }
-
-  render() {
-
-    if(this.state.isLoading)
-      return <LoadingIndicator />
-
-    return (
-      <div>
-        { resizeDetector() }
-        <ResponsiveGridLayout className="react-grid-layout" layouts={this.state.layout} margin={[20, 20]}
-                              breakpoints={{lg: 1000, md: 796, sm: 568, xs: 280, xxs: 0}}
-                              cols={{lg: 3, md: 2, sm: 1, xs: 1, xxs: 1}}
-                              compactType={'vertical'} rowHeight={350}
-                              onResizeStop={(layout, oldLayoutItem, layoutItem) => onResize(layout, oldLayoutItem, layoutItem, this)}
-                              onBreakpointChange={this.onBreakpointChange}
-                              onDragStop={(layout, oldLayoutItem, layoutItem) => onDrag(layout, oldLayoutItem, layoutItem, this)}
-                              draggableHandle={'.draggable'} >
-          {this.state.CRDView}
-        </ResponsiveGridLayout>
-      </div>
-    );
-  }
+  return (
+    <div>
+      { resizeDetector() }
+      <ResponsiveGridLayout className="react-grid-layout" layouts={layout} margin={[20, 20]}
+                            breakpoints={{lg: 1000, md: 796, sm: 568, xs: 280, xxs: 0}}
+                            cols={{lg: 3, md: 2, sm: 1, xs: 1, xxs: 1}}
+                            compactType={'vertical'} rowHeight={350}
+                            onResizeStop={(_layout, oldLayoutItem, layoutItem) => onResize(_layout, oldLayoutItem, layoutItem, CRDs, setCRDs, layout, setLayout, newBr)}
+                            onBreakpointChange={onBreakpointChange}
+                            onDragStop={(_layout, oldLayoutItem, layoutItem) => onDrag(_layout, oldLayoutItem, layoutItem, CRDs, setCRDs, layout, setLayout, newBr)}
+                            draggableHandle={'.draggable'} >
+        {CRDView}
+      </ResponsiveGridLayout>
+    </div>
+  );
 }
 
 export default CustomView;
