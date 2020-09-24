@@ -7,7 +7,7 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockCRDAndViewsExtended, setup_cv } from './RTLUtils';
 import fetchMock from 'jest-fetch-mock';
-import ApiManager from '../src/services/__mocks__/ApiManager';
+import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import CustomView from '../src/views/CustomView';
@@ -44,15 +44,15 @@ function mocks(view){
 }
 
 async function setup(error) {
-  window.api = new ApiManager({id_token: 'test'});
+  window.api = ApiInterface({id_token: 'test'});
   window.api.getCRDs().then(() => {
     window.api.loadCustomViewsCRs().then(() => {
-
-      if(error) window.api.customViews = [];
+      if(error) window.api.customViews.current = [];
 
       render(
         <MemoryRouter>
           <CustomView match={{params: {viewName: 'awesome-view'}}}
+                      history={[]}
           />
         </MemoryRouter>
       )
@@ -65,12 +65,11 @@ describe('CustomView', () => {
     mockCRDAndViewsExtended(null, 'PUT', 'advertisements', true);
     await setup();
 
-    window.api.customViews = JSON.parse(JSON.stringify(ViewMockResponse.items));
-    window.api.manageCallbackCVs(window.api.customViews);
-
+    window.api.customViews.current = JSON.parse(JSON.stringify(ViewMockResponse.items));
+    window.api.manageCallbackCVs();
     expect(await screen.findByText('Advertisement')).toBeInTheDocument();
 
-    await window.api.updateCustomResourceDefinition(null, window.api.getCRDfromKind('Advertisement'));
+    await window.api.updateCustomResourceDefinition(null, window.api.getCRDFromKind('Advertisement'));
 
     expect(await screen.findByText(/CRD advertisements.protocol.liqo.io modified/i));
   }, testTimeout)
@@ -82,8 +81,10 @@ describe('CustomView', () => {
     expect(await screen.findByText('Test')).toBeInTheDocument();
 
     /** Modify the custom view */
-    window.api.customViews = JSON.parse(JSON.stringify(ViewMockModified.items));
-    window.api.manageCallbackCVs(api.customViews);
+    window.api.customViews.current = JSON.parse(JSON.stringify(ViewMockModified.items));
+    act(() => {
+      window.api.manageCallbackCVs();
+    })
 
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
   }, testTimeout)
@@ -102,11 +103,13 @@ describe('CustomView', () => {
 
     await new Promise((r) => setTimeout(r, 1000));
 
-    await api.getCRDs();
+    await window.api.getCRDs();
 
     /** Modify the custom view */
-    api.customViews = JSON.parse(JSON.stringify(ViewMockResponseLayout.items));
-    api.manageCallbackCVs(api.customViews);
+    window.api.customViews.current = JSON.parse(JSON.stringify(ViewMockResponseLayout.items));
+    act(() => {
+      window.api.manageCallbackCVs();
+    })
 
     expect(await screen.findByText('Advertisement')).toBeInTheDocument();
   }, testTimeout)
@@ -116,8 +119,8 @@ describe('CustomView', () => {
     await setup();
 
     /** Modify the custom view */
-    api.customViews = JSON.parse(JSON.stringify(ViewMockResponseLayout.items));
-    api.manageCallbackCVs(api.customViews);
+    window.api.customViews.current = JSON.parse(JSON.stringify(ViewMockResponseLayout.items));
+    window.api.manageCallbackCVs();
 
     expect(await screen.findByText('Advertisement')).toBeInTheDocument();
   }, testTimeout)
@@ -126,12 +129,12 @@ describe('CustomView', () => {
     mockCRDAndViewsExtended(null, 'PUT', 'advertisements', true);
     await setup();
 
-    api.customViews = JSON.parse(JSON.stringify(ViewMockResponse.items));
-    api.manageCallbackCVs(api.customViews);
+    window.api.customViews.current = JSON.parse(JSON.stringify(ViewMockResponse.items));
+    window.api.manageCallbackCVs();
 
     expect(await screen.findByText('Advertisement')).toBeInTheDocument();
 
-    await api.updateCustomResource(null, null, null, 'advertisements', null, AdvMockResponse);
+    await window.api.updateCustomResource(null, null, null, 'advertisements', null, AdvMockResponse);
 
     expect(await screen.findByText(/resource/i));
   }, testTimeout)
@@ -141,5 +144,20 @@ describe('CustomView', () => {
     await setup();
 
     expect(await screen.findByText('Test')).toBeInTheDocument();
+  }, testTimeout)
+
+  test('Custom view gracefully unmount if CV has been deleted', async () => {
+    mocks(ViewMockResponse);
+    await setup();
+
+    expect(await screen.findByText('Test')).toBeInTheDocument();
+
+    let apiManager = window.api.apiManager.current;
+
+    act(() => {
+      apiManager.sendDeletedSignal('views/', ViewMockResponse.items[0]);
+    })
+
+    expect(await screen.findByText('TunnelEndpoint')).toBeInTheDocument();
   }, testTimeout)
 })

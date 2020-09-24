@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { metricsPODs } from './RTLUtils';
+import { metricsPODs, mockCRDAndViewsExtended } from './RTLUtils';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
@@ -16,6 +16,8 @@ import PodsMockResponse from '../__mocks__/pods.json';
 import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import CMMockResponse from '../__mocks__/configmap_clusterID.json';
+import Cookies from 'js-cookie';
+import userEvent from '@testing-library/user-event';
 
 fetchMock.enableMocks();
 
@@ -29,6 +31,10 @@ async function setup() {
     </MemoryRouter>
   )
 }
+
+beforeEach(() => {
+  Cookies.remove('token');
+});
 
 function mocks(){
   fetch.mockImplementation((url) => {
@@ -59,12 +65,87 @@ function mocks(){
 }
 
 describe('App', () => {
-  test('OIDC', async () => {
+  test('Login with OIDC', async () => {
     mocks();
 
     await setup();
 
     /** Assert that a success notification has spawned */
     expect(await screen.findByText(/custom resources/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByLabelText('logout'));
   }, testTimeout)
+
+  test('Login with path', async () => {
+    mocks();
+    Cookies.set('token', 'password');
+    window.history.pushState({}, 'Page Title', '/customresources');
+
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText('Kind'));
+    expect(await screen.findByText('Description'));
+    expect(await screen.findByText('Group'));
+  })
+
+  test('Access /login path when already logged redirect to Home', async () => {
+    mockCRDAndViewsExtended();
+    Cookies.set('token', 'password');
+    window.history.pushState({}, 'Page Title', '/login');
+
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText('Available Peers'));
+  })
+
+  test('Access /error path when already logged redirect to Home', async () => {
+    mockCRDAndViewsExtended();
+    Cookies.set('token', 'password');
+    window.history.pushState({}, 'Page Title', '/error');
+
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText('Available Peers'));
+  })
+
+  test('Access /callback path when already logged redirect to Home', async () => {
+    window.OIDC_PROVIDER_URL = 'test-url';
+    window.OIDC_CLIENT_ID = 'test-id';
+    mockCRDAndViewsExtended();
+    Cookies.set('token', 'password');
+    window.history.pushState({}, 'Page Title', '/callback?state=1234567890');
+
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText('Available Peers'));
+  })
+
+  test('Access an unknown route redirect to 404', async () => {
+    mockCRDAndViewsExtended();
+    Cookies.set('token', 'password');
+    window.history.pushState({}, 'Page Title', '/other');
+
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText('404'));
+  })
 })

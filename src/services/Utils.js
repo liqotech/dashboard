@@ -1,7 +1,5 @@
-export default class Utils {
-  constructor() {
-    this.result = [];
-  }
+export default function Utils() {
+  let result = [];
 
   /**
    * Function that transform string in dot notation and get the params from an object
@@ -10,32 +8,32 @@ export default class Utils {
    * @param value
    * @returns list of params retrieved from an object
    */
-  index(obj, is, value) {
+  const index = (obj, is, value) => {
     try{
       if (Array.isArray(obj)) {
         obj.forEach(item => {
-          this.index(item, is);
+          index(item, is);
         });
       } else {
         if (typeof is == 'string'){
-          return this.index(obj,is.split('.'), value);
+          return index(obj, is.split('.'), value);
         }
-        else if (is.length===1 && value!==undefined){
+        else if (is.length === 1 && value !== undefined){
           return obj[is[0]] = value;
         }
-        else if (is.length===0){
-          this.result.push(obj);
+        else if (is.length === 0){
+          result.push(obj);
           return obj;
         }
         else
-          return this.index(obj[is[0]],is.slice(1), value);
+          return index(obj[is[0]], is.slice(1), value);
       }
     } catch {
       return;
     }
 
-    let res = this.result;
-    this.result = [];
+    let res = result;
+    result = [];
     return res;
   }
 
@@ -44,10 +42,10 @@ export default class Utils {
    * @param schema: the OAPIV3 schema
    * @returns the converted schema
    */
-  OAPIV3toJSONSchema(schema){
+  const OAPIV3toJSONSchema = schema => {
     let toJsonSchema = require('@openapi-contrib/openapi-schema-to-json-schema');
     //TODO: Workaround for now
-    try{this.formatSchema(schema);} catch{}
+    try{formatSchema(schema);} catch{}
     return toJsonSchema(schema);
   }
 
@@ -56,42 +54,45 @@ export default class Utils {
    * so we get rid of it before converting
    * @param schema
    */
-  formatSchema(schema) {
+  const formatSchema = schema => {
     Object.keys(schema).forEach(key => {
       if(schema[key] && key !== 'description' && key !== 'type' && key !== 'required'){
         if(schema[key].type){
           if(schema[key].type === 'object'){
-            this.formatSchema(schema[key]);
+            formatSchema(schema[key]);
           } else {
             if(schema[key].format){
               delete schema[key].format;
             }
           }
         } else {
-          this.formatSchema(schema[key]);
+          formatSchema(schema[key]);
         }
       }
     })
   }
 
-
-  setRealProperties(schemaGen, schemaReal) {
+  const setRealProperties = (schemaGen, schemaReal) => {
     try{
       Object.keys(schemaGen).forEach(key => {
         if(schemaGen[key] && key !== 'description' && key !== 'type' && key !== 'required') {
           if (schemaGen[key].type) {
             if (schemaGen[key].type === 'object' || schemaGen[key].type === 'array' || !schemaGen[key].type) {
-              this.setRealProperties(schemaGen[key], schemaReal[key]);
+              setRealProperties(schemaGen[key], schemaReal[key]);
             } else {
               schemaGen[key] = schemaReal[key];
             }
           } else {
-            this.setRealProperties(schemaGen[key], schemaReal[key]);
+            setRealProperties(schemaGen[key], schemaReal[key]);
           }
         }
       })
     } catch {}
   }
 
-
+  return{
+    setRealProperties,
+    OAPIV3toJSONSchema,
+    index
+  }
 }

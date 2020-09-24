@@ -1137,10 +1137,10 @@
     },
     {
       "metadata": {
-        "name": "graphs.test"
+        "name": "graphs.dashboard.liqo.com"
       },
       "spec": {
-        "group": "test",
+        "group": "dashboard.liqo.com",
         "names": {
           "plural": "graphs",
           "singular": "graph",
@@ -1179,9 +1179,6 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "type"
-                    ],
                     "type": "object"
                   },
                   "neighbors": {

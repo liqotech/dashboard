@@ -4,7 +4,7 @@ import fetchMock from 'jest-fetch-mock';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ViewMockResponse from '../__mocks__/views.json';
-import ApiManager from '../src/services/__mocks__/ApiManager';
+import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
 import Home from '../src/home/Home';
 import FCMockResponse from '../__mocks__/foreigncluster_noJoin.json';
@@ -28,7 +28,7 @@ import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 fetchMock.enableMocks();
 
 async function setup() {
-  window.api = new ApiManager({id_token: 'test'});
+  window.api = ApiInterface({id_token: 'test'});
   window.api.getCRDs().then(async () => {
     render(
       <MemoryRouter>
@@ -179,6 +179,8 @@ describe('AvailablePeer', () => {
     await act(async () => {
       userEvent.click(await screen.findByLabelText('link'));
     })
+
+    expect(await screen.findByText(/No peer available/i)).toBeInTheDocument();
 
   }, testTimeout)
 

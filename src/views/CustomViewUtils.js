@@ -2,7 +2,7 @@ import ReactResizeDetector from 'react-resize-detector';
 import React from 'react';
 
 export function onDrag(_layout, oldLayoutItem, layoutItem, CRDs, setCRDs, layout, setLayout, newBr){
-  if(JSON.stringify(oldLayoutItem) !== JSON.stringify(layoutItem)){
+  if(!_.isEqual(oldLayoutItem, layoutItem)){
     CRDs.forEach(CRD => {
       let l = _layout.find(item => {return item.i === CRD.metadata.name});
       CRD.x = l.x;

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import ApiManager from '../src/services/__mocks__/ApiManager';
+import ApiInterface from '../src/services/api/ApiInterface';
 import CRDmockEmpty from '../__mocks__/crd_fetch.json';
 import ViewMockResponse from '../__mocks__/views.json';
 import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
@@ -26,11 +26,11 @@ async function setup(histo) {
     }
   })
 
-  let api = new ApiManager();
-  api.getCRDs().then(async () => {
+  window.api = ApiInterface({id_token: 'test'});
+  await window.api.getCRDs().then(async () => {
 
-    let liqo_crd = await api.getCRDfromKind('LiqoDashTest');
-    let histo_crd = await api.getCRDfromKind('HistoChart');
+    let liqo_crd = await api.getCRDFromKind('LiqoDashTest');
+    let histo_crd = await api.getCRDFromKind('HistoChart');
     let liqo_cr = await api.getCustomResourcesAllNamespaces(liqo_crd);
     let histo_cr = await api.getCustomResourcesAllNamespaces(histo_crd);
 

@@ -6,11 +6,11 @@ import fetchMock from 'jest-fetch-mock';
 import CRDMockResponse from '../__mocks__/crd_fetch.json';
 import Error401 from '../__mocks__/401.json';
 import Error403 from '../__mocks__/403.json';
-import Error404 from '../__mocks__/404.json';
-import Error409 from '../__mocks__/409.json';
+import Error500 from '../__mocks__/500.json';
 import { generalHomeGET, loginTest } from './RTLUtils';
 import ViewMockResponse from '../__mocks__/views.json';
 import { testTimeout } from '../src/constants';
+import Cookies from 'js-cookie';
 
 fetchMock.enableMocks();
 
@@ -25,11 +25,8 @@ async function setup(error) {
         return Promise.reject(Error401.body);
       } else if(error === 403){
         return Promise.reject(Error403.body);
-      } else if(error === 404){
-        return Promise.reject(Error404.body);
-      }
-      else if(error === 409){
-        return Promise.reject(Error409.body);
+      } else if(error === 500){
+        return Promise.reject(Error500.body);
       }
     } else {
       return generalHomeGET(url);
@@ -44,6 +41,10 @@ async function setup(error) {
   userEvent.click(await screen.findByText('LiqoDashTest'));
 }
 
+beforeEach(() => {
+  Cookies.remove('token');
+});
+
 describe('ErrorRedirect', () => {
   test('401 redirect works', async  () => {
     await setup(401);
@@ -55,14 +56,9 @@ describe('ErrorRedirect', () => {
     expect(await screen.findByText(/403/i)).toBeInTheDocument();
   }, testTimeout)
 
-  test('404 redirect works', async  () => {
-    await setup(404);
-    expect(await screen.findByText(/404/i)).toBeInTheDocument();
-  }, testTimeout)
-
   test('Default redirect works', async  () => {
-    await setup(409);
-    expect(await screen.findByText(/409/i)).toBeInTheDocument();
+    await setup(500);
+    expect(await screen.findByText(/error/i)).toBeInTheDocument();
 
     userEvent.click(screen.getByText(/logout/i));
 

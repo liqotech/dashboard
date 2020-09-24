@@ -1,19 +1,21 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { act, render, screen } from '@testing-library/react';
-import ApiManager from '../src/services/__mocks__/ApiManager';
+import { render, screen } from '@testing-library/react';
+import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
 import { testTimeout } from '../src/constants';
 import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 import ConfigMockResponse from '../__mocks__/configs.json';
+import Error500 from '../__mocks__/500.json';
 import LiqoHeader from '../src/home/LiqoHeader';
 import userEvent from '@testing-library/user-event';
 
 fetchMock.enableMocks();
 
 async function setup() {
-  window.api = new ApiManager({id_token: 'test'});
+  let props = {history: []}
+  window.api = ApiInterface({id_token: 'test'}, props);
   return render(
       <MemoryRouter>
         <LiqoHeader config={ConfigMockResponse.items[0]} />
@@ -21,7 +23,7 @@ async function setup() {
     )
 }
 
-function mocks(error){
+function mocks(error, errorCM){
   fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
       if(req.method === 'PUT'){
@@ -35,7 +37,10 @@ function mocks(error){
       else
         return Promise.resolve(new Response(JSON.stringify({body: ConfigMockResponse})));
     } else if (req.url === 'http://localhost:3001/configmaps/liqo') {
-      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
+      if(errorCM)
+        return Promise.reject(Error500.body);
+      else
+        return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
     }
   })
 }
@@ -72,6 +77,12 @@ describe('LiqoHeader', () => {
 
     expect(await screen.findByText('My cluster')).toBeInTheDocument();
     expect(await screen.queryByText('LIQO')).not.toBeInTheDocument();
+
+  }, testTimeout)
+
+  test('Error on getting configmap', async () => {
+    mocks(false, true);
+    await setup();
 
   }, testTimeout)
 })

@@ -1,7 +1,5 @@
-import { Button } from 'antd';
-import React from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
-const REQUIRED_FIELD_SYMBOL = "*";
 const COMPONENT_TYPES = {
   array: "ArrayField",
   boolean: "BooleanField",
@@ -46,145 +44,8 @@ function getFieldComponent(schema, uiSchema, idSchema, fields) {
       );
     };
 }
-/*
-function Label(props) {
-  const { label, required, id } = props;
-  if (!label) {
-    return null;
-  }
-  return (
-    <label className="control-label" htmlFor={id}>
-      {label}
-      {required && <span className="required">{REQUIRED_FIELD_SYMBOL}</span>}
-    </label>
-  );
-}
 
-function LabelInput(props) {
-  const { id, label, onChange } = props;
-  return (
-    <input
-      className="form-control"
-      type="text"
-      id={id}
-      onBlur={event => onChange(event.target.value)}
-      defaultValue={label}
-    />
-  );
-}
-
-function ErrorList(props) {
-  const { errors = [] } = props;
-  if (errors.length === 0) {
-    return null;
-  }
-
-  return (
-    <div>
-      <ul className="error-detail bs-callout bs-callout-info">
-        {errors
-          .filter(elem => !!elem)
-          .map((error, index) => {
-            return (
-              <li className="text-danger" key={index}>
-                {error}
-              </li>
-            );
-          })}
-      </ul>
-    </div>
-  );
-}
-
-function DefaultTemplate(props) {
-  const {
-    id,
-    label,
-    children,
-    errors,
-    help,
-    description,
-    hidden,
-    required,
-    displayLabel,
-  } = props;
-
-  if (hidden) {
-    return <div className="hidden">{children}</div>;
-  }
-
-  return (
-    <WrapIfAdditional {...props}>
-      {displayLabel && <Label label={label} required={required} id={id} />}
-      {displayLabel && description ? description : null}
-      {children}
-      {errors}
-      {help}
-    </WrapIfAdditional>
-  );
-}
-
-DefaultTemplate.defaultProps = {
-  hidden: false,
-  readonly: false,
-  required: false,
-  displayLabel: true,
-};
-
-function WrapIfAdditional(props) {
-  const {
-    id,
-    classNames,
-    disabled,
-    label,
-    onKeyChange,
-    onDropPropertyClick,
-    readonly,
-    required,
-    schema,
-  } = props;
-  const keyLabel = `${label} Key`; // i18n ?
-  const additional = schema.hasOwnProperty(utils.ADDITIONAL_PROPERTY_FLAG);
-
-  if (!additional) {
-    return <div className={classNames}>{props.children}</div>;
-  }
-
-  return (
-    <div className={classNames}>
-      <div className="row">
-        <div className="col-xs-5 form-additional">
-          <div className="form-group">
-            <Label label={keyLabel} required={required} id={`${id}-key`} />
-            <LabelInput
-              label={label}
-              required={required}
-              id={`${id}-key`}
-              onChange={onKeyChange}
-            />
-          </div>
-        </div>
-        <div className="form-additional form-group col-xs-5">
-          {props.children}
-        </div>
-        <div className="col-xs-2">
-          <Button
-            type="danger"
-            icon="remove"
-            className="array-item-remove btn-block"
-            tabIndex="-1"
-            style={{ border: "0" }}
-            disabled={disabled || readonly}
-            onClick={onDropPropertyClick(label)}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-*/
-
-function SchemaFieldRender(props, _this) {
+function SchemaFieldRender(props, _disabled, onDisableChange) {
   const {
     uiSchema,
     formData,
@@ -223,10 +84,6 @@ function SchemaFieldRender(props, _this) {
   const displayLabel = utils.getDisplayLabel(schema, uiSchema, rootSchema);
 
   const { __errors, ...fieldErrorSchema } = errorSchema;
-
-  let onDisableChange = _this.onDisableChange;
-
-  let _disabled = _this.state.disabled;
 
   // See #439: uiSchema: Don't pass consumed class names to child components
   const field = (
@@ -353,30 +210,23 @@ function SchemaFieldRender(props, _this) {
   );
 }
 
-class CustomSchemaField extends React.Component {
-  constructor(props) {
-    super(props);
+function CustomSchemaField(props) {
 
-    this.state = {
-      disabled: true,
-      originalValue: ''
+  const [disabled, setDisabled] = useState(true);
+  const originalValue = useRef('');
+
+  useEffect(() => {
+    if(props.schema.type !== 'object' && props.schema.type !== 'array'){
+      originalValue.current = props.formData;
     }
+  }, [])
 
-    if(this.props.schema.type !== 'object' && this.props.schema.type !== 'array'){
-      this.state.originalValue = props.formData;
-    }
-
-    this.onDisableChange = this.onDisableChange.bind(this);
+  const onDisableChange = () => {
+    setDisabled(prev => !prev);
+    props.onChange(originalValue.current);
   }
 
-  onDisableChange() {
-    this.setState({disabled: !this.state.disabled});
-    this.props.onChange(this.state.originalValue);
-  }
-
-  render() {
-    return SchemaFieldRender(this.props, this);
-  }
+  return SchemaFieldRender(props, disabled, onDisableChange);
 }
 
 CustomSchemaField.defaultProps = {

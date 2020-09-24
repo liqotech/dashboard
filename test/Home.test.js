@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import { metricsPODs, mockCRDAndViewsExtended } from './RTLUtils';
 import { act, render, screen } from '@testing-library/react';
-import ApiManager from '../src/services/__mocks__/ApiManager';
+import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
 import Home from '../src/home/Home';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
@@ -20,7 +20,7 @@ import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 fetchMock.enableMocks();
 
 async function setup() {
-  window.api = new ApiManager({id_token: 'test'});
+  window.api = ApiInterface({id_token: 'test'});
   window.api.getCRDs().then(async () => {
     render(
       <MemoryRouter>
@@ -30,10 +30,15 @@ async function setup() {
   });
 }
 
-function mocks(){
+function mocks(error, noNodes){
   fetch.mockImplementation((url) => {
     if (url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+      if(!error)
+        return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+      else{
+        let CRDs = CRDmockResponse.items.filter(item => {return item.metadata.name !== 'clusterconfigs.policy.liqo.io'})
+        return Promise.resolve(new Response(JSON.stringify({items: CRDs})));
+      }
     } else if (url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
       return Promise.resolve(new Response(JSON.stringify({body: FCMockResponse})));
     } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
@@ -43,7 +48,9 @@ function mocks(){
     } else if (url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
       return Promise.reject(Error404.body);
     } else if (url === 'http://localhost:3001/nodes') {
-        return Promise.resolve(new Response(JSON.stringify(NodesMockResponse)));
+      if(!noNodes)
+        return Promise.resolve(new Response(JSON.stringify({body :NodesMockResponse})));
+      else return Promise.reject();
     } else if (url === 'http://localhost:3001/metrics/nodes') {
         return Promise.resolve(new Response(JSON.stringify({body: NodesMetricsMockResponse})));
     } else if (url === 'http://localhost:3001/pod') {
@@ -111,19 +118,33 @@ describe('Home', () => {
 
     expect(await screen.findByText('LIQO')).toBeInTheDocument();
 
-    await window.api.updateCustomResourceDefinition(null, api.getCRDfromKind('Advertisement'));
+    await window.api.updateCustomResourceDefinition(null, api.getCRDFromKind('Advertisement'));
 
     await act(async () => {
       expect(await screen.findByText(/modified/i));
     })
   }, testTimeout)
 
+  test('No Config CRD present', async () => {
+    mocks(true);
+    await setup();
+
+    expect(await screen.findByText('LIQO')).toBeInTheDocument();
+    expect(await screen.findByText('Not Installed')).toBeInTheDocument();
+  }, testTimeout)
+
   test('Error on getting CR in home view', async () => {
     mocks();
     await setup();
 
-    await act(async () => {
-      expect(await screen.queryByText('LIQO')).not.toBeInTheDocument();
-    })
+    expect(await screen.findByText('LIQO')).toBeInTheDocument();
+    expect(await screen.findByText('Not Installed')).toBeInTheDocument();
+  }, testTimeout)
+
+  test('Error on getting Nodes in home view', async () => {
+    mocks(false, true);
+    await setup();
+
+    expect(await screen.queryByText('LIQO')).not.toBeInTheDocument();
   }, testTimeout)
 })

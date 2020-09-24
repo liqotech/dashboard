@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './CustomView.css';
 import CRD from '../CRD/CRD';
-import { isEmpty } from 'lodash';
+import _, { isEmpty } from 'lodash';
 import LoadingIndicator from '../common/LoadingIndicator';
 import 'react-resizable/css/styles.css';
 import { Responsive, WidthProvider } from 'react-grid-layout';
@@ -18,36 +18,14 @@ function CustomView(props) {
   const [layout, setLayout] = useState({ lg: [] });
   const [CRDView, setCRDView] = useState([]);
   const [newBr, setNewBr] = useState('lg');
+  const flag = useRef(false);
 
   useEffect(() => {
-    window.api.CVArrayCallback.push(getCustomViews);
-    customView.current = window.api.customViews.find(item => {
+    window.api.CVArrayCallback.current.push(getCustomViews);
+    customView.current = window.api.customViews.current.find(item => {
       return item.metadata.name === props.match.params.viewName;
     })
-    if(customView.current){
-      if(customView.current.spec.layout){
-        setLayout(customView.current.spec.layout);
-      }
-      CRDsCV.current = customView.current.spec.crds;
-      loadCRD();
-    }
-
-    return () => {
-      /**
-       * Cancel all callback for the CRDs
-       * Cancel all watchers
-       */
-      window.api.CVArrayCallback = window.api.CVArrayCallback.filter(func => {
-        return func !== getCustomViews;
-      });
-      window.api.abortAllWatchers();
-    }
-  }, [])
-
-  const updateCRD = CV => {
-    customView.current = CV;
-
-    if(CV.spec.crds.length !== CRDsCV.current.length){
+    if (customView.current) {
       if (customView.current.spec.layout) {
         setLayout(customView.current.spec.layout);
       }
@@ -55,23 +33,13 @@ function CustomView(props) {
       loadCRD();
     }
 
-    CRDsCV.current = customView.current.spec.crds;
-  }
-
-  /** Update the custom views */
-  const getCustomViews = customViews => {
-    let CV = customViews.find(item => {
-      return item.metadata.name === props.match.params.viewName;
-    })
-    if(!customView.current){
-      updateCRD(CV);
-    }else{
-      /** Update layout only if something really changed */
-      if(JSON.stringify(customView.current) !== JSON.stringify(CV)) {
-        updateCRD(CV);
-      }
+    return () => {
+      /** Cancel all callback for the CRDs */
+      window.api.CVArrayCallback.current = window.api.CVArrayCallback.current.filter(func => {
+        return func !== getCustomViews;
+      });
     }
-  }
+  }, [props.match])
 
   useEffect(() => {
     generateCRDView();
@@ -84,7 +52,12 @@ function CustomView(props) {
        * Save the layout
        */
 
-      if(!isEmpty(layout)){
+      if(!flag.current){
+        flag.current = true;
+        return;
+      }
+
+      if(!isEmpty(layout) && customView.current){
         customView.current.spec.layout = layout;
         let array = customView.current.metadata.selfLink.split('/');
         window.api.updateCustomResource(
@@ -98,6 +71,60 @@ function CustomView(props) {
       }
     }
   }, [layout])
+
+  const pruneLayout = l => {
+    Object.keys(l).forEach(br => {
+      l[br].forEach(item => {
+        delete item.isDraggable;
+        delete item.moved;
+        delete item.static;
+        delete item.isBounded;
+        delete item.isResizable;
+        delete item.maxH;
+        delete item.maxW;
+        delete item.minH;
+        delete item.minW;
+      })
+    })
+    return l;
+  }
+
+  const updateCRD = (CV, load) => {
+    let changeLayout = load;
+    if(!load && CV.spec.layout &&
+      !_.isEqual(pruneLayout(customView.current.spec.layout), CV.spec.layout))
+      changeLayout = true
+
+    if(changeLayout) {
+      flag.current = false;
+      setLayout(CV.spec.layout);
+    }
+
+    customView.current = CV;
+    if(!_.isEqual(CRDsCV.current, CV.spec.crds)){
+      CRDsCV.current = CV.spec.crds;
+      loadCRD();
+    }
+  }
+
+  /** Update the custom views */
+  const getCustomViews = () => {
+    let CV = window.api.customViews.current.find(item => {
+      return item.metadata.name === props.match.params.viewName;
+    })
+    if(!CV){
+      props.history.push('/')
+    } else {
+      if(!customView.current){
+        updateCRD(CV, true);
+      } else {
+        /** Update layout only if something really changed */
+        if(!_.isEqual(customView.current, CV)) {
+          updateCRD(CV);
+        }
+      }
+    }
+  }
 
   const loadCRD = () => {
     setLoading(true);
@@ -139,7 +166,7 @@ function CustomView(props) {
     let _CRDView = [];
 
     CRDs.forEach(item => {
-      if(window.api.getCRDfromName(item.metadata.name)){
+      if(window.api.getCRDFromName(item.metadata.name)){
         _CRDView.push(
           <div key={item.metadata.name} className="crd-content" aria-label={'crd_custom_view'} >
             <div className="inner-crd" >

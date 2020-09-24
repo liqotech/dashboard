@@ -1,7 +1,7 @@
 .error-red {
     background: #fff;
     max-width: 30vw;
-    margin: 50px auto 0;
+    margin: 50px auto;
     padding: 40px;
     border: 1px solid #c8c8c8;
     text-align: center;
@@ -10,7 +10,7 @@
 .error-red .title {
     font-size: 50px;
     letter-spacing: 10px;
-    margin-bottom: 10px;
+    margin: 16px;
 }
 
 .error-red .desc {

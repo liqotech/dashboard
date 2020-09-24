@@ -4,7 +4,6 @@ import fetchMock from 'jest-fetch-mock';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ViewMockResponse from '../__mocks__/views.json';
-import ApiManager from '../src/services/__mocks__/ApiManager';
 import { MemoryRouter } from 'react-router-dom';
 import Home from '../src/home/Home';
 import FCMockResponse from '../__mocks__/foreigncluster_noJoin.json';
@@ -18,11 +17,12 @@ import PodsMockResponse from '../__mocks__/pods.json';
 import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import CMMockResponse from '../__mocks__/configmap_clusterID.json';
+import ApiInterface from '../src/services/api/ApiInterface';
 
 fetchMock.enableMocks();
 
 async function setup() {
-  window.api = new ApiManager({id_token: 'test'});
+  window.api = ApiInterface({id_token: 'test'});
   window.api.getCRDs().then(async () => {
     render(
       <MemoryRouter>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Utils from '../../services/Utils';
 import { withTheme } from '@rjsf/core';
 import { Theme as AntDTheme } from '@rjsf/antd';
-import { Button, notification } from 'antd';
+import { Button, message } from 'antd';
 import { widgets } from './CustomWidget';
 import { CustomArrayFieldTemplate, fields, fieldsView } from './CustomField';
 import { json } from 'generate-schema';
@@ -16,7 +16,7 @@ function FormViewer(props) {
 
   const [showButton, setShowButton] = useState(false);
 
-  const util = new Utils();
+  const util = Utils();
 
   let formData;
   let schema;
@@ -71,10 +71,7 @@ function FormViewer(props) {
     promise
       .catch((error) => {
         console.log(error);
-        notification.error({
-          message: APP_NAME,
-          description: 'Could not update the resource'
-        });
+        message.error('Could not update the resource');
       });
   }
 

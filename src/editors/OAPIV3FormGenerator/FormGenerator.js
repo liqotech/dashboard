@@ -11,7 +11,7 @@ import { json } from 'generate-schema';
 const Form = withTheme(AntDTheme);
 
 function FormGenerator(props) {
-  const util = new Utils();
+  const util = Utils();
   let schema = util.OAPIV3toJSONSchema(props.CRD.spec.validation.openAPIV3Schema).properties.spec;
   let currentMetadata = {};
 

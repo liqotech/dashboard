@@ -4,7 +4,7 @@ import fetchMock from 'jest-fetch-mock';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ViewMockResponse from '../__mocks__/views.json';
-import ApiManager from '../src/services/__mocks__/ApiManager';
+import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
 import Home from '../src/home/Home';
 import FCMockResponseNoJoin from '../__mocks__/foreigncluster_noJoin.json';
@@ -24,7 +24,7 @@ import { testTimeout } from '../src/constants';
 fetchMock.enableMocks();
 
 async function setup() {
-  window.api = new ApiManager({id_token: 'test'});
+  window.api = ApiInterface({id_token: 'test'});
   window.api.getCRDs().then(async () => {
     render(
       <MemoryRouter>

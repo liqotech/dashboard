@@ -6,14 +6,14 @@ import React from 'react';
 
 function addUserLoaded(func){
   func({user: {
-      profile: 'user'
+      id_token: 'password'
     }});
 }
 
 function signinSilent(){
   return Promise.resolve({
     user: {
-      profile: 'user'
+      id_token: 'password'
     }
   })
 }
@@ -23,39 +23,35 @@ function addAccessTokenExpiring(func){
 }
 
 function getManager(){
-  let manager = {
+  return {
     events: {
       addUserLoaded: addUserLoaded,
       addAccessTokenExpiring: addAccessTokenExpiring
     },
     signinSilent: signinSilent
   };
-  return manager;
 }
 
-export default class Authenticator {
+export default function Authenticator(){
+  let manager = getManager();
 
-  constructor() {
-
-    this.manager = {};
-    this.OIDC = false;
-    this.token = '';
-
-    if (window.OIDC_PROVIDER_URL) {
-      this.OIDC = true;
-      this.manager = getManager();
-    }
-  }
-
-  login() {
+  const login = () => {
+    window.history.pushState({}, '', '/callback?state=12345679')
     return true;
   }
 
-  completeLogin() {
+  const completeLogin = () => {
     return true;
   }
 
-  logout() {
+  const logout = () => {
     return true;
+  }
+
+  return{
+    manager,
+    login,
+    completeLogin,
+    logout
   }
 }
