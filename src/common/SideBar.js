@@ -29,7 +29,7 @@ function SideBar() {
   }
 
   const getCustomViews = () => {
-    setCV(window.api.customViews);
+    setCV([...window.api.customViews]);
   }
 
   const onCollapse = collapsed => {

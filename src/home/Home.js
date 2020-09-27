@@ -127,28 +127,28 @@ function Home(props){
   }
 
   const checkModifies = (type, object, prev) => {
-    let cr = JSON.parse(JSON.stringify(prev));
 
-    let index = cr.indexOf(cr.find((item) => {
+    let cr = prev.find(item => {
       return item.metadata.name === object.metadata.name;
-    }));
+    });
 
     if ((type === 'ADDED' || type === 'MODIFIED')) {
       // Object creation succeeded
-      if(index !== -1) {
-        if(JSON.stringify(cr[index]) !== JSON.stringify(object)){
-          cr[index] = object;
+      if(cr) {
+        if(cr.metadata.resourceVersion !== object.metadata.resourceVersion){
+          prev = prev.filter(item => {return item.metadata.resourceVersion !== cr.metadata.resourceVersion});
+          prev.push(object);
         }
       } else {
-        cr.push(object);
+        prev.push(object);
       }
     } else if (type === 'DELETED') {
-      if(index !== -1) {
-        cr.splice(index, 1);
+      if(cr) {
+        prev = prev.filter(item => {return item.metadata.resourceVersion !== cr.metadata.resourceVersion});;
       }
     }
 
-    return cr;
+    return [...prev];
   }
 
   /**

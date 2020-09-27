@@ -72,9 +72,6 @@ function ConnectedPeer(props) {
     client: false
   });
 
-  let flagOut = useRef(false);
-  let flagInc = useRef(false);
-
   let metricsNotAvailableIncoming = useRef(false);
   let metricsNotAvailableOutgoing = useRef(false);
 
@@ -91,8 +88,8 @@ function ConnectedPeer(props) {
             metricsNotAvailableOutgoing.current = true;
         }
       }).catch(() => {
-        metricsNotAvailableIncoming.current = true;
-        metricsNotAvailableOutgoing.current = true;
+      metricsNotAvailableIncoming.current = true;
+      metricsNotAvailableOutgoing.current = true;
     })
   }, [])
 
@@ -124,6 +121,16 @@ function ConnectedPeer(props) {
       CPU: outgoingTotal.consumed.CPU
     });
   }, [outgoingTotal])
+
+  useEffect(() => {
+    if(props.client) {
+      getClientPODs();
+    }
+
+    if(props.server) {
+      getServerPODs();
+    }
+  }, [props.incomingPods, props.outgoingPods])
 
   const getPODPercentage = (po, res) => {
     let allocatableCPU = 0;
@@ -172,7 +179,7 @@ function ConnectedPeer(props) {
 
     home.totalPodsRAM += podPercentage.RAMmi;
     home.totalPodsCPU += podPercentage.CPUmi;
-    
+
     home.totalAllocatablePodsRAM += podPercentage.RAMTot;
     home.totalAllocatablePodsCPU += podPercentage.CPUTot;
 
@@ -281,8 +288,8 @@ function ConnectedPeer(props) {
             CPU: 0
           },
           available: {
-            RAM: 0,
-            CPU: 0
+            RAM: (home.totalMemory * props.config.spec.advertisementConfig.outgoingConfig.resourceSharingPercentage / 100),
+            CPU: (home.totalCPU * props.config.spec.advertisementConfig.outgoingConfig.resourceSharingPercentage / 100)
           }
         });
       } else {
@@ -341,8 +348,8 @@ function ConnectedPeer(props) {
             CPU: 0
           },
           available: {
-            RAM: 0,
-            CPU: 0
+            RAM: foreign.totalMemory,
+            CPU: foreign.totalCPU
           }
         });
       } else {
@@ -367,13 +374,6 @@ function ConnectedPeer(props) {
     }
   }
 
-  const checkFlag = flag => {
-    if(!flag.current){
-      updatePODPercentage();
-    }
-    return true;
-  }
-
   /**
    * Search for pods offloaded to the foreign cluster
    */
@@ -383,19 +383,15 @@ function ConnectedPeer(props) {
     ).status.vnodeReference.name;
 
     outgoingPods.current = props.outgoingPods.filter(po => { return po.spec.nodeName === vNode });
-    if(outgoingPods.current.length !== 0){
-      sharing.client = true;
-      flagOut.current = checkFlag(flagOut);
-    } else {
-      sharing.client = false;
-    }
+    sharing.client = outgoingPods.current.length !== 0;
+    updatePODPercentage();
   }
 
   /**
    * Search for pods offloaded to the home cluster from a foreign one
    */
   const getServerPODs = () => {
-   let vNode = 'liqo-' + props.foreignCluster.status.outgoing["remote-peering-request-name"];
+    let vNode = 'liqo-' + props.foreignCluster.status.outgoing["remote-peering-request-name"];
     incomingPods.current = props.incomingPods.filter(po => {
       try {
         return po.metadata.annotations.home_nodename === vNode
@@ -403,12 +399,8 @@ function ConnectedPeer(props) {
         return false
       }
     })
-    if(incomingPods.current.length !== 0){
-      sharing.server = true;
-      flagInc.current = checkFlag(flagInc);
-    } else {
-      sharing.server = false;
-    }
+    sharing.server = incomingPods.current.length !== 0;
+    updatePODPercentage();
   }
 
   const clientPercentage = () => {
@@ -426,14 +418,6 @@ function ConnectedPeer(props) {
     updatePeeringStatus(props, loading, setLoading,
       'Disconnected from ' + props.foreignCluster.metadata.name,
       'Could not disconnect');
-  }
-
-  if(props.client) {
-    getClientPODs();
-  }
-
-  if(props.server) {
-    getServerPODs();
   }
 
   const menu = (
@@ -507,7 +491,7 @@ function ConnectedPeer(props) {
               </div>
               {
                 (props.client && props.server) ? <SwapOutlined style={{fontSize: '2em'}} /> :
-                props.client ? <SwapRightOutlined style={{fontSize: '2em'}} /> : <SwapLeftOutlined style={{fontSize: '2em'}} />
+                  props.client ? <SwapRightOutlined style={{fontSize: '2em'}} /> : <SwapLeftOutlined style={{fontSize: '2em'}} />
               }
               <div>
                 <Tooltip title={props.client ? clientPercent + '%' : null} placement={'top'}>
@@ -536,14 +520,14 @@ function ConnectedPeer(props) {
             </Space>
           </>
         }
-        extra={
-          <div aria-label={'dropdown-connected'} onClick={event => {event.stopPropagation()}}>
-            <Dropdown.Button overlay={menu} trigger={['click']} icon={<EllipsisOutlined/>}/>
-          </div>
-        }
-        showArrow={false}
-        key={props.foreignCluster.metadata.name + '_connected'}
-        style={{border: 0}}
+                        extra={
+                          <div aria-label={'dropdown-connected'} onClick={event => {event.stopPropagation()}}>
+                            <Dropdown.Button overlay={menu} trigger={['click']} icon={<EllipsisOutlined/>}/>
+                          </div>
+                        }
+                        showArrow={false}
+                        key={props.foreignCluster.metadata.name + '_connected'}
+                        style={{border: 0}}
         >
           <div style={{paddingLeft: '1em', paddingBottom: '1em'}}>
             <Row align={'middle'}>

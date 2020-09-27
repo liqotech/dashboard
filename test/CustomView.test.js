@@ -72,7 +72,7 @@ describe('CustomView', () => {
 
     await window.api.updateCustomResourceDefinition(null, window.api.getCRDfromKind('Advertisement'));
 
-    expect(await screen.findByText(/modified/i));
+    expect(await screen.findByText(/CRD advertisements.protocol.liqo.io modified/i));
   }, testTimeout)
 
   test('Custom view react if new CRD has been added', async () => {

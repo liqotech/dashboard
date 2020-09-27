@@ -1,5 +1,5 @@
 import { Alert, Modal, Select, Input, Typography, Row, Col, Badge, notification } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PlusSquareOutlined from '@ant-design/icons/lib/icons/PlusSquareOutlined';
 import PlusSquareTwoTone from '@ant-design/icons/lib/icons/PlusSquareTwoTone';
 import { dashLowercase } from '../services/stringUtils';

@@ -1,11 +1,10 @@
-import React, { Component, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Badge, Col, Collapse, Divider, PageHeader, Row, Space, Typography, Tooltip } from 'antd';
 import QuestionCircleOutlined from '@ant-design/icons/lib/icons/QuestionCircleOutlined';
 import { addZero, convertCPU, convertRAM } from './HomeUtils';
 import LineChart from '../templates/line/LineChart';
 import Donut from '../templates/donut/Donut';
 import ExclamationCircleTwoTone from '@ant-design/icons/lib/icons/ExclamationCircleTwoTone';
-import useInterval from '@restart/hooks/cjs/useInterval';
 
 function Status(props){
 
@@ -23,6 +22,8 @@ function Status(props){
   });
   const [trendHome, setTrendHome] = useState([]);
   const [trendForeign, setTrendForeign] = useState([]);
+  const incomingMetrics = useRef([]);
+  const outgoingMetrics = useRef([]);
 
   let metricsNotAvailableIncoming = useRef(false);
   let metricsNotAvailableOutgoing = useRef(false);
@@ -37,12 +38,18 @@ function Status(props){
   }, [])
 
   useEffect(() => {
+    incomingMetrics.current = props.incomingMetrics;
+    outgoingMetrics.current = props.outgoingMetrics;
+  }, [props.outgoingMetrics, props.incomingMetrics])
+
+  useEffect(() => {
     /**
      * Every 30 seconds the metrics are retrieved and the view updated
      */
     let interval = setInterval( () => {
       setConsumedHome(prev => {consumedHome = prev; return prev});
       setTotalHome(prev => {totalHome = prev; return prev});
+      setTotalForeign(prev => {totalForeign = prev; return prev});
       updateTrend();
     }, 30000);
 
@@ -50,6 +57,10 @@ function Status(props){
       clearInterval(interval);
     }
   }, [])
+
+  useEffect(() => {
+    getConsumedResources();
+  }, [totalHome])
 
   const updateTrend = () => {
     getConsumedResources();
@@ -94,10 +105,6 @@ function Status(props){
       }
     })
   }
-
-  useEffect(() => {
-    getConsumedResources();
-  }, [totalHome])
 
   /** This means there are no metrics available */
   const getConsumedMetricsNoMetricsServer = () => {
@@ -175,7 +182,7 @@ function Status(props){
     let totalCPUPercentage = '';
     let totalConsumedResources = home ? consumedHome : null;
     let totalAvailableResources = home ? totalHome : totalForeign;
-    let externalMetrics = home ? props.incomingMetrics : props.outgoingMetrics;
+    let externalMetrics = home ? incomingMetrics.current : outgoingMetrics.current;
 
     let dataRAM = [];
     let dataCPU = [];
