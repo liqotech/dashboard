@@ -23,8 +23,7 @@ import LoadingIndicator from '../common/LoadingIndicator';
 import ApiInterface from '../services/api/ApiInterface';
 
 function CallBackHandler(props) {
-  if(!Cookies.get('token'))
-    props.func();
+  props.func();
   return <LoadingIndicator />
 }
 
