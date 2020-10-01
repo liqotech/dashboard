@@ -1,11 +1,11 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: graphs.dashboard.liqo.com
+  name: graphs.dashboard.liqo.io
   annotations:
     description: 'This CRD is used to create generic graphs designs'
 spec:
-  group: dashboard.liqo.com
+  group: dashboard.liqo.io
   scope: Namespaced
   subresources:
     status: {}

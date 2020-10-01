@@ -101,7 +101,7 @@ async function setup_only_CRD(error, template, noview) {
       <MemoryRouter>
         <CRD match={{
                params: {
-                 crdName: 'liqodashtests.dashboard.liqo.com'
+                 crdName: 'liqodashtests.dashboard.liqo.io'
                }
              }}
              history={[]}
