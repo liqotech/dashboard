@@ -51,7 +51,7 @@ function ListConnected(props){
         }))
         setOutgoingPods(_outgoingPods);
         setLoadingClient(false);
-      });
+      }).catch(error => console.log(error));
   }
 
   /**

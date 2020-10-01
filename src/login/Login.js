@@ -1,36 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './Login.css';
-import { Form, Input, Button, Typography } from 'antd';
-import { Redirect } from 'react-router-dom';
-import Cookies from 'js-cookie';
-import ApiManager from '../services/ApiManager';
+import { Button, Form, Input, Typography } from 'antd';
+import ApiInterface from '../services/api/ApiInterface';
 
 function Login(props){
-
-  /** First check if the token has been passed as a query parameter in the URL */
-  const search = window.location.search;
-  const params = new URLSearchParams(search);
-  const token = params.get('token');
-
-  if(token){
-    props.func(token);
-  }else{
-    if(Cookies.get('token')){
-      props.func(Cookies.get('token'));
-    }
-  }
 
   const onFinish = values => {
     props.func(values.token);
   }
 
-
-  if(!props.func || props.logged) {
-    return <Redirect
-      to={{
-        pathname: "/",
-        state: { from: props.location }
-      }}/>;
+  const validator = (rule, value) => {
+    let api = ApiInterface({id_token: value}, props)
+    return api.getNodes().then(() => {
+      return Promise.resolve();
+    }).catch(() => {
+      return Promise.reject('Token is not valid');
+    })
   }
 
   return (
@@ -44,20 +29,7 @@ function Login(props){
           name="token"
           rules={[
             { required: true, message: 'Please input your token!' },
-            { validator: async (rule, value) => {
-              if(value){
-                let user = {
-                  id_token: value
-                };
-                let api = new ApiManager(user);
-                /** Get the CRDs at the start of the app */
-                return api.getNodes().then(() => {
-                  return Promise.resolve();
-                }).catch(() => {
-                  return Promise.reject('Token is not valid');
-                })
-              }}
-            }
+            { validator: async (rule, value) => validator(rule, value)}
           ]}>
           <Input.Password aria-label={'lab'}  placeholder={'Please input your secret token'}/>
         </Form.Item>
@@ -66,7 +38,6 @@ function Login(props){
         </Form.Item>
       </Form>
     </div>
-
   );
 }
 

@@ -1,4 +1,4 @@
-import { notification } from 'antd';
+import { message } from 'antd';
 import { APP_NAME } from '../constants';
 import React from 'react';
 import { colors } from '../services/Colors';
@@ -60,7 +60,7 @@ export function updatePeeringStatus(props, loading, setLoading, messageOK, messa
 
   setLoading(prev => !prev);
 
-  let foreignClusterCRD = window.api.getCRDfromKind('ForeignCluster');
+  let foreignClusterCRD = window.api.getCRDFromKind('ForeignCluster');
 
   let promise = window.api.updateCustomResource(
     foreignClusterCRD.spec.group,
@@ -73,17 +73,10 @@ export function updatePeeringStatus(props, loading, setLoading, messageOK, messa
 
   promise
     .then(() => {
-      notification.success({
-        message: APP_NAME,
-        description: messageOK
-      });
+      message.success(messageOK);
     })
     .catch(() => {
-      notification.error({
-        message: APP_NAME,
-        description: messageError
-      });
-
+      message.error(messageError);
       setLoading(prev => !prev);
     });
 }

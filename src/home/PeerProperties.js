@@ -44,7 +44,7 @@ export function getPeerProperties(client, server, props, showProperties, setShow
 }
 
 function createTabs(kind, CR) {
-  let CRD = window.api.getCRDfromKind(kind);
+  let CRD = window.api.getCRDFromKind(kind);
 
   return (
     <Tabs tabPosition={'left'} size={'small'} style={{marginLeft: '-1.5em'}} defaultActiveKey={'spec'}>

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import ApiManager from '../src/services/__mocks__/ApiManager';
+import ApiInterface from '../src/services/api/ApiInterface';
 import CRDmockEmpty from '../__mocks__/crd_fetch.json';
 import ViewMockResponse from '../__mocks__/views.json';
 import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
@@ -35,16 +35,16 @@ function mockFetch() {
 }
 
 async function setup(adv) {
-  window.api = new ApiManager({id_token: 'test'});
+  window.api = ApiInterface({id_token: 'test'});
   window.api.getCRDs().then(async () => {
 
-    let liqo_crd = await window.api.getCRDfromKind('LiqoDashTest');
-    let pie_crd = await window.api.getCRDfromKind('PieChart');
+    let liqo_crd = await window.api.getCRDFromKind('LiqoDashTest');
+    let pie_crd = await window.api.getCRDFromKind('PieChart');
     let l = await window.api.getCustomResourcesAllNamespaces(liqo_crd);
     let p = await window.api.getCustomResourcesAllNamespaces(pie_crd);
 
     if(adv){
-      let adv_crd = await window.api.getCRDfromKind('Advertisement');
+      let adv_crd = await window.api.getCRDFromKind('Advertisement');
       let a = await window.api.getCustomResourcesAllNamespaces(adv_crd);
       render(
         <MemoryRouter>
@@ -187,7 +187,7 @@ describe('CR', () => {
   }, testTimeout)
 
   test('CR deletion error catch works', async () => {
-    await setup_resource('404', 'DELETE', 'liqodashtests');
+    await setup_resource('401', 'DELETE', 'liqodashtests');
 
     const del = await screen.findAllByLabelText('delete');
     expect(del).toHaveLength(2);
@@ -198,7 +198,7 @@ describe('CR', () => {
     const yes = await screen.findByText('Yes');
     userEvent.click(yes);
 
-    expect(await screen.findByText(/404/i)).toBeInTheDocument();
+    expect(await screen.findByText(/401/i)).toBeInTheDocument();
   }, testTimeout)
 
 })

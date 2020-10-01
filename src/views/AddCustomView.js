@@ -1,4 +1,4 @@
-import { Alert, Modal, Select, Input, Typography, Row, Col, Badge, notification } from 'antd';
+import { Alert, Modal, Select, Input, Typography, Row, Col, Badge, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import PlusSquareOutlined from '@ant-design/icons/lib/icons/PlusSquareOutlined';
 import PlusSquareTwoTone from '@ant-design/icons/lib/icons/PlusSquareTwoTone';
@@ -17,7 +17,7 @@ function AddCustomView(props){
 
   let options = [];
 
-  window.api.CRDs.forEach(CRD => options.push(CRD.metadata.name));
+  window.api.CRDs.current.forEach(CRD => options.push(CRD.metadata.name));
 
   const filteredOptions = options.filter(CRD => !selectedCRDs.includes(CRD));
 
@@ -30,7 +30,7 @@ function AddCustomView(props){
       setNoNameAlert(true);
     else {
       let namespace = 'default';
-      let CRD = window.api.getCRDfromKind('View');
+      let CRD = window.api.getCRDFromKind('View');
 
       let crds = [];
       selectedCRDs.forEach(crd => {
@@ -63,10 +63,7 @@ function AddCustomView(props){
         setShowAddCV(false);
       }).catch(error => {
         console.log(error);
-        notification.error({
-          message: APP_NAME,
-          description: 'Could not create custom view'
-        });
+        message.error('Could not create custom view');
       });
     }
   }

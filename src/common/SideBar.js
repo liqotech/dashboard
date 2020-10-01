@@ -14,14 +14,14 @@ const Sider = Layout.Sider;
 function SideBar() {
 
   const [CV, setCV] = useState([]);
-  const [favourites, setFavourites] = useState(window.api.CRDs.filter(item => {
+  const [favourites, setFavourites] = useState(window.api.CRDs.current.filter(item => {
     return item.metadata.annotations && item.metadata.annotations.favourite;
   }))
   const [collapsed, setCollapsed] = useState(false)
 
   useEffect(() => {
-    window.api.CVArrayCallback.push(getCustomViews);
-    window.api.sidebarCallback = getFavourite;
+    window.api.CVArrayCallback.current.push(getCustomViews);
+    window.api.sidebarCallback.current = getFavourite;
   }, [])
 
   const getFavourite = CRDs => {
@@ -29,7 +29,7 @@ function SideBar() {
   }
 
   const getCustomViews = () => {
-    setCV([...window.api.customViews]);
+    setCV([...window.api.customViews.current]);
   }
 
   const onCollapse = collapsed => {

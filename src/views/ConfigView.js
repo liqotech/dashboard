@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Badge, Button, Layout, notification, Space, Tabs, Typography } from 'antd';
+import { Alert, Badge, Button, Layout, message, Space, Tabs, Typography } from 'antd';
 import { withTheme } from '@rjsf/core';
 import { Theme as AntDTheme } from '@rjsf/antd';
 import Utils from '../services/Utils';
@@ -15,10 +15,10 @@ const Form = withTheme(AntDTheme);
 
 function ConfigView() {
   const [loading, setLoading] = useState(true);
-  const [CRD] = useState(window.api.getCRDfromKind('ClusterConfig'));
+  const [CRD] = useState(window.api.getCRDFromKind('ClusterConfig'));
   const [prevConfig, setPrevConfig] = useState();
   const currentConfig = useRef('');
-  const util = new Utils();
+  const util = Utils();
 
   useEffect(() => {
     if(CRD){
@@ -55,17 +55,11 @@ function ConfigView() {
     promise
       .then((res) => {
         setPrevConfig(res.body);
-        notification.success({
-          message: APP_NAME,
-          description: 'Configuration updated'
-        });
+        message.success('Configuration updated');
       })
       .catch((error) => {
         console.log(error)
-        notification.error({
-          message: APP_NAME,
-          description: 'Could not update the configuration'
-        });
+        message.error('Could not update the configuration');
       });
   }
 
@@ -73,7 +67,6 @@ function ConfigView() {
 
   if(prevConfig && CRD){
     const schema = util.OAPIV3toJSONSchema(CRD.spec.validation.openAPIV3Schema).properties.spec.properties;
-    //this.util.setDefault(schema, prevConfig.spec);
     Object.keys(CRD.spec.validation.openAPIV3Schema.properties.spec.properties).forEach(config => {
       const sub_schema = schema[config];
       configs.push(

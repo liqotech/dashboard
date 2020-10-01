@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Button, Divider, Modal, notification, PageHeader, Space, Tabs, Tooltip, Typography } from 'antd';
+import { Alert, Button, Divider, Modal, message, PageHeader, Tabs, Tooltip, Typography } from 'antd';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
 import FormGenerator from '../editors/OAPIV3FormGenerator/FormGenerator';
 import AvailablePeer from './AvailablePeer';
@@ -11,7 +11,7 @@ function ListAvailable(props) {
   const [showAddPeer, setShowAddPeer] = useState(false);
 
   const submit = item => {
-    let CRD = window.api.getCRDfromKind(item.kind)
+    let CRD = window.api.getCRDFromKind(item.kind)
 
     let promise = window.api.createCustomResource(
       CRD.spec.group,
@@ -24,17 +24,11 @@ function ListAvailable(props) {
     promise
       .then(() => {
         setShowAddPeer(false);
-        notification.success({
-          message: APP_NAME,
-          description: 'Peer added'
-        });
+        message.success('Peer added');
       })
       .catch((error) => {
         console.log(error);
-        notification.error({
-          message: APP_NAME,
-          description: 'Could not add peer'
-        });
+        message.error('Could not add peer');
       });
   }
 
@@ -131,10 +125,10 @@ function ListAvailable(props) {
         >
           <Tabs>
             <Tabs.TabPane tab={'Add domain'} key={1}>
-              <FormGenerator CRD={window.api.getCRDfromKind('SearchDomain')} submit={submit}/>
+              <FormGenerator CRD={window.api.getCRDFromKind('SearchDomain')} submit={submit}/>
             </Tabs.TabPane>
             <Tabs.TabPane tab={'Add remote peer'} key={2}>
-              <FormGenerator CRD={window.api.getCRDfromKind('ForeignCluster')} submit={submit}/>
+              <FormGenerator CRD={window.api.getCRDFromKind('ForeignCluster')} submit={submit}/>
             </Tabs.TabPane>
           </Tabs>
         </Modal>

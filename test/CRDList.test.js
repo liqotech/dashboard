@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
@@ -7,15 +7,15 @@ import userEvent from '@testing-library/user-event';
 import CRDmockResponse from '../__mocks__/crd_fetch_long.json';
 import CRDmockEmpty from '../__mocks__/crd_empty.json';
 import ViewMockResponse from '../__mocks__/views.json';
-import CRDMockResponseShort from '../__mocks__/crd_fetch.json';
-import ApiManager from '../src/services/__mocks__/ApiManager';
+import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
 import CRDList from '../src/CRD/CRDList';
 import { testTimeout } from '../src/constants';
+import Cookies from 'js-cookie';
 
 fetchMock.enableMocks();
 
-jest.mock('../src/services/ApiManager');
+jest.mock('../src/services/api/ApiManager');
 
 async function setup() {
   mockCRDAndViewsExtended();
@@ -26,6 +26,10 @@ async function setup() {
 
   expect(screen.getAllByRole('row')).toHaveLength(11);
 }
+
+beforeEach(() => {
+  Cookies.remove('token');
+});
 
 describe('CRD List', () => {
   test('Sidebar updates when a CRD is added/removed to favourites', async () => {
@@ -79,6 +83,62 @@ describe('CRD List', () => {
     expect(screen.getByText('This CRD is used to create custom views from a set of CRDs'));
   }, testTimeout)
 
+  test('CRD list changes on CRD deletion', async () => {
+    await setup();
+
+    expect(await screen.findByText('Advertisement'));
+
+    let apiManager = window.api.apiManager.current;
+
+    act(() => {
+      apiManager.sendDeletedSignal('customresourcedefinitions', CRDmockResponse.items[0]);
+    })
+
+    expect(await screen.queryByText('Advertisement')).not.toBeInTheDocument();
+  }, testTimeout)
+
+  test('CRD list changes on CRD add', async () => {
+    await setup();
+
+    expect(await screen.findByText('Advertisement'));
+
+    let apiManager = window.api.apiManager.current;
+
+    act(() => {
+      apiManager.sendAddedSignal('customresourcedefinitions', CRDmockResponse.items[11]);
+    })
+
+    expect(await screen.queryByText('SearchDomain')).not.toBeInTheDocument();
+  }, testTimeout)
+
+  test('CRD add with same resourceVersion of previous CRD', async () => {
+    await setup();
+
+    expect(await screen.findByText('Advertisement'));
+
+    let apiManager = window.api.apiManager.current;
+
+    act(() => {
+      apiManager.sendAddedSignal('customresourcedefinitions', CRDmockResponse.items[0]);
+    })
+
+    expect(await screen.queryByText('SearchDomain')).not.toBeInTheDocument();
+  }, testTimeout)
+
+  test('CRD watch and View watch return up if unexpectedly aborted', async () => {
+    await setup();
+
+    expect(await screen.findByText('Advertisement'));
+
+    let apiManager = window.api.apiManager.current;
+
+    apiManager.sendAbortedConnectionSignal('customresourcedefinitions');
+
+    apiManager.sendAbortedConnectionSignal('views/');
+
+    expect(window.api.watches.current).toHaveLength(2);
+  }, testTimeout)
+
   test('Empty notification when no CRDs', async () => {
     fetch.mockImplementation((url) => {
       if (url === 'http://localhost:3001/customresourcedefinition') {
@@ -88,7 +148,7 @@ describe('CRD List', () => {
       }
     })
 
-    window.api = new ApiManager({id_token: 'test'});
+    window.api = ApiInterface({id_token: 'test'});
     await window.api.getCRDs().then(async () => {
 
       render(

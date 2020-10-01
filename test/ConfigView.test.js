@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import FCMockResponse from '../__mocks__/foreigncluster.json';
 import AdvMockResponse from '../__mocks__/advertisement.json';
 import PRMockResponse from '../__mocks__/peeringrequest.json';
-import ApiManager from '../src/services/__mocks__/ApiManager';
+import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import ConfigView from '../src/views/ConfigView';
@@ -17,6 +17,7 @@ import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import PodsMockResponse from '../__mocks__/pods.json';
 import { testTimeout } from '../src/constants';
 import CMMockResponse from '../__mocks__/configmap_clusterID.json';
+import Cookies from 'js-cookie';
 
 function mocks(error, get){
   fetch.mockResponse(req => {
@@ -74,10 +75,10 @@ async function setup_with_error(error) {
 }
 
 async function setup_from_ConfigView(error) {
-  window.api = new ApiManager({id_token: 'test'});
+  window.api = ApiInterface({id_token: 'test'});
   window.api.getCRDs().then(() => {
 
-    if(error) window.api.CRDs = [];
+    if(error) window.api.CRDs.current = [];
 
     render(
       <MemoryRouter>
@@ -87,7 +88,18 @@ async function setup_from_ConfigView(error) {
   })
 }
 
+beforeEach(() => {
+  Cookies.remove('token');
+});
+
 describe('ConfigView', () => {
+  test('ConfigView with no Config CRD', async () => {
+    mocks();
+    await setup_from_ConfigView(true);
+
+    expect(await screen.findByText('No configuration CRD has been found.'))
+  }, testTimeout)
+
   test('Sidebar redirect works and general information are displayed', async () => {
     await setup_with_error();
 
@@ -98,6 +110,24 @@ describe('ConfigView', () => {
 
     userEvent.click(await screen.findByText('General'));
     userEvent.click(await screen.findByText('Reserved Subnets'));
+  }, testTimeout)
+
+  test('ConfigView with error on Config CR', async () => {
+    mocks('409', true);
+    await setup_from_ConfigView();
+
+    expect(await screen.findByText('No configuration file has been found.'))
+  }, testTimeout)
+
+  test('Error notification when config not updated', async () => {
+    await setup_with_error('409');
+
+    let switchButton = screen.getAllByRole('switch');
+
+    userEvent.click(switchButton[0]);
+    userEvent.click(screen.getByText('Save configuration'));
+
+    expect(await screen.findByText('Could not update the configuration'))
   }, testTimeout)
 
   test('Config update works', async () => {
@@ -124,30 +154,5 @@ describe('ConfigView', () => {
 
     expect(switchButton[0]).toHaveAttribute('aria-checked', 'false');
 
-  }, testTimeout)
-
-  test('Error notification when config not updated', async () => {
-    await setup_with_error('409');
-
-    let switchButton = screen.getAllByRole('switch');
-
-    userEvent.click(switchButton[0]);
-    userEvent.click(screen.getByText('Save configuration'));
-
-    expect(await screen.findByText('Could not update the configuration'))
-  }, testTimeout)
-
-  test('ConfigView with no Config CRD', async () => {
-    mocks();
-    await setup_from_ConfigView(true);
-
-    expect(await screen.findByText('No configuration CRD has been found.'))
-  }, testTimeout)
-
-  test('ConfigView with error on Config CR', async () => {
-    mocks('409', true);
-    await setup_from_ConfigView();
-
-    expect(await screen.findByText('No configuration file has been found.'))
   }, testTimeout)
 })

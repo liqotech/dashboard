@@ -36,8 +36,8 @@ function AppHeader(props) {
   }
 
   useEffect(() => {
-    window.api.autoCompleteCallback = autoCompleteSearch;
-    autoCompleteSearch(window.api.CRDs);
+    window.api.autoCompleteCallback.current = autoCompleteSearch;
+    autoCompleteSearch(window.api.CRDs.current);
   }, []);
 
   let menuItems;
@@ -57,11 +57,7 @@ function AppHeader(props) {
       <Menu.Item key="logout" >
         <LogoutOutlined style={{ fontSize: '20px', color: 'rgba(220,21,21,0.79)' }}
                         onClick={() => {
-                          if(props.authManager.OIDC)
-                            props.authManager.logout();
-                          else{
-                            props.tokenLogout();
-                          }
+                          props.tokenLogout();
                         }} />
       </Menu.Item>
     )

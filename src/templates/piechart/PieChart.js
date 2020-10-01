@@ -10,7 +10,7 @@ import { Alert } from 'antd';
  */
 
 function PieChart(props) {
-  const utils = new Utils();
+  const utils = Utils();
 
   const data = [];
   const values = utils.index(props.CR, props.template.spec.values);

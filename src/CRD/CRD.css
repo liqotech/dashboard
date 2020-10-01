@@ -21,3 +21,35 @@
     margin: 0 0 0 10px;
     padding: 0 0 0 4px;
 }
+
+.crd-container {
+    overflow: hidden;
+}
+
+@media only screen and (max-width: 576px) {
+    .crd-container {
+        overflow: hidden;
+        width: 95%;
+    }
+}
+
+@media only screen and (max-width: 768px) and (min-width: 991px) {
+    .crd-container {
+        overflow: hidden;
+        width: 90%;
+    }
+}
+
+@media only screen and (max-width: 992px) and (min-width: 1199px) {
+    .crd-container {
+        overflow: hidden;
+        width: 80%;
+    }
+}
+
+@media only screen and (min-width: 1200px) {
+    .crd-container {
+        overflow: hidden;
+        width: 70%;
+    }
+}

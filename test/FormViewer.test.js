@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import ApiManager from '../src/services/__mocks__/ApiManager';
+import ApiInterface from '../src/services/api/ApiInterface';
 import userEvent from '@testing-library/user-event';
 import CR from '../src/CRD/CR';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
@@ -38,10 +38,10 @@ function mockFetch(error) {
 }
 
 async function setup() {
-  window.api = new ApiManager({id_token: 'test'});
+  window.api = ApiInterface({id_token: 'test'});
   window.api.getCRDs().then(async () => {
 
-    let adv_crd = await window.api.getCRDfromKind('Advertisement');
+    let adv_crd = await window.api.getCRDFromKind('Advertisement');
     let adv = await window.api.getCustomResourcesAllNamespaces(adv_crd);
 
     render(

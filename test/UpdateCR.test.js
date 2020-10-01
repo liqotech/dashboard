@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import ApiManager from '../src/services/__mocks__/ApiManager';
+import ApiInterface from '../src/services/api/ApiInterface';
 import CRDmockEmpty from '../__mocks__/crd_fetch.json';
 import ViewMockResponse from '../__mocks__/views.json';
 import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
@@ -11,6 +11,7 @@ import userEvent from '@testing-library/user-event';
 import LiqoDashUpdatedMockResponse from '../__mocks__/liqodashtest_update.json';
 import UpdateCR from '../src/editors/UpdateCR';
 import { testTimeout } from '../src/constants';
+import Cookies from 'js-cookie';
 
 fetchMock.enableMocks();
 
@@ -25,10 +26,10 @@ async function setup() {
     }
   })
 
-  let api = new ApiManager();
-  api.getCRDs().then(async () => {
+  window.api = ApiInterface({id_token: 'test'});
+  await window.api.getCRDs().then(async () => {
 
-    let crd = await api.getCRDfromKind('LiqoDashTest');
+    let crd = await api.getCRDFromKind('LiqoDashTest');
     let cr = await api.getCustomResourcesAllNamespaces(crd);
 
     render(
@@ -43,6 +44,10 @@ async function setup() {
   });
 }
 
+beforeEach(() => {
+  Cookies.remove('token');
+});
+
 describe('UpdateCR', () => {
   test('CR drawer is present and text-editor is shown', async () => {
     await setup();
@@ -56,7 +61,7 @@ describe('UpdateCR', () => {
   test('CR is updated', async () => {
     await setup_resource();
 
-    userEvent.click(screen.getAllByLabelText('edit')[0]);
+    userEvent.click(screen.getAllByLabelText('edit')[1]);
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
     userEvent.click(screen.getByText('JSON/YAML'));
 
@@ -79,12 +84,18 @@ describe('UpdateCR', () => {
 
     expect(await screen.findAllByText('Cost')).toHaveLength(2);
     expect(screen.getAllByText('Name')).toHaveLength(2);
+
+    const textboxes = await screen.findAllByRole('textbox');
+    expect(textboxes[0]).toHaveAttribute('value', '13');
+    expect(textboxes[1]).toHaveAttribute('value', 'green');
+    expect(textboxes[2]).toHaveAttribute('value', '15');
+    expect(textboxes[3]).toHaveAttribute('value', 'purple');
   }, testTimeout)
 
   test('Editor throws error when not valid body', async () => {
     await setup_resource();
 
-    userEvent.click(screen.getAllByLabelText('edit')[0]);
+    userEvent.click(screen.getAllByLabelText('edit')[1]);
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
     userEvent.click(screen.getByText('JSON/YAML'));
 
@@ -98,7 +109,7 @@ describe('UpdateCR', () => {
   test('Error notification when 409', async () => {
     await setup_resource('409', 'PUT');
 
-    userEvent.click(screen.getAllByLabelText('edit')[0]);
+    userEvent.click(screen.getAllByLabelText('edit')[1]);
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
     userEvent.click(screen.getByText('JSON/YAML'));
 

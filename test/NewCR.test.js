@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect';
-import ApiManager from '../src/services/__mocks__/ApiManager';
+import ApiInterface from '../src/services/api/ApiInterface';
 import CRDmockEmpty from '../__mocks__/crd_fetch.json';
 import ViewMockResponse from '../__mocks__/views.json';
 import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
@@ -11,6 +11,7 @@ import userEvent from '@testing-library/user-event';
 import { setup_resource } from './RTLUtils';
 import NewCR from '../src/editors/NewCR';
 import { testTimeout } from '../src/constants';
+import Cookies from 'js-cookie';
 
 async function setup() {
   fetch.mockImplementation((url) => {
@@ -23,10 +24,10 @@ async function setup() {
     }
   })
 
-  window.api = new ApiManager({id_token: 'test'});
+  window.api = ApiInterface({id_token: 'test'});
   window.api.getCRDs().then(async () => {
 
-    let liqo_crd = await window.api.getCRDfromKind('LiqoDashTest');
+    let liqo_crd = await window.api.getCRDFromKind('LiqoDashTest');
 
     render(
       <NewCR CRD={liqo_crd}
@@ -53,11 +54,17 @@ async function check_new_CR(){
 
   expect(await screen.findAllByText('Cost')).toHaveLength(2);
   expect(screen.getAllByText('Name')).toHaveLength(3);
-  //expect(screen.getByText('cyan'));
-  //expect(screen.getByText('orange'));
-  //expect(screen.getByText('1'));
-  //expect(screen.getByText('2'));
+
+  const textboxes = await screen.findAllByRole('textbox');
+  expect(textboxes[0]).toHaveAttribute('value', '1');
+  expect(textboxes[1]).toHaveAttribute('value', 'cyan');
+  expect(textboxes[2]).toHaveAttribute('value', '2');
+  expect(textboxes[3]).toHaveAttribute('value', 'orange');
 }
+
+beforeEach(() => {
+  Cookies.remove('token');
+});
 
 describe('NewCR', () => {
   test('CR drawer is present and text-editor is the first tab selected', async () => {
@@ -80,10 +87,10 @@ describe('NewCR', () => {
       }
     })
 
-    window.api = new ApiManager({id_token: 'test'});
+    window.api = ApiInterface({id_token: 'test'});
     window.api.getCRDs().then(async () => {
 
-      let noschema_crd = await window.api.getCRDfromKind('NoAnnNoResNoSchema');
+      let noschema_crd = await window.api.getCRDFromKind('NoAnnNoResNoSchema');
 
       render(
         <NewCR CRD={noschema_crd}
@@ -147,6 +154,19 @@ describe('NewCR', () => {
     userEvent.click(screen.getByRole('button'));
 
     expect(await screen.findAllByText(/errors/i)).toHaveLength(2);
+  }, testTimeout)
+
+  test('Error message when wrong input (YAML)', async () => {
+    await setup();
+
+    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+    userEvent.click(screen.getByText('JSON/YAML'));
+
+    await userEvent.type(screen.getByLabelText('editor'), 'name: "test", {"namespace" test');
+
+    userEvent.click(screen.getByRole('button'));
+
+    expect(await screen.findAllByText(/not valid/i)).toHaveLength(1);
   }, testTimeout)
 
   test('Correct creation of a CR from editor', async () => {

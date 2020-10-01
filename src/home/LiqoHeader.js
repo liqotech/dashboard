@@ -8,7 +8,7 @@ import { LIQO_NAMESPACE } from '../constants';
 function LiqoHeader(props) {
 
   const [clusterID, setClusterID] = useState('');
-  const [clusterName, setClusterName] = useState(props.config.spec.discoveryConfig.clusterName);
+  const [clusterName, setClusterName] = useState(props.config ? props.config.spec.discoveryConfig.clusterName : null);
   const [onEdit, setOnEdit] = useState(false);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ function LiqoHeader(props) {
     });
   }
 
-  const running = true;
+  const running = !!props.config;
 
   //TODO: get the mode options from the config (not yet available)
   const selectMode = (
@@ -63,7 +63,7 @@ function LiqoHeader(props) {
                                         onChange={(value) => {setClusterName(value.target.value)}}
                                         onPressEnter={saveClusterName}
                         /> :
-                        <div onClick={() => setOnEdit(true)}>
+                        <div onClick={() => props.config ? setOnEdit(true) : null}>
                           <Tooltip title={'Rename cluster'}>
                             <Typography.Text strong style={{fontSize: '1.5em'}}>{clusterName ? clusterName : 'LIQO'}</Typography.Text>
                           </Tooltip>
@@ -73,40 +73,45 @@ function LiqoHeader(props) {
                   }
                   tags={
                     <Row align={'middle'}>
-                      {running ? <Tag color="blue">Running</Tag> : <Tag color="red">Stopped</Tag>}
-                      <Tag>
-                        <Row>
-                          <Space>
-                            <Typography.Text>Cluster ID:</Typography.Text>
-                            <Typography.Paragraph style={{margin: 0}} copyable>{clusterID}</Typography.Paragraph>
-                          </Space>
-                        </Row>
-                      </Tag>
+                      {running ? <Tag color="blue">Running</Tag> :
+                        props.config ? <Tag color="red">Stopped</Tag> : <Tag color="red">Not Installed</Tag>}
+                      {props.config ? (
+                        <Tag>
+                          <Row>
+                            <Space>
+                              <Typography.Text>Cluster ID:</Typography.Text>
+                              <Typography.Paragraph style={{margin: 0}} copyable>{clusterID}</Typography.Paragraph>
+                            </Space>
+                          </Row>
+                        </Tag>
+                      ) : null}
                     </Row>
                   }
                   extra={
-                    <Row align={'middle'} >
-                      <Space size={'large'} style={{fontSize: 24}}>
-                        <Input.Group compact>
-                          <Tooltip title={'Change LIQO functioning mode'}>
-                            <Button type={'primary'}>MODE</Button>
+                    props.config ? (
+                      <Row align={'middle'} >
+                        <Space size={'large'} style={{fontSize: 24}}>
+                          <Input.Group compact>
+                            <Tooltip title={'Change LIQO functioning mode'}>
+                              <Button type={'primary'}>MODE</Button>
+                            </Tooltip>
+                            {selectMode}
+                          </Input.Group>
+                          <Tooltip title={'Policies'}>
+                            <Link to={{ pathname: '/policies/' }}
+                                  style={{color: 'inherit',textDecoration: 'none'}}>
+                              <AuditOutlined key={'liqo-home-header-policies'}/>
+                            </Link>
                           </Tooltip>
-                          {selectMode}
-                        </Input.Group>
-                        <Tooltip title={'Policies'}>
-                          <Link to={{ pathname: '/policies/' }}
-                                style={{color: 'inherit',textDecoration: 'none'}}>
-                            <AuditOutlined key={'liqo-home-header-policies'}/>
-                          </Link>
-                        </Tooltip>
-                        <Tooltip title={'Settings'}>
-                          <Link to={{ pathname: '/settings/' }}
-                                style={{color: 'inherit',textDecoration: 'none'}}>
-                            <SettingOutlined key={'liqo-home-header-setting'}/>
-                          </Link>
-                        </Tooltip>
-                      </Space>
-                    </Row>
+                          <Tooltip title={'Settings'}>
+                            <Link to={{ pathname: '/settings/' }}
+                                  style={{color: 'inherit',textDecoration: 'none'}}>
+                              <SettingOutlined key={'liqo-home-header-setting'}/>
+                            </Link>
+                          </Tooltip>
+                        </Space>
+                      </Row>
+                    ) : null
                   }
       />
     </div>

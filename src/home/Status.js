@@ -324,23 +324,25 @@ function Status(props){
             {resourcePanel(resourcesHome, trendHome)}
           </Collapse.Panel>
         </Collapse>
-        <Collapse defaultActiveKey={['1']} className={'crd-collapse'} style={{backgroundColor: '#fafafa', marginTop: 16}}>
-          <Collapse.Panel style={{ borderBottomColor: '#f0f0f0' }}
-                          header={<span>Foreign (Total)  {metricsNotAvailableOutgoing.current ? (
-                            <Tooltip title={'Precise metrics not available in some of the foreign clusters'}>
-                              <ExclamationCircleTwoTone twoToneColor="#f5222d" />
-                            </Tooltip>) : null}</span>} key="1"
-                          extra={
-                            <Tooltip title={'Consumption on others\' cluster'}
-                                     placement={'left'}
-                            >
-                              <QuestionCircleOutlined />
-                            </Tooltip>
-                          }
-          >
-            {resourcePanel(resourcesForeign, trendForeign)}
-          </Collapse.Panel>
-        </Collapse>
+        {props.config ? (
+          <Collapse defaultActiveKey={['1']} className={'crd-collapse'} style={{backgroundColor: '#fafafa', marginTop: 16}}>
+            <Collapse.Panel style={{ borderBottomColor: '#f0f0f0' }}
+                            header={<span>Foreign (Total)  {metricsNotAvailableOutgoing.current ? (
+                              <Tooltip title={'Precise metrics not available in some of the foreign clusters'}>
+                                <ExclamationCircleTwoTone twoToneColor="#f5222d" />
+                              </Tooltip>) : null}</span>} key="1"
+                            extra={
+                              <Tooltip title={'Consumption on others\' cluster'}
+                                       placement={'left'}
+                              >
+                                <QuestionCircleOutlined />
+                              </Tooltip>
+                            }
+            >
+              {resourcePanel(resourcesForeign, trendForeign)}
+            </Collapse.Panel>
+          </Collapse>
+        ) : null}
       </div>
     </div>
   )

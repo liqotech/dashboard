@@ -20,16 +20,16 @@ function CRDList() {
    * Given a set (or subset) of CRD it generates the layout
    */
   const loadCustomResourceDefinitions = () => {
-    setCRDs(window.api.CRDs);
+    setCRDs(window.api.CRDs.current);
     setLoading(false);
   }
 
   useEffect(() => {
-    window.api.CRDListCallback = loadCustomResourceDefinitions;
+    window.api.CRDListCallback.current = loadCustomResourceDefinitions;
     loadCustomResourceDefinitions();
 
     return () => {
-      window.api.CRDListCallback = null;
+      window.api.CRDListCallback.current = null;
     }
   }, []);
 
@@ -48,7 +48,7 @@ function CRDList() {
   }
 
   const renderCRDs = (text, record, dataIndex) => {
-    let CRD = window.api.CRDs.find(item => {return item.metadata.name === record.key});
+    let CRD = window.api.CRDs.current.find(item => {return item.metadata.name === record.key});
     return (
       dataIndex === 'Kind' ? (
         <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
@@ -132,7 +132,7 @@ function CRDList() {
       {!loading && CRDViews.length > 0 ? (
         <Table columns={columns} dataSource={CRDViews}
                pagination={{ position: ['bottomCenter'],
-                 hideOnSinglePage: window.api.CRDs.length < 11,
+                 hideOnSinglePage: window.api.CRDs.current.length < 11,
                  showSizeChanger: true,
                }} showSorterTooltip={false}
         />

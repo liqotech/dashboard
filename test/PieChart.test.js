@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import ApiManager from '../src/services/__mocks__/ApiManager';
+import ApiInterface from '../src/services/api/ApiInterface';
 import CRDmockEmpty from '../__mocks__/crd_fetch.json';
 import ViewMockResponse from '../__mocks__/views.json';
 import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
@@ -26,11 +26,11 @@ async function setup(pie) {
     }
   })
 
-  window.api = new ApiManager({id_token: 'test'});
+  window.api = ApiInterface({id_token: 'test'});
   window.api.getCRDs().then(async () => {
 
-    let liqo_crd = await window.api.getCRDfromKind('LiqoDashTest');
-    let pie_crd = await window.api.getCRDfromKind('PieChart');
+    let liqo_crd = await window.api.getCRDFromKind('LiqoDashTest');
+    let pie_crd = await window.api.getCRDFromKind('PieChart');
     let liqo_cr = await window.api.getCustomResourcesAllNamespaces(liqo_crd);
     let pie_cr = await window.api.getCustomResourcesAllNamespaces(pie_crd);
 

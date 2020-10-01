@@ -4,8 +4,13 @@ import fetchMock from 'jest-fetch-mock';
 
 fetchMock.enableMocks();
 
-jest.mock('./src/services/ApiManager');
-jest.mock('./src/services/Authenticator');
+jest.mock('./src/services/api/ApiManager');
+jest.mock('./src/services/api/Authenticator');
+jest.mock('./src/templates/graph/GraphNet', () => {
+  return function GraphNet() {
+    return (<div/>);
+  }
+});
 
 jest.mock('react-ace', () => {
   return ({ onChange }) => {
@@ -28,22 +33,6 @@ jest.mock('./src/views/CustomViewUtils', () => {
     onResize,
     resizeDetector
   }
-});
-
-jest.mock('react-graph-vis', () => {
-  return ({ graph }) => {
-    let nodesTot = [];
-    graph.nodes.forEach(node => {
-      nodesTot.push(
-        <button key={node.id}>{node.id}</button>
-      )
-    })
-    return (
-      <div aria-label={'graph_mock'}>
-        {nodesTot}
-      </div>
-    )
-  };
 });
 
 Object.defineProperty(window, 'matchMedia', {
