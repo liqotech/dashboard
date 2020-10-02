@@ -482,19 +482,19 @@
         },
     {
           "metadata": {
-            "name": "liqodashtests.dashboard.liqo.com",
-            "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/liqodashtests.dashboard.liqo.com",
+            "name": "liqodashtests.dashboard.liqo.io",
+            "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/liqodashtests.dashboard.liqo.io",
             "uid": "22332251-e719-463d-b4a0-be3835e0f04b",
             "resourceVersion": "75319285",
             "generation": 1,
             "creationTimestamp": "2020-06-01T10:13:44Z",
             "annotations": {
               "description": "A test CRD for some implemetation on the liqo-dashboard",
-              "template": "dashboard.liqo.com/v1/piecharts/pie-test-123455"
+              "template": "dashboard.liqo.io/v1/piecharts/pie-test-123455"
             }
           },
           "spec": {
-            "group": "dashboard.liqo.com",
+            "group": "dashboard.liqo.io",
             "version": "v1",
             "names": {
               "plural": "liqodashtests",
@@ -580,8 +580,8 @@
         },
     {
           "metadata": {
-            "name": "piecharts.dashboard.liqo.com",
-            "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/piecharts.dashboard.liqo.com",
+            "name": "piecharts.dashboard.liqo.io",
+            "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/piecharts.dashboard.liqo.io",
             "uid": "a97b51b8-21ae-4867-80a3-70f30d791c5f",
             "resourceVersion": "62270658",
             "generation": 1,
@@ -591,7 +591,7 @@
             }
           },
           "spec": {
-            "group": "dashboard.liqo.com",
+            "group": "dashboard.liqo.io",
             "version": "v1",
             "names": {
               "plural": "piecharts",
@@ -831,8 +831,8 @@
         },
     {
           "metadata": {
-            "name": "views.dashboard.liqo.com",
-            "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/views.dashboard.liqo.com",
+            "name": "views.dashboard.liqo.io",
+            "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/views.dashboard.liqo.io",
             "resourceVersion": "0000000",
             "annotations": {
               "description": "This CRD is used to create custom views from a set of CRDs",
@@ -840,7 +840,7 @@
             }
           },
           "spec": {
-            "group": "dashboard.liqo.com",
+            "group": "dashboard.liqo.io",
             "version": "v1",
             "names": {
               "plural": "views",
@@ -1074,7 +1074,7 @@
         "selfLink": "/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/schedulingnodes.scheduling.liqo.io",
         "resourceVersion": "000000",
         "annotations": {
-          "template": "dashboard.liqo.com/v1/graphs/graph-test"
+          "template": "dashboard.liqo.io/v1/graphs/graph-test"
         }
       },
       "spec": {
@@ -1137,10 +1137,10 @@
     },
     {
       "metadata": {
-        "name": "graphs.dashboard.liqo.com"
+        "name": "graphs.dashboard.liqo.io"
       },
       "spec": {
-        "group": "dashboard.liqo.com",
+        "group": "dashboard.liqo.io",
         "names": {
           "plural": "graphs",
           "singular": "graph",

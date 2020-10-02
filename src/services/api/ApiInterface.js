@@ -71,7 +71,7 @@ export default function ApiInterface(_user, props) {
     });
   }
 
-  /** Get the CRDs for the group dashboard.liqo.com */
+  /** Get the CRDs for the group dashboard.liqo.io */
   const getTemplates = () => {
     let templates = [];
     CRDs.current.forEach(CRD => {

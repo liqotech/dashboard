@@ -1,14 +1,14 @@
 {
-  "apiVersion": "dashboard.liqo.com/v1",
+  "apiVersion": "dashboard.liqo.io/v1",
   "items": [
     {
-      "apiVersion": "dashboard.liqo.com/v1",
+      "apiVersion": "dashboard.liqo.io/v1",
       "kind": "Graph",
       "metadata": {
         "name": "graph-test",
         "namespace": "default",
         "resourceVersion": "000000",
-        "selfLink": "/apis/dashboard.liqo.com/v1/namespaces/nap-test/graphs/graph-test"
+        "selfLink": "/apis/dashboard.liqo.io/v1/namespaces/nap-test/graphs/graph-test"
       },
       "spec": {
         "group": {

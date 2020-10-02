@@ -20,8 +20,8 @@
             "crdName": "tunnelendpoints.liqonet.liqo.io"
           },
           {
-            "crdName": "liqodashtests.dashboard.liqo.com",
-            "template": "dashboard.liqo.com/v1/histocharts/histo-test"
+            "crdName": "liqodashtests.dashboard.liqo.io",
+            "template": "dashboard.liqo.io/v1/histocharts/histo-test"
           }
         ]
       }

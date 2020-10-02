@@ -29,7 +29,7 @@ describe('Header', () => {
     expect(CRDInput[0]).toHaveAttribute('placeholder', 'input CRD');
 
     await screen.findByLabelText('autocompletesearch');
-    await userEvent.type(screen.getAllByRole('combobox')[0], 'LiqoDashTest@liqodashtests.dashboard.liqo.com');
+    await userEvent.type(screen.getAllByRole('combobox')[0], 'LiqoDashTest@liqodashtests.dashboard.liqo.io');
     userEvent.click(await screen.findByLabelText('search'));
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
