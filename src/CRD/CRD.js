@@ -68,6 +68,7 @@ function CRD(props) {
 
   useEffect(() => {
     window.api.CRDArrayCallback.current.push(reloadCRD);
+    window.api.NSArrayCallback.current.push(loadCustomResources);
     tempTemplate = null;
 
     /** In case we are not on a custom view */
@@ -87,6 +88,7 @@ function CRD(props) {
     /** When unmounting, eliminate every callback and watch */
     return () => {
       window.api.CRDArrayCallback.current = window.api.CRDArrayCallback.current.filter(func => {return func !== reloadCRD});
+      window.api.NSArrayCallback.current = window.api.NSArrayCallback.current.filter(func => {return func !== loadCustomResources});
       if(!props.onCustomView){
         window.api.abortWatch(props.match.params.crdName.split('.')[0]);
         window.api.CVArrayCallback.current = window.api.CVArrayCallback.current.filter(func => {return func !== getCustomViews});
@@ -391,6 +393,8 @@ function CRD(props) {
    * @param object: object modified/added/deleted
    */
   const CRNotifyEvent = (type, object) => {
+    if(object.metadata.namespace && object.metadata.namespace !== window.api.namespace.current && window.api.namespace.current)
+      return;
 
     setCustomResources(prev => {
       let CR = prev.find((item) => {

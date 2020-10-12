@@ -7,6 +7,7 @@ import { Col, Layout, Menu, Row, Input, AutoComplete } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import NotificationOutlined from '@ant-design/icons/lib/icons/NotificationOutlined';
 import LogoutOutlined from '@ant-design/icons/lib/icons/LogoutOutlined';
+import NamespaceSelect from './NamespaceSelect';
 const Header = Layout.Header;
 
 function AppHeader(props) {
@@ -44,8 +45,8 @@ function AppHeader(props) {
 
   menuItems =
     [
-      <Menu.Item key="/">
-        <NotificationOutlined style={{ fontSize: '20px' }} />
+      <Menu.Item key="namespace" style={{ margin: 0 }}>
+        <NamespaceSelect />
       </Menu.Item>,
       <Menu.Item key="/question">
         <QuestionCircleOutlined style={{ fontSize: '20px' }} />

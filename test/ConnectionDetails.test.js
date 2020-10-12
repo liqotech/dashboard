@@ -21,6 +21,7 @@ import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import { metricsPODs } from './RTLUtils';
 import { testTimeout } from '../src/constants';
 import CMMockResponse from '../__mocks__/configmap_clusterID.json';
+import NamespaceResponse from '../__mocks__/namespaces.json';
 
 fetchMock.enableMocks();
 
@@ -39,6 +40,8 @@ function mocks(advertisement, foreignCluster, peeringRequest, error, podsError) 
   fetch.mockResponse((req) => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
       return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+    } else if (req.url === 'http://localhost:3001/namespaces') {
+      return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
     } else if (req.url === 'http://localhost:3001/clustercustomobject/views') {
       return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
     } else if (req.url === 'http://localhost:3001/clustercustomobject/foreignclusters') {

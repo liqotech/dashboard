@@ -6,6 +6,7 @@
       "kind": "View",
       "metadata": {
         "name": "awesome-view",
+        "namespace": "default",
         "resourceVersion": "000000",
         "selfLink": "/apis/test/v1/namespaces/default/views/awesome-view"
       },

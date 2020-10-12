@@ -183,7 +183,7 @@ export default function ApiManager(user) {
 
   /** gets all namespaces with label */
   const getNamespaces = label => {
-    return apiCore.listNamespace(null, null, null, null, label)
+    return apiCore.listNamespace(undefined, undefined, undefined, undefined, label)
   }
 
   /** gets all the pods with namespace (if specified) */

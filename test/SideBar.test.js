@@ -25,10 +25,8 @@ describe('Sidebar', () => {
     const name = await screen.findByRole('input');
     await userEvent.type(name, 'Test Custom View');
     let crds = await screen.findAllByLabelText('select');
-    userEvent.click(crds[0]);
-    userEvent.click(crds[1]);
+    userEvent.click(crds[2]);
     const adv = await screen.findAllByText('advertisements.protocol.liqo.io');
-
     fireEvent.mouseOver(adv[1]);
     fireEvent.click(adv[1]);
 

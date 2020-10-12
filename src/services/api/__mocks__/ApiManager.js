@@ -17,6 +17,14 @@ export default function ApiManager() {
       .then(res => res.json());
   }
 
+  const getCustomResources = (item, namespace) => {
+    return fetch('http://localhost:3001/clustercustomobject/' + item.spec.names.plural)
+      .then(res => res.json()).then(res => {
+        res.body.items = res.body.items.filter(item => item.metadata.namespace === namespace);
+        return res;
+      });
+  }
+
   const deleteCustomResource = (group, version, namespace, plural, name) => {
     return fetch('http://localhost:3001/clustercustomobject/' + plural, { method: 'DELETE'})
       .then(res => res.json())
@@ -89,7 +97,7 @@ export default function ApiManager() {
   }
 
   const getNamespaces = () => {
-    return Promise.resolve({body: { items: [{ metadata: { name: 'test' }}]}});
+    return fetch('http://localhost:3001/namespaces').then(res => res.json());
   }
 
   const getPODs = () => {
@@ -155,6 +163,7 @@ export default function ApiManager() {
     sendDeletedSignal,
     sendAddedSignal,
     sendModifiedSignal,
-    sendAbortedConnectionSignal
+    sendAbortedConnectionSignal,
+    getCustomResources,
   }
 }
