@@ -1,44 +1,68 @@
 import React, { useEffect, useState } from 'react';
 import {
-  withRouter
+  withRouter, useHistory, useParams
 } from 'react-router-dom';
 import './AppHeader.css';
-import { Col, Layout, Menu, Row, Input, AutoComplete } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
-import NotificationOutlined from '@ant-design/icons/lib/icons/NotificationOutlined';
+import { Select, Modal, Col, Layout, Menu, Row, Input, AutoComplete, Typography, Button } from 'antd';
+import { GithubOutlined, QuestionCircleOutlined, SelectOutlined } from '@ant-design/icons';
 import LogoutOutlined from '@ant-design/icons/lib/icons/LogoutOutlined';
 import NamespaceSelect from './NamespaceSelect';
 const Header = Layout.Header;
 
 function AppHeader(props) {
-  const [CRDs, setCRDs] = useState([]);
+  const [infoModal, setInfoModal] = useState(false);
+  const [autocomplete, setAutocomplete] = useState([]);
+  let history = useHistory();
+  let params = useParams();
 
-  const autoCompleteSearch = CRDs => {
-    let tempCRDs = [];
-    CRDs.forEach(item =>{
-      tempCRDs.push({
-        value: item.spec.names.kind + '@' + item.metadata.name,
-        singular: item.spec.names.singular,
-        name: item.metadata.name
+  const autoCompleteSearch = () => {
+    window.api.getApis('/').then(res => {
+      res.body.groups.forEach(group => {
+        window.api.getGenericResource(
+          '/apis/' +
+          group.preferredVersion.groupVersion
+        ).then(_res => {
+          let tempRes = [];
+          _res.resources.forEach(resource => {
+            if(resource.name.split('/').length === 1)
+              tempRes.push({
+                value: '/apis/' + group.preferredVersion.groupVersion + '/' + resource.name,
+                label: resource.name
+              })
+          });
+          setAutocomplete(prev => [...prev, {
+            label: group.name,
+            options: tempRes
+          }])
+        }).catch(error => console.log(error))
       })
-    });
-    setCRDs(tempCRDs);
+    }).catch(error => console.log(error))
+
+    window.api.getGenericResource('/api/v1')
+      .then(_res => {
+      let tempRes = [];
+      _res.resources.forEach(resource => {
+        if(resource.name.split('/').length === 1)
+          tempRes.push({
+            value: '/api/v1/' + resource.name,
+            label: resource.name
+          })
+      })
+      setAutocomplete(prev => [...prev, {
+        label: 'api',
+        options: tempRes
+      }])
+    }).catch(error => console.log(error));
   }
 
-  const onSearch = value => {
-    let CRD = CRDs.find(item=>{
-      if(item.value === value || item.singular === value){
-        return item;
-      }
-    });
-    if(CRD){
-      props.history.push("/customresources/" + CRD.name);
-    }
+  const onSearch = (value, option) => {
+    if(option.value)
+      history.push(option.value);
   }
 
   useEffect(() => {
     window.api.autoCompleteCallback.current = autoCompleteSearch;
-    autoCompleteSearch(window.api.CRDs.current);
+    autoCompleteSearch();
   }, []);
 
   let menuItems;
@@ -48,18 +72,21 @@ function AppHeader(props) {
       <Menu.Item key="namespace" style={{ margin: 0 }}>
         <NamespaceSelect />
       </Menu.Item>,
-      <Menu.Item key="/question">
-        <QuestionCircleOutlined style={{ fontSize: '20px' }} />
+      <Menu.Item key="question" onClick={() => setInfoModal(true)}
+                 style={{ margin: 0 }}
+      >
+        <QuestionCircleOutlined style={{ fontSize: '20px', padding: 20 }} />
       </Menu.Item>
     ];
 
   if(props.logged){
     menuItems.push(
-      <Menu.Item key="logout" >
-        <LogoutOutlined style={{ fontSize: '20px', color: 'rgba(220,21,21,0.79)' }}
-                        onClick={() => {
-                          props.tokenLogout();
-                        }} />
+      <Menu.Item key="logout" danger
+                 style={{ margin: 0 }}
+                 onClick={() => {
+        props.tokenLogout();
+      }}>
+        <LogoutOutlined style={{ fontSize: '20px', padding: 20 }}/>
       </Menu.Item>
     )
   }
@@ -72,14 +99,14 @@ function AppHeader(props) {
             <Col>
               <div aria-label={'autocompletesearch'}>
                 <AutoComplete
-                  filterOption={(inputValue, option) =>
-                    option.name.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                  options={CRDs}
+                  filterOption={(inputValue, option) => {
+                    return option.label.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                  }}
+                  options={autocomplete}
                   onSelect={onSearch}
                   style={{ width: '22vw', marginLeft: 5, lineHeight: '31px' }}
                 >
-                  <Input.Search placeholder="input CRD" enterButton onSearch={onSearch} allowClear />
+                  <Input.Search placeholder="Search resource" enterButton onSearch={onSearch} allowClear />
                 </AutoComplete>
               </div>
             </Col>
@@ -88,10 +115,41 @@ function AppHeader(props) {
       </Header>
       <Menu
         className="app-menu"
-        mode="horizontal"
-        style={{ lineHeight: '64px' }} >
+        selectable={false}
+        style={{ lineHeight: '58px' }}
+        mode="horizontal" >
         {menuItems}
       </Menu>
+      <Modal
+        title="LiqoDash Information"
+        visible={infoModal}
+        footer={null}
+        centered
+        onCancel={() => setInfoModal(false)}
+      >
+        <Row align={'middle'} gutter={[0, 20]}>
+          <Col span={2}>
+            <GithubOutlined style={{ fontSize: '32px'}}/>
+          </Col>
+          <Col span={7}>
+            <Typography.Text strong>LiqoDash Github</Typography.Text>
+          </Col>
+          <Col span={15}>
+            <Typography.Text strong copyable type="secondary">https://github.com/liqotech/dashboard</Typography.Text>
+          </Col>
+        </Row>
+        <Row align={'middle'}>
+          <Col span={2}>
+            <GithubOutlined style={{ fontSize: '32px'}}/>
+          </Col>
+          <Col span={7}>
+            <Typography.Text strong>Liqo Github</Typography.Text>
+          </Col>
+          <Col span={15}>
+            <Typography.Text strong copyable type="secondary">https://github.com/liqotech/liqo</Typography.Text>
+          </Col>
+        </Row>
+      </Modal>
     </div>
   );
 }

@@ -1,15 +1,17 @@
-import { ApiextensionsV1beta1Api, Config, CoreV1Api, CustomObjectsApi, watch } from '@kubernetes/client-node';
+import { ApiextensionsV1beta1Api, Config, CoreV1Api, AppsV1Api, ApisApi, CustomObjectsApi, watch } from '@kubernetes/client-node';
 
 /**
  * Class to manage all the interaction with the cluster
  */
 
 export default function ApiManager(user) {
-
+  //window.APISERVER_URL = 'https://127.0.0.1:41749';
   const config = new Config(window.APISERVER_URL, user.id_token, user.token_type);
   const apiExt = config.makeApiClient(ApiextensionsV1beta1Api);
   const apiCRD = config.makeApiClient(CustomObjectsApi);
   const apiCore = config.makeApiClient(CoreV1Api);
+  const apiApps = config.makeApiClient(AppsV1Api);
+  const apiApis = config.makeApiClient(ApisApi);
   /** used to change the content-type of a PATCH request */
   const options = {
     headers: {
@@ -168,11 +170,11 @@ export default function ApiManager(user) {
   /** This watch only watches changes in the CRDs
    * (if a CRD has been added, deleted or modified)
    */
-  const watchFunction = (path, callback, done, signal) => {
+  const watchFunction = (path, callback, done, signal, queryParams) => {
     return watch(
       config,
       path,
-      {},
+      queryParams,
       function(type, object) {
         callback(type, object);
       },
@@ -187,8 +189,12 @@ export default function ApiManager(user) {
   }
 
   /** gets all the pods with namespace (if specified) */
-  const getPODs = namespace => {
-    return apiCore.listPodForAllNamespaces(null, namespace ? 'metadata.namespace=' + namespace : null);
+  const getPODsAllNamespaces = (fieldSelector) => {
+    return apiCore.listPodForAllNamespaces(undefined, fieldSelector);
+  }
+
+  const getPODs = (namespace, fieldSelector) => {
+    return apiCore.listNamespacedPod(namespace, undefined, undefined, undefined, fieldSelector);
   }
 
   /** gets the list of all the nodes in cluster */
@@ -216,7 +222,53 @@ export default function ApiManager(user) {
   }
 
   const getConfigMaps = (namespace, fieldSelector) => {
-    return apiCore.listNamespacedConfigMap(namespace, null, null, null, fieldSelector)
+    return apiCore.listNamespacedConfigMap(namespace, undefined, undefined, undefined, fieldSelector);
+  }
+
+  const getApis = () => {
+    return apiApis.getAPIVersions();
+  }
+
+  const fetchRaw = (path, method, item) => {
+    let headers = new Headers();
+    headers.append("Authorization", "Bearer " + user.id_token);
+    if(method === 'PATCH')
+      headers.append("Content-Type", "application/merge-patch+json");
+
+    let requestOptions = {
+      method: method,
+      headers: headers,
+      redirect: 'follow',
+      body: JSON.stringify(item)
+    };
+
+    return fetch(path, requestOptions).then(res => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        return Promise.reject(res.status);
+      }
+    });
+  }
+
+  const logFunction = (path) => {
+    let headers = new Headers();
+    headers.append("Authorization", "Bearer " + user.id_token);
+
+    let requestOptions = {
+      method: 'GET',
+      headers: headers,
+      redirect: 'follow'
+    };
+
+    return fetch(path, requestOptions)
+      .then(res => {
+        if (res.ok) {
+          return res.text();
+        } else {
+          return Promise.reject(res.status);
+        }
+      });
   }
 
   return{
@@ -230,9 +282,13 @@ export default function ApiManager(user) {
     watchFunction,
     getNamespaces,
     getPODs,
+    getPODsAllNamespaces,
     getNodes,
     fetchMetrics,
-    getConfigMaps
+    getConfigMaps,
+    getApis,
+    fetchRaw,
+    logFunction
   }
 
 }

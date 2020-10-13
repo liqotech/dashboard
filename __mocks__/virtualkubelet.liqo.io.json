@@ -1,0 +1,24 @@
+{
+  "kind": "APIResourceList",
+  "apiVersion": "v1",
+  "groupVersion": "virtualkubelet.liqo.io/v1alpha1",
+  "resources": [
+    {
+      "name": "namespacenattingtables",
+      "singularName": "namespacenattingtable",
+      "namespaced": false,
+      "kind": "NamespaceNattingTable",
+      "verbs": [
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "create",
+        "update",
+        "watch"
+      ],
+      "storageVersionHash": "YJqJ3KNdQoc="
+    }
+  ]
+}

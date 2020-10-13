@@ -109,7 +109,7 @@ function Status(props){
   /** This means there are no metrics available */
   const getConsumedMetricsNoMetricsServer = () => {
     metricsNotAvailableIncoming.current = true;
-    window.api.getPODs().
+    window.api.getPODsAllNamespaces().
     then(res => {
       let pods = res.body.items.filter(po => {
         if(po.spec.nodeName)

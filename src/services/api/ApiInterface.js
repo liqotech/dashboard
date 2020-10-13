@@ -1,5 +1,5 @@
-import { APP_NAME, TEMPLATE_GROUP } from '../../constants';
-import { message, notification } from 'antd';
+import { TEMPLATE_GROUP } from '../../constants';
+import { message } from 'antd';
 import ApiManager from './ApiManager';
 
 /**
@@ -65,7 +65,14 @@ export default function ApiInterface(_user, props) {
         /** update CRDs in the views */
         manageCallbackCRDs(CRDs.current);
       }).then(() => {
-        watchCRD('apiextensions.k8s.io', 'v1beta1', 'customresourcedefinitions', CRDsNotifyEvent);
+        watchResource(
+          'apis',
+          'apiextensions.k8s.io',
+          undefined,
+          'v1beta1',
+          'customresourcedefinitions/',
+          undefined,
+          CRDsNotifyEvent);
       }).catch(error => handleError(error));
   }
 
@@ -94,27 +101,28 @@ export default function ApiInterface(_user, props) {
     return templates;
   }
 
-  /** Load Custom Views CRs */
-  const loadCustomViewsCRs = () => {
-    let CRD = getCRDFromKind('View');
+  /** Load Dashboard Configs CRs */
+  const loadDashboardCRs = kind => {
+    let CRD = getCRDFromKind(kind);
 
     if(CRD){
       /** First get all the CR */
       return getCustomResourcesAllNamespaces(CRD)
         .then((res) => {
-            customViews.current = res.body.items;
+          customViews.current = res.body.items;
+          /** update CVs in the views */
+          manageCallbackCVs(customViews.current);
 
-            /** update CVs in the views */
-            manageCallbackCVs(customViews.current);
-
-            /** Then set up a watch to watch changes in the CR of the CRD */
-            watchCRD(
-              CRD.spec.group,
-              CRD.spec.version,
-              CRD.spec.names.plural + '/',
-              CVsNotifyEvent);
-          }
-        );
+          /** Then set up a watch to watch changes in the CR of the CRD */
+          watchResource(
+            'apis',
+            CRD.spec.group,
+            undefined,
+            CRD.spec.version,
+            CRD.spec.names.plural + '/',
+            undefined,
+            CVsNotifyEvent);
+        });
     }
   }
 
@@ -205,7 +213,7 @@ export default function ApiInterface(_user, props) {
   /**
    * This watch report changes of the CRs in a CRD
    */
-  const watchCRD = (group, version, plural, func) => {
+  const watchResource = (api, group, namespace, version, plural, name, func) => {
     /** We don't want two of the same watch */
     if(watches.current.find(item => {return item.plural === plural})){
       return;
@@ -213,47 +221,63 @@ export default function ApiInterface(_user, props) {
 
     let controller = new AbortController();
 
-    watches.current.push({
+    let queryParams = name ? {fieldSelector: 'metadata.name=' + name} : {}
+
+    let watch = {
       controller: controller,
+      api: api,
       group: group,
+      namespace: namespace,
       version: version,
       plural: plural,
+      name: name,
       callback: func
-    });
+    }
 
-    triggerWatch(group, version, plural, controller, func);
+    watches.current.push(watch);
+
+    let path = '/' +
+      api + '/' +
+      (group ? group + '/' : '') +
+      version + '/' +
+      (namespace ? 'namespaces/' + namespace + '/' : '') +
+      plural;
+
+    triggerWatch(path, watch, controller, func, queryParams);
     return controller;
   }
 
-  const triggerWatch = (group, version, plural, controller, func) => {
-    let path = '/apis/' +
-      group + '/' +
-      version + '/' +
-      plural;
-
+  const triggerWatch = (path, watch, controller, func, queryParams) => {
     let signal = controller.signal;
 
     let done = function(type){
       /** If the watch stops */
       if(!type){
-        if(abortWatch(plural)){
+        if(abortWatch(watch.plural)){
           /**
            * If it's the views watcher that stopped, we need to do an extra step
            */
-          if(plural === 'views/' || plural === 'customresourcedefinitions'){
-            watches.current = watches.current.filter(item => {return item.plural !== plural});
+          if(watch.plural === 'views/' || watch.plural === 'customresourcedefinitions/'){
+            watches.current = watches.current.filter(item => {return item.plural !== watch.plural});
           }
-          watchCRD(group, version, plural, func);
+          watchResource(
+            watch.api,
+            watch.group,
+            watch.namespace,
+            watch.version,
+            watch.plural,
+            watch.name,
+            func);
         }
       }
     }
 
-    apiManager.current.watchFunction(path, func, done, signal);
+    apiManager.current.watchFunction(path, func, done, signal, queryParams);
   }
 
   const abortWatch = watch => {
     /** These watch need to always be up and restarted if aborted */
-    if(watch === 'views/' || watch === 'customresourcedefinitions') return true;
+    if(watch === 'views/' || watch === 'customresourcedefinitions/') return true;
 
     let w = watches.current.find(item => {return item.plural === watch});
     if(w){
@@ -377,10 +401,20 @@ export default function ApiInterface(_user, props) {
       .catch(error => handleError(error));
   }
 
-  /** gets all the pods with namespace (if specified) */
-  const getPODs = namespace => {
-    return apiManager.current.getPODs(namespace)
+  /** gets all the pods in namespace */
+  const getPODs = (_namespace, fieldSelector) => {
+    return apiManager.current.getPODs(_namespace)
       .catch(error => handleError(error));
+  }
+
+  /** gets all the pods in all namespace */
+  const getPODsAllNamespaces = (fieldSelector) => {
+    if(namespace.current)
+      return getPODs(namespace.current, fieldSelector)
+        .catch(error => handleError(error));
+    else
+      return apiManager.current.getPODsAllNamespaces(fieldSelector)
+        .catch(error => handleError(error));
   }
 
   /** gets the list of all the nodes in cluster */
@@ -389,8 +423,8 @@ export default function ApiInterface(_user, props) {
   }
 
   /** gets the metrics of pods for a specific namespace */
-  const getMetricsPOD = (namespace, name) => {
-    let path = window.APISERVER_URL + '/apis/metrics.k8s.io/v1beta1/namespaces/' + namespace + '/pods/' + name;
+  const getMetricsPOD = (_namespace, name) => {
+    let path = window.APISERVER_URL + '/apis/metrics.k8s.io/v1beta1/namespaces/' + _namespace + '/pods/' + name;
 
     return apiManager.current.fetchMetrics(path);
   }
@@ -402,9 +436,27 @@ export default function ApiInterface(_user, props) {
     return apiManager.current.fetchMetrics(path);
   }
 
-  const getConfigMaps = (namespace, fieldSelector) => {
-    return apiManager.current.getConfigMaps(namespace, fieldSelector)
+  const getConfigMaps = (_namespace, fieldSelector) => {
+    return apiManager.current.getConfigMaps(_namespace, fieldSelector)
       .catch(error => handleError(error));
+  }
+
+  const getApis = () => {
+    return apiManager.current.getApis()
+      .catch(error => handleError(error));
+  }
+
+  const getGenericResource = (partialPath) => {
+    let path = window.APISERVER_URL + partialPath;
+
+    return apiManager.current.fetchRaw(path, 'GET')
+      .catch(error => handleError(error));
+  }
+
+  const getPodLogs = partialPath => {
+    let path = window.APISERVER_URL + partialPath + '/log';
+
+    return apiManager.current.logFunction(path);
   }
 
   return {
@@ -425,16 +477,18 @@ export default function ApiInterface(_user, props) {
     getMetricsPOD,
     getNodes,
     getPODs,
+    getPODsAllNamespaces,
     getNamespaces,
     CRDsNotifyEvent,
     abortWatch,
-    watchCRD,
+    watchResource,
     updateCustomResourceDefinition,
     updateCustomResource,
     createCustomResource,
     deleteCustomResource,
+    getCustomResources,
     getCustomResourcesAllNamespaces,
-    loadCustomViewsCRs,
+    loadDashboardCRs,
     getTemplates,
     getCRDFromName,
     getCRDFromKind,
@@ -442,6 +496,9 @@ export default function ApiInterface(_user, props) {
     setUser,
     manageCallbackCVs,
     setNamespace,
+    getApis,
+    getGenericResource,
+    getPodLogs,
   }
 
 }

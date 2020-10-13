@@ -8,7 +8,7 @@ import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();
 
-describe('Status', () => {
+describe('Donut', () => {
   test('Line chart NaN data', async () => {
     render(
       <MemoryRouter>

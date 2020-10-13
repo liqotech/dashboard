@@ -80,7 +80,7 @@ export default function ApiManager() {
   const updateCustomResourceDefinition = (name, item) => {
     let itemDC = JSON.parse(JSON.stringify(item));
     itemDC.metadata.resourceVersion++;
-    watchList.find(item => item.plural === 'customresourcedefinitions')
+    watchList.find(item => item.plural === 'customresourcedefinitions/')
       .callback('MODIFIED', itemDC);
     return Promise.resolve();
   }
@@ -89,6 +89,8 @@ export default function ApiManager() {
     let array = path.split('/');
     if(array[4] === 'views' && path.slice(-1) === '/')
       array[4] = 'views/';
+    if(array[4] === 'customresourcedefinitions' && path.slice(-1) === '/')
+      array[4] = 'customresourcedefinitions/';
     watchList.push({
       plural: array[4],
       callback: callback,
@@ -100,9 +102,17 @@ export default function ApiManager() {
     return fetch('http://localhost:3001/namespaces').then(res => res.json());
   }
 
-  const getPODs = () => {
-    return fetch('http://localhost:3001/pod').then(res => res.json());
+  const getPODs = (namespace) => {
+    return fetch('http://localhost:3001/pod')
+      .then(res => res.json()).then(res => {
+        res.body.items = res.body.items.filter(item => item.metadata.namespace === namespace);
+        return res;
+      });
   }
+
+  const getPODsAllNamespaces = () => {
+    return fetch('http://localhost:3001/pod').then(res => res.json());
+  };
 
   const getNodes = () => {
     return fetch('http://localhost:3001/nodes').then(res => res.json());
@@ -147,8 +157,33 @@ export default function ApiManager() {
       .done();
   }
 
+  const getApis = () => {
+    return fetch('http://localhost:3001/apis/').then(res => res.json());
+  }
+
+  const fetchRaw = (path, method, item) => {
+    let headers = new Headers();
+    if(method === 'PATCH')
+      headers.append("Content-Type", "application/merge-patch+json");
+
+    let requestOptions = {
+      method: method,
+      headers: headers,
+      redirect: 'follow',
+      body: JSON.stringify(item)
+    };
+
+    return fetch(path, requestOptions).then(res => res.json());
+  }
+
+  const logFunction = (path) => {
+    console.log(path)
+    return fetch(path).then(res => res.text());
+  }
+
   return{
     getCRDs,
+    getCustomResources,
     getCustomResourcesAllNamespaces,
     deleteCustomResource,
     createCustomResource,
@@ -157,13 +192,16 @@ export default function ApiManager() {
     watchFunction,
     getNamespaces,
     getPODs,
-    getNodes,
-    fetchMetrics,
-    getConfigMaps,
+    getPODsAllNamespaces,
     sendDeletedSignal,
     sendAddedSignal,
     sendModifiedSignal,
     sendAbortedConnectionSignal,
-    getCustomResources,
+    getNodes,
+    fetchMetrics,
+    getConfigMaps,
+    getApis,
+    fetchRaw,
+    logFunction
   }
 }

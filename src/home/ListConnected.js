@@ -60,7 +60,7 @@ function ListConnected(props){
    * so we take all pods
    */
   const getServerPODs = () => {
-    window.api.getPODs().
+    window.api.getPODsAllNamespaces().
     then(res => {
       let pods = res.body.items;
       setIncomingPods(pods);

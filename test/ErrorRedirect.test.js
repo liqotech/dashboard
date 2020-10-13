@@ -7,7 +7,7 @@ import CRDMockResponse from '../__mocks__/crd_fetch.json';
 import Error401 from '../__mocks__/401.json';
 import Error403 from '../__mocks__/403.json';
 import Error500 from '../__mocks__/500.json';
-import { generalHomeGET, loginTest } from './RTLUtils';
+import { alwaysPresentGET, generalHomeGET, loginTest } from './RTLUtils';
 import ViewMockResponse from '../__mocks__/views.json';
 import { testTimeout } from '../src/constants';
 import Cookies from 'js-cookie';
@@ -20,7 +20,7 @@ async function setup(error) {
       return Promise.resolve(new Response(JSON.stringify(CRDMockResponse)))
     } else if (url === 'http://localhost:3001/clustercustomobject/views') {
       return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-    } else if (url === 'http://localhost:3001/clustercustomobject/liqodashtests') {
+    } else if (url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions/liqodashtests.dashboard.liqo.io') {
       if(error === 401){
         return Promise.reject(Error401.body);
       } else if(error === 403){
@@ -28,6 +28,8 @@ async function setup(error) {
       } else if(error === 500){
         return Promise.reject(Error500.body);
       }
+    } else if(alwaysPresentGET(url)){
+      return alwaysPresentGET(url)
     } else {
       return generalHomeGET(url);
     }
@@ -38,7 +40,7 @@ async function setup(error) {
   const customview = screen.getByText('Custom Resources');
   userEvent.click(customview);
 
-  userEvent.click(await screen.findByText('LiqoDashTest'));
+  userEvent.click(await screen.findByText('liqodashtests.dashboard.liqo.io'));
 }
 
 beforeEach(() => {

@@ -1,33 +1,15 @@
 import React, { useState } from 'react';
 import './NewCR.css';
-import { Tabs, Button, message } from 'antd';
-import AceEditor from 'react-ace';
-import YAML from 'yaml';
-import 'ace-builds/src-noconflict/mode-json';
-import 'ace-builds/src-noconflict/mode-yaml';
-import 'ace-builds/src-noconflict/theme-monokai';
-import LoadingIndicator from '../common/LoadingIndicator';
-import FormGenerator from './OAPIV3FormGenerator/FormGenerator';
+import { Tabs, message, Badge, Drawer } from 'antd';
+import LoadingIndicator from '../../common/LoadingIndicator';
+import FormGenerator from '../OAPIV3FormGenerator/FormGenerator';
+import Editor from '../Editor';
 
 function NewCR(props) {
 
-  const [value, setValue] = useState('');
   const [loading, setLoading] = useState(false);
-  const [editorWidth] = useState('auto');
 
-  const onClick = () => {
-    let item;
-
-    try {
-      item = JSON.parse(value);
-    } catch(error) {
-      try {
-        item = YAML.parse(value);
-      } catch(error){
-        message.error('JSON or YAML not valid');
-        return;
-      }
-    }
+  const onClick = (item) => {
 
     if(!item || !item.metadata || item.metadata.name === ''){
       message.error('Errors in the custom resource definition');
@@ -71,40 +53,25 @@ function NewCR(props) {
       });
   }
 
-  const onChange = value => {
-    setValue(value);
-  }
-
-  const inputText = () => {
-    return(
-      <div>
-        <AceEditor
-          mode="yaml"
-          theme="monokai"
-          fontSize={16}
-          value={value}
-          showPrintMargin={true}
-          showGutter={true}
-          onChange={onChange}
-          highlightActiveLine={true}
-          showLineNumbers={true}
-          tabSize={2}
-          width={editorWidth}
-          height="75vh"
-        />
-        <div style={{marginTop: 20}}>
-          <Button onClick={onClick} style={{width: "20%"}}>OK</Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div>
+    <Drawer
+      title={
+        <Badge status="processing"
+               text={"Create a new " + props.CRD.spec.names.kind + " resource"}
+        />
+      }
+      placement={'right'}
+      visible={props.showCreate}
+      onClose={() => {props.setShowCreate(false)}}
+      width={window.innerWidth > 1400 ? 1200 : window.innerWidth - 200}
+      destroyOnClose
+    >
       { !loading ? (
         <Tabs defaultActiveKey="2">
           <Tabs.TabPane tab="JSON/YAML" key="1">
-            {inputText()}
+            <Editor value={''}
+                    onClick={onClick}
+            />
           </Tabs.TabPane>
           { props.CRD.spec.validation && props.CRD.spec.validation.openAPIV3Schema ? (
             <Tabs.TabPane tab="Form Wizard" key="2">
@@ -114,7 +81,7 @@ function NewCR(props) {
         </Tabs>
       ) : null }
       { loading ? <LoadingIndicator /> : null }
-    </div>
+    </Drawer>
   );
 }
 

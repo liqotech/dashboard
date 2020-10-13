@@ -1,0 +1,77 @@
+{
+  "kind": "APIResourceList",
+  "apiVersion": "v1",
+  "groupVersion": "dashboard.liqo.io/v1alpha1",
+  "resources": [
+    {
+      "name": "dashboardconfigs",
+      "singularName": "dashboardconfig",
+      "namespaced": false,
+      "kind": "DashboardConfig",
+      "verbs": [
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "create",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "name": "dashboardconfigs/status",
+      "singularName": "",
+      "namespaced": false,
+      "kind": "DashboardConfig",
+      "verbs": [
+        "get",
+        "patch",
+        "update"
+      ]
+    },
+    {
+      "name": "views",
+      "singularName": "view",
+      "namespaced": true,
+      "kind": "View",
+      "verbs": [
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "create",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "name": "views/status",
+      "singularName": "",
+      "namespaced": true,
+      "kind": "View",
+      "verbs": [
+        "get",
+        "patch",
+        "update"
+      ]
+    },
+    {
+      "name": "liqodashtests",
+      "singularName": "liqodashtest",
+      "namespaced": true,
+      "kind": "LiqoDashTest",
+      "verbs": [
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "create",
+        "update",
+        "watch"
+      ]
+    }
+  ]
+}

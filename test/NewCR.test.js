@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react'
+import { findByText, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import ApiInterface from '../src/services/api/ApiInterface';
 import CRDmockEmpty from '../__mocks__/crd_fetch.json';
@@ -8,10 +8,12 @@ import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import LiqoDashNewMockResponse from '../__mocks__/liqodashtest_new.json';
 import NoAnnNoResNoSch from '../__mocks__/no_Ann_noRes_noSch.json';
 import userEvent from '@testing-library/user-event';
-import { setup_resource } from './RTLUtils';
-import NewCR from '../src/editors/NewCR';
+import { mockCRDAndViewsExtended } from './RTLUtils';
+import NewCR from '../src/editors/CRD/NewCR';
 import { testTimeout } from '../src/constants';
 import Cookies from 'js-cookie';
+import { MemoryRouter } from 'react-router-dom';
+import App from '../src/app/App';
 
 async function setup() {
   fetch.mockImplementation((url) => {
@@ -31,6 +33,7 @@ async function setup() {
 
     render(
       <NewCR CRD={liqo_crd}
+             showCreate={true}
       />
     )
   });
@@ -47,6 +50,8 @@ async function check_new_CR(){
   userEvent.click(screen.getByRole('switch'));
 
   userEvent.click(test);
+
+  userEvent.click(await screen.findByText('Spec'));
 
   const items = await screen.findAllByText('Item');
 
@@ -65,6 +70,20 @@ async function check_new_CR(){
 beforeEach(() => {
   Cookies.remove('token');
 });
+
+async function setup_resources(error, method, crd){
+  mockCRDAndViewsExtended(error, method, crd);
+  Cookies.set('token', 'password');
+  window.history.pushState({}, 'Page Title', '/customresources/liqodashtests.dashboard.liqo.io');
+
+  render(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>
+  );
+
+  expect(await screen.findByLabelText('plus')).toBeInTheDocument();
+}
 
 describe('NewCR', () => {
   test('CR drawer is present and text-editor is the first tab selected', async () => {
@@ -94,6 +113,7 @@ describe('NewCR', () => {
 
       render(
         <NewCR CRD={noschema_crd}
+               showCreate={true}
         />
       )
     });
@@ -127,7 +147,7 @@ describe('NewCR', () => {
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
     userEvent.click(screen.getByText('JSON/YAML'));
 
-    userEvent.click(screen.getByText('OK'));
+    userEvent.click(screen.getByText('Save'));
 
     expect(await screen.findByText(/errors/i)).toBeInTheDocument();
   }, testTimeout)
@@ -151,7 +171,7 @@ describe('NewCR', () => {
 
     await userEvent.type(screen.getByLabelText('editor'), '{"name": "test", "namespace": "test"}');
 
-    userEvent.click(screen.getByRole('button'));
+    userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
     expect(await screen.findAllByText(/errors/i)).toHaveLength(2);
   }, testTimeout)
@@ -164,13 +184,13 @@ describe('NewCR', () => {
 
     await userEvent.type(screen.getByLabelText('editor'), 'name: "test", {"namespace" test');
 
-    userEvent.click(screen.getByRole('button'));
+    userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
     expect(await screen.findAllByText(/not valid/i)).toHaveLength(1);
   }, testTimeout)
 
   test('Correct creation of a CR from editor', async () => {
-    await setup_resource();
+    await setup_resources();
 
     userEvent.click(screen.getByLabelText('plus'));
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
@@ -178,13 +198,13 @@ describe('NewCR', () => {
 
     await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashNewMockResponse));
 
-    userEvent.click(screen.getByRole('button', {name: 'OK'}));
+    userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
     await check_new_CR();
   }, testTimeout)
 
   test('Correct creation of a CR from form', async () => {
-    await setup_resource();
+    await setup_resources();
 
     userEvent.click(screen.getByLabelText('plus'));
 
@@ -222,7 +242,7 @@ describe('NewCR', () => {
   }, testTimeout)
 
   test('Error notification when 409', async () => {
-    await setup_resource('409', 'POST');
+    await setup_resources('409', 'POST');
 
     userEvent.click(screen.getByLabelText('plus'));
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
@@ -230,7 +250,7 @@ describe('NewCR', () => {
 
     await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashNewMockResponse));
 
-    userEvent.click(screen.getByRole('button', {name: 'OK'}));
+    userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
     expect(await screen.findByText(/Could not/i)).toBeInTheDocument();
   }, testTimeout)

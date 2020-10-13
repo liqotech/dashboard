@@ -1,33 +1,25 @@
 import React, { useState } from 'react';
 import './CR.css';
 import {
-  Badge, Card,
   Button,
-  Drawer,
   message,
-  Popconfirm, Alert,
+  Popconfirm,
   Tooltip, Typography, Collapse, Tag
 
 } from 'antd';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 import EditOutlined from '@ant-design/icons/lib/icons/EditOutlined';
-import PieChart from '../templates/piechart/PieChart';
-import HistoChart from '../templates/histogram/HistoChart';
+import PieChart from '../../templates/piechart/PieChart';
+import HistoChart from '../../templates/histogram/HistoChart';
 import DeleteOutlined from '@ant-design/icons/lib/icons/DeleteOutlined';
-import UpdateCR from '../editors/UpdateCR';
+import UpdateCR from '../../editors/CRD/UpdateCR';
 import { withRouter } from 'react-router-dom';
-import FormViewer from '../editors/OAPIV3FormGenerator/FormViewer';
-import ToolOutlined from '@ant-design/icons/lib/icons/ToolOutlined';
+import ResourceForm from '../resource/ResourceForm';
 
 function CR(props) {
 
   const [showJSON, setShowJSON] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
-  const [currentTab, setCurrentTab] = useState('Spec');
-
-  const onTabChange = (key) => {
-    setCurrentTab(key);
-  };
 
   /** Make the JSON visible or invisible */
   const handleClick_show = (event) => {
@@ -75,64 +67,6 @@ function CR(props) {
     );
   }
 
-  let tabList = [];
-
-  if(props.cr.metadata)
-    tabList.push({
-      key: 'Metadata',
-      tab: <span>
-             <ToolOutlined />
-             Metadata
-           </span>
-    })
-
-  if(props.cr.spec)
-    tabList.push({
-      key: 'Spec',
-      tab: <span>
-             <ToolOutlined />
-             Spec
-           </span>
-    })
-
-  if(props.cr.status)
-    tabList.push({
-      key: 'Status',
-      tab: <span>
-             <ToolOutlined />
-             Status
-           </span>
-    })
-
-  let contentList = {
-    Metadata: props.cr.metadata ? (
-      <div key={'metadata_' + props.cr.metadata.name}>
-        <Alert.ErrorBoundary>
-          <div aria-label={'form_metadata'}>
-            <FormViewer CR={props.cr} CRD={props.crd} api={window.api} show={'metadata'} />
-          </div>
-        </Alert.ErrorBoundary>
-      </div>
-    ) : null,
-    Spec: props.cr.spec ? (
-      <div key={'spec_' + props.cr.metadata.name}>
-        <Alert.ErrorBoundary>
-          <div aria-label={'form_spec'}>
-            <FormViewer CR={props.cr} CRD={props.crd} api={window.api} show={'spec'} />
-          </div>
-        </Alert.ErrorBoundary>
-      </div>
-    ) : null,
-    Status: props.cr.status ? (
-      <div key={'status_' + props.cr.metadata.name}>
-        <Alert.ErrorBoundary>
-          <div aria-label={'form_status'}>
-            <FormViewer CR={props.cr} CRD={props.crd} show={'status'} api={window.api} />
-          </div>
-        </Alert.ErrorBoundary>
-      </div>) : null,
-  };
-
   return (
     <div aria-label={'cr'} style={{ marginBottom: 10 }}>
       <Collapse className={'crd-collapse'} style={{backgroundColor: '#fafafa'}}>
@@ -152,26 +86,11 @@ function CR(props) {
                   }
                   style={{ fontSize: 15, marginRight: 15, color: '#1890FF' }}
                 />
-              </Tooltip>
-              <Drawer
-                title={
-                  <Badge status="processing"
-                         text={"Update " + props.cr.metadata.name}
-                  />
-                }
-                placement={'right'}
-                visible={showUpdate}
-                onClose={() => {setShowUpdate(false)}}
-                width={window.innerWidth > 900 ? 700 : window.innerWidth - 200}
-              >
                 <UpdateCR CR={props.cr} CRD={props.crd}
-                          group={props.crd.spec.group}
-                          version={props.crd.spec.version}
-                          plural={props.crd.spec.names.plural}
                           setShowUpdate={setShowUpdate}
-                          api={window.api}
+                          showUpdate={showUpdate}
                 />
-              </Drawer>
+              </Tooltip>
               <Tooltip title={'Show JSON'}>
                 <Button size={'small'}
                         onClick={(event) => handleClick_show(event)}
@@ -220,18 +139,7 @@ function CR(props) {
               ? getChart()
               : null}
             {!showJSON && !props.template ? (
-              <Card tabList={tabList}
-                    tabProps={{
-                      size: 'small'
-                    }}
-                    size={'small'}
-                    type={'inner'}
-                    activeTabKey={currentTab}
-                    onTabChange={key => {onTabChange(key)}}
-                    style={{overflow: 'hidden'}}
-              >
-                {contentList[currentTab]}
-              </Card>
+              <ResourceForm resource={props.cr} CRD={props.crd} />
             ) : null}
           </div>
         </Collapse.Panel>

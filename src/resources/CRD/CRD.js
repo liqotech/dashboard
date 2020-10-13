@@ -1,26 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './CRD.css';
 import './CRDList.css';
+import _ from 'lodash';
 import {
   Space, Alert,
-  Badge, Button, Layout, Dropdown,
+  Badge, Button, Layout,
   message, Tag, Typography, Tooltip,
   Descriptions, Switch, Pagination, Empty, Rate, Drawer, Card, Divider
 } from 'antd';
 import CR from './CR';
-import { Link } from 'react-router-dom';
-import LoadingIndicator from '../common/LoadingIndicator';
-import GraphNet from '../templates/graph/GraphNet';
-import Utils from '../services/Utils';
+import { Link, useParams, useLocation } from 'react-router-dom';
+import LoadingIndicator from '../../common/LoadingIndicator';
+import GraphNet from '../../templates/graph/GraphNet';
+import Utils from '../../services/Utils';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
 import PictureOutlined from '@ant-design/icons/lib/icons/PictureOutlined';
 import DragOutlined from '@ant-design/icons/lib/icons/DragOutlined';
 import PushpinOutlined from '@ant-design/icons/lib/icons/PushpinOutlined';
-import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
-import { Menu } from 'antd';
-import NewCR from '../editors/NewCR';
-import DesignEditorCRD from '../editors/DesignEditorCRD';
-import AddCustomView from '../views/AddCustomView';
+import NewCR from '../../editors/CRD/NewCR';
+import DesignEditorCRD from '../../editors/CRD/DesignEditorCRD';
+import Editor from '../../editors/Editor';
+import CustomViewButton from '../common/buttons/CustomViewButton';
+import { resourceNotifyEvent } from '../resource/ResourceUtils';
 
 function CRD(props) {
 
@@ -39,17 +40,7 @@ function CRD(props) {
    */
 
   const [loading, setLoading] = useState(true);
-  const [CRD, setCRD] = useState(() => {
-    /** In case we are not on a custom view */
-    if(!props.onCustomView){
-      /** Get the CRD */
-      return window.api.getCRDFromName(props.match.params.crdName);
-    }
-    /** In case we are in a custom view */
-    else {
-      return window.api.getCRDFromName(props.CRD);
-    }
-  });
+  const [CRD, setCRD] = useState({});
   const currentPageSizeChange = useRef(0);
   const pageSize = useRef(5);
   const currentPage = useRef(1);
@@ -57,7 +48,6 @@ function CRD(props) {
   const [template, setTemplate] = useState(null);
   const [isPinned, setIsPinned] = useState(false);
   const [CRShown, setCRShown] = useState([]);
-  let [customViews, setCustomViews] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
   const [showResources, setShowResources] = useState(true);
@@ -66,44 +56,47 @@ function CRD(props) {
   let [tempTemplate, setTempTemplate] = useState(null);
   let multi = false;
 
+  let params = useParams();
+  let location = useLocation();
+
   useEffect(() => {
     window.api.CRDArrayCallback.current.push(reloadCRD);
     window.api.NSArrayCallback.current.push(loadCustomResources);
     tempTemplate = null;
+    let _CRD;
 
     /** In case we are not on a custom view */
     if(!props.onCustomView){
-      /** Set a callback to keep track of custom view's update */
-      window.api.CVArrayCallback.current.push(getCustomViews);
-      /** Get the custom views */
-      customViews = window.api.customViews.current;
       /** Get the CRD */
-      setCRD(window.api.getCRDFromName(props.match.params.crdName));
+      _CRD = window.api.getCRDFromName(params.crdName);
+      setCRD(_CRD);
     }
     /** In case we are in a custom view */
     else {
-      setCRD(window.api.getCRDFromName(props.CRD));
+      _CRD = window.api.getCRDFromName(props.CRD);
+      setCRD(_CRD);
     }
 
     /** When unmounting, eliminate every callback and watch */
     return () => {
+      setCRD({});
       window.api.CRDArrayCallback.current = window.api.CRDArrayCallback.current.filter(func => {return func !== reloadCRD});
       window.api.NSArrayCallback.current = window.api.NSArrayCallback.current.filter(func => {return func !== loadCustomResources});
       if(!props.onCustomView){
-        window.api.abortWatch(props.match.params.crdName.split('.')[0]);
-        window.api.CVArrayCallback.current = window.api.CVArrayCallback.current.filter(func => {return func !== getCustomViews});
+        window.api.abortWatch(params.crdName.split('.')[0]);
       } else {
-        window.api.abortWatch(CRD.spec.names.plural);
+        window.api.abortWatch(_CRD.spec.names.plural);
       }
     }
-  }, [props.match])
+  }, [location.pathname])
 
   useEffect(() => {
     setCRShown(customResources.slice(0, pageSize.current));
   }, [customResources])
 
   useEffect(() => {
-    loadCustomResources();
+    if(!_.isEmpty(CRD))
+      loadCustomResources();
   }, [CRD])
 
   /** Update state if a CRD is loaded or changed */
@@ -117,7 +110,7 @@ function CRD(props) {
         });
       } else {
         _CRD = CRDs.find(item => {
-          return item.metadata.name === props.match.params.crdName;
+          return item.metadata.name === params.crdName;
         });
       }
       setCRD(_CRD);
@@ -126,30 +119,31 @@ function CRD(props) {
     }
   }
 
-  /** Update the custom views */
-  const getCustomViews = () => {
-    setCustomViews([...window.api.customViews.current]);
-  }
-
   const loadCustomResources = () => {
-    /** First get all the CR */
-    window.api.getCustomResourcesAllNamespaces(CRD)
-      .then((res) => {
-          setCustomResources(res.body.items);
-          setLoading(false);
-
-          /** Then set up a watch to watch changes in the CR of the CRD */
-          window.api.watchCRD(
-            CRD.spec.group,
-            CRD.spec.version,
-            CRD.spec.names.plural,
-            CRNotifyEvent
-          );
-
-          /** See if there is a template for the CRD */
-          findTemplate(CRD);
-        }
-      ).catch(error => console.log(error));
+    setCRD(prev => {
+      /** First get all the CR */
+      window.api.getCustomResourcesAllNamespaces(prev)
+        .then((res) => {
+            setCustomResources(res.body.items);
+            setLoading(false);
+  
+            /** Then set up a watch to watch changes in the CR of the prev */
+            window.api.watchResource(
+              'apis',
+              prev.spec.group,
+              undefined,
+              prev.spec.version,
+              prev.spec.names.plural,
+              undefined,
+              CRNotifyEvent
+            );
+  
+            /** See if there is a template for the prev */
+            findTemplate(prev);
+          }
+        ).catch(error => console.log(error));
+      return prev
+    })
   }
 
   /** Update CRD with the 'favourite' annotation */
@@ -165,65 +159,6 @@ function CRD(props) {
     )
   }
 
-  /** check if this CRD is already in a custom view */
-  const checkAlreadyInView = (e) => {
-    let cv = window.api.customViews.current.find(item => {
-      return item.metadata.name === e;
-    });
-
-    if(cv.spec.crds){
-      return !!cv.spec.crds.find(item => {
-        if(item)
-          return item.crdName === CRD.metadata.name;
-      });
-    }
-  }
-
-  /** Update the custom view CR and include this CRD */
-  const handleClick_addToView = (e) => {
-    let cv = window.api.customViews.current.find(item => {
-      return item.metadata.name === e.key;
-    });
-    let index = -1;
-
-    /** Search if the CRD is in the view */
-    index = cv.spec.crds.indexOf(
-      cv.spec.crds.find(item => {
-        if(item)
-          return item.crdName === CRD.metadata.name;
-      }));
-
-    /** If the CRD is in the view, remove it
-     *  or else, add it in the view
-     */
-    if(index !== -1){
-      cv.spec.crds[index] = null;
-    } else {
-      cv.spec.crds.push({
-        crdName: CRD.metadata.name
-      });
-    }
-
-    let array = cv.metadata.selfLink.split('/');
-    let promise = window.api.updateCustomResource(
-      array[2],
-      array[3],
-      array[5],
-      array[6],
-      array[7],
-      cv
-    );
-
-    promise
-      .then(() => {
-        message.success('Resource updated');
-      })
-      .catch((error) => {
-        console.log(error)
-        message.error('Could not update the resource');
-      });
-  }
-
   const editDescription = async (value) => {
     CRD.metadata.annotations.description = value;
 
@@ -234,41 +169,6 @@ function CRD(props) {
   }
 
   const header = () => {
-    const items = [];
-
-    window.api.customViews.current.forEach(item => {
-      items.push(
-        <Menu.Item key={item.metadata.name} onClick={handleClick_addToView}>
-          {
-            item.spec.viewName ? (
-              <span style={checkAlreadyInView(item.metadata.name) ? {
-                color: 'red'
-              } : null}>{ item.spec.viewName }</span>
-            ) : (
-              <span style={checkAlreadyInView(item.metadata.name) ? {
-                color: 'red'
-              } : null}>{ item.metadata.name }</span>
-            )
-          }
-        </Menu.Item>
-      )
-    });
-
-    if(items.length === 0){
-      items.push(
-        <Menu.Item key={'no-item'}>No custom views</Menu.Item>
-      )
-    }
-
-    const menu = (
-      <Menu>
-        {items}
-        <Menu.Item key="addCV" >
-          <AddCustomView selected={CRD.metadata.name} />
-        </Menu.Item>
-      </Menu>
-    )
-
     return (
       <div>
         <div>
@@ -297,11 +197,7 @@ function CRD(props) {
             !props.onCustomView ? (
               <div style={{float: "right"}}>
                 <Space align={'center'}>
-                  <Tooltip title={'Add or Remove to View'} placement={'topLeft'}>
-                    <Dropdown.Button overlay={menu} placement="bottomCenter"
-                                     style={{paddingTop: 6}}
-                                     trigger={['click']} icon={<LayoutOutlined />} />
-                  </Tooltip>
+                  <CustomViewButton resource={CRD} />
                   <Tooltip title={'Edit design'} placement={'top'}>
                     <Button icon={<PictureOutlined />} type="primary"
                             onClick={() => {setShowEditor(true)}}/>
@@ -315,20 +211,10 @@ function CRD(props) {
                                  setShowEditor={setShowEditor}
                                  CR={customResources} showEditor={showEditor}
                 />
-                <Drawer
-                  title={
-                    <Badge status="processing"
-                           text={"Create a new " + CRD.spec.names.kind + " resource"}
-                    />
-                  }
-                  placement={'right'}
-                  visible={showCreate}
-                  onClose={() => {setShowCreate(false)}}
-                  width={window.innerWidth > 900 ? 700 : window.innerWidth - 200}
-                  destroyOnClose
-                >
-                  <NewCR CRD={CRD} setShowCreate={setShowCreate} />
-                </Drawer>
+                <NewCR CRD={CRD}
+                       showCreate={showCreate}
+                       setShowCreate={setShowCreate}
+                />
               </div>
             ) : (
               <div style={{float: 'right'}}>
@@ -344,10 +230,10 @@ function CRD(props) {
                       marginRight: 10,
                       marginLeft: 30
                     }}
-                                   onClick={() => {
-                                     setIsPinned(!isPinned);
-                                     props.func(CRD.metadata.name);
-                                   }}
+                    onClick={() => {
+                      setIsPinned(!isPinned);
+                      props.func(CRD.metadata.name);
+                    }}
                   />
                 </Tooltip>
                 <Tooltip title={'Drag'} placement={'top'}>
@@ -393,38 +279,7 @@ function CRD(props) {
    * @param object: object modified/added/deleted
    */
   const CRNotifyEvent = (type, object) => {
-    if(object.metadata.namespace && object.metadata.namespace !== window.api.namespace.current && window.api.namespace.current)
-      return;
-
-    setCustomResources(prev => {
-      let CR = prev.find((item) => {
-        return item.metadata.name === object.metadata.name;
-      });
-
-      if ((type === 'ADDED' || type === 'MODIFIED')) {
-        // Object creation succeeded
-        if(CR) {
-          if(CR.metadata.resourceVersion !== object.metadata.resourceVersion){
-            prev = prev.filter(item => item.metadata.name !== object.metadata.name);
-            prev.push(object);
-            message.success('Resource ' + object.metadata.name + ' modified');
-            return [...prev];
-          }
-        } else {
-          prev.push(object);
-          message.success('Resource ' + object.metadata.name + ' added');
-          return [...prev];
-        }
-      } else if (type === 'DELETED') {
-        if(CR){
-          prev = prev.filter(item => item.metadata.name !== CR.metadata.name);
-          message.success('Resource ' + object.metadata.name + ' deleted');
-          return [...prev];
-        }
-      }
-
-      return prev;
-    });
+    resourceNotifyEvent(setCustomResources, type, object);
   }
 
   /**
@@ -533,7 +388,7 @@ function CRD(props) {
     })
     if(CRViews.length === 0) {
       CRViews.push(
-        <Empty key={'empty_res'} description={<strong>No resources present</strong>}/>
+        <Empty key={'empty_res'} description={<Typography.Text type={'secondary'}>No resources present</Typography.Text>}/>
       )
     }
   }
@@ -585,7 +440,7 @@ function CRD(props) {
                     CRD_annotations.length > 0 ? (
                       <div>{CRD_annotations}</div>
                     ) : (
-                      <Empty key={'empty_ann'} description={<strong>No annotations</strong>}/>
+                      <Empty key={'empty_ann'} description={<Typography.Text type={'secondary'}>No annotations</Typography.Text>}/>
                     )
                   ) : null}
                   { showResources ? (
@@ -607,11 +462,11 @@ function CRD(props) {
                   {/** Show the JSON Schema of the CRD */}
                   { showSchema ? (
                     schema ? (
-                      <Tag style={{width: '100%', fontSize: '1.1em'}}>
-                        <pre aria-label={'schema'}>{JSON.stringify(schema.properties.spec, null, 2)}</pre>
-                      </Tag>
+                      <div aria-label={'schema'}>
+                        <Editor value={JSON.stringify(schema.properties.spec, null, 2)} />
+                      </div>
                     ) : (
-                      <Empty key={'empty_schema'} description={<strong>No schema for this CRD</strong>}/>
+                      <Empty key={'empty_schema'} description={<Typography.Text type={'secondary'}>No schema for this CRD</Typography.Text>}/>
                     )
                   ) : null}
                 </div>

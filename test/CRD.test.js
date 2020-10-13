@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { generalHomeGET, loginTest } from './RTLUtils';
+import { alwaysPresentGET, generalHomeGET, loginTest, mockCRDAndViewsExtended } from './RTLUtils';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
@@ -13,7 +13,7 @@ import PieMockResponse from '../__mocks__/piecharts.json';
 import NoAnnNoResNoSch from '../__mocks__/no_Ann_noRes_noSch.json';
 import ManyResources from '../__mocks__/manyResources.json';
 import ApiInterface from '../src/services/api/ApiInterface';
-import CRD from '../src/CRD/CRD';
+import CRD from '../src/resources/CRD/CRD';
 import { MemoryRouter } from 'react-router-dom';
 import Error401 from '../__mocks__/401.json';
 import Error409 from '../__mocks__/409.json';
@@ -23,14 +23,19 @@ import Cookies from 'js-cookie';
 import CRDmockLong from '../__mocks__/crd_fetch_long.json';
 import SchedNodesMockResponse from '../__mocks__/schedulingnodes.json';
 import GraphMockResponse from '../__mocks__/graph.json';
+import App from '../src/app/App';
 
 fetchMock.enableMocks();
 
-async function setup() {
-  await loginTest();
+async function setup(crd) {
+  Cookies.set('token', 'password');
+  window.history.pushState({}, 'Page Title', crd);
 
-  const customview = screen.getByText('Custom Resources');
-  userEvent.click(customview);
+  render(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>
+  );
 }
 
 async function setup_extended() {
@@ -38,10 +43,14 @@ async function setup_extended() {
     return mocks(req);
   })
 
-  await setup();
+  Cookies.set('token', 'password');
+  window.history.pushState({}, 'Page Title', '/customresources/advertisements.protocol.liqo.io');
 
-  let kind = screen.getByText('Advertisement');
-  userEvent.click(kind);
+  render(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>
+  );
 }
 
 function mocks(req, error, template, noview) {
@@ -49,10 +58,12 @@ function mocks(req, error, template, noview) {
     return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
   } else if (req.url === 'http://localhost:3001/clustercustomobject/views') {
     if(req.method === 'GET')
-      if(noview)
+      if(noview){
         return Promise.resolve(new Response(JSON.stringify({ body: { items: [] } })))
-      else
-        return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
+      }
+      else {
+        return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })));
+      }
     else if(req.method === 'PUT') {
       if (error)
         return Promise.reject(Error409.body);
@@ -79,6 +90,8 @@ function mocks(req, error, template, noview) {
     return Promise.resolve(new Response(JSON.stringify({ body: NoAnnNoResNoSch })))
   } else if (req.url === 'http://localhost:3001/clustercustomobject/manyresources') {
     return Promise.resolve(new Response(JSON.stringify({ body: ManyResources })))
+  } else if(alwaysPresentGET(req.url)){
+    return alwaysPresentGET(req.url)
   } else {
     return generalHomeGET(req.url);
   }
@@ -93,22 +106,14 @@ async function setup_only_CRD(error, template, noview) {
     return mocks(req, error, template, noview);
   })
 
-  window.api = ApiInterface({id_token: 'test'});
-  window.api.getCRDs().then(async () => {
-    await window.api.loadCustomViewsCRs();
+  Cookies.set('token', 'password');
+  window.history.pushState({}, 'Page Title', '/customresources/liqodashtests.dashboard.liqo.io');
 
-    render(
-      <MemoryRouter>
-        <CRD match={{
-               params: {
-                 crdName: 'liqodashtests.dashboard.liqo.io'
-               }
-             }}
-             history={[]}
-        />
-      </MemoryRouter>
-    )
-  });
+  render(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>
+  );
 }
 
 async function alwaysPresent(kind, descr) {
@@ -125,7 +130,7 @@ async function alwaysPresent(kind, descr) {
 }
 
 describe('CRD', () => {
-  test('Favourite are updated accordingly', async () => {
+  /*test('Favourite are updated accordingly', async () => {
     await setup_extended();
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
@@ -138,28 +143,26 @@ describe('CRD', () => {
     userEvent.click(favCRD);
 
     expect(await screen.findByText('Advertisement')).toBeInTheDocument();
-  }, testTimeout)
+  }, testTimeout)*/
 
   test('CRD card shows every general information in different cases', async () => {
     fetch.mockResponse(req => {
       return mocks(req);
     })
 
-    await setup();
+    await setup('/customresources/advertisements.protocol.liqo.io');
 
-    let row = screen.getByText('Advertisement');
-
-    userEvent.click(row);
-
-    await alwaysPresent('Advertisement','No description for this CRD');
+    await alwaysPresent('Advertisement', 'No description for this CRD');
     expect(screen.queryByRole('switch')).not.toBeInTheDocument();
 
-    const customview = screen.getByText('Custom Resources');
-    userEvent.click(customview);
+  }, testTimeout)
 
-    row = screen.getByText('LiqoDashTest');
-    userEvent.click(row);
+  test('CRD card shows every general information in different cases 2', async () => {
+    fetch.mockResponse(req => {
+      return mocks(req);
+    })
 
+    await setup('/customresources/liqodashtests.dashboard.liqo.io');
     /** This CRD contains a custom template and a description, so there has to be a switch and not the default description*/
     await alwaysPresent('LiqoDashTest','A test CRD for some implemetation on the liqo-dashboard');
     expect(screen.queryByRole('switch')).toBeInTheDocument();
@@ -170,11 +173,7 @@ describe('CRD', () => {
       return mocks(req);
     })
 
-    await setup();
-
-    let row = screen.getByText('Advertisement');
-
-    userEvent.click(row);
+    await setup('/customresources/advertisements.protocol.liqo.io');
 
     await alwaysPresent('Advertisement','No description for this CRD');
 
@@ -189,10 +188,7 @@ describe('CRD', () => {
       return mocks(req);
     })
 
-    await setup();
-
-    let kind = screen.getByText('Advertisement');
-    userEvent.click(kind);
+    await setup('/customresources/advertisements.protocol.liqo.io');
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
 
@@ -200,16 +196,19 @@ describe('CRD', () => {
     userEvent.click(annotations);
 
     expect(screen.getByLabelText('tag')).toBeInTheDocument();
+  }, testTimeout);
 
-    const customview = screen.getByText('Custom Resources');
-    userEvent.click(customview);
+  test('Annotations tab works 2', async () => {
+    fetch.mockResponse(req => {
+      return mocks(req);
+    })
 
-    kind = screen.getByText('NoAnnNoResNoSchema');
-    userEvent.click(kind);
+    await setup('/customresources/noannnoresnoschemas.test');
+    await screen.findByText('NoAnnNoResNoSchema');
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
 
-    annotations = screen.getByText('Annotations');
+    let annotations = screen.getByText('Annotations');
     userEvent.click(annotations);
 
     expect(screen.getByText('No annotations'));
@@ -220,10 +219,9 @@ describe('CRD', () => {
       return mocks(req);
     })
 
-    await setup();
+    await setup('/customresources/noannnoresnoschemas.test');
 
-    let kind = screen.getByText('NoAnnNoResNoSchema');
-    userEvent.click(kind);
+    await screen.findByText('NoAnnNoResNoSchema');
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
 
@@ -233,18 +231,29 @@ describe('CRD', () => {
 
     const customview = screen.getByText('Custom Resources');
     userEvent.click(customview);
+  }, testTimeout);
 
-    kind = screen.getByText('Advertisement');
-    userEvent.click(kind);
+  test('Annotations tab works 2', async () => {
+    fetch.mockResponse(req => {
+      return mocks(req);
+    })
+
+    await setup('/customresources/advertisements.protocol.liqo.io');
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
     expect(await screen.findByLabelText('cr')).toBeInTheDocument();
     expect(screen.queryByLabelText('pagination')).not.toBeInTheDocument();
 
-    userEvent.click(customview);
+  }, testTimeout);
 
-    kind = screen.getByText('ManyResource');
-    userEvent.click(kind);
+  test('Annotations tab works 3', async () => {
+    fetch.mockResponse(req => {
+      return mocks(req);
+    })
+
+    await setup('/customresources/manyresources.test');
+
+    await screen.findByText('ManyResource');
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
     expect(await screen.findAllByLabelText('cr')).toHaveLength(5);
@@ -263,27 +272,28 @@ describe('CRD', () => {
       return mocks(req);
     })
 
-    await setup();
-
-    let kind = screen.getByText('NoAnnNoResNoSchema');
-    userEvent.click(kind);
+    await setup('/customresources/noannnoresnoschemas.test');
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
 
-    let schema = screen.getByText('Schema');
+    let schema = await screen.findByText('Schema');
     userEvent.click(schema);
 
     expect(screen.getByText('No schema for this CRD'));
 
-    const customview = screen.getByText('Custom Resources');
-    userEvent.click(customview);
+  }, testTimeout);
 
-    kind = screen.getByText('Advertisement');
-    userEvent.click(kind);
+  test('Schema tab works 2', async () => {
+    fetch.mockResponse(req => {
+      return mocks(req);
+    })
+
+    await setup('/customresources/advertisements.protocol.liqo.io');
+    await screen.findByText('Advertisement');
 
     expect(await screen.findByLabelText('crd')).toBeInTheDocument();
 
-    schema = screen.getByText('Schema');
+    let schema = await screen.findByText('Schema');
     userEvent.click(schema);
 
     expect(await screen.findByLabelText('schema')).toBeInTheDocument();
@@ -326,10 +336,9 @@ describe('CRD', () => {
       return mocks(req);
     })
 
-    await setup();
+    await setup('/customresources/liqodashtests.dashboard.liqo.io');
 
-    let kind = screen.getByText('LiqoDashTest');
-    userEvent.click(kind);
+    await screen.findByText('LiqoDashTest');
 
     /** This CRD contains a custom template and a description, so there has to be a switch and not the default description*/
     const switcher = await screen.findByRole('switch');
@@ -360,15 +369,16 @@ describe('CRD', () => {
         return Promise.resolve(new Response(JSON.stringify({ body: LiqoDashAlteredMockResponse })))
       } else if (url === 'http://localhost:3001/clustercustomobject/piecharts') {
         return Promise.resolve(new Response(JSON.stringify({ body: PieMockResponse })))
+      } else if(alwaysPresentGET(url)){
+        return alwaysPresentGET(url)
       } else {
         return generalHomeGET(url);
       }
     })
 
-    await setup();
+    await setup('/customresources/liqodashtests.dashboard.liqo.io');
 
-    let kind = screen.getByText('LiqoDashTest');
-    userEvent.click(kind);
+    await screen.findByText('LiqoDashTest');
 
     /** This CRD contains a custom template and a description, so there has to be a switch and not the default description*/
     const switcher = await screen.findByRole('switch');
@@ -424,7 +434,7 @@ describe('CRD', () => {
   test('CRD template error', async () => {
     await setup_only_CRD(true, true);
 
-    expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
+    expect(await screen.queryByText('LiqoDashTest')).not.toBeInTheDocument();
   }, testTimeout)
 
   test('CRD dropdown custom view', async () => {
@@ -432,20 +442,22 @@ describe('CRD', () => {
 
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
 
-    let layout = await screen.findByLabelText('layout');
+    let layout = await screen.findAllByLabelText('layout');
 
-    userEvent.click(layout);
+    userEvent.click(layout[1]);
 
     await act(async () => {
-      userEvent.click(await screen.findByText('Liqo View'));
+      let view = await screen.findAllByText('Liqo View');
+      userEvent.click(view[1]);
     })
 
-    layout = await screen.findByLabelText('layout');
+    layout = await screen.findAllByLabelText('layout');
 
-    userEvent.click(layout);
+    userEvent.click(layout[1]);
 
     await act(async () => {
-      userEvent.click(await screen.findByText('Liqo View'));
+      let view = await screen.findAllByText('Liqo View');
+      userEvent.click(view[1]);
     })
 
     expect(await screen.findAllByText(/updated/i)).toHaveLength(1)
@@ -456,11 +468,12 @@ describe('CRD', () => {
 
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
 
-    let layout = await screen.findByLabelText('layout');
+    let layout = await screen.findAllByLabelText('layout');
 
-    userEvent.click(layout);
+    userEvent.click(layout[1]);
 
-    userEvent.click(await screen.findByText('Liqo View'));
+    let view = await screen.findAllByText('Liqo View')
+    userEvent.click(view[1]);
   }, testTimeout)
 
   test('CRD dropdown custom view no custom view', async () => {
@@ -468,9 +481,9 @@ describe('CRD', () => {
 
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
 
-    let layout = await screen.findByLabelText('layout');
+    let layout = await screen.findAllByLabelText('layout');
 
-    userEvent.click(layout);
+    userEvent.click(layout[0]);
 
     expect(await screen.findByText('No custom views')).toBeInTheDocument();
   }, testTimeout)
@@ -480,19 +493,21 @@ describe('CRD', () => {
 
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
 
-    let layout = await screen.findByLabelText('layout');
+    let layout = await screen.findAllByLabelText('layout');
 
-    userEvent.click(layout);
+    userEvent.click(layout[1]);
 
-    userEvent.click(await screen.findByText('New Custom View'));
+    let newCV = await screen.findAllByText('New Custom View')
+    userEvent.click(newCV[1]);
 
-    expect(await screen.findAllByText('New Custom View')).toHaveLength(2);
+    expect(await screen.findAllByText('New Custom View')).toHaveLength(3);
 
     const name = await screen.findByRole('input');
     await userEvent.type(name, 'Test Custom View');
     const crds = await screen.findAllByLabelText('select');
     userEvent.click(crds[0]);
     userEvent.click(crds[1]);
+    userEvent.click(crds[2]);
     const adv = await screen.findAllByText('advertisements.protocol.liqo.io');
 
     fireEvent.mouseOver(adv[0]);

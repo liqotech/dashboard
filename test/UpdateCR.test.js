@@ -9,7 +9,7 @@ import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import { setup_resource } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import LiqoDashUpdatedMockResponse from '../__mocks__/liqodashtest_update.json';
-import UpdateCR from '../src/editors/UpdateCR';
+import UpdateCR from '../src/editors/CRD/UpdateCR';
 import { testTimeout } from '../src/constants';
 import Cookies from 'js-cookie';
 
@@ -38,7 +38,7 @@ async function setup() {
                 group={crd.spec.group}
                 version={crd.spec.version}
                 plural={crd.spec.names.plural}
-                api={api}
+                showUpdate={true}
       />
     )
   });
@@ -67,7 +67,7 @@ describe('UpdateCR', () => {
 
     await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashUpdatedMockResponse));
 
-    userEvent.click(screen.getByRole('button', {name: 'OK'}));
+    userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
     const test = await screen.findByText('test-1');
 
@@ -101,7 +101,7 @@ describe('UpdateCR', () => {
 
     await userEvent.type(screen.getByLabelText('editor'), '{"item": [{"cost": 11 "name": "green"}]}');
 
-    userEvent.click(screen.getByRole('button', {name: 'OK'}));
+    userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
     expect(await screen.findByText('JSON or YAML not valid')).toBeInTheDocument();
   }, testTimeout)
@@ -115,7 +115,7 @@ describe('UpdateCR', () => {
 
     await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashUpdatedMockResponse));
 
-    userEvent.click(screen.getByRole('button', {name: 'OK'}));
+    userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
     expect(await screen.findByText('Could not update the resource')).toBeInTheDocument();
   }, testTimeout)
