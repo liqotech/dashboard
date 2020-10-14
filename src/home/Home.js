@@ -25,13 +25,16 @@ function Home(){
   const [foreignNodes, setForeignNodes] = useState([]);
   const [fcMetricsIn, setFcMetricsIn] = useState([]);
   const [fcMetricsOut, setFcMetricsOut] = useState([]);
+  const [namespace, setNamespace] = useState(window.api.namespace.current);
 
   useEffect(() => {
+    window.api.NSArrayCallback.current.push(setNamespace);
     /**
      * Delete any reference to the component in the api service.
      * Avoid no-op and memory leaks
      */
     return () => {
+      window.api.NSArrayCallback.current = window.api.NSArrayCallback.current.filter(func => {return func !== setNamespace});
       window.api.CRDArrayCallback.current = window.api.CRDArrayCallback.current.filter(func => {return func !== CRDCallback});
       window.api.abortWatch('foreignclusters');
       window.api.abortWatch('clusterconfigs');

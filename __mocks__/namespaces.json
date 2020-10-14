@@ -1,0 +1,34 @@
+{
+  "kind": "NamespaceList",
+  "apiVersion": "v1",
+  "metadata": {
+    "selfLink": "/api/v1/namespaces",
+    "resourceVersion": "00000"
+  },
+  "items": [
+    {
+      "metadata": {
+        "name": "default",
+        "selfLink": "/api/v1/namespaces/default",
+        "resourceVersion": "001"
+      }
+    },
+    {
+      "metadata": {
+        "name": "liqo",
+        "selfLink": "/api/v1/namespaces/liqo",
+        "resourceVersion": "002"
+      }
+    },
+    {
+      "metadata": {
+        "name": "test",
+        "selfLink": "/api/v1/namespaces/test",
+        "resourceVersion": "003",
+        "labels": {
+          "liqo.io/enabled": "true"
+        }
+      }
+    }
+  ]
+}

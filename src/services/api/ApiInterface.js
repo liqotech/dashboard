@@ -11,6 +11,7 @@ export default function ApiInterface(_user, props) {
 
   const CRDs = {current: []};
   const customViews = {current: []};
+  const namespace = {current: null};
   const watches = {current: []};
   /** Callback for CRD list view */
   const CRDListCallback = {current: null};
@@ -22,6 +23,8 @@ export default function ApiInterface(_user, props) {
   const sidebarCallback = {current: null};
   /** Callback array for custom views */
   const CVArrayCallback = {current: []};
+  /** Callback array for namespace change */
+  const NSArrayCallback = {current: []};
 
   const user = {current: _user};
   const apiManager = {current: ApiManager(_user)};
@@ -30,6 +33,15 @@ export default function ApiInterface(_user, props) {
     user.current = _user;
     apiManager.current = ApiManager(_user);
     return user.current;
+  }
+
+  /** Set the global current namespace */
+  const setNamespace = (_namespace) => {
+    if(_namespace === 'all namespaces')
+      namespace.current = null;
+    else namespace.current = _namespace;
+
+    NSArrayCallback.current.forEach(cb => cb());
   }
 
   /** Handle errors: if 401 or 403 log out */
@@ -107,14 +119,30 @@ export default function ApiInterface(_user, props) {
   }
 
   /**
+   * Function called to retrieve all custom resource of a CRD in a namespaces
+   *
+   * @param item is the CRD
+   * @param namespace is the namespace of the resource
+   * @returns a list of the custom resources
+   */
+  const getCustomResources = (item, namespace) => {
+    return apiManager.current.getCustomResources(item, namespace)
+      .catch(error => handleError(error));
+  }
+
+  /**
    * Function called to retrieve all custom resource of a CRD in all namespaces
    *
    * @param item is the CRD
    * @returns a list of the custom resources
    */
   const getCustomResourcesAllNamespaces = item => {
-    return apiManager.current.getCustomResourcesAllNamespaces(item)
-      .catch(error => handleError(error));
+    if(namespace.current && item.spec.scope === 'Namespaced')
+      return getCustomResources(item, namespace.current)
+        .catch(error => handleError(error));
+    else
+      return apiManager.current.getCustomResourcesAllNamespaces(item)
+        .catch(error => handleError(error));
   }
 
   /**
@@ -383,12 +411,14 @@ export default function ApiInterface(_user, props) {
     user,
     CRDs,
     customViews,
+    namespace,
     watches,
     CRDListCallback,
     autoCompleteCallback,
     CRDArrayCallback,
     sidebarCallback,
     CVArrayCallback,
+    NSArrayCallback,
     apiManager,
     getConfigMaps,
     getMetricsNodes,
@@ -411,6 +441,7 @@ export default function ApiInterface(_user, props) {
     getCRDs,
     setUser,
     manageCallbackCVs,
+    setNamespace,
   }
 
 }
