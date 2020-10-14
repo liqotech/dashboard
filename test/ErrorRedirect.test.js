@@ -26,7 +26,7 @@ async function setup(error) {
       } else if(error === 403){
         return Promise.reject(Error403.body);
       } else if(error === 500){
-        return Promise.reject(Error500.body);
+        return Promise.reject();
       }
     } else if(alwaysPresentGET(url)){
       return alwaysPresentGET(url)

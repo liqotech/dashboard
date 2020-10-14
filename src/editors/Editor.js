@@ -8,7 +8,7 @@ import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-dawn';
 
 export default function Editor(props){
-  const [value, setValue] = useState(props.value.toString());
+  const [value, setValue] = useState('');
 
   const onClick = () => {
     let item;
@@ -31,7 +31,7 @@ export default function Editor(props){
   }
 
   useEffect(() => {
-    setValue(props.value.toString());
+    setValue(props.value ? props.value : '');
   }, [props.value])
 
   const onChange = (value) => {
@@ -46,11 +46,12 @@ export default function Editor(props){
         fontSize={16}
         value={value}
         readOnly={!props.onClick}
+        placeholder={props.placeholder}
         onChange={props.onClick ? onChange : null}
         highlightActiveLine
         showLineNumbers
         tabSize={2}
-        height={'64vh'}
+        height={'72vh'}
         width={'auto'}
         setOptions={{
           useWorker: false

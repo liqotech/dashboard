@@ -19,17 +19,6 @@ import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 import Cookies from 'js-cookie';
 import userEvent from '@testing-library/user-event';
 import NamespaceResponse from '../__mocks__/namespaces.json';
-import ApiV1MockResponse from '../__mocks__/apiv1.json';
-import ApisMockResponse from '../__mocks__/apis.json';
-import AppsResponse from '../__mocks__/apps.json';
-import ApiExtResponse from '../__mocks__/apiextension.k8s.io.json';
-import ConfigGroup from '../__mocks__/config.liqo.io.json';
-import DashboardGroup from '../__mocks__/dashboard.liqo.io.json';
-import DiscoveryGroup from '../__mocks__/discovery.liqo.io.json';
-import NetGroup from '../__mocks__/net.liqo.io.json';
-import SchedulingGroup from '../__mocks__/scheduling.liqo.io.json';
-import SharingGroup from '../__mocks__/sharing.liqo.io.json';
-import VKGroup from '../__mocks__/virtualkubelet.liqo.io.json';
 
 fetchMock.enableMocks();
 
@@ -50,7 +39,6 @@ beforeEach(() => {
 
 function mocks(){
   fetch.mockImplementation((url) => {
-    console.log(url)
     if (url === 'http://localhost:3001/customresourcedefinition') {
       return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
     } else if (url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {

@@ -58,6 +58,8 @@ function createTabs(kind, CR) {
           <FormViewer CRD={CRD}
                       resource={CR}
                       show={'metadata'}
+                      resourceName={CR.metadata.name}
+                      resourceNamespace={CR.metadata.namespace}
           />
         </Alert.ErrorBoundary>
       </Tabs.TabPane>
@@ -71,6 +73,8 @@ function createTabs(kind, CR) {
           <FormViewer CRD={CRD}
                       resource={CR}
                       show={'spec'}
+                      resourceName={CR.metadata.name}
+                      resourceNamespace={CR.metadata.namespace}
           />
         </Alert.ErrorBoundary>
       </Tabs.TabPane>
@@ -84,6 +88,8 @@ function createTabs(kind, CR) {
           <FormViewer CRD={CRD}
                       resource={CR}
                       show={'status'}
+                      resourceName={CR.metadata.name}
+                      resourceNamespace={CR.metadata.namespace}
           />
         </Alert.ErrorBoundary>
       </Tabs.TabPane>

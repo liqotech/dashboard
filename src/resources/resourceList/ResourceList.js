@@ -3,7 +3,7 @@ import { Table } from 'antd';
 import { withRouter, useLocation, useHistory, useParams } from 'react-router-dom';
 import { getColumnSearchProps } from '../../services/TableUtils';
 import ListHeader from './ListHeader';
-import { resourceNotifyEvent } from '../resource/ResourceUtils';
+import { resourceNotifyEvent } from '../common/ResourceUtils';
 import { renderResourceList } from './ResourceListRenderer';
 import { calculateAge } from '../../services/TimeUtils';
 
@@ -16,26 +16,23 @@ function ResourceList(props) {
   const [kind, setKind] = useState('');
   const [columnHeaders, setColumnHeaders] = useState([]);
   const [columnContents, setColumnsContents] = useState([]);
+  const [onCustomResource, setOnCustomResource] = useState(false);
   let location = useLocation();
   let history = useHistory();
   let params = useParams();
 
   useEffect(() => {
     loadResourceList();
-    if(params.namespace) window.api.setNamespace(params.namespace);
+
+    if(params.namespace)
+      window.api.setNamespace(params.namespace);
     window.api.NSArrayCallback.current.push(changeNamespace);
 
-    /** Start a watch for the list of resources */
-    if(!props.onCustomView)
-      window.api.watchResource(
-        location.pathname.split('/')[1],
-        (params.group ? params.group : undefined),
-        (params.namespace ? params.namespace : undefined),
-        params.version,
-        params.resource,
-        undefined,
-        notifyEvent
-      )
+    setOnCustomResource(
+      window.api.CRDs.current.find(CRD => {
+        return params.resource === CRD.spec.names.plural
+      })
+    )
 
     return () => {
       setLoading(true);
@@ -46,10 +43,6 @@ function ResourceList(props) {
       window.api.NSArrayCallback.current = window.api.NSArrayCallback.current.filter(func => {return func !== changeNamespace});
     }
   }, [location]);
-
-  const notifyEvent = (type, object) => {
-    resourceNotifyEvent(loadResourceList, type, object)
-  }
 
   useEffect(() => {
     manageColumnHeaders();
@@ -94,6 +87,10 @@ function ResourceList(props) {
     setColumnHeaders(columns);
   }
 
+  const notifyEvent = (type, object) => {
+    resourceNotifyEvent(setResourceList, type, object)
+  }
+
   const manageColumnContents = () => {
 
     const resourceViews = [];
@@ -126,7 +123,20 @@ function ResourceList(props) {
     window.api.getGenericResource(location.pathname)
       .then(res => {
         setKind(res.kind);
-        setResourceList(res.items);
+        setResourceList(res.items.sort((a, b) => a.metadata.name.localeCompare(b.metadata.name)));
+
+        /** Start a watch for the list of resources */
+        if(!props.onCustomView)
+          window.api.watchResource(
+            location.pathname.split('/')[1],
+            (params.group ? params.group : undefined),
+            (params.namespace ? params.namespace : undefined),
+            params.version,
+            params.resource,
+            undefined,
+            notifyEvent
+          )
+
         setLoading(false);
       })
       .catch(error => {
@@ -136,7 +146,7 @@ function ResourceList(props) {
 
   return (
     <div>
-      <ListHeader kind={kind} />
+      <ListHeader kind={kind.slice(0, -4)} resource={onCustomResource}/>
       <Table columns={columnHeaders} dataSource={columnContents}
              bordered scroll={{ x: 'max-content' }} sticky
              pagination={{ position: ['bottomCenter'],

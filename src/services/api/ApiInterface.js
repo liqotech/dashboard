@@ -46,11 +46,14 @@ export default function ApiInterface(_user, props) {
 
   /** Handle errors: if 401 or 403 log out */
   const handleError = (error) => {
-    if(!error.response) props.history.push("/error/general");
+    if(!error)
+      props.history.push('/error/general');
     else if(error.response && (error.response._fetchResponse.status === 401 ||
       error.response._fetchResponse.status === 403))
       props.history.push("/error/" + error.response._fetchResponse.status);
-    return Promise.reject(error);
+    else if(error === 401 || error === 403)
+      props.history.push("/error/" + error);
+    return Promise.reject(error.response ? error.response._fetchResponse.status : error);
   }
 
   /**
@@ -453,6 +456,27 @@ export default function ApiInterface(_user, props) {
       .catch(error => handleError(error));
   }
 
+  const createGenericResource = (partialPath, item) => {
+    let path = window.APISERVER_URL + partialPath;
+
+    return apiManager.current.fetchRaw(path, 'POST', item)
+      .catch(error => handleError(error));
+  }
+
+  const updateGenericResource = (partialPath, item) => {
+    let path = window.APISERVER_URL + partialPath;
+
+    return apiManager.current.fetchRaw(path, 'PATCH', item)
+      .catch(error => handleError(error));
+  }
+
+  const deleteGenericResource = (partialPath) => {
+    let path = window.APISERVER_URL + partialPath;
+
+    return apiManager.current.fetchRaw(path, 'DELETE')
+      .catch(error => handleError(error));
+  }
+
   const getPodLogs = partialPath => {
     let path = window.APISERVER_URL + partialPath + '/log';
 
@@ -498,6 +522,9 @@ export default function ApiInterface(_user, props) {
     setNamespace,
     getApis,
     getGenericResource,
+    createGenericResource,
+    updateGenericResource,
+    deleteGenericResource,
     getPodLogs,
   }
 

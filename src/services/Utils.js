@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export default function Utils() {
   let result = [];
 
@@ -90,9 +92,41 @@ export default function Utils() {
     } catch {}
   }
 
+  let objectSet = {};
+
+  const getSelectedProperties = (object, searchedKey, path) => {
+    try{
+      if(typeof object === 'object' && object !== null){
+        Object.keys(object).forEach(key => {
+          let k = (path ? path + ' > ' : '') + key;
+          if(key === searchedKey){
+            objectSet = {
+              ...objectSet,
+              [k]: object[key]
+            };
+          }
+          getSelectedProperties(object[key], searchedKey, (path ? path + ' > ' : '') + key);
+        })
+      }
+    } catch {}
+
+    return objectSet;
+  }
+
+  const fromDotToObject = (item, origResource) => {
+    Object.keys(item).forEach(key => {
+      Object.keys(item[key]).forEach(k => {
+        _.set(origResource, k.replace(/\s>\s/gi, '.'), item[key][k])
+      })
+    })
+    return origResource;
+  }
+
   return{
     setRealProperties,
     OAPIV3toJSONSchema,
-    index
+    index,
+    getSelectedProperties,
+    fromDotToObject,
   }
 }

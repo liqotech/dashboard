@@ -9,7 +9,7 @@ import LiqoDashNewMockResponse from '../__mocks__/liqodashtest_new.json';
 import NoAnnNoResNoSch from '../__mocks__/no_Ann_noRes_noSch.json';
 import userEvent from '@testing-library/user-event';
 import { mockCRDAndViewsExtended } from './RTLUtils';
-import NewCR from '../src/editors/CRD/NewCR';
+import NewResource from '../src/editors/CRD/NewResource';
 import { testTimeout } from '../src/constants';
 import Cookies from 'js-cookie';
 import { MemoryRouter } from 'react-router-dom';
@@ -32,8 +32,8 @@ async function setup() {
     let liqo_crd = await window.api.getCRDFromKind('LiqoDashTest');
 
     render(
-      <NewCR CRD={liqo_crd}
-             showCreate={true}
+      <NewResource resource={liqo_crd}
+                   showCreate={true}
       />
     )
   });
@@ -61,10 +61,10 @@ async function check_new_CR(){
   expect(screen.getAllByText('Name')).toHaveLength(3);
 
   const textboxes = await screen.findAllByRole('textbox');
-  expect(textboxes[0]).toHaveAttribute('value', '1');
-  expect(textboxes[1]).toHaveAttribute('value', 'cyan');
-  expect(textboxes[2]).toHaveAttribute('value', '2');
-  expect(textboxes[3]).toHaveAttribute('value', 'orange');
+  expect(textboxes[1]).toHaveAttribute('value', '1');
+  expect(textboxes[2]).toHaveAttribute('value', 'cyan');
+  expect(textboxes[3]).toHaveAttribute('value', '2');
+  expect(textboxes[4]).toHaveAttribute('value', 'orange');
 }
 
 beforeEach(() => {
@@ -85,8 +85,8 @@ async function setup_resources(error, method, crd){
   expect(await screen.findByLabelText('plus')).toBeInTheDocument();
 }
 
-describe('NewCR', () => {
-  test('CR drawer is present and text-editor is the first tab selected', async () => {
+describe('NewResource', () => {
+  test('CR drawer is present and form wizard is the first tab selected', async () => {
     await setup();
 
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
@@ -112,8 +112,8 @@ describe('NewCR', () => {
       let noschema_crd = await window.api.getCRDFromKind('NoAnnNoResNoSchema');
 
       render(
-        <NewCR CRD={noschema_crd}
-               showCreate={true}
+        <NewResource resource={noschema_crd}
+                     showCreate={true}
         />
       )
     });
