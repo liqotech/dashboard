@@ -1,0 +1,35 @@
+{
+  "kind": "APIResourceList",
+  "apiVersion": "v1",
+  "groupVersion": "sharing.liqo.io/v1alpha1",
+  "resources": [
+    {
+      "name": "advertisements",
+      "singularName": "advertisement",
+      "namespaced": false,
+      "kind": "Advertisement",
+      "verbs": [
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "create",
+        "update",
+        "watch"
+      ],
+      "storageVersionHash": "SP0hABvyTEw="
+    },
+    {
+      "name": "advertisements/status",
+      "singularName": "",
+      "namespaced": false,
+      "kind": "Advertisement",
+      "verbs": [
+        "get",
+        "patch",
+        "update"
+      ]
+    }
+  ]
+}

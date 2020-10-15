@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../src/app/App';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
@@ -27,6 +27,21 @@ import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import PodsMetricsMockResponse from '../__mocks__/pods_metrics.json';
 import CMMockResponse from '../__mocks__/configmap_clusterID.json';
+import ApisMockResponse from '../__mocks__/apis.json';
+import ApiV1MockResponse from '../__mocks__/apiv1.json';
+import AppsResponse from '../__mocks__/apps.json';
+import ApiExtResponse from '../__mocks__/apiextension.k8s.io.json';
+import ConfigGroup from '../__mocks__/config.liqo.io.json';
+import DashboardGroup from '../__mocks__/dashboard.liqo.io.json';
+import DiscoveryGroup from '../__mocks__/discovery.liqo.io.json';
+import NetGroup from '../__mocks__/net.liqo.io.json';
+import SchedulingGroup from '../__mocks__/scheduling.liqo.io.json';
+import SharingGroup from '../__mocks__/sharing.liqo.io.json';
+import VKGroup from '../__mocks__/virtualkubelet.liqo.io.json';
+import NamespaceResponse from '../__mocks__/namespaces.json';
+import PodMockResponse from '../__mocks__/pod.json';
+
+import Cookies from 'js-cookie';
 
 export function setup_login() {
   render(
@@ -49,23 +64,68 @@ export function metricsPODs(req, error){
     return Promise.resolve(new Response(JSON.stringify(PodsMetricsMockResponse.podMetrics[3])));
 }
 
+export function alwaysPresentGET(url) {
+  //console.log(url)
+  if (url === 'http://localhost/apiserver/api/v1' || url === 'http://localhost:/apiserver/api/v1') {
+    return Promise.resolve(new Response(JSON.stringify(ApiV1MockResponse)));
+  } else if (url === 'http://localhost:3001/apis/') {
+    return Promise.resolve(new Response(JSON.stringify({body: ApisMockResponse})));
+  } else if (url === 'http://localhost/apiserver/apis/apps/v1' || url === 'http://localhost:/apiserver/apis/apps/v1') {
+    return Promise.resolve(new Response(JSON.stringify(AppsResponse)));
+  } else if (url === 'http://localhost/apiserver/apis/apiextensions.k8s.io/v1' || url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1') {
+    return Promise.resolve(new Response(JSON.stringify(ApiExtResponse)));
+  } else if (url === 'http://localhost/apiserver/apis/config.liqo.io/v1alpha1' || url === 'http://localhost:/apiserver/apis/config.liqo.io/v1alpha1') {
+    return Promise.resolve(new Response(JSON.stringify(ConfigGroup)));
+  } else if (url === 'http://localhost/apiserver/apis/dashboard.liqo.io/v1alpha1' || url === 'http://localhost:/apiserver/apis/dashboard.liqo.io/v1alpha1') {
+    return Promise.resolve(new Response(JSON.stringify(DashboardGroup)));
+  } else if (url === 'http://localhost/apiserver/apis/dashboard.liqo.io/v1alpha1/liqodashtests' ||
+    url === 'http://localhost:/apiserver/apis/dashboard.liqo.io/v1alpha1/liqodashtests'
+  ) {
+    return Promise.resolve(new Response(JSON.stringify(LiqoDashMockResponse)));
+  } else if (url === 'http://localhost/apiserver/apis/discovery.liqo.io/v1alpha1' || url === 'http://localhost:/apiserver/apis/discovery.liqo.io/v1alpha1') {
+    return Promise.resolve(new Response(JSON.stringify(DiscoveryGroup)));
+  } else if (url === 'http://localhost/apiserver/apis/net.liqo.io/v1alpha1' || url === 'http://localhost:/apiserver/apis/net.liqo.io/v1alpha1') {
+    return Promise.resolve(new Response(JSON.stringify(NetGroup)));
+  } else if (url === 'http://localhost/apiserver/apis/scheduling.liqo.io/v1alpha1' || url === 'http://localhost:/apiserver/apis/scheduling.liqo.io/v1alpha1') {
+    return Promise.resolve(new Response(JSON.stringify(SchedulingGroup)));
+  } else if (url === 'http://localhost/apiserver/apis/sharing.liqo.io/v1alpha1' || url === 'http://localhost:/apiserver/apis/sharing.liqo.io/v1alpha1') {
+    return Promise.resolve(new Response(JSON.stringify(SharingGroup)));
+  } /*else if (url === 'http://localhost/apiserver/apis/virtualkubelet.liqo.io/v1alpha1' || url === 'http://localhost:/apiserver/apis/virtualkubelet.liqo.io/v1alpha1') {
+    return Promise.resolve(new Response(JSON.stringify(VKGroup)));
+  }*/ else if (url === 'http://localhost:/apiserver/api/v1/pods' || url === 'http://localhost/apiserver/api/v1/pods') {
+    return Promise.resolve(new Response(JSON.stringify(PodsMockResponse)));
+  } else if (url === 'http://localhost/apiserver/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9' ||
+    url === 'http://localhost:/apiserver/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'
+  ){
+    return Promise.resolve(new Response(JSON.stringify(PodMockResponse)))
+  } else if (url === 'http://localhost/apiserver/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9/log' ||
+    url === 'http://localhost:/apiserver/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9/log'
+  ){
+    return Promise.resolve(new Response('LogPodMockResponse'))
+  } else if (url === 'http://localhost/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions' ||
+    url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
+  ) {
+    return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+  } else return false;
+}
+
 export function generalHomeGET(url) {
   if (url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
-    return Promise.resolve(new Response(JSON.stringify({body: FCMockResponse})));
+    return Promise.resolve(new Response(JSON.stringify({ body: FCMockResponse })));
   } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
-    return Promise.resolve(new Response(JSON.stringify({body: AdvMockResponse})));
+    return Promise.resolve(new Response(JSON.stringify({ body: AdvMockResponse })));
   } else if (url === 'http://localhost:3001/clustercustomobject/peeringrequests') {
-    return Promise.resolve(new Response(JSON.stringify({body: PRMockResponse})));
+    return Promise.resolve(new Response(JSON.stringify({ body: PRMockResponse })));
   } else if (url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
-    return Promise.resolve(new Response(JSON.stringify({body: ConfigMockResponse})));
+    return Promise.resolve(new Response(JSON.stringify({ body: ConfigMockResponse })));
   } else if (url === 'http://localhost:3001/pod') {
-    return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+    return Promise.resolve(new Response(JSON.stringify({ body: PodsMockResponse })));
   } else if (url === 'http://localhost:3001/nodes') {
-    return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+    return Promise.resolve(new Response(JSON.stringify({ body: NodesMockResponse })));
   } /*else if (url === 'http://localhost:3001/metrics/nodes') {
     return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
   }*/ else if (url === 'http://localhost:3001/configmaps/liqo') {
-    return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
+    return Promise.resolve(new Response(JSON.stringify({ body: CMMockResponse })));
   } else {
     return metricsPODs({url : url});
   }
@@ -103,6 +163,8 @@ export function mockCRDAndViewsExtended(error, method, crd, view) {
   fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
       return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+    } else if (req.url === 'http://localhost:3001/namespaces') {
+      return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
     } else if (req.url === 'http://localhost:3001/clustercustomobject/views') {
       if(req.method === 'GET'){
         if(view){
@@ -146,6 +208,8 @@ export function mockCRDAndViewsExtended(error, method, crd, view) {
       return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
     } else if (req.url === 'http://localhost:3001/configmaps/liqo') {
       return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
+    } else if(alwaysPresentGET(req.url)){
+      return alwaysPresentGET(req.url)
     } else {
       return metricsPODs(req);
     }
@@ -171,14 +235,16 @@ export const loginTest = async () => {
 
 export async function setup_resource(error, method, crd) {
   mockCRDAndViewsExtended(error, method, crd);
-  await loginTest();
+  Cookies.set('token', 'password');
+  window.history.pushState({}, 'Page Title', '/customresources/liqodashtests.dashboard.liqo.io');
 
-  const customview = screen.getByText('Custom Resources');
-  userEvent.click(customview);
+  render(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>
+  );
 
-  userEvent.click(await screen.findByText('LiqoDashTest'));
-
-  await screen.findByLabelText('plus');
+  expect(await screen.findByLabelText('plus')).toBeInTheDocument();
 }
 
 export async function setup_cv(view) {
@@ -192,6 +258,8 @@ export async function setup_cv(view) {
       return Promise.resolve(new Response(JSON.stringify({ body: view })))
     } else if (url === 'http://localhost:3001/clustercustomobject/tunnelendpoints') {
       return Promise.resolve(new Response(JSON.stringify({ body: TunnMockResponse })))
+    } else if(alwaysPresentGET(url)){
+      return alwaysPresentGET(url)
     } else {
       return generalHomeGET(url);
     }

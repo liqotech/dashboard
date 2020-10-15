@@ -11,12 +11,13 @@ import SchedNodesMockResponse from '../__mocks__/schedulingnodes.json';
 import PieMockResponse from '../__mocks__/piecharts.json';
 import Error409 from '../__mocks__/409.json'
 import userEvent from '@testing-library/user-event';
-import { setup_resource } from './RTLUtils';
-import DesignEditorCRD from '../src/editors/DesignEditorCRD';
+import { mockCRDAndViewsExtended } from './RTLUtils';
+import DesignEditorCRD from '../src/editors/CRD/DesignEditorCRD';
 import { MemoryRouter } from 'react-router-dom';
 import { testTimeout } from '../src/constants';
 import Cookies from 'js-cookie';
 import GraphMockResponse from '../__mocks__/graph.json';
+import App from '../src/app/App';
 
 fetchMock.enableMocks();
 
@@ -93,6 +94,18 @@ async function setup_graphs() {
 beforeEach(() => {
   Cookies.remove('token');
 });
+
+async function setup_resources(){
+  mockCRDAndViewsExtended();
+  Cookies.set('token', 'password');
+  window.history.pushState({}, 'Page Title', '/customresources/liqodashtests.dashboard.liqo.io');
+
+  render(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>
+  );
+}
 
 async function fillFields(noMetadata){
   const name = screen.getAllByRole('textbox', {name: ''})[0];
@@ -220,7 +233,7 @@ describe('DesignEditorCRD', () => {
   }, testTimeout)
 
   test('Definition of a new template works', async () => {
-    await setup_resource();
+    await setup_resources();
 
     userEvent.click(await screen.findByLabelText('picture'));
 
@@ -242,7 +255,7 @@ describe('DesignEditorCRD', () => {
   }, testTimeout)
 
   test('Default template overrides old template', async () => {
-    await setup_resource();
+    await setup_resources();
 
     userEvent.click(await screen.findByLabelText('picture'));
 

@@ -8,11 +8,11 @@ import {
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/theme-monokai';
-import FormGenerator from './OAPIV3FormGenerator/FormGenerator';
-import PieChart from '../templates/piechart/PieChart';
-import HistoChart from '../templates/histogram/HistoChart';
-import GraphNet from '../templates/graph/GraphNet';
-import FormViewer from './OAPIV3FormGenerator/FormViewer';
+import FormGenerator from '../OAPIV3FormGenerator/FormGenerator';
+import PieChart from '../../templates/piechart/PieChart';
+import HistoChart from '../../templates/histogram/HistoChart';
+import GraphNet from '../../templates/graph/GraphNet';
+import FormViewer from '../OAPIV3FormGenerator/FormViewer';
 
 function DesignEditorCRD(props) {
   const [chosenTemplate, setChosenTemplate] = useState(null);
@@ -52,7 +52,7 @@ function DesignEditorCRD(props) {
   const previewFunction = CRTemplate => {
     if(CRTemplate === 'default' && props.CR[0]){
       setPreview(
-        <FormViewer CR={props.CR[0]} CRD={props.CRD} onEditor={true} show={'spec'} />
+        <FormViewer resource={props.CR[0]} CRD={props.CRD} onEditor={true} show={'spec'} />
       );
     }
     else if (chosenTemplate && props.CR[0]) {

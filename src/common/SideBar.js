@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
-import DesktopOutlined from '@ant-design/icons/lib/icons/DesktopOutlined';
 import './SideBar.css';
-import DashboardOutlined from '@ant-design/icons/lib/icons/DashboardOutlined';
-import SettingOutlined from '@ant-design/icons/lib/icons/SettingOutlined';
-import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
-import StarOutlined from '@ant-design/icons/lib/icons/StarOutlined';
+import {
+  DashboardOutlined,
+  SettingOutlined, DesktopOutlined,
+  LayoutOutlined, StarOutlined, ApiOutlined
+} from '@ant-design/icons';
 import AddCustomView from '../views/AddCustomView';
 
 const Sider = Layout.Sider;
@@ -112,8 +112,21 @@ function SideBar() {
             <AddCustomView  />
           </Menu.Item>
           <Menu.Divider/>
+          <Menu.Item key="apis">
+            <Link to="/apis">
+              <ApiOutlined style={{ fontSize: '20px' }} />
+              <span>Apis</span>
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="api">
+            <Link to="/api/v1">
+              <ApiOutlined style={{ fontSize: '20px' }} />
+              <span>Api</span>
+            </Link>
+          </Menu.Item>
+          <Menu.Divider/>
           <Menu.Item key="2" style={{ marginTop: 8}}>
-            <Link to="/customresources">
+            <Link to="/apis/apiextensions.k8s.io/v1/customresourcedefinitions">
               <DesktopOutlined style={{ fontSize: '20px' }} />
               <span>Custom Resources</span>
             </Link>

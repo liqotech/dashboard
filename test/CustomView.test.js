@@ -5,7 +5,7 @@ import ViewMockModified from '../__mocks__/views_modified.json';
 import ViewMockAltTemplate from '../__mocks__/views_alt_template.json';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockCRDAndViewsExtended, setup_cv } from './RTLUtils';
+import { alwaysPresentGET, mockCRDAndViewsExtended, setup_cv } from './RTLUtils';
 import fetchMock from 'jest-fetch-mock';
 import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
@@ -39,6 +39,8 @@ function mocks(view){
       return Promise.resolve(new Response(JSON.stringify({ body: PieMockResponse })))
     } else if (url === 'http://localhost:3001/clustercustomobject/histocharts') {
       return Promise.resolve(new Response(JSON.stringify({body: HistoMockResponse })))
+    } else if(alwaysPresentGET(url)){
+      return alwaysPresentGET(url)
     }
   })
 }
@@ -46,7 +48,7 @@ function mocks(view){
 async function setup(error) {
   window.api = ApiInterface({id_token: 'test'});
   window.api.getCRDs().then(() => {
-    window.api.loadCustomViewsCRs().then(() => {
+    window.api.loadDashboardCRs('View').then(() => {
       if(error) window.api.customViews.current = [];
 
       render(
@@ -136,7 +138,7 @@ describe('CustomView', () => {
 
     await window.api.updateCustomResource(null, null, null, 'advertisements', null, AdvMockResponse);
 
-    expect(await screen.findByText(/resource/i));
+    expect(await screen.findAllByText(/modified/i));
   }, testTimeout)
 
   test('Custom view shows alternative template', async () => {

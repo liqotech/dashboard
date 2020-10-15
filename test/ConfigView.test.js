@@ -3,7 +3,7 @@ import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import ClusterConfigMockResponse from '../__mocks__/configs.json';
 import { render, screen } from '@testing-library/react';
 import Error409 from '../__mocks__/409.json';
-import { loginTest, metricsPODs } from './RTLUtils';
+import { alwaysPresentGET, loginTest, metricsPODs } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import FCMockResponse from '../__mocks__/foreigncluster.json';
 import AdvMockResponse from '../__mocks__/advertisement.json';
@@ -56,6 +56,8 @@ function mocks(error, get){
       return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
     } else if (req.url === 'http://localhost:3001/configmaps/liqo') {
       return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
+    } else if(alwaysPresentGET(req.url)){
+      return alwaysPresentGET(req.url)
     } else {
       return metricsPODs(req);
     }

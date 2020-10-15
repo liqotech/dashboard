@@ -1,0 +1,24 @@
+{
+  "kind": "APIResourceList",
+  "apiVersion": "v1",
+  "groupVersion": "scheduling.liqo.io/v1alpha1",
+  "resources": [
+    {
+      "name": "schedulingnodes",
+      "singularName": "schedulingnode",
+      "namespaced": false,
+      "kind": "SchedulingNode",
+      "verbs": [
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "create",
+        "update",
+        "watch"
+      ],
+      "storageVersionHash": "igicX09+lSY="
+    }
+  ]
+}

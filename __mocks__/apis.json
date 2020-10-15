@@ -1,0 +1,114 @@
+{
+  "kind": "APIGroupList",
+  "apiVersion": "v1",
+  "groups": [
+    {
+      "name": "apps",
+      "versions": [
+        {
+          "groupVersion": "apps/v1",
+          "version": "v1"
+        }
+      ],
+      "preferredVersion": {
+        "groupVersion": "apps/v1",
+        "version": "v1"
+      }
+    },
+    {
+      "name": "apiextensions.k8s.io",
+      "versions": [
+        {
+          "groupVersion": "apiextensions.k8s.io/v1",
+          "version": "v1"
+        },
+        {
+          "groupVersion": "apiextensions.k8s.io/v1beta1",
+          "version": "v1beta1"
+        }
+      ],
+      "preferredVersion": {
+        "groupVersion": "apiextensions.k8s.io/v1",
+        "version": "v1"
+      }
+    },
+    {
+      "name": "config.liqo.io",
+      "versions": [
+        {
+          "groupVersion": "config.liqo.io/v1alpha1",
+          "version": "v1alpha1"
+        }
+      ],
+      "preferredVersion": {
+        "groupVersion": "config.liqo.io/v1alpha1",
+        "version": "v1alpha1"
+      }
+    },
+    {
+      "name": "dashboard.liqo.io",
+      "versions": [
+        {
+          "groupVersion": "dashboard.liqo.io/v1alpha1",
+          "version": "v1alpha1"
+        }
+      ],
+      "preferredVersion": {
+        "groupVersion": "dashboard.liqo.io/v1alpha1",
+        "version": "v1alpha1"
+      }
+    },
+    {
+      "name": "discovery.liqo.io",
+      "versions": [
+        {
+          "groupVersion": "discovery.liqo.io/v1alpha1",
+          "version": "v1alpha1"
+        }
+      ],
+      "preferredVersion": {
+        "groupVersion": "discovery.liqo.io/v1alpha1",
+        "version": "v1alpha1"
+      }
+    },
+    {
+      "name": "net.liqo.io",
+      "versions": [
+        {
+          "groupVersion": "net.liqo.io/v1alpha1",
+          "version": "v1alpha1"
+        }
+      ],
+      "preferredVersion": {
+        "groupVersion": "net.liqo.io/v1alpha1",
+        "version": "v1alpha1"
+      }
+    },
+    {
+      "name": "scheduling.liqo.io",
+      "versions": [
+        {
+          "groupVersion": "scheduling.liqo.io/v1alpha1",
+          "version": "v1alpha1"
+        }
+      ],
+      "preferredVersion": {
+        "groupVersion": "scheduling.liqo.io/v1alpha1",
+        "version": "v1alpha1"
+      }
+    },
+    {
+      "name": "sharing.liqo.io",
+      "versions": [
+        {
+          "groupVersion": "sharing.liqo.io/v1alpha1",
+          "version": "v1alpha1"
+        }
+      ],
+      "preferredVersion": {
+        "groupVersion": "sharing.liqo.io/v1alpha1",
+        "version": "v1alpha1"
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './CustomView.css';
-import CRD from '../CRD/CRD';
+import CRD from '../resources/CRD/CRD';
 import _, { isEmpty } from 'lodash';
 import LoadingIndicator from '../common/LoadingIndicator';
 import 'react-resizable/css/styles.css';
@@ -194,7 +194,7 @@ function CustomView(props) {
 
     for(let i = 0; i < CRDs.length; i++) {
       let CRDlayout = null;
-      if (layout[newBr]) {
+      if (layout && layout[newBr]) {
         CRDlayout = layout[newBr].find(item => {return item.i === CRDs[i].metadata.name})
       }
       /** Stay where I put you even when the layout is regenerated */
@@ -208,7 +208,7 @@ function CustomView(props) {
         static: CRDs[i].static ? CRDs[i].static : false
       });
     }
-    let layouts = JSON.parse(JSON.stringify(layout));
+    let layouts = layout ? JSON.parse(JSON.stringify(layout)) : {};
     layouts[newBr] = _layout;
     setLoading(false);
     setLayout(layouts);

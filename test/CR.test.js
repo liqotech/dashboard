@@ -8,7 +8,7 @@ import ViewMockResponse from '../__mocks__/views.json';
 import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import PieMockResponse from '../__mocks__/piecharts.json';
 import userEvent from '@testing-library/user-event';
-import CR from '../src/CRD/CR';
+import CR from '../src/resources/CRD/CR';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import LiqoDashAlteredMockResponse from '../__mocks__/liqodashtest_noSpec_noStatus.json';
 import { setup_resource } from './RTLUtils';
@@ -134,6 +134,7 @@ describe('CR', () => {
 
     expect(await screen.findByLabelText('cr')).toBeInTheDocument();
     userEvent.click(screen.getByText(/advertisement-/i));
+    userEvent.click(await screen.findByText('Spec'));
     userEvent.click(await screen.findByText('General'));
     let date = screen.getAllByRole('date-picker');
     let edit = screen.getAllByLabelText('edit');

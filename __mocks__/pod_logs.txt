@@ -1,0 +1,17 @@
+[INFO] plugin/ready: Still waiting on: "kubernetes"
+.:53
+[INFO] plugin/reload: Running configuration MD5 = 4e235fcc3696966e76816bcd9034ebc7
+CoreDNS-1.6.7
+linux/amd64, go1.13.6, da7f65b
+[INFO] plugin/ready: Still waiting on: "kubernetes"
+[INFO] plugin/ready: Still waiting on: "kubernetes"
+I1014 08:53:50.545770       1 trace.go:116] Trace[2019727887]: "Reflector ListAndWatch" name:pkg/mod/k8s.io/client-go@v0.17.2/tools/cache/reflector.go:105 (started: 2020-10-14 08:53:20.5452 +0000 UTC m=+0.019370001) (total time: 30.000433s):
+Trace[2019727887]: [30.000433s] [30.000433s] END
+E1014 08:53:50.545814       1 reflector.go:153] pkg/mod/k8s.io/client-go@v0.17.2/tools/cache/reflector.go:105: Failed to list *v1.Namespace: Get https://10.96.0.1:443/api/v1/namespaces?limit=500&resourceVersion=0: dial tcp 10.96.0.1:443: i/o timeout
+I1014 08:53:50.545832       1 trace.go:116] Trace[1427131847]: "Reflector ListAndWatch" name:pkg/mod/k8s.io/client-go@v0.17.2/tools/cache/reflector.go:105 (started: 2020-10-14 08:53:20.5452622 +0000 UTC m=+0.019432101) (total time: 30.0003768s):
+Trace[1427131847]: [30.0003768s] [30.0003768s] END
+E1014 08:53:50.545858       1 reflector.go:153] pkg/mod/k8s.io/client-go@v0.17.2/tools/cache/reflector.go:105: Failed to list *v1.Service: Get https://10.96.0.1:443/api/v1/services?limit=500&resourceVersion=0: dial tcp 10.96.0.1:443: i/o timeout
+I1014 08:53:50.545897       1 trace.go:116] Trace[939984059]: "Reflector ListAndWatch" name:pkg/mod/k8s.io/client-go@v0.17.2/tools/cache/reflector.go:105 (started: 2020-10-14 08:53:20.5452473 +0000 UTC m=+0.019417301) (total time: 30.0004771s):
+Trace[939984059]: [30.0004771s] [30.0004771s] END
+E1014 08:53:50.545922       1 reflector.go:153] pkg/mod/k8s.io/client-go@v0.17.2/tools/cache/reflector.go:105: Failed to list *v1.Endpoints: Get https://10.96.0.1:443/api/v1/endpoints?limit=500&resourceVersion=0: dial tcp 10.96.0.1:443: i/o timeout
+[INFO] plugin/ready: Still waiting on: "kubernetes"

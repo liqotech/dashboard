@@ -1,0 +1,58 @@
+{
+  "kind": "APIResourceList",
+  "apiVersion": "v1",
+  "groupVersion": "discovery.liqo.io/v1alpha1",
+  "resources": [
+    {
+      "name": "foreignclusters",
+      "singularName": "foreigncluster",
+      "namespaced": false,
+      "kind": "ForeignCluster",
+      "verbs": [
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "create",
+        "update",
+        "watch"
+      ],
+      "storageVersionHash": "wxDkOgq9qmQ="
+    },
+    {
+      "name": "searchdomains",
+      "singularName": "searchdomain",
+      "namespaced": false,
+      "kind": "SearchDomain",
+      "verbs": [
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "create",
+        "update",
+        "watch"
+      ],
+      "storageVersionHash": "TiyPLjS5IPU="
+    },
+    {
+      "name": "peeringrequests",
+      "singularName": "peeringrequest",
+      "namespaced": false,
+      "kind": "PeeringRequest",
+      "verbs": [
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "create",
+        "update",
+        "watch"
+      ],
+      "storageVersionHash": "sA2PCJnQjpk="
+    }
+  ]
+}

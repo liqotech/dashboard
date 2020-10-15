@@ -56,7 +56,7 @@ function createTabs(kind, CR) {
       >
         <Alert.ErrorBoundary>
           <FormViewer CRD={CRD}
-                      CR={CR}
+                      resource={CR}
                       show={'metadata'}
           />
         </Alert.ErrorBoundary>
@@ -69,7 +69,7 @@ function createTabs(kind, CR) {
       >
         <Alert.ErrorBoundary>
           <FormViewer CRD={CRD}
-                      CR={CR}
+                      resource={CR}
                       show={'spec'}
           />
         </Alert.ErrorBoundary>
@@ -82,7 +82,7 @@ function createTabs(kind, CR) {
       >
         <Alert.ErrorBoundary>
           <FormViewer CRD={CRD}
-                      CR={CR}
+                      resource={CR}
                       show={'status'}
           />
         </Alert.ErrorBoundary>

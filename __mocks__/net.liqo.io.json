@@ -1,0 +1,63 @@
+{
+  "kind": "APIResourceList",
+  "apiVersion": "v1",
+  "groupVersion": "net.liqo.io/v1alpha1",
+  "resources": [
+    {
+      "name": "networkconfigs",
+      "singularName": "networkconfig",
+      "namespaced": false,
+      "kind": "NetworkConfig",
+      "verbs": [
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "create",
+        "update",
+        "watch"
+      ],
+      "storageVersionHash": "qsc7utRJ/kY="
+    },
+    {
+      "name": "networkconfigs/status",
+      "singularName": "",
+      "namespaced": false,
+      "kind": "NetworkConfig",
+      "verbs": [
+        "get",
+        "patch",
+        "update"
+      ]
+    },
+    {
+      "name": "tunnelendpoints",
+      "singularName": "tunnelendpoint",
+      "namespaced": false,
+      "kind": "TunnelEndpoint",
+      "verbs": [
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "create",
+        "update",
+        "watch"
+      ],
+      "storageVersionHash": "R4sUOfG4c7g="
+    },
+    {
+      "name": "tunnelendpoints/status",
+      "singularName": "",
+      "namespaced": false,
+      "kind": "TunnelEndpoint",
+      "verbs": [
+        "get",
+        "patch",
+        "update"
+      ]
+    }
+  ]
+}

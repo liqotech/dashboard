@@ -1,0 +1,35 @@
+{
+  "kind": "APIResourceList",
+  "apiVersion": "v1",
+  "groupVersion": "config.liqo.io/v1alpha1",
+  "resources": [
+    {
+      "name": "clusterconfigs",
+      "singularName": "clusterconfig",
+      "namespaced": false,
+      "kind": "ClusterConfig",
+      "verbs": [
+        "delete",
+        "deletecollection",
+        "get",
+        "list",
+        "patch",
+        "create",
+        "update",
+        "watch"
+      ],
+      "storageVersionHash": "Zvt6E4r+7OI="
+    },
+    {
+      "name": "clusterconfigs/status",
+      "singularName": "",
+      "namespaced": false,
+      "kind": "ClusterConfig",
+      "verbs": [
+        "get",
+        "patch",
+        "update"
+      ]
+    }
+  ]
+}

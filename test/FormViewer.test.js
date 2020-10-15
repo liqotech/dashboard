@@ -4,7 +4,7 @@ import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import ApiInterface from '../src/services/api/ApiInterface';
 import userEvent from '@testing-library/user-event';
-import CR from '../src/CRD/CR';
+import CR from '../src/resources/CRD/CR';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import { MemoryRouter } from 'react-router-dom';
 import AdvMockResponse from '../__mocks__/advertisement.json';
@@ -84,6 +84,7 @@ describe('FormViewer', () => {
     await check();
 
     userEvent.click(screen.getByText(/advertisement-/i));
+    userEvent.click(await screen.findByText('Spec'));
     userEvent.click(await screen.findByText('General'));
     userEvent.click(await screen.findByText('Network'));
 
@@ -99,6 +100,7 @@ describe('FormViewer', () => {
     await check();
 
     userEvent.click(screen.getByText(/advertisement-/i));
+    userEvent.click(await screen.findByText('Spec'));
     userEvent.click(await screen.findByText('General'));
     userEvent.click(await screen.findByText('Limit Range'));
     userEvent.click(await screen.findByText('Limits'));
@@ -122,6 +124,7 @@ describe('FormViewer', () => {
     await check();
 
     userEvent.click(screen.getByText(/advertisement-/i));
+    userEvent.click(await screen.findByText('Spec'));
     userEvent.click(await screen.findByText('General'));
     userEvent.click(await screen.findByText('Limit Range'));
     userEvent.click(await screen.findByText('Limits'));

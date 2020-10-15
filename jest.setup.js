@@ -22,6 +22,10 @@ jest.mock('ace-builds/src-noconflict/mode-json', () => { return null});
 jest.mock('ace-builds/src-noconflict/mode-yaml', () => { return null});
 jest.mock('ace-builds/src-noconflict/theme-monokai', () => { return null});
 jest.mock('ace-builds/src-noconflict/theme-github', () => { return null});
+jest.mock('ace-builds/webpack-resolver', () => { return null});
+jest.mock('ace-builds/src-noconflict/mode-markdown', () => { return null});
+jest.mock('ace-builds/src-noconflict/mode-javascript', () => { return null});
+jest.mock('ace-builds/src-noconflict/theme-dawn', () => { return null});
 
 jest.mock('./src/views/CustomViewUtils', () => {
   const onDrag = () => {}

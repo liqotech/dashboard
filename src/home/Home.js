@@ -118,10 +118,13 @@ function Home(){
         }
 
         /** Then set up a watch to watch changes in the CRs of the CRD */
-        window.api.watchCRD(
+        window.api.watchResource(
+          'apis',
           CRD.spec.group,
+          undefined,
           CRD.spec.version,
           CRD.spec.names.plural,
+          undefined,
           notifyEvent
         );
 

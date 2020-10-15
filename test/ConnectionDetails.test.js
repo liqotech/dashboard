@@ -132,8 +132,6 @@ describe('ConnectionDetails', () => {
     userEvent.click(await screen.findByText('Foreign'));
 
     expect(await screen.findAllByText(/POD/i)).toHaveLength(2);
-
-    screen.debug(await screen.findAllByText(/0/i))
   }, testTimeout)
 
   test('Detail button works (only in)', async () => {

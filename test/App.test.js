@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { metricsPODs, mockCRDAndViewsExtended } from './RTLUtils';
+import { alwaysPresentGET, metricsPODs, mockCRDAndViewsExtended } from './RTLUtils';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
@@ -18,6 +18,18 @@ import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 import Cookies from 'js-cookie';
 import userEvent from '@testing-library/user-event';
+import NamespaceResponse from '../__mocks__/namespaces.json';
+import ApiV1MockResponse from '../__mocks__/apiv1.json';
+import ApisMockResponse from '../__mocks__/apis.json';
+import AppsResponse from '../__mocks__/apps.json';
+import ApiExtResponse from '../__mocks__/apiextension.k8s.io.json';
+import ConfigGroup from '../__mocks__/config.liqo.io.json';
+import DashboardGroup from '../__mocks__/dashboard.liqo.io.json';
+import DiscoveryGroup from '../__mocks__/discovery.liqo.io.json';
+import NetGroup from '../__mocks__/net.liqo.io.json';
+import SchedulingGroup from '../__mocks__/scheduling.liqo.io.json';
+import SharingGroup from '../__mocks__/sharing.liqo.io.json';
+import VKGroup from '../__mocks__/virtualkubelet.liqo.io.json';
 
 fetchMock.enableMocks();
 
@@ -38,8 +50,13 @@ beforeEach(() => {
 
 function mocks(){
   fetch.mockImplementation((url) => {
+    console.log(url)
     if (url === 'http://localhost:3001/customresourcedefinition') {
       return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+    } else if (url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {
+      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+    } else if (url === 'http://localhost:3001/namespaces') {
+      return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
     } else if (url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
       return Promise.resolve(new Response(JSON.stringify({body: FCMockResponse})));
     } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
@@ -58,6 +75,8 @@ function mocks(){
       return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
     } else if (url === 'http://localhost:3001/configmaps/liqo') {
       return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
+    } else if(alwaysPresentGET(url)){
+      return alwaysPresentGET(url)
     } else {
       return metricsPODs({url : url});
     }
@@ -78,7 +97,7 @@ describe('App', () => {
   test('Login with path', async () => {
     mocks();
     Cookies.set('token', 'password');
-    window.history.pushState({}, 'Page Title', '/customresources');
+    window.history.pushState({}, 'Page Title', '/apis/apiextensions.k8s.io/v1/customresourcedefinitions');
 
     render(
       <MemoryRouter>
@@ -86,9 +105,8 @@ describe('App', () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByText('Kind'));
-    expect(await screen.findByText('Description'));
-    expect(await screen.findByText('Group'));
+    expect(await screen.findByText('Name'));
+    expect(await screen.findByText('Namespace'));
   })
 
   test('Access /login path when already logged redirect to Home', async () => {
