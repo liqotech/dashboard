@@ -46,6 +46,7 @@ export default function ApiManager() {
           } else if (w.plural === plural)
             w.callback('ADDED', res.body);
         })
+        return res;
       });
   }
 
@@ -91,6 +92,8 @@ export default function ApiManager() {
       array[4] = 'views/';
     if(array[4] === 'customresourcedefinitions' && path.slice(-1) === '/')
       array[4] = 'customresourcedefinitions/';
+    if(array[4] === 'dashboardconfigs' && path.slice(-1) === '/')
+      array[4] = 'dashboardconfigs/';
     watchList.push({
       plural: array[1] === 'api' ? (array[3] === 'namespaces' ? array[5] : array[4])
       : array[4],
@@ -188,7 +191,6 @@ export default function ApiManager() {
           plural = array[4];
         else plural = array[4];
       }
-      //console.log(plural);
       if(method === 'PATCH' || method === 'POST')
         watchList.find(item => item.plural === plural)
           .callback(method === 'PATCH' ? 'MODIFIED' : 'ADDED', item);

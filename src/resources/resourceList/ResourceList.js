@@ -6,6 +6,7 @@ import ListHeader from './ListHeader';
 import { resourceNotifyEvent } from '../common/ResourceUtils';
 import { renderResourceList } from './ResourceListRenderer';
 import { calculateAge } from '../../services/TimeUtils';
+import { getResourceConfig } from '../common/DashboardConfigUtils';
 
 function ResourceList(props) {
   /**
@@ -14,6 +15,7 @@ function ResourceList(props) {
   const [loading, setLoading] = useState(true);
   const [resourceList, setResourceList] = useState([]);
   const [kind, setKind] = useState('');
+  const [resourceConfig, setResourceConfig] = useState({});
   const [columnHeaders, setColumnHeaders] = useState([]);
   const [columnContents, setColumnsContents] = useState([]);
   const [onCustomResource, setOnCustomResource] = useState(false);
@@ -23,10 +25,11 @@ function ResourceList(props) {
 
   useEffect(() => {
     loadResourceList();
-
+    getDashConfig();
     if(params.namespace)
       window.api.setNamespace(params.namespace);
     window.api.NSArrayCallback.current.push(changeNamespace);
+    window.api.DCArrayCallback.current.push(getDashConfig);
 
     setOnCustomResource(
       window.api.CRDs.current.find(CRD => {
@@ -41,6 +44,9 @@ function ResourceList(props) {
       setColumnHeaders([]);
       window.api.abortWatch(params.resource);
       window.api.NSArrayCallback.current = window.api.NSArrayCallback.current.filter(func => {return func !== changeNamespace});
+      window.api.DCArrayCallback.current = window.api.DCArrayCallback.current.filter(func => {
+        return func !== getDashConfig;
+      });
     }
   }, [location]);
 
@@ -107,6 +113,12 @@ function ResourceList(props) {
     });
 
     setColumnsContents([...resourceViews]);
+  }
+
+  const getDashConfig = () => {
+    setResourceConfig(() => {
+      return getResourceConfig(params);
+    });
   }
 
   const changeNamespace = () => {

@@ -7,13 +7,14 @@ import ResourceForm from './ResourceForm';
 import { resourceNotifyEvent } from '../common/ResourceUtils';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { CodeOutlined, InfoCircleOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
-import Utils from '../../services/Utils';
+import { getResourceConfig } from '../common/DashboardConfigUtils';
 
 function ResourceGeneral(props){
   const [container, setContainer] = useState(null);
   const deleted = useRef(false)
   const [loading, setLoading] = useState(true);
   const [resource, setResource] = useState([]);
+  const [resourceConfig, setResourceConfig] = useState({});
   const [currentTab, setCurrentTab] = useState('General');
   const [tabList, setTabList] = useState([])
   const [contentList, setContentList] = useState({});
@@ -24,9 +25,14 @@ function ResourceGeneral(props){
 
   useEffect(() => {
     loadResource();
+    getDashConfig();
+    window.api.DCArrayCallback.current.push(getDashConfig);
 
     /** When unmounting, eliminate every callback and watch */
     return () => {
+      window.api.DCArrayCallback.current = window.api.DCArrayCallback.current.filter(func => {
+        return func !== getDashConfig;
+      });
       if(props.onCustomView){
         //window.api.abortWatch(params.crdName.split('.')[0]);
       } else {
@@ -78,6 +84,12 @@ function ResourceGeneral(props){
 
   const submit = item => {
     updateResource(item.metadata.name, item.metadata.namespace, item);
+  }
+
+  const getDashConfig = () => {
+    setResourceConfig(() => {
+      return getResourceConfig(params);
+    });
   }
 
   const manageContentList = () => {
