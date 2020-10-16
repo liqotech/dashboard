@@ -32,7 +32,6 @@ beforeEach(() => {
 
 function mocks(errorApis, errorApi){
   fetch.mockImplementation((url) => {
-    //console.log(url)
     if (url === 'http://localhost:3001/customresourcedefinition') {
       return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
     } else if (url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {

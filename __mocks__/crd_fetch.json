@@ -1330,6 +1330,158 @@
         }
       },
       "status": {}
+    },
+    {
+      "metadata": {
+        "name": "dashboardconfigs.dashboard.liqo.io",
+        "selfLink": "/apis/apiextensions.k8s.io/v1/customresourcedefinitions/dashboardconfigs.dashboard.liqo.io",
+        "uid": "6092e0f8-7996-42dc-b3be-2cf76574827f",
+        "resourceVersion": "0000000",
+        "creationTimestamp": "2020-10-11T17:00:03Z",
+        "annotations": {
+          "favourite": "true"
+        }
+      },
+      "spec": {
+        "group": "dashboard.liqo.io",
+        "names": {
+          "plural": "dashboardconfigs",
+          "singular": "dashboardconfig",
+          "kind": "DashboardConfig",
+          "listKind": "DashboardConfigList"
+        },
+        "scope": "Cluster",
+        "versions": [
+          {
+            "name": "v1alpha1",
+            "served": true,
+            "storage": true,
+            "schema": {
+              "openAPIV3Schema": {
+                "type": "object",
+                "properties": {
+                  "apiVersion": {
+                    "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+                    "type": "string"
+                  },
+                  "kind": {
+                    "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "type": "object"
+                  },
+                  "spec": {
+                    "type": "object",
+                    "properties": {
+                      "resources": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "favourite": {
+                              "type": "boolean"
+                            },
+                            "icon": {
+                              "type": "string"
+                            },
+                            "render": {
+                              "type": "object",
+                              "properties": {
+                                "columns": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "columnContent": {
+                                        "type": "string"
+                                      },
+                                      "columnName": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                },
+                                "tabs": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "tabContent": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "cardContent": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "parameter": {
+                                                    "type": "string"
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "cardLayout": {
+                                              "type": "object",
+                                              "properties": {
+                                                "h": {
+                                                  "type": "integer"
+                                                },
+                                                "w": {
+                                                  "type": "integer"
+                                                },
+                                                "x": {
+                                                  "type": "integer"
+                                                },
+                                                "y": {
+                                                  "type": "integer"
+                                                }
+                                              }
+                                            },
+                                            "cardTitle": {
+                                              "type": "string"
+                                            },
+                                            "displayMode": {
+                                              "type": "string"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "tabName": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "resourceName": {
+                              "type": "string"
+                            },
+                            "resourcePath": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "status": {
+        "acceptedNames": {
+          "plural": "dashboardconfigs",
+          "singular": "dashboardconfig",
+          "kind": "DashboardConfig",
+          "listKind": "DashboardConfigList"
+        }
+      }
     }
   ]
 }

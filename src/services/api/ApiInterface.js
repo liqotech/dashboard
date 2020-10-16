@@ -11,10 +11,9 @@ export default function ApiInterface(_user, props) {
 
   const CRDs = {current: []};
   const customViews = {current: []};
+  const dashConfigs = {current: null};
   const namespace = {current: null};
   const watches = {current: []};
-  /** Callback for CRD list view */
-  const CRDListCallback = {current: null};
   /** Callback for the autocomplete search bar */
   const autoCompleteCallback = {current: null};
   /** Callback array for CRDs in CRD view */
@@ -23,6 +22,8 @@ export default function ApiInterface(_user, props) {
   const sidebarCallback = {current: null};
   /** Callback array for custom views */
   const CVArrayCallback = {current: []};
+  /** Callback array for dashboard config */
+  const DCArrayCallback = {current: []};
   /** Callback array for namespace change */
   const NSArrayCallback = {current: []};
 
@@ -112,21 +113,62 @@ export default function ApiInterface(_user, props) {
       /** First get all the CR */
       return getCustomResourcesAllNamespaces(CRD)
         .then((res) => {
-          customViews.current = res.body.items;
-          /** update CVs in the views */
-          manageCallbackCVs(customViews.current);
+          if(kind === 'DashboardConfig'){
+            if(res.body.items[0]){
+              dashConfigs.current = res.body.items[0];
+              /** update CDs in the views */
+              manageCallbackDCs(dashConfigs.current);
+            } else {
+              /** If there is no config, create one */
+              createNewDC(CRD);
+            }
 
-          /** Then set up a watch to watch changes in the CR of the CRD */
-          watchResource(
-            'apis',
-            CRD.spec.group,
-            undefined,
-            CRD.spec.version,
-            CRD.spec.names.plural + '/',
-            undefined,
-            CVsNotifyEvent);
-        });
+            /** Then set up a watch to watch changes in the CR of the CRD */
+            watchResource(
+              'apis',
+              CRD.spec.group,
+              undefined,
+              CRD.spec.version,
+              CRD.spec.names.plural + '/',
+              undefined,
+              DCsNotifyEvent);
+          }else{
+            customViews.current = res.body.items;
+            /** update CVs in the views */
+            manageCallbackCVs(customViews.current);
+
+            /** Then set up a watch to watch changes in the CR of the CRD */
+            watchResource(
+              'apis',
+              CRD.spec.group,
+              undefined,
+              CRD.spec.version,
+              CRD.spec.names.plural + '/',
+              undefined,
+              CVsNotifyEvent);
+          }
+        }).catch(error => console.log(error));
     }
+  }
+
+  const createNewDC = (CRD) => {
+    /** If there is no config, create one */
+    createCustomResource(
+      CRD.spec.group,
+      CRD.spec.version,
+      undefined,
+      CRD.spec.names.plural,
+      {
+        apiVersion: CRD.spec.group + '/' + CRD.spec.version,
+        kind: CRD.spec.names.kind,
+        metadata: { name: 'default-config' },
+        spec: { resources: [] }
+      }
+    ).then(res => {
+      dashConfigs.current = res.body;
+      /** update CDs in the views */
+      manageCallbackDCs(dashConfigs.current);
+    })
   }
 
   /**
@@ -258,9 +300,12 @@ export default function ApiInterface(_user, props) {
       if(!type){
         if(abortWatch(watch.plural)){
           /**
-           * If it's the views watcher that stopped, we need to do an extra step
+           * If it's an always needed watch that stopped, we need to do an extra step
            */
-          if(watch.plural === 'views/' || watch.plural === 'customresourcedefinitions/'){
+          if(watch.plural === 'views/' ||
+            watch.plural === 'customresourcedefinitions/' ||
+            watch.plural === 'dashboardconfigs/'
+          ){
             watches.current = watches.current.filter(item => {return item.plural !== watch.plural});
           }
           watchResource(
@@ -280,7 +325,7 @@ export default function ApiInterface(_user, props) {
 
   const abortWatch = watch => {
     /** These watch need to always be up and restarted if aborted */
-    if(watch === 'views/' || watch === 'customresourcedefinitions/') return true;
+    if(watch === 'views/' || watch === 'customresourcedefinitions/' || watch === 'dashboardconfigs/') return true;
 
     let w = watches.current.find(item => {return item.plural === watch});
     if(w){
@@ -344,10 +389,6 @@ export default function ApiInterface(_user, props) {
     if(autoCompleteCallback.current)
       autoCompleteCallback.current(CRDs.current);
 
-    /** update CRDs in the CRD view*/
-    if(CRDListCallback.current)
-      CRDListCallback.current(CRDs.current);
-
     /** update CRDs in the CRD views */
     CRDArrayCallback.current.forEach(func => {
       func(CRDs.current, object, type);
@@ -394,6 +435,24 @@ export default function ApiInterface(_user, props) {
   const manageCallbackCVs = () =>{
     /** update custom views */
     return CVArrayCallback.current.forEach(func => {
+      func();
+    })
+  }
+
+  const DCsNotifyEvent = (type, object) => {
+    if (type === 'MODIFIED') {
+      dashConfigs.current = object.items[0];
+      message.success('Dashboard Config modified');
+      manageCallbackDCs();
+    } else if (type === 'DELETED') {
+      dashConfigs.current = undefined;
+      createNewDC(getCRDFromKind('DashboardConfig'));
+    }
+  }
+
+  const manageCallbackDCs = () =>{
+    /** update custom views */
+    return DCArrayCallback.current.forEach(func => {
       func();
     })
   }
@@ -487,13 +546,14 @@ export default function ApiInterface(_user, props) {
     user,
     CRDs,
     customViews,
+    dashConfigs,
     namespace,
     watches,
-    CRDListCallback,
     autoCompleteCallback,
     CRDArrayCallback,
     sidebarCallback,
     CVArrayCallback,
+    DCArrayCallback,
     NSArrayCallback,
     apiManager,
     getConfigMaps,
@@ -519,6 +579,7 @@ export default function ApiInterface(_user, props) {
     getCRDs,
     setUser,
     manageCallbackCVs,
+    manageCallbackDCs,
     setNamespace,
     getApis,
     getGenericResource,

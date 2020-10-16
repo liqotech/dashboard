@@ -38,6 +38,7 @@ import SchedulingGroup from '../__mocks__/scheduling.liqo.io.json';
 import SharingGroup from '../__mocks__/sharing.liqo.io.json';
 import NamespaceResponse from '../__mocks__/namespaces.json';
 import PodMockResponse from '../__mocks__/pod.json';
+import DashboardConfig from '../__mocks__/dashboardconf.json';
 
 import Cookies from 'js-cookie';
 
@@ -104,6 +105,12 @@ export function alwaysPresentGET(url) {
     url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
   ) {
     return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+  } /*else if (url === 'http://localhost/apiserver/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs' ||
+    url === 'http://localhost:/apiserver/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs'
+  ) {
+    return Promise.resolve(new Response(JSON.stringify(DashboardConfig)));
+  }*/ else if (url === 'http://localhost:3001/clustercustomobject/dashboardconfigs') {
+    return Promise.resolve(new Response(JSON.stringify({body: DashboardConfig})));
   } else return false;
 }
 
@@ -160,9 +167,9 @@ function responseManager(req, error, method, crd, crd_v, res_get, res_post, res_
 export function generalMocks(url){
   if (url === 'http://localhost:3001/customresourcedefinition') {
     return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-  } else if (url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {
+  } /*else if (url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {
     return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-  } else if (url === 'http://localhost:3001/namespaces') {
+  }*/ else if (url === 'http://localhost:3001/namespaces') {
     return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
   } else if (url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
     return Promise.resolve(new Response(JSON.stringify({body: FCMockResponse})));
@@ -174,15 +181,15 @@ export function generalMocks(url){
     return Promise.resolve(new Response(JSON.stringify({body: ConfigMockResponse})));
   } else if (url === 'http://localhost:3001/clustercustomobject/views') {
     return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
-  } else if (url === 'http://localhost:3001/pod') {
+  } /*else if (url === 'http://localhost:3001/pod') {
     return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
-  } else if (url === 'http://localhost:3001/nodes') {
+  }*/ else if (url === 'http://localhost:3001/nodes') {
     return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
-  } else if (url === 'http://localhost:3001/metrics/nodes') {
+  } /*else if (url === 'http://localhost:3001/metrics/nodes') {
     return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
   } else if (url === 'http://localhost:3001/configmaps/liqo') {
     return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
-  } else if(alwaysPresentGET(url)){
+  }*/ else if(alwaysPresentGET(url)){
     return alwaysPresentGET(url)
   } else {
     return metricsPODs({url : url});

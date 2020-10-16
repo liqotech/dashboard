@@ -15,6 +15,7 @@ import ResourceList from '../src/resources/resourceList/ResourceList';
 import App from '../src/app/App';
 import NamespaceResponse from '../__mocks__/namespaces.json';
 import NodesMockResponse from '../__mocks__/nodes.json';
+import Error404 from '../__mocks__/404.json';
 
 fetchMock.enableMocks();
 
@@ -60,6 +61,8 @@ describe('Resource List', () => {
         return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
       } else if (url === 'http://localhost:3001/clustercustomobject/views') {
         return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
+      } else if (url === 'http://localhost:3001/clustercustomobject/dashboardconfigs') {
+        return Promise.reject(Error404.body);
       } else if(alwaysPresentGET(url)){
         return alwaysPresentGET(url)
       } else {
@@ -78,22 +81,8 @@ describe('Resource List', () => {
 
     userEvent.click(screen.getByText('2'));
 
-    expect(await screen.findAllByRole('row')).toHaveLength(2);
+    expect(await screen.findAllByRole('row')).toHaveLength(3);
 
-  }, testTimeout)
-
-  test('CRD list changes on CRD deletion', async () => {
-    await setup();
-
-    expect(await screen.findByText(/advertisement/i));
-
-    let apiManager = window.api.apiManager.current;
-
-    act(() => {
-      apiManager.sendDeletedSignal('customresourcedefinitions', CRDmockResponse.items[0]);
-    })
-
-    expect(await screen.queryByText('Advertisement')).not.toBeInTheDocument();
   }, testTimeout)
 
   test('CRD list changes on CRD add', async () => {
@@ -105,6 +94,11 @@ describe('Resource List', () => {
 
     act(() => {
       apiManager.sendAddedSignal('customresourcedefinitions', CRDmockResponse.items[11]);
+    })
+
+    await act(async () => {
+      apiManager.sendAddedSignal('customresourcedefinitions/', CRDmockResponse.items[11]);
+      await new Promise((r) => setTimeout(r, 1000));
     })
 
     expect(await screen.queryByText('SearchDomain')).not.toBeInTheDocument();
@@ -121,6 +115,11 @@ describe('Resource List', () => {
       apiManager.sendAddedSignal('customresourcedefinitions', CRDmockResponse.items[0]);
     })
 
+    await act(async () => {
+      apiManager.sendAddedSignal('customresourcedefinitions/', CRDmockResponse.items[0]);
+      await new Promise((r) => setTimeout(r, 1000));
+    })
+
     expect(await screen.queryByText('SearchDomain')).not.toBeInTheDocument();
   }, testTimeout)
 
@@ -135,7 +134,26 @@ describe('Resource List', () => {
 
     apiManager.sendAbortedConnectionSignal('views/');
 
-    expect(window.api.watches.current).toHaveLength(3);
+    expect(window.api.watches.current).toHaveLength(4);
+  }, testTimeout)
+
+  test('CRD list changes on CRD deletion', async () => {
+    await setup();
+
+    expect(await screen.findByText(/advertisement/i));
+
+    let apiManager = window.api.apiManager.current;
+
+    act(() => {
+      apiManager.sendDeletedSignal('customresourcedefinitions', CRDmockResponse.items[0]);
+    })
+
+    await act(async () => {
+      apiManager.sendDeletedSignal('customresourcedefinitions/', CRDmockResponse.items[0]);
+      await new Promise((r) => setTimeout(r, 1000));
+    })
+
+    expect(await screen.queryByText('Advertisement')).not.toBeInTheDocument();
   }, testTimeout)
 
   test('Empty notification when no CRDs', async () => {

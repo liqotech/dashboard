@@ -11,6 +11,8 @@ import React from 'react';
 import fetchMock from 'jest-fetch-mock';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../src/app/App';
+import NamespaceSelect from '../src/common/NamespaceSelect';
+import ApiInterface from '../src/services/api/ApiInterface';
 
 fetchMock.enableMocks();
 
@@ -81,6 +83,39 @@ describe('Namespace Select', () => {
     })
 
     expect(await screen.queryByText('awesome-view')).not.toBeInTheDocument();
+
+  }, testTimeout)
+
+  test('Namespace starting from non default', async () => {
+    fetch.mockResponse(req => {
+      return mocks(req);
+    })
+
+    Cookies.set('token', 'password');
+    window.api =  ApiInterface({id_token: 'test'});
+    window.api.namespace.current = 'liqo';
+
+    render(
+      <MemoryRouter>
+        <NamespaceSelect />
+      </MemoryRouter>
+    );
+
+    const ns = await screen.findByText('liqo');
+    userEvent.click(ns);
+
+    const ns_all = await screen.findByText('all namespaces');
+
+    expect(ns_all).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.mouseOver(ns_all);
+      fireEvent.click(ns_all);
+
+      await new Promise((r) => setTimeout(r, 1000));
+    })
+
+    expect(window.api.namespace.current).toBeNull();
 
   }, testTimeout)
 

@@ -16,6 +16,7 @@ function AppHeader(props) {
   let params = useParams();
 
   const autoCompleteSearch = () => {
+    setAutocomplete([]);
     window.api.getApis('/').then(res => {
       res.body.groups.forEach(group => {
         window.api.getGenericResource(
