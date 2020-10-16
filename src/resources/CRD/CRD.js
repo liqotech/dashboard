@@ -17,11 +17,11 @@ import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
 import PictureOutlined from '@ant-design/icons/lib/icons/PictureOutlined';
 import DragOutlined from '@ant-design/icons/lib/icons/DragOutlined';
 import PushpinOutlined from '@ant-design/icons/lib/icons/PushpinOutlined';
-import NewCR from '../../editors/CRD/NewCR';
+import NewResource from '../../editors/CRD/NewResource';
 import DesignEditorCRD from '../../editors/CRD/DesignEditorCRD';
 import Editor from '../../editors/Editor';
 import CustomViewButton from '../common/buttons/CustomViewButton';
-import { resourceNotifyEvent } from '../resource/ResourceUtils';
+import { resourceNotifyEvent } from '../common/ResourceUtils';
 
 function CRD(props) {
 
@@ -211,9 +211,10 @@ function CRD(props) {
                                  setShowEditor={setShowEditor}
                                  CR={customResources} showEditor={showEditor}
                 />
-                <NewCR CRD={CRD}
-                       showCreate={showCreate}
-                       setShowCreate={setShowCreate}
+                <NewResource resource={CRD}
+                             showCreate={showCreate}
+                             setShowCreate={setShowCreate}
+                             kind={CRD.spec.names.kind}
                 />
               </div>
             ) : (

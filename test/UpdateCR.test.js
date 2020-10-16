@@ -86,10 +86,10 @@ describe('UpdateCR', () => {
     expect(screen.getAllByText('Name')).toHaveLength(2);
 
     const textboxes = await screen.findAllByRole('textbox');
-    expect(textboxes[0]).toHaveAttribute('value', '13');
-    expect(textboxes[1]).toHaveAttribute('value', 'green');
-    expect(textboxes[2]).toHaveAttribute('value', '15');
-    expect(textboxes[3]).toHaveAttribute('value', 'purple');
+    expect(textboxes[1]).toHaveAttribute('value', '13');
+    expect(textboxes[2]).toHaveAttribute('value', 'green');
+    expect(textboxes[3]).toHaveAttribute('value', '15');
+    expect(textboxes[4]).toHaveAttribute('value', 'purple');
   }, testTimeout)
 
   test('Editor throws error when not valid body', async () => {

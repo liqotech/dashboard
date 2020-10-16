@@ -1,9 +1,11 @@
 import ToolOutlined from '@ant-design/icons/lib/icons/ToolOutlined';
 import React, { useEffect, useState } from 'react';
-import { Alert, Card } from 'antd';
+import{  Input, Alert, Card } from 'antd';
 import FormViewer from '../../editors/OAPIV3FormGenerator/FormViewer';
 import { properCase } from '../../services/stringUtils';
-import Logs from '../pod/Logs';
+import Logs from './pod/Logs';
+import Utils from '../../services/Utils';
+import _ from 'lodash';
 
 export default function ResourceForm(props){
   const [currentTab, setCurrentTab] = useState('metadata');
@@ -33,7 +35,10 @@ export default function ResourceForm(props){
             [key]: (<div key={key + '_' + props.resource.metadata.name}>
               <Alert.ErrorBoundary>
                 <div aria-label={'form_' + key}>
-                  <FormViewer {...props} show={key} readonly={readonly}/>
+                  <FormViewer {...props} show={key} readonly={readonly}
+                              resourceName={props.resource.metadata.name}
+                              resourceNamespace={props.resource.metadata.namespace}
+                  />
                 </div>
               </Alert.ErrorBoundary>
             </div>)
@@ -61,11 +66,44 @@ export default function ResourceForm(props){
     }
   }, [props.resource])
 
+  const searchProperty = value => {
+    let utils = Utils();
+    let object = utils.getSelectedProperties(props.resource[currentTab], value.target.value);
+
+    if(_.isEmpty(object))
+      object = props.resource[currentTab];
+
+    let searchedRes = {
+      [currentTab]: object
+    }
+
+    setContentList(prev => {
+      prev[currentTab] = (
+        <div key={currentTab + '_' + props.resource.metadata.name + '#' + value.target.value}>
+          <Alert.ErrorBoundary>
+            <div aria-label={'form_' + currentTab}>
+              <FormViewer {...props} resource={JSON.parse(JSON.stringify(searchedRes))} show={currentTab}
+                          resourceName={props.resource.metadata.name} origResource={props.resource[currentTab]}
+                          resourceNamespace={props.resource.metadata.namespace}
+              />
+            </div>
+          </Alert.ErrorBoundary>
+        </div>
+      )
+      return {...prev}
+    })
+  };
+
   return(
     <Card tabList={tabList}
           tabProps={{
             size: 'small',
           }}
+          tabBarExtraContent={
+            <div style={{width: '20em'}}>
+              <Input size={'small'} onPressEnter={searchProperty} placeholder={'Search'} allowClear />
+            </div>
+          }
           size={'small'}
           type={'inner'}
           activeTabKey={currentTab}

@@ -14,6 +14,7 @@ const Form = withTheme(AntDTheme);
 function FormViewer(props) {
 
   const [showButton, setShowButton] = useState(false);
+  const [updateCount, setUpdateCount] = useState(0);
 
   const util = Utils();
 
@@ -46,10 +47,8 @@ function FormViewer(props) {
 
     item[props.show] = value.formData
 
-    let namespace = null;
-
-    if(props.resource.metadata.namespace){
-      namespace = props.resource.metadata.namespace;
+    if(props.origResource){
+      item[props.show] = Utils().fromDotToObject(item, props.origResource);
     }
 
     let promise;
@@ -58,18 +57,21 @@ function FormViewer(props) {
       promise = window.api.updateCustomResource(
         props.CRD.spec.group,
         props.CRD.spec.version,
-        namespace,
+        props.resourceNamespace,
         props.CRD.spec.names.plural,
-        props.resource.metadata.name,
+        props.resourceName,
         item
       );
     } else {
       promise = props.updateFunc(
-        props.resource.metadata.name,
-        props.resource.metadata.namespace,
+        props.resourceName,
+        props.resourceNamespace,
         item
       )
     }
+
+    setShowButton(false);
+    setUpdateCount(prev => ++prev);
 
     promise
       .catch((error) => {
@@ -79,7 +81,7 @@ function FormViewer(props) {
   }
 
   return(
-    <div key={props.show}>
+    <div key={props.show + '#' + updateCount} >
       <Form
         uiSchema = {{ "ui:disabled": true }}
         schema={schema}

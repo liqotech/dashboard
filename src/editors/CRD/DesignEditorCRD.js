@@ -52,7 +52,10 @@ function DesignEditorCRD(props) {
   const previewFunction = CRTemplate => {
     if(CRTemplate === 'default' && props.CR[0]){
       setPreview(
-        <FormViewer resource={props.CR[0]} CRD={props.CRD} onEditor={true} show={'spec'} />
+        <FormViewer resource={props.CR[0]} CRD={props.CRD} onEditor={true} show={'spec'}
+                    resourceName={props.CR[0].metadata.name}
+                    resourceNamespace={props.CR[0].metadata.namespace}
+        />
       );
     }
     else if (chosenTemplate && props.CR[0]) {

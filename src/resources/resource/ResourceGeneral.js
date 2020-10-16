@@ -1,17 +1,17 @@
-import { Button, Affix, Alert, Card, Input } from 'antd';
+import { Button, Affix, Alert, Card, Input, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import ResourceHeader from './ResourceHeader';
 import LoadingIndicator from '../../common/LoadingIndicator';
 import Editor from '../../editors/Editor';
 import ResourceForm from './ResourceForm';
-import { resourceNotifyEvent } from './ResourceUtils';
+import { resourceNotifyEvent } from '../common/ResourceUtils';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
-import './ResourceGeneral.css';
 import { CodeOutlined, InfoCircleOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
+import Utils from '../../services/Utils';
 
 function ResourceGeneral(props){
   const [container, setContainer] = useState(null);
-  const [deleted, setDeleted] = useState(false)
+  const deleted = useRef(false)
   const [loading, setLoading] = useState(true);
   const [resource, setResource] = useState([]);
   const [currentTab, setCurrentTab] = useState('General');
@@ -36,11 +36,11 @@ function ResourceGeneral(props){
   }, [location])
 
   useEffect(() => {
-    if(!loading){
+    if(!loading && resource[0]){
       manageTabList();
       manageContentList();
     }
-  }, [loading])
+  }, [loading, resource])
 
   const manageTabList = () => {
     let items = [
@@ -65,18 +65,34 @@ function ResourceGeneral(props){
     setTabList([...items]);
   }
 
+  const updateResource = (name, namespace, item) => {
+    return window.api.updateGenericResource(location.pathname, item)
+      .catch(() => {
+        message.error('Could not update the resource');
+      })
+  }
+
+  const deleteResource = () => {
+    return window.api.deleteGenericResource(location.pathname);
+  }
+
+  const submit = item => {
+    updateResource(item.metadata.name, item.metadata.namespace, item);
+  }
+
   const manageContentList = () => {
     let items = {
       General: (
         <div>
           <ResourceForm resource={JSON.parse(JSON.stringify(resource[0]))}
-                        kind={resource[0].kind}
+                        updateFunc={updateResource} kind={resource[0].kind}
           />
         </div>
       ),
       JSON: (
         <div style={{padding: 12}}>
           <Editor value={JSON.stringify(resource[0], null, 2)}
+                  onClick={submit}
           />
         </div>
       )
@@ -107,23 +123,20 @@ function ResourceGeneral(props){
       }
     ).catch(error => {
       console.log(error);
-      setDeleted(true);
+      deleted.current = true;
       setLoading(false);
     });
   }
 
   const notifyEvent = (type, object) => {
     resourceNotifyEvent(setResource, type, object);
-    if(type === 'DELETED'){
-      setDeleted(true);
-    }
   }
 
   return(
     <div>
       <Alert.ErrorBoundary>
       {loading ? <LoadingIndicator /> : (
-        !deleted ? (
+        resource[0] ? (
           <div aria-label={'crd'} key={resource[0].metadata.name} ref={setContainer}
                style={{height: '92vh', overflow: 'auto', marginLeft: -20, marginRight: -20, marginTop: -20}}
           >
@@ -136,6 +149,9 @@ function ResourceGeneral(props){
                     resource={resource[0]}
                     name={resource[0].metadata.name}
                     kind={resource[0].kind}
+                    deleted={deleted}
+                    deleteFunc={deleteResource}
+                    updateFunc={updateResource}
                   />
                 </Affix>
                 <div>

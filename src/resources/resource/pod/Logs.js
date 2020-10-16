@@ -27,6 +27,7 @@ export default function Logs(){
         highlightActiveLine
         showLineNumbers
         tabSize={2}
+        height={'72vh'}
         width={'auto'}
       />
     </div>

@@ -116,12 +116,15 @@ function GraphNet(props){
         } else {
           setTitleModal(<Badge status="processing" text={event.nodes[0]} />);
           setShowModal(true);
+          let resource = props.customResources.find(item => {
+            return item.metadata.name === event.nodes[0];
+          });
           setContentModal(
             /** Just show the default information */
-            <FormViewer api={props.api} CRD={props.CRD} show={'spec'}
-                        CR={props.customResources.find(item => {
-                          return item.metadata.name === event.nodes[0];
-                        })}
+            <FormViewer CRD={props.CRD} show={'spec'}
+                        resource={resource}
+                        resourceName={resource.metadata.name}
+                        resourceNamespace={resource.metadata.namespace}
             />
           );
         }

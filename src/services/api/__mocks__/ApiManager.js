@@ -92,7 +92,8 @@ export default function ApiManager() {
     if(array[4] === 'customresourcedefinitions' && path.slice(-1) === '/')
       array[4] = 'customresourcedefinitions/';
     watchList.push({
-      plural: array[4],
+      plural: array[1] === 'api' ? (array[3] === 'namespaces' ? array[5] : array[4])
+      : array[4],
       callback: callback,
       done: done
     });
@@ -173,11 +174,29 @@ export default function ApiManager() {
       body: JSON.stringify(item)
     };
 
-    return fetch(path, requestOptions).then(res => res.json());
+    return fetch(path, requestOptions).then(res => {
+      return res.json()
+    }).then(res => {
+      let array = path.slice(20).split('/');
+      let plural;
+      if(array[1] === 'api'){
+        if(array[3] === 'namespaces')
+          plural = array[5];
+        else plural = array[4];
+      } else {
+        if(array[3] === 'namespaces')
+          plural = array[4];
+        else plural = array[4];
+      }
+      //console.log(plural);
+      if(method === 'PATCH' || method === 'POST')
+        watchList.find(item => item.plural === plural)
+          .callback(method === 'PATCH' ? 'MODIFIED' : 'ADDED', item);
+      return Promise.resolve(res);
+    });
   }
 
   const logFunction = (path) => {
-    console.log(path)
     return fetch(path).then(res => res.text());
   }
 

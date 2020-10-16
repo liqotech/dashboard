@@ -1,16 +1,14 @@
-import { ApiextensionsV1beta1Api, Config, CoreV1Api, AppsV1Api, ApisApi, CustomObjectsApi, watch } from '@kubernetes/client-node';
+import { ApiextensionsV1beta1Api, Config, CoreV1Api, ApisApi, CustomObjectsApi, watch } from '@kubernetes/client-node';
 
 /**
  * Class to manage all the interaction with the cluster
  */
 
 export default function ApiManager(user) {
-  //window.APISERVER_URL = 'https://127.0.0.1:41749';
   const config = new Config(window.APISERVER_URL, user.id_token, user.token_type);
   const apiExt = config.makeApiClient(ApiextensionsV1beta1Api);
   const apiCRD = config.makeApiClient(CustomObjectsApi);
   const apiCore = config.makeApiClient(CoreV1Api);
-  const apiApps = config.makeApiClient(AppsV1Api);
   const apiApis = config.makeApiClient(ApisApi);
   /** used to change the content-type of a PATCH request */
   const options = {
@@ -234,6 +232,8 @@ export default function ApiManager(user) {
     headers.append("Authorization", "Bearer " + user.id_token);
     if(method === 'PATCH')
       headers.append("Content-Type", "application/merge-patch+json");
+    else if(method === 'POST')
+      headers.append("Content-Type", "application/json");
 
     let requestOptions = {
       method: method,
