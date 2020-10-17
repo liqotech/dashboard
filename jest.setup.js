@@ -12,6 +12,19 @@ jest.mock('./src/templates/graph/GraphNet', () => {
   }
 });
 
+jest.mock('./src/resources/common/CustomIcon', () => {
+  const icons = require(`@ant-design/icons`);
+
+  const Icon = ({type}) => {
+    const Component = icons[type];
+    return <Component />;
+  }
+
+  return function CustomIcon(props) {
+    return (<Icon type={props.icon ? props.icon : 'ApiOutlined'}/>)
+  }
+})
+
 jest.mock('react-ace', () => {
   return ({ onChange }) => {
     return <input aria-label={'editor'} onChange={e => onChange(e.target.value)}/>

@@ -11,7 +11,7 @@ export default function ApiInterface(_user, props) {
 
   const CRDs = {current: []};
   const customViews = {current: []};
-  const dashConfigs = {current: null};
+  const dashConfigs = {current: {}};
   const namespace = {current: null};
   const watches = {current: []};
   /** Callback for the autocomplete search bar */
@@ -117,12 +117,11 @@ export default function ApiInterface(_user, props) {
             if(res.body.items[0]){
               dashConfigs.current = res.body.items[0];
               /** update CDs in the views */
-              manageCallbackDCs(dashConfigs.current);
+              manageCallbackDCs();
             } else {
               /** If there is no config, create one */
               createNewDC(CRD);
             }
-
             /** Then set up a watch to watch changes in the CR of the CRD */
             watchResource(
               'apis',
@@ -135,7 +134,7 @@ export default function ApiInterface(_user, props) {
           }else{
             customViews.current = res.body.items;
             /** update CVs in the views */
-            manageCallbackCVs(customViews.current);
+            manageCallbackCVs();
 
             /** Then set up a watch to watch changes in the CR of the CRD */
             watchResource(
@@ -167,7 +166,7 @@ export default function ApiInterface(_user, props) {
     ).then(res => {
       dashConfigs.current = res.body;
       /** update CDs in the views */
-      manageCallbackDCs(dashConfigs.current);
+      manageCallbackDCs();
     })
   }
 
@@ -441,7 +440,7 @@ export default function ApiInterface(_user, props) {
 
   const DCsNotifyEvent = (type, object) => {
     if (type === 'MODIFIED') {
-      dashConfigs.current = object.items[0];
+      dashConfigs.current = object;
       message.success('Dashboard Config modified');
       manageCallbackDCs();
     } else if (type === 'DELETED') {

@@ -1,31 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Typography } from 'antd';
 import './SideBar.css';
 import {
   DashboardOutlined,
   SettingOutlined, DesktopOutlined,
-  LayoutOutlined, StarOutlined, ApiOutlined
+  LayoutOutlined, StarOutlined, ApiOutlined, BlockOutlined
 } from '@ant-design/icons';
 import AddCustomView from '../views/AddCustomView';
+import CustomIcon from '../resources/common/CustomIcon';
+import FavouriteButton from '../resources/common/buttons/FavouriteButton';
 
 const Sider = Layout.Sider;
 
 function SideBar() {
 
   const [CV, setCV] = useState([]);
-  const [favourites, setFavourites] = useState(window.api.CRDs.current.filter(item => {
+  const [favouritesResource, setFavouriteResource] = useState([]);
+  const [favouritesCRD, setFavouritesCRD] = useState(window.api.CRDs.current.filter(item => {
     return item.metadata.annotations && item.metadata.annotations.favourite;
   }))
   const [collapsed, setCollapsed] = useState(false)
 
   useEffect(() => {
     window.api.CVArrayCallback.current.push(getCustomViews);
+    window.api.DCArrayCallback.current.push(getFavouriteResources);
     window.api.sidebarCallback.current = getFavourite;
   }, [])
 
   const getFavourite = CRDs => {
-    setFavourites(CRDs);
+    setFavouritesCRD(CRDs);
+  }
+
+  const getFavouriteResources = () => {
+    setFavouriteResource(window.api.dashConfigs.current.spec.resources.filter(resource => {
+      return resource.favourite;
+    }));
   }
 
   const getCustomViews = () => {
@@ -38,16 +48,18 @@ function SideBar() {
 
   let cv = [];
   let fav = [];
+  let favR = [];
 
   /** If there are custom views, show them in the sider */
   if(CV.length !== 0) {
     CV.forEach(item => {
       cv.push(
-        <Menu.Item key={item.metadata.name} style={{ marginTop: 8}}>
+        <Menu.Item key={item.metadata.name} style={{ marginTop: 0, marginBottom: 0}}
+                   icon={<LayoutOutlined style={{ fontSize: '20px' }} />}
+        >
           <Link to={{
             pathname: '/customview/' +  item.metadata.name,
           }}>
-            <LayoutOutlined style={{ fontSize: '20px' }} />
             {
               item.spec.viewName ? (
                 <span>{ item.spec.viewName }</span>
@@ -62,14 +74,33 @@ function SideBar() {
   }
 
   /** If there are favourite CRDs, show them in the sider */
-  if(favourites.length !== 0) {
-    favourites.forEach(item => {
+  if(favouritesCRD.length !== 0) {
+    favouritesCRD.forEach(item => {
       fav.push(
-        <Menu.Item key={item.metadata.name} style={{ marginTop: 8}}>
+        <Menu.Item key={item.metadata.name}
+                   icon={<StarOutlined style={{ fontSize: '20px' }} />}
+        >
           <Link to={{
             pathname: '/customresources/' +  item.metadata.name}}
           >
             <span>{item.spec.names.kind}</span>
+          </Link>
+        </Menu.Item>
+      )
+    });
+  }
+
+  /** If there are favourite Resources, show them in the sider */
+  if(favouritesResource.length !== 0) {
+    favouritesResource.forEach(item => {
+      favR.push(
+        <Menu.Item key={item.resourceName}
+                   icon={<CustomIcon icon={item.icon} size={20} />}
+        >
+          <Link to={{
+            pathname: item.resourcePath}}
+          >
+            <span>{item.resourceName}</span>
           </Link>
         </Menu.Item>
       )
@@ -98,49 +129,72 @@ function SideBar() {
             </Link>
           ) : null}
         </div>
-        <Menu mode="inline" defaultOpenKeys={['sub_fav']}
+        <Menu mode="inline" defaultOpenKeys={['sub_fav', 'resources', 'APIs', 'customViews']}
               defaultSelectedKeys={'1'} style={{ marginTop: 16}}>
-          <Menu.Item key="1">
+          <Menu.Item key="home" style={{ marginBottom: 0}}
+                     icon={<DashboardOutlined style={{ fontSize: '20px' }} />}
+          >
             <Link to="/">
-              <DashboardOutlined style={{ fontSize: '20px' }} />
               <span>Home</span>
             </Link>
           </Menu.Item>
           <Menu.Divider/>
-          {cv}
-          <Menu.Item key="addCV" style={{ marginTop: 8}}>
-            <AddCustomView  />
-          </Menu.Item>
+          <Menu.SubMenu key={"customViews"}
+                        title={
+                          collapsed ? <LayoutOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
+                            <Typography.Text type={'secondary'}>Custom Views</Typography.Text>
+                        }
+          >
+            {cv}
+            <Menu.Item key="addCV" style={{ marginTop: 0, marginBottom: 0}}>
+              <AddCustomView  />
+            </Menu.Item>
+          </Menu.SubMenu>
           <Menu.Divider/>
-          <Menu.Item key="apis">
-            <Link to="/apis">
-              <ApiOutlined style={{ fontSize: '20px' }} />
-              <span>Apis</span>
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="api">
-            <Link to="/api/v1">
-              <ApiOutlined style={{ fontSize: '20px' }} />
-              <span>Api</span>
-            </Link>
-          </Menu.Item>
+          <Menu.SubMenu key={"APIs"}
+                        title={
+                          collapsed ? <ApiOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
+                          <Typography.Text type={'secondary'}>APIs</Typography.Text>
+                        }
+          >
+            <Menu.Item key="apis"
+                       icon={<ApiOutlined style={{ fontSize: '20px' }} />}
+            >
+              <Link to="/apis">
+                <span>Apis</span>
+              </Link>
+            </Menu.Item>
+            <Menu.Item key="api"
+                       icon={<ApiOutlined style={{ fontSize: '20px' }} />}
+            >
+              <Link to="/api/v1">
+                <span>Api V1</span>
+              </Link>
+            </Menu.Item>
+          </Menu.SubMenu>
           <Menu.Divider/>
-          <Menu.Item key="2" style={{ marginTop: 8}}>
-            <Link to="/apis/apiextensions.k8s.io/v1/customresourcedefinitions">
-              <DesktopOutlined style={{ fontSize: '20px' }} />
-              <span>Custom Resources</span>
-            </Link>
-          </Menu.Item>
+          <Menu.SubMenu key={"resources"}
+                        title={
+                          collapsed ? <BlockOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
+                          <Typography.Text type={'secondary'}>Resources</Typography.Text>
+                        }
+          >
+            {favR}
+          </Menu.SubMenu>
+          <Menu.Divider/>
           <Menu.SubMenu key={"sub_fav"}
-                        icon={<StarOutlined style={{ fontSize: '20px' }} />}
-                        title={'Favourites'}
+                        title={
+                          collapsed ? <StarOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
+                          <Typography.Text type={'secondary'}>Favourites</Typography.Text>
+                        }
           >
             {fav}
           </Menu.SubMenu>
           <Menu.Divider/>
-          <Menu.Item key="3" style={{ marginTop: 8}}>
+          <Menu.Item key="settings" style={{ marginTop: 0, marginBottom: 0}}
+                     icon={<SettingOutlined style={{ fontSize: '20px' }} />}
+          >
             <Link to="/settings">
-              <SettingOutlined style={{ fontSize: '20px' }} />
               <span>Settings</span>
             </Link>
           </Menu.Item>

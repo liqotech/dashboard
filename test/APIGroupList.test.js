@@ -65,7 +65,6 @@ function mocks(errorApis, errorApi){
         return Promise.resolve(new Response(JSON.stringify(ApiV1MockResponse)));
     } else if (url === 'http://localhost:3001/apis/') {
       if(errorApis) {
-        console.log('hello')
         return Promise.reject(Error401.body);
       }
       else
@@ -94,7 +93,7 @@ describe('APIGroupList', () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByText('Api')).toBeInTheDocument();
+    expect(await screen.findByText(/Api v1/i)).toBeInTheDocument();
     expect(await screen.findByText('Apis')).toBeInTheDocument();
 
     userEvent.click(await screen.findByText('Apis'));
@@ -104,7 +103,7 @@ describe('APIGroupList', () => {
     userEvent.click(await screen.findByText('apis'));
     userEvent.click(await screen.findByLabelText('home'));
 
-    userEvent.click(await screen.findByText('Api'));
+    userEvent.click(await screen.findByText(/Api v1/i));
     expect(await screen.findByText('pods')).toBeInTheDocument();
     userEvent.click(await screen.findByText('pods'));
     expect(await screen.findByText('Pod')).toBeInTheDocument();

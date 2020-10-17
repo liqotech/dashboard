@@ -2,11 +2,17 @@ import { Col, Row, Typography, Button, Tooltip } from 'antd';
 import React, { useState } from 'react';
 import ResourceBreadcrumb from '../common/ResourceBreadcrumb';
 import { useParams, useLocation } from 'react-router-dom';
-import { PlusOutlined } from '@ant-design/icons';
+import { ApiOutlined, PlusOutlined } from '@ant-design/icons';
 import NewResource from '../../editors/CRD/NewResource';
+import { createNewConfig, getResourceConfig, updateResourceConfig } from '../common/DashboardConfigUtils';
+import FavouriteButton from '../common/buttons/FavouriteButton';
+import IconButton from '../common/buttons/IconButton';
+import CustomIcon from '../common/CustomIcon';
+import _ from 'lodash';
 
 export default function ListHeader(props){
   const [onAddResource, setOnAddResource] = useState(false);
+  const [onAddIcon, setOnAddIcon] = useState(false);
 
   let location = useLocation();
   let params = useParams();
@@ -19,6 +25,25 @@ export default function ListHeader(props){
       title = params.group;
     else
       title = location.pathname.split('/')[1];
+  }
+
+  const setIcon = (icon) => {
+    setOnAddIcon(false);
+    updateDashConfig(icon);
+  }
+
+  const updateDashConfig = (key) => {
+    let tempResourceConfig = getResourceConfig(params, location);
+
+    if(!_.isEmpty(tempResourceConfig)){
+      tempResourceConfig.icon = key;
+    } else {
+      tempResourceConfig = createNewConfig(params, {kind: props.kind}, location);
+      /** The resource doesn't have a config, create one */
+      tempResourceConfig.icon = key;
+    }
+
+    updateResourceConfig(tempResourceConfig, params, location);
   }
 
   const addResource = item => {
@@ -42,7 +67,32 @@ export default function ListHeader(props){
               <ResourceBreadcrumb />
             </Col>
             <Col>
-              <Typography.Title level={3} style={{marginBottom: 0}}>{title}</Typography.Title>
+              <Row align={'bottom'}>
+                <Col>
+                  {params.group || params.resource ? (
+                  <Tooltip title={'Change Icon'}>
+                    <Button onClick={() => setOnAddIcon(true)}
+                            loading={onAddIcon}
+                            style={{border: 'none', boxShadow: 'none', marginRight: 4, background: 'none'}}
+                            icon={<CustomIcon icon={getResourceConfig(params, location).icon ? getResourceConfig(params, location).icon : 'ApiOutlined'}
+                                        size={28}
+                            />}
+                    />
+                  </Tooltip>
+                  ) : <ApiOutlined style={{fontSize: '28px', marginRight: 4}} />}
+                </Col>
+                <Col>
+                  <Typography.Title level={3} style={{marginBottom: 0}}>{title}</Typography.Title>
+                </Col>
+              </Row>
+            </Col>
+            <Col>
+              {params.group || params.resource ? (
+                <FavouriteButton {...props} list={true}
+                                 favourite={getResourceConfig(params, location).favourite ?
+                                   1 : 0}
+                />
+              ) : null}
             </Col>
           </Row>
         </Col>
@@ -61,6 +111,7 @@ export default function ListHeader(props){
           </div>
         </Col>
       </Row>
+      <IconButton setIcon={setIcon} onAddIcon={onAddIcon} setOnAddIcon={setOnAddIcon} />
       <NewResource showCreate={onAddResource} setShowCreate={setOnAddResource}
                    addFunction={addResource} {...props}
       />

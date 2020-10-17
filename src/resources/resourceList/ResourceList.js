@@ -7,6 +7,7 @@ import { resourceNotifyEvent } from '../common/ResourceUtils';
 import { renderResourceList } from './ResourceListRenderer';
 import { calculateAge } from '../../services/TimeUtils';
 import { getResourceConfig } from '../common/DashboardConfigUtils';
+import FavouriteButton from '../common/buttons/FavouriteButton';
 
 function ResourceList(props) {
   /**
@@ -40,6 +41,7 @@ function ResourceList(props) {
     return () => {
       setLoading(true);
       setResourceList([]);
+      setResourceConfig({});
       setColumnsContents([]);
       setColumnHeaders([]);
       window.api.abortWatch(params.resource);
@@ -59,6 +61,23 @@ function ResourceList(props) {
     let columns = [];
 
     columns.push(
+      {
+        title: '',
+        fixed: 'left',
+        dataIndex: 'Favourite',
+        width: '1em',
+        sortDirections: ['descend'],
+        align: 'center',
+        ellipsis: true,
+        sorter: {
+          compare: (a, b) => a.Favourite - b.Favourite,
+        },
+        render: (text, record) => (
+          <FavouriteButton favourite={text} resourceList={resourceList}
+                           resourceName={record.Name}
+          />
+        )
+      },
       {
         dataIndex: 'Name',
         key: 'Name',
@@ -101,8 +120,14 @@ function ResourceList(props) {
 
     const resourceViews = [];
     resourceList.forEach(resource => {
+      let favourite = 0;
+      if(resource.metadata.annotations){
+        if(resource.metadata.annotations.favourite)
+          favourite = 1;
+      }
       let object = {
         key: resource.metadata.name + '_' + resource.metadata.namespace,
+        Favourite: favourite,
         Age: calculateAge(resource.metadata.creationTimestamp)
       };
 
@@ -117,7 +142,7 @@ function ResourceList(props) {
 
   const getDashConfig = () => {
     setResourceConfig(() => {
-      return getResourceConfig(params);
+      return getResourceConfig(params, location);
     });
   }
 

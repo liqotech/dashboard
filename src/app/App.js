@@ -96,8 +96,8 @@ function App(props) {
     /** Get the CRDs at the start of the app */
     _api.getCRDs().
     then(() => {
-      _api.loadDashboardCRs('View');
       _api.loadDashboardCRs('DashboardConfig');
+      _api.loadDashboardCRs('View');
       window.api = _api;
       setApi(_api);
       message.success('Successfully logged in');

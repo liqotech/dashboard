@@ -88,7 +88,7 @@ function ResourceGeneral(props){
 
   const getDashConfig = () => {
     setResourceConfig(() => {
-      return getResourceConfig(params);
+      return getResourceConfig(params, location);
     });
   }
 

@@ -56,11 +56,17 @@ export default function ApiManager() {
       plural === 'foreignclusters' ||
       plural === 'searchdomains' ||
       plural === 'advertisements' ||
+      plural === 'dashboardconfigs' ||
       plural === 'views') {
       return fetch('http://localhost:3001/clustercustomobject/' + plural, { method: 'PUT', body: item })
         .then(res => res.json())
         .then((res) => {
           if(plural === 'views') {
+            let itemDC = JSON.parse(JSON.stringify(item));
+            itemDC.metadata.resourceVersion++;
+            watchList.find(item => item.plural === (plural + '/')).callback('MODIFIED', itemDC);
+            return Promise.resolve(new Response(JSON.stringify(item)))
+          } else if(plural === 'dashboardconfigs') {
             let itemDC = JSON.parse(JSON.stringify(item));
             itemDC.metadata.resourceVersion++;
             watchList.find(item => item.plural === (plural + '/')).callback('MODIFIED', itemDC);

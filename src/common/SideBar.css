@@ -38,3 +38,15 @@
         font-size: 20px;
     }
 }
+
+.ant-menu .ant-menu-submenu .ant-menu-submenu-title {
+    padding-left: 16px !important;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.ant-menu .ant-menu-submenu .ant-menu-item {
+    padding-left: 24px !important;
+    margin-top: 0;
+    margin-bottom: 0;
+}

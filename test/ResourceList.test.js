@@ -7,11 +7,9 @@ import userEvent from '@testing-library/user-event';
 import CRDmockResponse from '../__mocks__/crd_fetch_long.json';
 import CRDmockEmpty from '../__mocks__/crd_empty.json';
 import ViewMockResponse from '../__mocks__/views.json';
-import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
 import { testTimeout } from '../src/constants';
 import Cookies from 'js-cookie';
-import ResourceList from '../src/resources/resourceList/ResourceList';
 import App from '../src/app/App';
 import NamespaceResponse from '../__mocks__/namespaces.json';
 import NodesMockResponse from '../__mocks__/nodes.json';
@@ -38,31 +36,12 @@ beforeEach(() => {
 });
 
 describe('Resource List', () => {
-  /*test('Sidebar updates when a resource is added/removed to favourites', async () => {
-    await setup();
-
-    expect(await screen.findByLabelText('caret-down'));
-
-    const favCRD = screen.getAllByLabelText('star')[2];
-    userEvent.click(favCRD);
-
-    userEvent.click(await screen.findByLabelText('caret-down'));
-
-    expect(await screen.findAllByText('Advertisement')).toHaveLength(2);
-
-    userEvent.click(favCRD);
-
-    expect(screen.findByText('Advertisement'));
-  }, testTimeout)*/
-
   test('CRD list is correctly paginated and updated when page is changed', async () => {
     fetch.mockImplementation((url) => {
       if (url === 'http://localhost:3001/customresourcedefinition') {
         return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
       } else if (url === 'http://localhost:3001/clustercustomobject/views') {
         return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-      } else if (url === 'http://localhost:3001/clustercustomobject/dashboardconfigs') {
-        return Promise.reject(Error404.body);
       } else if(alwaysPresentGET(url)){
         return alwaysPresentGET(url)
       } else {
@@ -82,6 +61,27 @@ describe('Resource List', () => {
     userEvent.click(screen.getByText('2'));
 
     expect(await screen.findAllByRole('row')).toHaveLength(3);
+
+  }, testTimeout)
+
+  test('404 on dashboardconfig', async () => {
+    fetch.mockImplementation((url) => {
+      if (url === 'http://localhost:3001/customresourcedefinition') {
+        return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+      } else if (url === 'http://localhost:3001/clustercustomobject/views') {
+        return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
+      } else if (url === 'http://localhost:3001/clustercustomobject/dashboardconfigs') {
+        return Promise.reject(Error404.body);
+      } else if(alwaysPresentGET(url)){
+        return alwaysPresentGET(url)
+      } else {
+        return generalHomeGET(url);
+      }
+    })
+
+    await loginTest();
+
+    expect(await screen.queryByText('Custom Resources')).not.toBeInTheDocument();
 
   }, testTimeout)
 
