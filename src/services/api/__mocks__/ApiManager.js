@@ -69,6 +69,14 @@ export default function ApiManager() {
           } else if(plural === 'dashboardconfigs') {
             let itemDC = JSON.parse(JSON.stringify(item));
             itemDC.metadata.resourceVersion++;
+            if(itemDC.spec.resources){
+              itemDC.spec.resources.forEach(item => {
+                if(item.render && item.render.columns){
+                  item.render.columns = item.render.columns.filter(col => col !== null);
+                }
+                return item;
+              })
+            }
             watchList.find(item => item.plural === (plural + '/')).callback('MODIFIED', itemDC);
             return Promise.resolve(new Response(JSON.stringify(item)))
           } else {

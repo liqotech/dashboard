@@ -20,7 +20,7 @@ async function setup() {
   const customview = screen.getByText('Custom Resources');
   userEvent.click(customview);
 
-  expect(await screen.findByText(/advertisement/i)).toBeInTheDocument();
+  expect(await screen.findByText(/advertisement./i)).toBeInTheDocument();
 
   expect(screen.getAllByRole('row')).toHaveLength(10);
 }
@@ -31,12 +31,6 @@ function mocks(errorPATCH, errorPUT){
       return Promise.reject();
     } else if(req.method === 'PUT' && errorPUT){
       return Promise.reject(Error401.body);
-    }
-    else if(req.method === 'DELETE' && req.url === 'http://localhost/apiserver/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'){
-      if(!error)
-        return Promise.resolve(new Response(JSON.stringify('')));
-      else
-        return Promise.reject();
     }
     else if(generalMocks(req.url))
       return generalMocks(req.url);
@@ -51,7 +45,9 @@ describe('Favourites and Icons', () => {
   test('Sidebar updates when a resource is added/removed to favourites', async () => {
     await setup();
 
-    expect(await screen.findAllByLabelText('caret-down'));
+    let cdown = await screen.findAllByLabelText('caret-down');
+    userEvent.click(cdown[0]);
+    userEvent.click(cdown[1]);
 
     let stars = await screen.findAllByLabelText('star');
 

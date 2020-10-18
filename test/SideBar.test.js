@@ -69,7 +69,7 @@ describe('Sidebar', () => {
     const customview = await screen.findByText('Custom Resources');
     userEvent.click(customview);
 
-    expect(await screen.findByText(/advertisement/i)).toBeInTheDocument();
+    expect(await screen.findByText(/advertisement./i)).toBeInTheDocument();
 
     expect(await screen.findAllByRole('row')).toHaveLength(10);
   }, testTimeout)

@@ -16,6 +16,7 @@
           "app": "hello-world",
           "pod-template-hash": "6756549f5"
         },
+        "annotations": {},
         "ownerReferences": [
           {
             "apiVersion": "apps/v1",
@@ -40,7 +41,7 @@
         "containers": [
           {
             "name": "hello-world",
-            "image": "bhargavshah86/kube-test:v0.1",
+            "image": "nappozord/kube-test:v0.1",
             "ports": [
               {
                 "containerPort": 80,
@@ -90,10 +91,14 @@
           }
         ],
         "priority": 0,
-        "enableServiceLinks": true
+        "enableServiceLinks": false
       },
       "status": {
-        "phase": "Running"
+        "phase": "Running",
+        "containerStatuses": [
+          true,
+          false
+        ]
       }
     },
     {
@@ -130,7 +135,7 @@
         "containers": [
           {
             "name": "hello-world",
-            "image": "bhargavshah86/kube-test:v0.1",
+            "image": "nappozord/kube-test:v0.1",
             "ports": [
               {
                 "containerPort": 80,
@@ -182,7 +187,11 @@
         "enableServiceLinks": true
       },
       "status": {
-        "phase": "Running"
+        "phase": "Running",
+        "containerStatuses": [
+          true,
+          false
+        ]
       }
     },
     {
@@ -217,7 +226,7 @@
         "containers": [
           {
             "name": "hello-world",
-            "image": "bhargavshah86/kube-test:v0.1",
+            "image": "nappozord/kube-test:v0.1",
             "ports": [
               {
                 "containerPort": 80,
@@ -293,7 +302,11 @@
         "enableServiceLinks": true
       },
       "status": {
-        "phase": "Pending"
+        "phase": "Pending",
+        "containerStatuses": [
+          true,
+          false
+        ]
       }
     },
     {
@@ -316,19 +329,11 @@
         }
       },
       "spec": {
-        "volumes": [
-          {
-            "name": "default-token-l6gv9",
-            "secret": {
-              "secretName": "default-token-l6gv9",
-              "defaultMode": 420
-            }
-          }
-        ],
+        "volumes": [],
         "containers": [
           {
             "name": "hello-world",
-            "image": "bhargavshah86/kube-test:v0.1",
+            "image": "nappozord/kube-test:v0.1",
             "ports": [
               {
                 "containerPort": 80,
@@ -404,7 +409,11 @@
         "enableServiceLinks": true
       },
       "status": {
-        "phase": "Running"
+        "phase": "Running",
+        "containerStatuses": [
+          true,
+          false
+        ]
       }
     }
   ]
