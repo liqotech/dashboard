@@ -9,7 +9,8 @@ import dayjs from 'dayjs';
 
 const CustomCheckbox = function(props) {
   return (
-    <Switch id={props.id} style={{marginTop: 5, marginBottom: 5, float: 'right'}}
+    <Switch id={props.id} style={{marginTop: 0, marginBottom: 0, float: 'right'}}
+            size={'small'}
             checkedChildren={'ON'}
             unCheckedChildren={'OFF'}
             disabled={props.disabled}
@@ -26,6 +27,7 @@ const CustomInputNumber = function(props){
                  max={props.schema.maximum ? props.schema.maximum : Number.MAX_SAFE_INTEGER}
                  defaultValue={props.value}
                  value={props.value}
+                 size={'small'}
                  onChange={(value) => {if(!props.readonly) props.onChange(value)}}
     />
   )
@@ -53,6 +55,7 @@ const CustomText = function(props) {
                 role={'textbox'}
                 formatter={value => `${value}%`}
                 parser={value => value.replace('%', '')}
+                size={'small'}
                 min={0}
                 max={100}
                 value={typeof props.value === 'number' ? props.value : 0}
@@ -70,13 +73,14 @@ const CustomText = function(props) {
   }
   return (
     <Input id={props.id} defaultValue={props.value} value={props.value} disabled={props.disabled} role={'textbox'}
+           size={'small'}
            onChange={({ target }) => {if(!props.readonly) props.onChange(target.value)}}/>
   )
 }
 
 const CustomDateTime = function(props) {
   return(
-    <DatePicker showTime  style={{marginTop: 5, marginBottom: 5, float: 'right', width: '100%'}}
+    <DatePicker showTime  style={{marginTop: 0, marginBottom: 0, float: 'right', width: '100%'}}
                 id={props.id} value={dayjs(props.value)}  disabled={props.disabled} role={'date-picker'}
                 onChange={( value ) => {if(!props.readonly) props.onChange(value.toISOString())}} />
   )

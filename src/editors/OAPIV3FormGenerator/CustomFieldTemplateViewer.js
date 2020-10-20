@@ -1,5 +1,5 @@
 import React from 'react';
-import { Popconfirm, Badge, Button, Col, Row, Tooltip, Typography } from 'antd';
+import { Popconfirm, Badge, Button, Col, Row, Tooltip, Typography, InputNumber } from 'antd';
 import { rootSplitCamelCaseAndUp, splitCamelCaseAndUp } from '../../services/stringUtils';
 import { QuestionCircleOutlined, EditOutlined, CloseOutlined } from '@ant-design/icons';
 import { customFieldTemplateGeneral } from './CustomFieldTemplate';
@@ -17,9 +17,9 @@ function CustomFieldTemplateViewer(props){
             <div>
               {!props.disabled ? (
                 <>
-                  {!required ? <Badge status="processing"/> : (
+                  {!required ? <Badge color={'blue'}/> : (
                     <Tooltip placement="top" title={'Field required'}>
-                      <Badge status="processing" color={'red'}/>
+                      <Badge color={'red'}/>
                     </Tooltip>
                   )}
                 </>
@@ -42,7 +42,9 @@ function CustomFieldTemplateViewer(props){
                 <Button icon={<EditOutlined/>}
                         onClick={() => {
                           props.onDisableChange()
-                        }}/>
+                        }}
+                        size={'small'}
+                />
               </Tooltip>
             ) : (
               <Popconfirm title={'Discard changes?'} placement={'top'}

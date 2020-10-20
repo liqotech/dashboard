@@ -17,7 +17,7 @@ export function checkChildren(props){
 }
 
 export function customFieldTemplateGeneral(props){
-  const { id, classNames, label, help, required, description, errors, children } = props;
+  const { id, classNames, label, errors, children } = props;
 
   if (!props.schema.type && !label) {
     return (
@@ -40,7 +40,7 @@ export function customFieldTemplateGeneral(props){
     } else {
       return (
         <div className={classNames} id={id} style={{ marginBottom: 5, marginTop: 5 }}>
-          <Collapse>
+          <Collapse defaultActiveKey={id === 'root' ? ('collapse_' + id) : null}>
             <Collapse.Panel
               key={'collapse_' + id}
               style={{ borderBottomColor: '#f0f0f0' }}
@@ -65,7 +65,7 @@ export function customFieldTemplateGeneral(props){
   } else if (props.schema.type === 'array') {
     return (
       <div className={classNames} id={id} style={{ marginBottom: 5, marginTop: 5 }}>
-        <Collapse>
+        <Collapse defaultActiveKey={id === 'root' ? ('collapse_' + id) : null}>
           <Collapse.Panel
             key={'collapse_' + id}
             style={{ borderBottomColor: '#f0f0f0' }}
@@ -122,9 +122,9 @@ function CustomFieldTemplate(props){
           <Row align="middle">
             <Col span={10}>
               <div>
-                {!required ? <Badge status="processing"/> : (
+                {!required ? <Badge color={'blue'}/> : (
                   <Tooltip placement="top" title={'Field required'}>
-                    <Badge status="processing" color={'red'}/>
+                    <Badge color={'red'}/>
                   </Tooltip>
                 )}
                 {label ? <Typography.Text strong>{splitCamelCaseAndUp(label)}</Typography.Text> :
