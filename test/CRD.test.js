@@ -120,9 +120,9 @@ async function alwaysPresent(kind, descr) {
   expect(await screen.findByLabelText('crd')).toBeInTheDocument();
   expect(screen.getByText(kind)).toBeInTheDocument();
   expect(screen.getByText(descr)).toBeInTheDocument();
-  expect(screen.getAllByLabelText('star')).toHaveLength(3);
+  expect(screen.getAllByLabelText('star')).toHaveLength(4);
   expect(screen.getByText('Annotations')).toBeInTheDocument();
-  expect(screen.getByText('Resources')).toBeInTheDocument();
+  expect(screen.getAllByText('Resources')).toHaveLength(2);
   expect(screen.getByText('Schema')).toBeInTheDocument();
   expect(screen.getAllByLabelText('layout')).toHaveLength(2);
   expect(screen.getByLabelText('picture')).toBeInTheDocument();
@@ -537,7 +537,9 @@ describe('CRD', () => {
     await setup_only_CRD(false, false, true);
 
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
-    userEvent.click(await screen.findByText('Resources'));
+
+    let resources = await screen.findAllByText('Resources');
+    userEvent.click(resources[1]);
 
     act(() => {
       window.api.apiManager.current.sendModifiedSignal('liqodashtests', LiqoDashMockResponse.items[0])

@@ -63,7 +63,7 @@ describe('DashboardConfig', () => {
 
     let apiManager = window.api.apiManager.current;
 
-    let dashConf = DashboardConfig;
+    let dashConf = DashboardConfig.items[0];
 
     dashConf.metadata.resourceVersion += 1;
 

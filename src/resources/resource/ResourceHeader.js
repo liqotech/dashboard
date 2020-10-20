@@ -11,6 +11,7 @@ import {
   DragOutlined, PushpinOutlined, DeleteOutlined
 } from '@ant-design/icons';
 import ResourceBreadcrumb from '../common/ResourceBreadcrumb';
+import FavouriteButton from '../common/buttons/FavouriteButton';
 
 function ResourceHeader(props) {
   const [isPinned, setIsPinned] = useState(false);
@@ -68,6 +69,16 @@ function ResourceHeader(props) {
                     <LoadingOutlined />)
                   </div>
                 ) : null}
+              </Col>
+              <Col>
+                <span style={{marginLeft: 10}}>
+                  <FavouriteButton resourceName={props.resource.metadata.name}
+                                   favourite={(props.resource.metadata.annotations &&
+                                     props.resource.metadata.annotations.favourite) ? 1 : 0
+                                   }
+                                   resourceList={[props.resource]}
+                  />
+                </span>
               </Col>
             </Row>
           </Col>
