@@ -67,11 +67,17 @@ export function alwaysPresentGET(url) {
   //console.log(url)
   if (url === 'http://localhost/apiserver/api/v1' || url === 'http://localhost:/apiserver/api/v1') {
     return Promise.resolve(new Response(JSON.stringify(ApiV1MockResponse)));
+  } else if (url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions' ||
+    url === 'http://localhost/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
+  ) {
+    return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
   } else if (url === 'http://localhost:3001/apis/') {
     return Promise.resolve(new Response(JSON.stringify({body: ApisMockResponse})));
   } else if (url === 'http://localhost/apiserver/apis/apps/v1' || url === 'http://localhost:/apiserver/apis/apps/v1') {
     return Promise.resolve(new Response(JSON.stringify(AppsResponse)));
-  } else if (url === 'http://localhost/apiserver/apis/apiextensions.k8s.io/v1' || url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1') {
+  } else if (url === 'http://localhost/apiserver/apis/apiextensions.k8s.io/v1' || url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1' ||
+    url === 'http://localhost/apiserver/apis/apiextensions.k8s.io/v1beta1' || url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1beta1'
+  ) {
     return Promise.resolve(new Response(JSON.stringify(ApiExtResponse)));
   } else if (url === 'http://localhost/apiserver/apis/config.liqo.io/v1alpha1' || url === 'http://localhost:/apiserver/apis/config.liqo.io/v1alpha1') {
     return Promise.resolve(new Response(JSON.stringify(ConfigGroup)));
@@ -167,9 +173,7 @@ function responseManager(req, error, method, crd, crd_v, res_get, res_post, res_
 export function generalMocks(url){
   if (url === 'http://localhost:3001/customresourcedefinition') {
     return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-  } /*else if (url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {
-    return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-  }*/ else if (url === 'http://localhost:3001/namespaces') {
+  } else if (url === 'http://localhost:3001/namespaces') {
     return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
   } else if (url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
     return Promise.resolve(new Response(JSON.stringify({body: FCMockResponse})));

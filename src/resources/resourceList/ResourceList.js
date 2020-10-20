@@ -3,7 +3,7 @@ import { Table } from 'antd';
 import { withRouter, useLocation, useHistory, useParams } from 'react-router-dom';
 import { getColumnSearchProps } from '../../services/TableUtils';
 import ListHeader from './ListHeader';
-import { resourceNotifyEvent } from '../common/ResourceUtils';
+import { getNamespaced, resourceNotifyEvent } from '../common/ResourceUtils';
 import { renderResourceList } from './ResourceListRenderer';
 import { calculateAge } from '../../services/TimeUtils';
 import { getResourceConfig } from '../common/DashboardConfigUtils';
@@ -25,13 +25,16 @@ function ResourceList(props) {
   let params = useParams();
 
   useEffect(() => {
+    getNamespaced(location.pathname)
+      .then(res => {
+        if(res && res.namespaced)
+          window.api.NSArrayCallback.current.push(changeNamespace);
+      });
     loadResourceList();
     getDashConfig();
     if(params.namespace)
       window.api.setNamespace(params.namespace);
-    window.api.NSArrayCallback.current.push(changeNamespace);
     window.api.DCArrayCallback.current.push(getDashConfig);
-
     setOnCustomResource(
       window.api.CRDs.current.find(CRD => {
         return params.resource === CRD.spec.names.plural
