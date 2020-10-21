@@ -82,8 +82,8 @@ describe('UpdateCR', () => {
     const items = await screen.findAllByText('Item');
     userEvent.click(items[0]);
 
-    expect(await screen.findAllByText('Cost')).toHaveLength(2);
-    expect(screen.getAllByText('Name')).toHaveLength(2);
+    expect(await screen.findAllByText('Cost')).toHaveLength(4);
+    expect(screen.getAllByText('Name')).toHaveLength(4);
 
     const textboxes = await screen.findAllByRole('textbox');
     expect(textboxes[1]).toHaveAttribute('value', '13');
