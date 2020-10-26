@@ -94,7 +94,6 @@ describe('App', () => {
     );
 
     expect(await screen.findByText('Name'));
-    expect(await screen.findByText('Namespace'));
   })
 
   test('Access /login path when already logged redirect to Home', async () => {

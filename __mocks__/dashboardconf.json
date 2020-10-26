@@ -18,16 +18,16 @@
             "render":{
               "columns":[
                 {
-                  "columnContent":"param.metadata.name%//",
-                  "columnName":"Name"
+                  "columnContent":"param.metadata.name",
+                  "columnTitle":"Name"
                 },
                 {
-                  "columnContent":"param.metadata.namespace%//",
-                  "columnName":"Namespace"
+                  "columnContent":"param.metadata.namespace",
+                  "columnTitle":"Namespace"
                 },
                 {
                   "columnContent":"param.metadata.resourceVersion",
-                  "columnName":"Resource Version"
+                  "columnTitle":"Resource Version"
                 }
               ],
               "tabs":[
@@ -145,7 +145,7 @@
                       "displayMode":"List"
                     }
                   ],
-                  "tabName":"Summary"
+                  "tabTitle":"Summary"
                 }
               ]
             },
@@ -158,16 +158,16 @@
             "render":{
               "columns":[
                 {
-                  "columnContent":"param.metadata.name%//",
-                  "columnName":"Name"
+                  "columnContent":"param.metadata.name",
+                  "columnTitle":"Name"
                 },
                 {
                   "columnContent":"param.spec.names.kind",
-                  "columnName":"Kind"
+                  "columnTitle":"Kind"
                 },
                 {
                   "columnContent":"param.spec.group",
-                  "columnName":"Group"
+                  "columnTitle":"Group"
                 }
               ]
             },
@@ -180,28 +180,28 @@
             "render":{
               "columns":[
                 {
-                  "columnContent":"param.metadata.name%//",
-                  "columnName":"Name"
+                  "columnContent":"param.metadata.name",
+                  "columnTitle":"Name"
                 },
                 {
-                  "columnContent":"param.metadata.namespace%//",
-                  "columnName":"Namespace"
+                  "columnContent":"param.metadata.namespace",
+                  "columnTitle":"Namespace"
                 },
                 {
                   "columnContent":"param.spec.type",
-                  "columnName":"Type"
+                  "columnTitle":"Type"
                 },
                 {
                   "columnContent":"param.spec.clusterIP",
-                  "columnName":"Cluster Ip"
+                  "columnTitle":"Cluster Ip"
                 },
                 {
                   "columnContent":"param.spec.externalIPs",
-                  "columnName":"External Ips"
+                  "columnTitle":"External Ips"
                 },
                 {
                   "columnContent":"param.spec.ports.port",
-                  "columnName":"Port"
+                  "columnTitle":"Port"
                 }
               ],
               "tabs":[
@@ -238,7 +238,7 @@
                       "displayMode":"Table"
                     }
                   ],
-                  "tabName":"Summary"
+                  "tabTitle":"Summary"
                 },
                 {
                   "tabContent":[
@@ -258,7 +258,7 @@
                       "displayMode":"List"
                     }
                   ],
-                  "tabName":"Tab"
+                  "tabTitle":"Tab"
                 }
               ]
             },

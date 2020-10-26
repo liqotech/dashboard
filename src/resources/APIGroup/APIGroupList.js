@@ -54,6 +54,7 @@ function APIGroupList() {
     {
       dataIndex: 'Name',
       key: 'Name',
+      title: <div style={{marginLeft: '2em'}}>Name</div>,
       fixed: true,
       ...getColumnSearchProps('Name', renderAPIGroups)
     },
@@ -61,6 +62,7 @@ function APIGroupList() {
       dataIndex: 'Preferred Version',
       key: 'Preferred Version',
       fixed: true,
+      title: <div style={{marginLeft: '2em'}}>Preferred Version</div>,
       ...getColumnSearchProps('Preferred Version', renderAPIGroups)
     }
   ]

@@ -26,7 +26,7 @@ async function setup() {
   const customview = screen.getByText('Custom Resources');
   userEvent.click(customview);
 
-  expect(await screen.findByText(/advertisement/i)).toBeInTheDocument();
+  expect(await screen.findByText(/advertisement./i)).toBeInTheDocument();
 
   expect(screen.getAllByRole('row')).toHaveLength(10);
 }
@@ -54,7 +54,7 @@ describe('Resource List', () => {
     const customview = screen.getByText('Custom Resources');
     userEvent.click(customview);
 
-    expect(await screen.findByText(/advertisement/i)).toBeInTheDocument();
+    expect(await screen.findByText(/advertisement./i)).toBeInTheDocument();
 
     expect(screen.getAllByRole('row')).toHaveLength(10);
 
@@ -88,7 +88,7 @@ describe('Resource List', () => {
   test('CRD list changes on CRD add', async () => {
     await setup();
 
-    expect(await screen.findByText(/advertisement/i));
+    expect(await screen.findByText(/advertisement./i));
 
     let apiManager = window.api.apiManager.current;
 
@@ -107,7 +107,7 @@ describe('Resource List', () => {
   test('CRD add with same resourceVersion of previous CRD', async () => {
     await setup();
 
-    expect(await screen.findByText(/advertisement/i));
+    expect(await screen.findByText(/advertisement./i));
 
     let apiManager = window.api.apiManager.current;
 
@@ -126,7 +126,7 @@ describe('Resource List', () => {
   test('CRD watch and View watch return up if unexpectedly aborted', async () => {
     await setup();
 
-    expect(await screen.findByText(/advertisement/i));
+    expect(await screen.findByText(/advertisement./i));
 
     let apiManager = window.api.apiManager.current;
 
@@ -140,7 +140,7 @@ describe('Resource List', () => {
   test('CRD list changes on CRD deletion', async () => {
     await setup();
 
-    expect(await screen.findByText(/advertisement/i));
+    expect(await screen.findByText(/advertisement./i));
 
     let apiManager = window.api.apiManager.current;
 

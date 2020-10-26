@@ -541,6 +541,11 @@ export default function ApiInterface(_user, props) {
     return apiManager.current.logFunction(path);
   }
 
+  const getKubernetesJSONSchema = () => {
+    return fetch('https://kubernetesjsonschema.dev/master/_definitions.json').then(r => r.json())
+      .catch(error => console.log(error));
+  }
+
   return {
     user,
     CRDs,
@@ -586,6 +591,7 @@ export default function ApiInterface(_user, props) {
     updateGenericResource,
     deleteGenericResource,
     getPodLogs,
+    getKubernetesJSONSchema,
   }
 
 }

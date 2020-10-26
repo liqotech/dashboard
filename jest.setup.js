@@ -12,6 +12,15 @@ jest.mock('./src/templates/graph/GraphNet', () => {
   }
 });
 
+jest.mock('./src/services/TimeUtils', () => {
+  function calculateAge() {
+    return '1d';
+  }
+  return {
+    calculateAge
+  };
+});
+
 jest.mock('./src/resources/common/CustomIcon', () => {
   const icons = require(`@ant-design/icons`);
 

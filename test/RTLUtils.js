@@ -39,6 +39,7 @@ import SharingGroup from '../__mocks__/sharing.liqo.io.json';
 import NamespaceResponse from '../__mocks__/namespaces.json';
 import PodMockResponse from '../__mocks__/pod.json';
 import DashboardConfig from '../__mocks__/dashboardconf.json';
+import K8sSchemaDefinitions from '../__mocks__/kubernetesjsonschema.json';
 
 import Cookies from 'js-cookie';
 
@@ -173,7 +174,12 @@ function responseManager(req, error, method, crd, crd_v, res_get, res_post, res_
 export function generalMocks(url){
   if (url === 'http://localhost:3001/customresourcedefinition') {
     return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-  } else if (url === 'http://localhost:3001/namespaces') {
+
+  } /*else if (url === 'https://kubernetesjsonschema.dev/master/_definitions.json'){
+    return Promise.resolve(new Response(JSON.stringify(K8sSchemaDefinitions)))
+  }*/ /*else if (url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {
+    return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+  }*/ else if (url === 'http://localhost:3001/namespaces') {
     return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
   } else if (url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
     return Promise.resolve(new Response(JSON.stringify({body: FCMockResponse})));

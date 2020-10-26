@@ -65,11 +65,13 @@ function ConnectionDetails(props) {
       {
         dataIndex: 'Name',
         key: 'Name',
+        title: <div style={{marginLeft: '2em'}}>Name</div>,
         ...getColumnSearchProps('Name', renderPODs)
       },
       {
         dataIndex: 'Status',
         key: 'Status',
+        title: <div style={{marginLeft: '2em'}}>Status</div>,
         ...getColumnSearchProps('Status', renderPODs)
       },
       {
@@ -121,6 +123,7 @@ function ConnectionDetails(props) {
       {
         dataIndex: 'Namespace',
         key: 'Namespace',
+        title: <div style={{marginLeft: '2em'}}>Namespace</div>,
         ...getColumnSearchProps('Namespace', renderPODs)
       },
     ];
