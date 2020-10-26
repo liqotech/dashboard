@@ -8,7 +8,7 @@ import ViewMockResponse from '../__mocks__/views.json';
 import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import PieMockResponse from '../__mocks__/piecharts.json';
 import PieMockResponseWrong from '../__mocks__/piecharts_wrong.json';
-import PieChart from '../src/templates/piechart/PieChart';
+import PieChart from '../src/widgets/piechart/PieChart';
 import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();

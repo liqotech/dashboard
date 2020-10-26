@@ -4,7 +4,7 @@ import './GraphNet.css';
 import image from '../../assets/database.png'
 import Utils from '../../services/Utils';
 import { Badge, Button, Modal } from 'antd';
-import FormViewer from '../../editors/OAPIV3FormGenerator/FormViewer';
+import FormViewer from '../form/FormViewer';
 
 function GraphNet(props){
 

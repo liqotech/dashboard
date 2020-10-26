@@ -1,0 +1,7 @@
+.custom-tab {
+    letter-spacing: .01em;
+    border: 1px solid #ececec;
+    box-shadow: 2px 2px 2px 2px #ececec, 1px 1px 1px 1px #ececec;
+    background: white;
+    min-height: 100%;
+}

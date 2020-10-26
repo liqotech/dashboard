@@ -4,10 +4,12 @@ import ResourceHeader from './ResourceHeader';
 import LoadingIndicator from '../../common/LoadingIndicator';
 import Editor from '../../editors/Editor';
 import ResourceForm from './ResourceForm';
+import _ from 'lodash';
 import { resourceNotifyEvent } from '../common/ResourceUtils';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { CodeOutlined, InfoCircleOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
-import { getResourceConfig } from '../common/DashboardConfigUtils';
+import { createNewConfig, getResourceConfig, updateResourceConfig } from '../common/DashboardConfigUtils';
+import CustomTab from './CustomTab';
 
 function ResourceGeneral(props){
   const [container, setContainer] = useState(null);
@@ -18,6 +20,8 @@ function ResourceGeneral(props){
   const [currentTab, setCurrentTab] = useState('General');
   const [tabList, setTabList] = useState([])
   const [contentList, setContentList] = useState({});
+  const [onEditTabTitle, setOnEditTabTitle] = useState('');
+  const [onEditTabContent, setOnEditTabContent] = useState('');
   let location = useLocation();
   let history = useHistory();
   let params = useParams();
@@ -33,11 +37,7 @@ function ResourceGeneral(props){
       window.api.DCArrayCallback.current = window.api.DCArrayCallback.current.filter(func => {
         return func !== getDashConfig;
       });
-      if(props.onCustomView){
-        //window.api.abortWatch(params.crdName.split('.')[0]);
-      } else {
-        window.api.abortWatch(params.resource);
-      }
+      window.api.abortWatch(params.resource);
     }
   }, [location])
 
@@ -46,30 +46,31 @@ function ResourceGeneral(props){
       manageTabList();
       manageContentList();
     }
-  }, [loading, resource])
+  }, [loading, resource, resourceConfig])
 
-  const manageTabList = () => {
-    let items = [
-        {
-        key: 'General',
+  useEffect(() => {
+    if(onEditTabTitle !== ''){
+      let index = tabList.indexOf(tabList.find(tab => tab.key === onEditTabTitle));
+      const key = tabList[index].key;
+      tabList[index] = {
+        key: key,
         tab: (
-          <span>
-            <InfoCircleOutlined />General
-          </span>
+          <div>
+            <PlusOutlined/>
+            <Input bordered={false} defaultValue={key} placeholder={key}
+                   size={'small'}
+                   role={'input'}
+                   onPressEnter={(e) =>
+                     updateConfigTabs(e.target.value, key)}
+                   onBlur={(e) =>
+                     updateConfigTabs(e.target.value, key)}
+            />
+          </div>
         )
-      },
-      {
-        key: 'JSON',
-        tab: (
-          <span>
-            <CodeOutlined />JSON
-          </span>
-        )
-      }
-    ]
-
-    setTabList([...items]);
-  }
+      };
+      setTabList([...tabList]);
+    }
+  }, [onEditTabTitle])
 
   const updateResource = (name, namespace, item) => {
     return window.api.updateGenericResource(location.pathname, item)
@@ -92,6 +93,42 @@ function ResourceGeneral(props){
     });
   }
 
+  const manageTabList = () => {
+    let items = [
+      {
+        key: 'General',
+        tab: (
+          <span>
+            <InfoCircleOutlined />General
+          </span>
+        )
+      },
+      {
+        key: 'JSON',
+        tab: (
+          <span>
+            <CodeOutlined />JSON
+          </span>
+        )
+      }
+    ]
+
+    if(resourceConfig.render && resourceConfig.render.tabs){
+      resourceConfig.render.tabs.forEach(tab => {
+        items.push({
+          key: tab.tabTitle,
+          tab: (
+            <span onDoubleClick={() => setOnEditTabTitle(tab.tabTitle)}>
+              <PlusOutlined />{tab.tabTitle}
+            </span>
+          )
+        })
+      })
+    }
+
+    setTabList([...items]);
+  }
+
   const manageContentList = () => {
     let items = {
       General: (
@@ -108,6 +145,14 @@ function ResourceGeneral(props){
           />
         </div>
       )
+    }
+
+    if(resourceConfig.render && resourceConfig.render.tabs){
+      resourceConfig.render.tabs.forEach(tab => {
+        items[tab.tabTitle] = (
+          <CustomTab content={tab.tabContent} resource={resource[0]} tabTitle={tab.tabTitle}/>
+        )
+      })
     }
 
     setContentList({...items});
@@ -138,6 +183,98 @@ function ResourceGeneral(props){
       deleted.current = true;
       setLoading(false);
     });
+  }
+
+  const updateConfigTabs = (name, prevValue) => {
+    setOnEditTabTitle('');
+
+    /** If nothing has changed, exit from the editing mode */
+    if(name === prevValue){
+      manageTabList();
+      return;
+    }
+
+    let tempResourceConfig = resourceConfig;
+
+    if(!_.isEmpty(tempResourceConfig)){
+
+      if(!tempResourceConfig.render) tempResourceConfig.render = {};
+      if(!tempResourceConfig.render.tabs) tempResourceConfig.render.tabs = [];
+
+      /** If there is a tab render for this parameter, update it */
+      let index = tempResourceConfig.render.tabs.indexOf(
+        tempResourceConfig.render.tabs.find(tab =>
+          tab.tabTitle === prevValue
+        )
+      );
+
+      if(index !== -1){
+        /** Delete tab if no name */
+        if(name === '')
+          delete tempResourceConfig.render.tabs[index];
+        else
+          tempResourceConfig.render.tabs[index].tabTitle = name;
+      } else
+        tempResourceConfig.render.tabs.push({
+          tabTitle: name,
+          tabContent: []
+        })
+    } else {
+      tempResourceConfig = createNewConfig(params, {kind: resource[0].kind}, location);
+
+      /** The resource doesn't have a config, create one */
+      tempResourceConfig.render.tabs.push({
+        tabTitle: name,
+        tabContent: []
+      })
+    }
+
+    updateResourceConfig(tempResourceConfig, params, location);
+
+    if(name !== ''){
+      setCurrentTab(name);
+      changeTabFlag.current = false;
+    }
+  }
+
+  const addTab = () => {
+    const key = 'NewTab'
+    const newPane = {
+      key: key,
+      tab: (
+        <span>
+          <PlusOutlined />{key}
+        </span>
+      )
+    };
+    setTabList(prev => [...prev, newPane]);
+    setContentList(prev => {
+      return {
+        ...prev,
+        [key]: (
+          <CustomTab content={[]} resource={resource[0]} tabTitle={key}/>
+        )
+      }
+    })
+    setCurrentTab(key);
+    updateConfigTabs(key);
+  }
+
+  const removeTab = (targetKey) => {
+    setTabList(prev => {
+      return prev.filter(tab => tab.key !== targetKey);
+    });
+    if(currentTab === targetKey)
+      setCurrentTab('General');
+    updateConfigTabs('', targetKey);
+  }
+
+  const onEditTab = (targetKey, action) => {
+    if(action === 'add'){
+      addTab();
+    } else {
+      removeTab(targetKey);
+    }
   }
 
   const notifyEvent = (type, object) => {
@@ -171,6 +308,7 @@ function ResourceGeneral(props){
                         headStyle={{marginLeft: -12, marginRight: -12}}
                         tabList={tabList}
                         tabProps={{
+                          onEdit: onEditTab,
                           tabBarStyle: {
                             backgroundColor: '#f0f2f5'
                           },
@@ -178,6 +316,10 @@ function ResourceGeneral(props){
                           size: 'small',
                           animated: true
                         }}
+                        tabBarExtraContent={(currentTab !== 'General' && currentTab !== 'JSON') ?
+                          <Button icon={<SettingOutlined />} size={'large'}/>
+                          : null
+                        }
                         size={'small'}
                         type={'inner'}
                         activeTabKey={currentTab}

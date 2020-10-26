@@ -1,4 +1,5 @@
 import { message } from 'antd';
+import _ from 'lodash';
 
 export function resourceNotifyEvent(func, type, object){
   if(object.metadata.namespace && object.metadata.namespace !== window.api.namespace.current && window.api.namespace.current)
@@ -50,4 +51,19 @@ export function getNamespaced(path){
           }
         })
     }).catch(error => console.log(error));
+}
+
+export function filterResource(props, res){
+  if(props.onRef.filter  === 'labels'){
+    res = res.filter(item => {
+      let flag = 0;
+      _.keys(props.onRef.filterValues).forEach(key => {
+        if(key.includes('app.kubernetes')) return;
+        if(item.metadata.labels && item.metadata.labels[key] === props.onRef.filterValues[key])
+          flag++;
+      })
+      return flag > 0;
+    })
+  }
+  return res;
 }

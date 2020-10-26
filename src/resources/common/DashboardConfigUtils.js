@@ -1,8 +1,13 @@
 import _ from 'lodash';
 
 export const createNewConfig = (params, props, location) => {
+  let path = '/' + location.pathname.split('/')[1] + '/' +
+    (params.group ? params.group + '/' : '') +
+    params.version + '/' +
+    params.resource;
+
   return {
-    resourcePath: location.pathname,
+    resourcePath: path,
     resourceName: props.kind,
     favourite: false,
     render: {
@@ -15,7 +20,8 @@ export const createNewConfig = (params, props, location) => {
           columnTitle: 'Namespace',
           columnContent: 'param.metadata.namespace'
         }
-      ]
+      ],
+      tabs: []
     }
   }
 }

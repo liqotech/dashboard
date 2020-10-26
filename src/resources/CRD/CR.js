@@ -9,8 +9,8 @@ import {
 } from 'antd';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 import EditOutlined from '@ant-design/icons/lib/icons/EditOutlined';
-import PieChart from '../../templates/piechart/PieChart';
-import HistoChart from '../../templates/histogram/HistoChart';
+import PieChart from '../../widgets/piechart/PieChart';
+import HistoChart from '../../widgets/histogram/HistoChart';
 import DeleteOutlined from '@ant-design/icons/lib/icons/DeleteOutlined';
 import UpdateCR from '../../editors/CRD/UpdateCR';
 import { withRouter } from 'react-router-dom';

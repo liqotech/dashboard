@@ -15,7 +15,7 @@ import Error409 from '../__mocks__/409.json';
 import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import PodsMockResponse from '../__mocks__/pods.json';
-import LineChart from '../src/templates/line/LineChart';
+import LineChart from '../src/widgets/line/LineChart';
 import { metricsPODs } from './RTLUtils';
 import { testTimeout } from '../src/constants';
 import CMMockResponse from '../__mocks__/configmap_clusterID.json';

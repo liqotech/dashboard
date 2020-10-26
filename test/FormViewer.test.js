@@ -11,6 +11,7 @@ import AdvMockResponse from '../__mocks__/advertisement.json';
 import ClusterConfigMockResponse from '../__mocks__/configs.json';
 import Error409 from '../__mocks__/409.json';
 import { testTimeout } from '../src/constants';
+import K8sSchemaDefinitions from '../__mocks__/kubernetesjsonschema.json';
 
 fetchMock.enableMocks();
 
@@ -18,6 +19,8 @@ function mockFetch(error) {
   fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
       return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+    } else if (req.url === 'https://kubernetesjsonschema.dev/master/_definitions.json'){
+      return Promise.resolve(new Response(JSON.stringify(K8sSchemaDefinitions)))
     } else if (req.url === 'http://localhost:3001/clustercustomobject/advertisements') {
       if (req.method === 'GET') {
         let advertisement = AdvMockResponse;

@@ -5,6 +5,7 @@ import FormGenerator from '../editors/OAPIV3FormGenerator/FormGenerator';
 import AvailablePeer from './AvailablePeer';
 import { checkAdvertisement, checkPeeringRequest } from './HomeUtils';
 import { APP_NAME } from '../constants';
+import DraggableWrapper from '../common/DraggableWrapper';
 
 function ListAvailable(props) {
 
@@ -70,22 +71,22 @@ function ListAvailable(props) {
   const availablePeersCard = (
     <div>
       <div style={{position: 'fixed', zIndex: 10, width: '100%', backgroundColor: 'white'}}>
-        <PageHeader style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}
-                    title={
-                      <div className={'draggable'}>
+        <DraggableWrapper>
+          <PageHeader style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}
+                      title={
                         <Typography.Text strong style={{fontSize: 24}}>Available Peers</Typography.Text>
-                      </div>
-                    }
-                    extra={
-                      <Tooltip title={'Add new peer'}>
-                        <Button type={'primary'}
-                                onClick={() => {
-                                  setShowAddPeer(true);
-                                }}
-                                icon={<PlusOutlined />} style={{marginTop: 2}}/>
-                      </Tooltip>
-                    }
-        />
+                      }
+                      extra={
+                        <Tooltip title={'Add new peer'}>
+                          <Button type={'primary'}
+                                  onClick={() => {
+                                    setShowAddPeer(true);
+                                  }}
+                                  icon={<PlusOutlined />} style={{marginTop: 2}}/>
+                        </Tooltip>
+                      }
+          />
+        </DraggableWrapper>
         <Divider style={{marginTop: 0, marginBottom: 0}}/>
       </div>
       <div style={{paddingTop: '5.5vh'}} >

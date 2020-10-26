@@ -9,10 +9,10 @@ import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/theme-monokai';
 import FormGenerator from '../OAPIV3FormGenerator/FormGenerator';
-import PieChart from '../../templates/piechart/PieChart';
-import HistoChart from '../../templates/histogram/HistoChart';
-import GraphNet from '../../templates/graph/GraphNet';
-import FormViewer from '../OAPIV3FormGenerator/FormViewer';
+import PieChart from '../../widgets/piechart/PieChart';
+import HistoChart from '../../widgets/histogram/HistoChart';
+import GraphNet from '../../widgets/graph/GraphNet';
+import FormViewer from '../../widgets/form/FormViewer';
 
 function DesignEditorCRD(props) {
   const [chosenTemplate, setChosenTemplate] = useState(null);

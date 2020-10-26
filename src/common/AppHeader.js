@@ -1,71 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  withRouter, useHistory, useParams
+  withRouter, useHistory
 } from 'react-router-dom';
 import './AppHeader.css';
 import { Select, Modal, Col, Layout, Menu, Row, Input, AutoComplete, Typography, Button } from 'antd';
 import { GithubOutlined, QuestionCircleOutlined, SelectOutlined } from '@ant-design/icons';
 import LogoutOutlined from '@ant-design/icons/lib/icons/LogoutOutlined';
 import NamespaceSelect from './NamespaceSelect';
+import { ResourceAutocomplete } from './ResourceAutocomplete';
 const Header = Layout.Header;
 
 function AppHeader(props) {
   const [infoModal, setInfoModal] = useState(false);
-  const [autocomplete, setAutocomplete] = useState([]);
   let history = useHistory();
-  let params = useParams();
-
-  const autoCompleteSearch = () => {
-    setAutocomplete([]);
-    window.api.getApis('/').then(res => {
-      res.body.groups.forEach(group => {
-        window.api.getGenericResource(
-          '/apis/' +
-          group.preferredVersion.groupVersion
-        ).then(_res => {
-          let tempRes = [];
-          _res.resources.forEach(resource => {
-            if(resource.name.split('/').length === 1)
-              tempRes.push({
-                value: '/apis/' + group.preferredVersion.groupVersion + '/' + resource.name,
-                label: resource.name
-              })
-          });
-          setAutocomplete(prev => [...prev, {
-            label: group.name,
-            options: tempRes
-          }])
-        }).catch(error => console.log(error))
-      })
-    }).catch(error => console.log(error))
-
-    window.api.getGenericResource('/api/v1')
-      .then(_res => {
-      let tempRes = [];
-      _res.resources.forEach(resource => {
-        if(resource.name.split('/').length === 1)
-          tempRes.push({
-            value: '/api/v1/' + resource.name,
-            label: resource.name
-          })
-      })
-      setAutocomplete(prev => [...prev, {
-        label: 'api',
-        options: tempRes
-      }])
-    }).catch(error => console.log(error));
-  }
-
-  const onSearch = (value, option) => {
-    if(option.value)
-      history.push(option.value);
-  }
-
-  useEffect(() => {
-    window.api.autoCompleteCallback.current = autoCompleteSearch;
-    autoCompleteSearch();
-  }, []);
-
   let menuItems;
 
   menuItems =
@@ -92,24 +39,18 @@ function AppHeader(props) {
     )
   }
 
+  const onSearch = (value, option) => {
+    if(option.value)
+      history.push(option.value);
+  }
+
   return (
     <div>
       <Header className="app-header">
         <div className="container">
           <Row className="app-title" align="middle">
             <Col>
-              <div aria-label={'autocompletesearch'}>
-                <AutoComplete
-                  filterOption={(inputValue, option) => {
-                    return option.label.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                  }}
-                  options={autocomplete}
-                  onSelect={onSearch}
-                  style={{ width: '22vw', marginLeft: 5, lineHeight: '31px' }}
-                >
-                  <Input.Search placeholder="Search resource" enterButton onSearch={onSearch} allowClear />
-                </AutoComplete>
-              </div>
+              <ResourceAutocomplete onSearch={onSearch} style={{ width: '22vw', marginLeft: 5, lineHeight: '31px' }}/>
             </Col>
           </Row>
         </div>

@@ -5,7 +5,7 @@ import { withRouter, useLocation, useHistory, useParams } from 'react-router-dom
 import { InsertRowRightOutlined } from '@ant-design/icons';
 import { getColumnSearchProps } from '../../services/TableUtils';
 import ListHeader from './ListHeader';
-import { getNamespaced, resourceNotifyEvent } from '../common/ResourceUtils';
+import { getNamespaced, filterResource, resourceNotifyEvent } from '../common/ResourceUtils';
 import { renderResourceList } from './ResourceListRenderer';
 import { calculateAge } from '../../services/TimeUtils';
 import { createNewConfig, getResourceConfig, updateResourceConfig } from '../common/DashboardConfigUtils';
@@ -25,21 +25,27 @@ function ResourceList(props) {
   const [columnHeaders, setColumnHeaders] = useState([]);
   const [columnContents, setColumnsContents] = useState([]);
   const [onCustomResource, setOnCustomResource] = useState(false);
-  let location = useLocation();
+  let location = props._location ? props._location : useLocation();
   let history = useHistory();
-  let params = useParams();
+  let params = props._params ? props._params : useParams();
 
   useEffect(() => {
     getNamespaced(location.pathname)
       .then(res => {
         if(res && res.namespaced)
           window.api.NSArrayCallback.current.push(changeNamespace);
+        else
+          params.namespace = undefined;
+        loadResourceList();
       });
-    loadResourceList();
     getDashConfig();
-    if(params.namespace)
+    if(params.namespace) {
       window.api.setNamespace(params.namespace);
-    window.api.DCArrayCallback.current.push(getDashConfig);
+    }
+    if(!props.onRef){
+      window.api.NSArrayCallback.current.push(changeNamespace);
+      window.api.DCArrayCallback.current.push(getDashConfig);
+    }
     setOnCustomResource(
       window.api.CRDs.current.find(CRD => {
         return params.resource === CRD.spec.names.plural
@@ -58,7 +64,7 @@ function ResourceList(props) {
         return func !== getDashConfig;
       });
     }
-  }, [location]);
+  }, [location.pathname]);
 
   useEffect(() => {
     manageColumnHeaders();
@@ -66,31 +72,36 @@ function ResourceList(props) {
   }, [resourceList, resourceConfig, editColumn])
 
   const notifyEvent = (type, object) => {
-    resourceNotifyEvent(setResourceList, type, object)
+    if(props.onRef) {
+      if(filterResource(props, [object])[0])
+        resourceNotifyEvent(setResourceList, type, object);
+    } else resourceNotifyEvent(setResourceList, type, object);
   }
 
   const manageColumnHeaders = () => {
     let columns = [];
 
-    columns.push(
-      {
-        title: '',
-        fixed: 'left',
-        dataIndex: 'Favourite',
-        width: '1em',
-        sortDirections: ['descend'],
-        align: 'center',
-        ellipsis: true,
-        sorter: {
-          compare: (a, b) => a.Favourite - b.Favourite,
-        },
-        render: (text, record) => (
-          <FavouriteButton favourite={text} resourceList={resourceList}
-                           resourceName={record.Name}
-          />
-        )
-      }
-    )
+    if(!props.onRef){
+      columns.push(
+        {
+          title: '',
+          fixed: 'left',
+          dataIndex: 'Favourite',
+          width: '1em',
+          sortDirections: ['descend'],
+          align: 'center',
+          ellipsis: true,
+          sorter: {
+            compare: (a, b) => a.Favourite - b.Favourite,
+          },
+          render: (text, record) => (
+            <FavouriteButton favourite={text} resourceList={resourceList}
+                             resourceName={record.Name}
+            />
+          )
+        }
+      )
+    }
 
     if(!_.isEmpty(resourceConfig) && resourceConfig.render && resourceConfig.render.columns){
       let index = 0;
@@ -119,10 +130,13 @@ function ResourceList(props) {
               </div>
             ) : (
               <div style={{marginLeft: '2em'}} >
-                <span onClick={() => setEditColumn(column.columnContent)}>
+                <span onClick={() => {
+                  if(!props.onRef)
+                    setEditColumn(column.columnContent);
+                }}>
                   {column.columnTitle}
                 </span>
-                {index === resourceConfig.render.columns.length - 1 ? (
+                {index === resourceConfig.render.columns.length - 1 && !props.onRef ? (
                   <span style={{float: 'right'}}>
                     { /** The one to last column is where the 'add a column' button is located */ }
                     <Tooltip title={'Add column'} >
@@ -201,7 +215,7 @@ function ResourceList(props) {
     const resourceViews = [];
     resourceList.forEach(resource => {
       let favourite = 0;
-      if(resource.metadata.annotations){
+      if(resource.metadata.annotations && !props.onRef){
         if(resource.metadata.annotations.favourite)
           favourite = 1;
       }
@@ -245,20 +259,23 @@ function ResourceList(props) {
   const loadResourceList = () => {
     window.api.getGenericResource(location.pathname)
       .then(res => {
-        setKind(res.kind);
+        setKind(res.kind.slice(0, -4));
+        if(props.onRef) {
+          res.items = filterResource(props, res.items);
+        }
+
         setResourceList(res.items.sort((a, b) => a.metadata.name.localeCompare(b.metadata.name)));
 
         /** Start a watch for the list of resources */
-        if(!props.onCustomView)
-          window.api.watchResource(
-            location.pathname.split('/')[1],
-            (params.group ? params.group : undefined),
-            (params.namespace ? params.namespace : undefined),
-            params.version,
-            params.resource,
-            undefined,
-            notifyEvent
-          )
+        window.api.watchResource(
+          location.pathname.split('/')[1],
+          (params.group ? params.group : undefined),
+          (params.namespace ? params.namespace : undefined),
+          params.version,
+          params.resource,
+          undefined,
+          notifyEvent
+        )
 
         setLoading(false);
       })
@@ -330,7 +347,7 @@ function ResourceList(props) {
           dataIndex: 'NewColumn',
           key: 'NewColumn',
           title:
-            <KubernetesSchemaAutocomplete kind={kind.slice(0, -4)}
+            <KubernetesSchemaAutocomplete kind={kind}
                                           updateFunc={updateDashConfig}
                                           cancelFunc={() => addColumnHeader(false)}
             />,
@@ -350,8 +367,11 @@ function ResourceList(props) {
 
   return (
     <div>
-      <ListHeader kind={kind.slice(0, -4)} resource={onCustomResource} />
+      {!props.onRef ? (
+        <ListHeader kind={kind} resource={onCustomResource} />
+      ) : null}
       <Table columns={columnHeaders} dataSource={columnContents}
+             size={props.onRef ? 'small' : 'default'}
              bordered scroll={{ x: 'max-content' }} sticky
              pagination={{ position: ['bottomCenter'],
                hideOnSinglePage: columnContents.length < 11,

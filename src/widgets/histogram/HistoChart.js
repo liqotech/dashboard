@@ -1,5 +1,4 @@
 import React from 'react';
-import './HistoChart.css';
 import Utils from '../../services/Utils';
 import { Chart, Interval } from 'bizcharts';
 import { Alert } from 'antd';

@@ -15,6 +15,7 @@ import { setup_resource } from './RTLUtils';
 import { MemoryRouter } from 'react-router-dom';
 import AdvMockResponse from '../__mocks__/advertisement.json';
 import { testTimeout } from '../src/constants';
+import K8sSchemaDefinitions from '../__mocks__/kubernetesjsonschema.json';
 
 fetchMock.enableMocks();
 
@@ -30,6 +31,8 @@ function mockFetch() {
       return Promise.resolve(new Response(JSON.stringify({ body: PieMockResponse })))
     } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
       return Promise.resolve(new Response(JSON.stringify({ body: AdvMockResponse })));
+    } else if (url === 'https://kubernetesjsonschema.dev/master/_definitions.json'){
+      return Promise.resolve(new Response(JSON.stringify(K8sSchemaDefinitions)))
     }
   })
 }

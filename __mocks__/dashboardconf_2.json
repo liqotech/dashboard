@@ -1,0 +1,84 @@
+{
+  "apiVersion": "dashboard.liqo.io/v1alpha1",
+  "items": [
+    {
+      "apiVersion": "dashboard.liqo.io/v1alpha1",
+      "kind": "DashboardConfig",
+      "metadata": {
+        "creationTimestamp": "2020-10-17T13:38:13Z",
+        "name": "default-config",
+        "resourceVersion": "1335367",
+        "selfLink": "/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/default-config"
+      },
+      "spec": {
+        "resources": [
+          {
+            "favourite": true,
+            "icon": "AppstoreOutlined",
+            "render": {
+              "columns": [
+                {
+                  "columnContent": "param.metadata.name",
+                  "columnTitle": "Name"
+                },
+                {
+                  "columnContent": "param.metadata.namespace",
+                  "columnTitle": "Namespace"
+                },
+                {
+                  "columnContent": "param.status.phase",
+                  "columnTitle": "Phase"
+                }
+              ],
+              "tabs": [
+                {
+                  "tabContent": [
+                    {
+                      "cardContent": [
+                        {
+                          "parameter": "/apis/apps/v1/deployments"
+                        }
+                      ],
+                      "cardDisplay": "Ref",
+                      "cardLayout": {
+                        "h": 10,
+                        "w": 12,
+                        "x": 0,
+                        "y": 0
+                      },
+                      "cardTitle": "Deployments"
+                    },
+                    {
+                      "cardContent": [
+                        {
+                          "parameter": "spec.containers"
+                        }
+                      ],
+                      "cardDisplay": "Table",
+                      "cardLayout": {
+                        "h": 8,
+                        "w": 12,
+                        "x": 0,
+                        "y": 24
+                      },
+                      "cardTitle": "Containers"
+                    }
+                  ],
+                  "tabTitle": "NewTab"
+                }
+              ]
+            },
+            "resourceName": "PodList",
+            "resourcePath": "/api/v1/pods"
+          }
+        ]
+      }
+    }
+  ],
+  "kind": "DashboardConfigList",
+  "metadata": {
+    "continue": "",
+    "resourceVersion": "1396902",
+    "selfLink": "/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs"
+  }
+}

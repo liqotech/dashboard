@@ -8,7 +8,7 @@ import ViewMockResponse from '../__mocks__/views.json';
 import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import HistoMockResponse from '../__mocks__/histocharts.json';
 import HistoMockResponseWrong from '../__mocks__/histocharts_wrong.json';
-import HistoChart from '../src/templates/histogram/HistoChart';
+import HistoChart from '../src/widgets/histogram/HistoChart';
 import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();

@@ -1,5 +1,5 @@
 import { Col, Row, Typography, Button, Tooltip } from 'antd';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import ResourceBreadcrumb from '../common/ResourceBreadcrumb';
 import { useParams, useLocation } from 'react-router-dom';
 import { ApiOutlined, PlusOutlined } from '@ant-design/icons';
@@ -16,15 +16,15 @@ export default function ListHeader(props){
 
   let location = useLocation();
   let params = useParams();
-  let title = '';
+  const title = useRef('');
 
   if(params.resource)
-    title = props.kind;
+    title.current = props.kind;
   else {
     if(params.group)
-      title = params.group;
+      title.current = params.group;
     else
-      title = location.pathname.split('/')[1];
+      title.current = location.pathname.split('/')[1];
   }
 
   const setIcon = (icon) => {
@@ -38,7 +38,7 @@ export default function ListHeader(props){
     if(!_.isEmpty(tempResourceConfig)){
       tempResourceConfig.icon = key;
     } else {
-      tempResourceConfig = createNewConfig(params, {kind: props.kind}, location);
+      tempResourceConfig = createNewConfig(params, {kind: title.current}, location);
       /** The resource doesn't have a config, create one */
       tempResourceConfig.icon = key;
     }
@@ -82,7 +82,7 @@ export default function ListHeader(props){
                   ) : <ApiOutlined style={{fontSize: '28px', marginRight: 4}} />}
                 </Col>
                 <Col>
-                  <Typography.Title level={3} style={{marginBottom: 0}}>{title}</Typography.Title>
+                  <Typography.Title level={3} style={{marginBottom: 0}}>{title.current}</Typography.Title>
                 </Col>
               </Row>
             </Col>

@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Badge, Col, Collapse, Divider, PageHeader, Row, Space, Typography, Tooltip } from 'antd';
 import QuestionCircleOutlined from '@ant-design/icons/lib/icons/QuestionCircleOutlined';
 import { addZero, convertCPU, convertRAM } from './HomeUtils';
-import LineChart from '../templates/line/LineChart';
-import Donut from '../templates/donut/Donut';
+import LineChart from '../widgets/line/LineChart';
+import Donut from '../widgets/donut/Donut';
 import ExclamationCircleTwoTone from '@ant-design/icons/lib/icons/ExclamationCircleTwoTone';
+import DraggableWrapper from '../common/DraggableWrapper';
 
 function Status(props){
 
@@ -296,14 +297,15 @@ function Status(props){
   return(
     <div className="home-header">
       <div style={{position: 'fixed', zIndex: 10, width: '100%', backgroundColor: 'white'}}>
-        <PageHeader style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}
-                    title={
-                      <Space>
-                        <Typography.Text strong style={{fontSize: 24}}>Cluster Status</Typography.Text>
-                      </Space>
-                    }
-                    className={'draggable'}
-        />
+        <DraggableWrapper>
+          <PageHeader style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}
+                      title={
+                        <Space>
+                          <Typography.Text strong style={{fontSize: 24}}>Cluster Status</Typography.Text>
+                        </Space>
+                      }
+          />
+        </DraggableWrapper>
         <Divider style={{marginTop: 0, marginBottom: 4}}/>
       </div>
       <div style={{paddingTop: '7vh', paddingBottom: 4, paddingLeft: 16, paddingRight: 16}} >
