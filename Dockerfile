@@ -3,7 +3,7 @@
 
 # This first stage downloads and installs the k8s_library from the LiqoTech repo and is necessary
 # because for some reasons just "npm install" do not properly install it from the repo
-FROM node:alpine as builder_k8s
+FROM node:14-alpine as builder_k8s
 # Download git to fetch the kubernetes repo
 RUN apk add --no-cache --update git openssh
 RUN git clone https://github.com/LiqoTech/kubernetes-client-javascript.git
@@ -11,8 +11,8 @@ WORKDIR /kubernetes-client-javascript
 RUN npm install --silent --unsafe-perm
 RUN npm run build
 
-# a custom Docker Image with this Dockerfile
-FROM node:alpine as build-deps
+## a custom Docker Image with this Dockerfile
+FROM node:14-alpine as build-deps
 # Download git to fetch the kubernetes repo
 RUN apk add --no-cache --update git openssh
 # A directory within the virtualized Docker environment
@@ -28,7 +28,7 @@ COPY --from=builder_k8s /kubernetes-client-javascript/dist ./node_modules/@kuber
 COPY . ./
 RUN npm run build
 
-FROM nginx:alpine
+FROM nginx:1.19
 COPY --chown=101:101 --from=build-deps /app/dist /usr/share/nginx/html
 COPY --chown=101:101 nginx.conf /etc/nginx/conf.d/default.conf
 COPY --chown=101:101 docker-entrypoint.sh /
