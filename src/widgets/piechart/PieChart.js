@@ -1,5 +1,4 @@
 import React from 'react';
-import './PieChart.css';
 import Utils from '../../services/Utils';
 import { Axis, Chart, Coordinate, Interval, Tooltip } from 'bizcharts';
 import { Alert } from 'antd';

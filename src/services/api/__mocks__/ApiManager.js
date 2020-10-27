@@ -74,6 +74,9 @@ export default function ApiManager() {
                 if(item.render && item.render.columns){
                   item.render.columns = item.render.columns.filter(col => col !== null);
                 }
+                if(item.render && item.render.tabs){
+                  item.render.tabs = item.render.tabs.filter(tab => tab !== null);
+                }
                 return item;
               })
             }
@@ -108,9 +111,10 @@ export default function ApiManager() {
       array[4] = 'customresourcedefinitions/';
     if(array[4] === 'dashboardconfigs' && path.slice(-1) === '/')
       array[4] = 'dashboardconfigs/';
+
     watchList.push({
       plural: array[1] === 'api' ? (array[3] === 'namespaces' ? array[5] : array[4])
-      : array[4],
+      : (array[4] === 'namespaces' ? array[6] : array[4]),
       callback: callback,
       done: done
     });

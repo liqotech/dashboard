@@ -6,7 +6,7 @@ fetchMock.enableMocks();
 
 jest.mock('./src/services/api/ApiManager');
 jest.mock('./src/services/api/Authenticator');
-jest.mock('./src/templates/graph/GraphNet', () => {
+jest.mock('./src/widgets/graph/GraphNet', () => {
   return function GraphNet() {
     return (<div/>);
   }
@@ -20,6 +20,12 @@ jest.mock('./src/services/TimeUtils', () => {
     calculateAge
   };
 });
+
+jest.mock('./src/common/DraggableWrapper',  () => {
+  return function DraggableWrapper({children}) {
+    return <div>{children}</div>
+  }
+})
 
 jest.mock('./src/resources/common/CustomIcon', () => {
   const icons = require(`@ant-design/icons`);

@@ -61,10 +61,10 @@ async function check_new_CR(){
   expect(screen.getAllByText('Name')).toHaveLength(3);
 
   const textboxes = await screen.findAllByRole('textbox');
-  expect(textboxes[1]).toHaveAttribute('value', '1');
-  expect(textboxes[2]).toHaveAttribute('value', 'cyan');
-  expect(textboxes[3]).toHaveAttribute('value', '2');
-  expect(textboxes[4]).toHaveAttribute('value', 'orange');
+  expect(textboxes[0]).toHaveAttribute('value', '1');
+  expect(textboxes[1]).toHaveAttribute('value', 'cyan');
+  expect(textboxes[2]).toHaveAttribute('value', '2');
+  expect(textboxes[3]).toHaveAttribute('value', 'orange');
 }
 
 beforeEach(() => {

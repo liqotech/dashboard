@@ -3,13 +3,11 @@ import { Link, withRouter } from 'react-router-dom';
 import { Layout, Menu, Typography } from 'antd';
 import './SideBar.css';
 import {
-  DashboardOutlined,
-  SettingOutlined, DesktopOutlined,
+  DashboardOutlined, SettingOutlined,
   LayoutOutlined, StarOutlined, ApiOutlined, BlockOutlined
 } from '@ant-design/icons';
 import AddCustomView from '../views/AddCustomView';
 import CustomIcon from '../resources/common/CustomIcon';
-import FavouriteButton from '../resources/common/buttons/FavouriteButton';
 
 const Sider = Layout.Sider;
 

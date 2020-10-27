@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import LineChart from '../src/templates/line/LineChart';
+import LineChart from '../src/widgets/line/LineChart';
 import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();

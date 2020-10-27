@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import { fireEvent, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import Donut from '../src/templates/donut/Donut';
+import Donut from '../src/widgets/donut/Donut';
 import { testTimeout } from '../src/constants';
 
 fetchMock.enableMocks();

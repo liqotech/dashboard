@@ -5,6 +5,7 @@ import ConnectedPeer from './ConnectedPeer';
 import { checkAdvertisement, checkPeeringRequest } from './HomeUtils';
 import { LIQO_LABEL_ENABLED } from '../constants';
 import LoadingIndicator from '../common/LoadingIndicator';
+import DraggableWrapper from '../common/DraggableWrapper';
 
 function ListConnected(props){
   
@@ -107,24 +108,25 @@ function ListConnected(props){
   return (
     <div className="home-header">
       <div style={{position: 'fixed', zIndex: 10, width: '100%', backgroundColor: 'white'}}>
-        <PageHeader style={{ paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16 }}
-                    title={
-                      <Space>
-                        <Typography.Text strong style={{ fontSize: 24 }}>Connected Peers</Typography.Text>
-                      </Space>
-                    }
-                    extra={
-                      <Space>
-                        <Tooltip title={'Add filter'}>
-                          {
-                            //TODO: add some filter option
-                          }
-                          <Button type={'text'} icon={<FilterOutlined/>}/>
-                        </Tooltip>
-                      </Space>
-                    }
-                    className={'draggable'}
-        />
+        <DraggableWrapper>
+          <PageHeader style={{ paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16 }}
+                      title={
+                        <Space>
+                          <Typography.Text strong style={{ fontSize: 24 }}>Connected Peers</Typography.Text>
+                        </Space>
+                      }
+                      extra={
+                        <Space>
+                          <Tooltip title={'Add filter'}>
+                            {
+                              //TODO: add some filter option
+                            }
+                            <Button type={'text'} icon={<FilterOutlined/>}/>
+                          </Tooltip>
+                        </Space>
+                      }
+          />
+        </DraggableWrapper>
         <Divider style={{ marginTop: 0, marginBottom: 0 }}/>
       </div>
       <div style={{paddingTop: '5.5vh'}} >

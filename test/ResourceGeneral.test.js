@@ -98,7 +98,7 @@ describe('ResourceHeader', () => {
 
     const textboxes = await screen.findAllByRole('textbox');
 
-    expect(textboxes[3]).toHaveAttribute('value', 'testV2');
+    expect(textboxes[2]).toHaveAttribute('value', 'testV2');
 
   }, testTimeout)
 

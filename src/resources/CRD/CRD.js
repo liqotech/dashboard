@@ -11,7 +11,7 @@ import {
 import CR from './CR';
 import { Link, useParams, useLocation } from 'react-router-dom';
 import LoadingIndicator from '../../common/LoadingIndicator';
-import GraphNet from '../../templates/graph/GraphNet';
+import GraphNet from '../../widgets/graph/GraphNet';
 import Utils from '../../services/Utils';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
 import PictureOutlined from '@ant-design/icons/lib/icons/PictureOutlined';

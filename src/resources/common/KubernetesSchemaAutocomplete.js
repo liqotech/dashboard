@@ -106,11 +106,12 @@ export default function KubernetesSchemaAutocomplete(props){
   return(
     <div>
       <Row align={'center'}>
-        <Col span={18}>
+        <Col span={props.single ? 24 : 18}>
           <Select
             aria-label={'select-k8s'}
             allowClear
             onDeselect={onDeselect}
+            onClear={props.onClear? props.onClear : null}
             style={{width: '100%'}}
             size={'small'}
             placeholder={'Select parameter'}
@@ -118,28 +119,30 @@ export default function KubernetesSchemaAutocomplete(props){
               return option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
             }}
             options={totItems}
-            onSelect={onSearch}
+            onSelect={props.onSearch ? props.onSearch : onSearch}
             showSearch
-            mode={'tags'}
+            mode={props.single ? null : 'tags'}
           />
         </Col>
-        <Col span={6}>
-          <div style={{float: 'right', width: 55}}>
-            <Tooltip title={'Save column'}>
-              <Button type={'primary'} icon={<SaveOutlined />}
-                      onClick={onComplete}
-                      size={'small'}
-              />
-            </Tooltip>
-            <Tooltip title={'Cancel'}>
-              <Button type={'danger'} icon={<CloseOutlined />}
-                      onClick={props.cancelFunc}
-                      size={'small'}
-                      style={{marginLeft: 4}}
-              />
-            </Tooltip>
-          </div>
-        </Col>
+        {!props.single ? (
+          <Col span={6}>
+            <div style={{float: 'right', width: 55}}>
+              <Tooltip title={'Save column'}>
+                <Button type={'primary'} icon={<SaveOutlined />}
+                        onClick={onComplete}
+                        size={'small'}
+                />
+              </Tooltip>
+              <Tooltip title={'Cancel'}>
+                <Button type={'danger'} icon={<CloseOutlined />}
+                        onClick={props.cancelFunc}
+                        size={'small'}
+                        style={{marginLeft: 4}}
+                />
+              </Tooltip>
+            </div>
+          </Col>
+        ) : null}
       </Row>
     </div>
   )

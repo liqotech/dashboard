@@ -1,11 +1,12 @@
 import ToolOutlined from '@ant-design/icons/lib/icons/ToolOutlined';
 import React, { useEffect, useState } from 'react';
 import{  Input, Alert, Card } from 'antd';
-import FormViewer from '../../editors/OAPIV3FormGenerator/FormViewer';
+import FormViewer from '../../widgets/form/FormViewer';
 import { properCase } from '../../services/stringUtils';
 import Logs from './pod/Logs';
 import Utils from '../../services/Utils';
 import _ from 'lodash';
+import KubernetesSchemaAutocomplete from '../common/KubernetesSchemaAutocomplete';
 
 export default function ResourceForm(props){
   const [currentTab, setCurrentTab] = useState('metadata');
@@ -66,24 +67,26 @@ export default function ResourceForm(props){
     }
   }, [props.resource])
 
-  const searchProperty = value => {
+  const searchProperty = (value, tab) => {
     let utils = Utils();
-    let object = utils.getSelectedProperties(props.resource[currentTab], value.target.value);
+    let object = utils.getSelectedProperties(props.resource, value);
 
-    if(_.isEmpty(object))
-      object = props.resource[currentTab];
+    if(_.isEmpty(object)) {
+      tab = currentTab;
+      object = props.resource[tab];
+    }
 
     let searchedRes = {
-      [currentTab]: object
+      form: object
     }
 
     setContentList(prev => {
-      prev[currentTab] = (
-        <div key={currentTab + '_' + props.resource.metadata.name + '#' + value.target.value}>
+      prev[tab] = (
+        <div key={tab + '_' + props.resource.metadata.name + '#' + value}>
           <Alert.ErrorBoundary>
-            <div aria-label={'form_' + currentTab}>
-              <FormViewer {...props} resource={JSON.parse(JSON.stringify(searchedRes))} show={currentTab}
-                          resourceName={props.resource.metadata.name} origResource={props.resource[currentTab]}
+            <div aria-label={'form_' + tab}>
+              <FormViewer {...props} resource={JSON.parse(JSON.stringify(searchedRes))} show={'form'}
+                          resourceName={props.resource.metadata.name} origResource={props.resource}
                           resourceNamespace={props.resource.metadata.namespace}
               />
             </div>
@@ -92,7 +95,12 @@ export default function ResourceForm(props){
       )
       return {...prev}
     })
+    setCurrentTab(tab);
   };
+
+  const onSearch = (value, option) => {
+    searchProperty(option.label, option.value.split('.')[0])
+  }
 
   return(
     <Card tabList={tabList}
@@ -101,7 +109,10 @@ export default function ResourceForm(props){
           }}
           tabBarExtraContent={
             <div style={{width: '20em'}}>
-              <Input size={'small'} onPressEnter={searchProperty} placeholder={'Search'} allowClear />
+              <KubernetesSchemaAutocomplete kind={props.kind}
+                                            onSearch={onSearch}
+                                            onClear={() => searchProperty('')} single
+              />
             </div>
           }
           size={'small'}

@@ -3,11 +3,11 @@ import Utils from '../../services/Utils';
 import { withTheme } from '@rjsf/core';
 import { Theme as AntDTheme } from '@rjsf/antd';
 import { Button, message } from 'antd';
-import { widgets } from './CustomWidget';
-import { CustomArrayFieldTemplate, fields, fieldsView } from './CustomField';
+import { widgets } from '../../editors/OAPIV3FormGenerator/CustomWidget';
+import { CustomArrayFieldTemplate, fields, fieldsView } from '../../editors/OAPIV3FormGenerator/CustomField';
 import { json } from 'generate-schema';
-import CustomFieldTemplateViewer from './CustomFieldTemplateViewer';
-import CustomFieldTemplate from './CustomFieldTemplate';
+import CustomFieldTemplateViewer from '../../editors/OAPIV3FormGenerator/CustomFieldTemplateViewer';
+import CustomFieldTemplate from '../../editors/OAPIV3FormGenerator/CustomFieldTemplate';
 
 const Form = withTheme(AntDTheme);
 
@@ -47,9 +47,8 @@ function FormViewer(props) {
 
     item[props.show] = value.formData
 
-    if(props.origResource){
-      item[props.show] = Utils().fromDotToObject(item, props.origResource);
-    }
+    if(props.origResource)
+      item = Utils().fromDotToObject(item, props.origResource);
 
     let promise;
 

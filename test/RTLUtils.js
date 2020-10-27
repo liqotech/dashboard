@@ -40,6 +40,7 @@ import NamespaceResponse from '../__mocks__/namespaces.json';
 import PodMockResponse from '../__mocks__/pod.json';
 import DashboardConfig from '../__mocks__/dashboardconf.json';
 import K8sSchemaDefinitions from '../__mocks__/kubernetesjsonschema.json';
+import DeploymentMockResponse from '../__mocks__/deployments.json';
 
 import Cookies from 'js-cookie';
 
@@ -72,6 +73,8 @@ export function alwaysPresentGET(url) {
     url === 'http://localhost/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
   ) {
     return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+  } else if (url === 'https://kubernetesjsonschema.dev/master/_definitions.json'){
+    return Promise.resolve(new Response(JSON.stringify(K8sSchemaDefinitions)))
   } else if (url === 'http://localhost:3001/apis/') {
     return Promise.resolve(new Response(JSON.stringify({body: ApisMockResponse})));
   } else if (url === 'http://localhost/apiserver/apis/apps/v1' || url === 'http://localhost:/apiserver/apis/apps/v1') {
@@ -118,6 +121,10 @@ export function alwaysPresentGET(url) {
     return Promise.resolve(new Response(JSON.stringify(DashboardConfig)));
   }*/ else if (url === 'http://localhost:3001/clustercustomobject/dashboardconfigs') {
     return Promise.resolve(new Response(JSON.stringify({body: DashboardConfig})));
+  } else if (url === 'http://localhost:/apiserver/apis/apps/v1/deployments' ||
+    url === 'http://localhost/apiserver/apis/apps/v1/deployments'
+  ) {
+    return Promise.resolve(new Response(JSON.stringify(DeploymentMockResponse)));
   } else return false;
 }
 
@@ -174,7 +181,6 @@ function responseManager(req, error, method, crd, crd_v, res_get, res_post, res_
 export function generalMocks(url){
   if (url === 'http://localhost:3001/customresourcedefinition') {
     return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-
   } /*else if (url === 'https://kubernetesjsonschema.dev/master/_definitions.json'){
     return Promise.resolve(new Response(JSON.stringify(K8sSchemaDefinitions)))
   }*/ /*else if (url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {
