@@ -6,7 +6,7 @@ import Editor from '../../editors/Editor';
 import ResourceForm from './ResourceForm';
 import _ from 'lodash';
 import { resourceNotifyEvent } from '../common/ResourceUtils';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { CodeOutlined, InfoCircleOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { createNewConfig, getResourceConfig, updateResourceConfig } from '../common/DashboardConfigUtils';
 import CustomTab from './CustomTab';
@@ -21,16 +21,20 @@ function ResourceGeneral(props){
   const [tabList, setTabList] = useState([])
   const [contentList, setContentList] = useState({});
   const [onEditTabTitle, setOnEditTabTitle] = useState('');
-  const [onEditTabContent, setOnEditTabContent] = useState('');
-  let location = useLocation();
-  let history = useHistory();
-  let params = useParams();
+  const [onCustomResource, setOnCustomResource] = useState(false);
+  let location = props._location ? props._location : useLocation();
+  let params = props._params ? props._params : useParams();
   const changeTabFlag = useRef(true);
 
   useEffect(() => {
     loadResource();
     getDashConfig();
     window.api.DCArrayCallback.current.push(getDashConfig);
+    setOnCustomResource(() => {
+      if(params.resource && params.group){
+        return window.api.getCRDFromName(params.resource + '.' + params.group);
+      }
+    })
 
     /** When unmounting, eliminate every callback and watch */
     return () => {
@@ -135,6 +139,7 @@ function ResourceGeneral(props){
         <div>
           <ResourceForm resource={JSON.parse(JSON.stringify(resource[0]))}
                         updateFunc={updateResource} kind={resource[0].kind}
+                        CRD={onCustomResource}
           />
         </div>
       ),
@@ -144,13 +149,15 @@ function ResourceGeneral(props){
                   onClick={submit}
           />
         </div>
-      )
+      ),
     }
 
     if(resourceConfig.render && resourceConfig.render.tabs){
       resourceConfig.render.tabs.forEach(tab => {
         items[tab.tabTitle] = (
-          <CustomTab content={tab.tabContent} resource={resource[0]} tabTitle={tab.tabTitle}/>
+          <CustomTab content={tab.tabContent} resource={resource[0]} tabTitle={tab.tabTitle}
+                     onCustomResource={onCustomResource} {...props}
+          />
         )
       })
     }
@@ -289,52 +296,49 @@ function ResourceGeneral(props){
           <div aria-label={'crd'} key={resource[0].metadata.name} ref={setContainer}
                style={{height: '92vh', overflow: 'auto', marginLeft: -20, marginRight: -20, marginTop: -20}}
           >
-            {!props.onCustomView ? (
-              <div style={{marginLeft: 20, marginRight: 20}}>
-                <Affix target={() => container}>
-                  <ResourceHeader
-                    onCustomView={props.onCustomView}
-                    resourceRedirect={'resources'}
-                    resource={resource[0]}
-                    name={resource[0].metadata.name}
-                    kind={resource[0].kind}
-                    deleted={deleted}
-                    deleteFunc={deleteResource}
-                    updateFunc={updateResource}
-                  />
-                </Affix>
+            <div style={{marginLeft: 20, marginRight: 20}}>
+              {!props.onRef ? (
                 <div>
-                  <Card bodyStyle={{paddingTop: 0, paddingLeft: 0, paddingRight: 0, paddingBottom: 0}}
-                        headStyle={{marginLeft: -12, marginRight: -12}}
-                        tabList={tabList}
-                        tabProps={{
-                          onEdit: onEditTab,
-                          tabBarStyle: {
-                            backgroundColor: '#f0f2f5'
-                          },
-                          type: 'editable-card',
-                          size: 'small',
-                          animated: true
-                        }}
-                        tabBarExtraContent={(currentTab !== 'General' && currentTab !== 'JSON') ?
-                          <Button icon={<SettingOutlined />} size={'large'}/>
-                          : null
-                        }
-                        size={'small'}
-                        type={'inner'}
-                        activeTabKey={currentTab}
-                        onTabChange={key => {if(changeTabFlag.current) setCurrentTab(key); else changeTabFlag.current = true}}
-                        style={{overflow: 'hidden'}}
-                  >
-                    {contentList[currentTab]}
-                  </Card>
-                </div>
-              </div>
-            ) : (
-              <div>
+                  <Affix target={() => container}>
+                    <ResourceHeader
+                      onCustomResource={onCustomResource}
+                      onCustomView={props.onCustomView}
+                      resourceRedirect={'resources'}
+                      resource={resource[0]}
+                      name={resource[0].metadata.name}
+                      kind={resource[0].kind}
+                      deleted={deleted}
+                      deleteFunc={deleteResource}
+                      updateFunc={updateResource}
+                    />
+                  </Affix>
+                </div> ) :
+              null}
+              <Card bodyStyle={{paddingTop: 0, paddingLeft: 0, paddingRight: 0, paddingBottom: 0}}
+                    headStyle={{marginLeft: -12, marginRight: -12}}
+                    tabList={tabList}
+                    tabProps={{
+                      onEdit: onEditTab,
+                      tabBarStyle: {
+                        backgroundColor: '#f0f2f5'
+                      },
+                      type: 'editable-card',
+                      size: 'small',
+                      animated: true
+                    }}
+                    tabBarExtraContent={(currentTab !== 'General' && currentTab !== 'JSON') ?
+                      <Button icon={<SettingOutlined />} size={'large'}/>
+                      : null
+                    }
+                    size={'small'}
+                    type={'inner'}
+                    activeTabKey={currentTab}
+                    onTabChange={key => {if(changeTabFlag.current) setCurrentTab(key); else changeTabFlag.current = true}}
+                    style={{overflow: 'hidden'}}
+              >
                 {contentList[currentTab]}
-              </div>
-            )}
+              </Card>
+            </div>
           </div>
         ) : (
           <Alert
@@ -345,7 +349,7 @@ function ResourceGeneral(props){
           />
         )
       )}
-    </Alert.ErrorBoundary>
+      </Alert.ErrorBoundary>
     </div>
   )
 }

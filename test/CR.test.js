@@ -139,8 +139,9 @@ describe('CR', () => {
     userEvent.click(screen.getByText(/advertisement-/i));
     userEvent.click(await screen.findByText('Spec'));
     userEvent.click(await screen.findByText('General'));
-    let date = screen.getAllByRole('date-picker');
-    let edit = screen.getAllByLabelText('edit');
+    expect(await screen.findByText('Cluster Id'))
+    let date = await screen.findAllByRole('date-picker');
+    let edit = await screen.findAllByLabelText('edit');
     userEvent.click(edit[3]);
     userEvent.click(date[1]);
     userEvent.click(await screen.findByText('Now'));

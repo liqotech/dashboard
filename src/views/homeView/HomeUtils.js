@@ -1,7 +1,7 @@
 import { message } from 'antd';
-import { APP_NAME } from '../constants';
+import { APP_NAME } from '../../constants';
 import React from 'react';
-import { colors } from '../services/Colors';
+import { colors } from '../../services/Colors';
 
 /** Return the right color from the percentage given */
 export function getColor(percent, allocatable) {

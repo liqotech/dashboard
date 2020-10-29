@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Badge, Col, Collapse, Divider, PageHeader, Row, Space, Typography, Tooltip } from 'antd';
 import QuestionCircleOutlined from '@ant-design/icons/lib/icons/QuestionCircleOutlined';
 import { addZero, convertCPU, convertRAM } from './HomeUtils';
-import LineChart from '../widgets/line/LineChart';
-import Donut from '../widgets/donut/Donut';
+import LineChart from '../../widgets/line/LineChart';
+import Donut from '../../widgets/donut/Donut';
 import ExclamationCircleTwoTone from '@ant-design/icons/lib/icons/ExclamationCircleTwoTone';
-import DraggableWrapper from '../common/DraggableWrapper';
+import DraggableWrapper from '../../common/DraggableWrapper';
 
 function Status(props){
 

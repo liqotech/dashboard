@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event';
 import ViewMockResponse from '../__mocks__/views.json';
 import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
-import Home from '../src/home/Home';
+import Home from '../src/views/homeView/Home';
 import FCMockResponseNoJoin from '../__mocks__/foreigncluster_noJoin.json';
 import FCMockResponse from '../__mocks__/foreigncluster.json';
 import PRMockResponse from '../__mocks__/peeringrequest.json';

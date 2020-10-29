@@ -51,7 +51,9 @@ function CustomFieldTemplateViewer(props){
                           onConfirm={() => {props.onDisableChange()}}
                           okText="Yes" cancelText="No"
               >
-                <Button icon={<CloseOutlined />} htmlType={'submit'}/>
+                <Button icon={<CloseOutlined />} htmlType={'submit'}
+                        size={'small'}
+                />
               </Popconfirm>
             )
             }

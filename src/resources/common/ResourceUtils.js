@@ -38,18 +38,16 @@ export function resourceNotifyEvent(func, type, object){
 }
 
 export function getNamespaced(path){
-  return window.api.getGenericResource(path)
+  let link = path.split('/').slice(0, -1).join('/');
+  let resource = path.split('/').slice(-1)[0];
+
+  return window.api.getGenericResource(link)
     .then(res => {
-      let link = res.metadata.selfLink.split('/').slice(0, -1).join('/');
-      let resource = res.metadata.selfLink.split('/').slice(-1)[0];
-      return window.api.getGenericResource(link)
-        .then(res => {
-          return {
-            namespaced: res.resources.find(item => {
-              return item.name === resource;
-            }).namespaced
-          }
-        })
+      return {
+        namespaced: res.resources.find(item => {
+          return item.name === resource;
+        }).namespaced
+      }
     }).catch(error => console.log(error));
 }
 

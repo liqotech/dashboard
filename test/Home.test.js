@@ -5,7 +5,7 @@ import { metricsPODs, mockCRDAndViewsExtended } from './RTLUtils';
 import { act, render, screen } from '@testing-library/react';
 import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
-import Home from '../src/home/Home';
+import Home from '../src/views/homeView/Home';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import FCMockResponse from '../__mocks__/foreigncluster.json';
 import AdvMockResponse from '../__mocks__/advertisement.json';

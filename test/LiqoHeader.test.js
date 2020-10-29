@@ -8,7 +8,7 @@ import { testTimeout } from '../src/constants';
 import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 import ConfigMockResponse from '../__mocks__/configs.json';
 import Error500 from '../__mocks__/500.json';
-import LiqoHeader from '../src/home/LiqoHeader';
+import LiqoHeader from '../src/views/homeView/LiqoHeader';
 import userEvent from '@testing-library/user-event';
 
 fetchMock.enableMocks();

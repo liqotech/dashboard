@@ -8,7 +8,7 @@ import {
 import AppHeader from '../common/AppHeader';
 import SideBar from '../common/SideBar';
 import { Layout, notification, message } from 'antd';
-import Home from '../home/Home';
+import Home from '../views/homeView/Home';
 import CRD from '../resources/CRD/CRD';
 import Authenticator from '../services/api/Authenticator';
 import ErrorRedirect from '../error-handles/ErrorRedirect';

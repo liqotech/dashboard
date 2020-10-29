@@ -22,7 +22,7 @@ function Login(props){
   return (
     <div className={'login-container'}>
       <Typography.Title style={{marginBottom: 50, fontSize: 50}}>
-        Liqo Login
+        Liqo<span style={{fontStyle: 'italic'}}>Dash</span> Login
       </Typography.Title>
       <Form onFinish={onFinish} className="login-form">
         <Form.Item

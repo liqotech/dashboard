@@ -122,11 +122,24 @@ export default function Utils() {
     return origResource;
   }
 
+  const replaceObject = (item, itemKey, origResource) => {
+    Object.keys(origResource).forEach(key => {
+      if(key === itemKey) {
+        origResource[key] = item[key];
+        return origResource;
+      }
+      if(typeof origResource[key] === 'object' || Array.isArray(origResource[key]))
+        replaceObject(item, itemKey, origResource[key]);
+    })
+    return origResource;
+  }
+
   return{
     setRealProperties,
     OAPIV3toJSONSchema,
     index,
     getSelectedProperties,
     fromDotToObject,
+    replaceObject,
   }
 }

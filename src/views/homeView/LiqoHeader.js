@@ -3,7 +3,7 @@ import { Row, Button, Input, PageHeader, Select, Space, Tag, Tooltip, Typography
 import AuditOutlined from '@ant-design/icons/lib/icons/AuditOutlined';
 import SettingOutlined from '@ant-design/icons/lib/icons/SettingOutlined';
 import { Link } from 'react-router-dom';
-import { LIQO_NAMESPACE } from '../constants';
+import { LIQO_NAMESPACE } from '../../constants';
 
 function LiqoHeader(props) {
 

@@ -139,7 +139,9 @@ function CR(props) {
               ? getChart()
               : null}
             {!showJSON && !props.template ? (
-              <ResourceForm resource={props.cr} CRD={props.crd} />
+              <ResourceForm resource={props.cr}
+                            CRD={props.crd}
+              />
             ) : null}
           </div>
         </Collapse.Panel>
