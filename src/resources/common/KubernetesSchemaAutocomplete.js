@@ -12,7 +12,15 @@ export default function KubernetesSchemaAutocomplete(props){
   let columnValue = '';
 
   useEffect(() => {
-    getSchema();
+    if(!props.CRD)
+      getSchema();
+    else {
+      window.api.getKubernetesJSONSchema()
+        .then(r => {
+          definitions = r.definitions;
+          fillItems(props.CRD.spec.validation.openAPIV3Schema.properties, '', 0);
+        })
+    }
   }, [props.kind]);
 
   const getSchema = () => {

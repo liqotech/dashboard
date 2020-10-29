@@ -11,7 +11,6 @@ import { getResourceConfig, updateResourceConfig } from '../common/DashboardConf
 import Utils from '../../services/Utils';
 import TableViewer from '../../widgets/table/TableViewer';
 import ResourceList from '../resourceList/ResourceList';
-import { getNamespaced } from '../common/ResourceUtils';
 import { ResourceAutocomplete } from '../../common/ResourceAutocomplete';
 import KubernetesSchemaAutocomplete from '../common/KubernetesSchemaAutocomplete';
 import DraggableWrapper from '../../common/DraggableWrapper';
@@ -21,8 +20,8 @@ export default function CustomTab(props){
   const [editTabTitle, setEditTabTitle] = useState(false);
   const [cardTitle, setCardTitle] = useState(props.cardTitle);
   const [onContentEdit, setOnContentEdit] = useState(!(props.cardContent && props.cardContent.length !== 0));
-  let params = useParams();
-  let location = useLocation();
+  let location = props._location ? props._location : useLocation();
+  let params = props._params ? props._params : useParams();
 
   const onDeleteContent = () => {
     setDeleting(true);
@@ -237,6 +236,7 @@ export default function CustomTab(props){
                   <KubernetesSchemaAutocomplete kind={getKind()}
                                                 onSearch={onSearch}
                                                 single
+                                                CRD={props.onCustomResource}
                   />
                 </div>
               )

@@ -90,6 +90,7 @@ function DesignEditorCRD(props) {
           <GraphNet customResources={props.CR}
                     template={CRTemplate}
                     CRD={props.CRD}
+                    style={{height: '50vh', margin: 'auto'}}
           />
         );
       }

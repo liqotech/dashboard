@@ -6,10 +6,10 @@ import LiqoHeader from './LiqoHeader';
 import ListConnected from './ListConnected';
 import ListAvailable from './ListAvailable';
 import Status from './Status';
-import LoadingIndicator from '../common/LoadingIndicator';
+import LoadingIndicator from '../../common/LoadingIndicator';
 import 'react-resizable/css/styles.css';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import { resizeDetector } from '../views/CustomViewUtils';
+import { resizeDetector } from '../CustomViewUtils';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 

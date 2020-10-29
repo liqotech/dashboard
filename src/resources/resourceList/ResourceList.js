@@ -19,38 +19,41 @@ function ResourceList(props) {
    */
   const [editColumn, setEditColumn] = useState('');
   const [loading, setLoading] = useState(true);
+  const [resource, setResource] = useState({});
   const [resourceList, setResourceList] = useState([]);
   const [kind, setKind] = useState('');
   const [resourceConfig, setResourceConfig] = useState({});
   const [columnHeaders, setColumnHeaders] = useState([]);
   const [columnContents, setColumnsContents] = useState([]);
   const [onCustomResource, setOnCustomResource] = useState(false);
+  const [render, setRender] = useState(false);
   let location = props._location ? props._location : useLocation();
   let history = useHistory();
   let params = props._params ? props._params : useParams();
 
   useEffect(() => {
-    getNamespaced(location.pathname)
-      .then(res => {
-        if(res && res.namespaced)
-          window.api.NSArrayCallback.current.push(changeNamespace);
-        else
-          params.namespace = undefined;
-        loadResourceList();
-      });
-    getDashConfig();
     if(params.namespace) {
-      window.api.setNamespace(params.namespace);
-    }
-    if(!props.onRef){
       window.api.NSArrayCallback.current.push(changeNamespace);
+      loadResourceList();
+    } else {
+      getNamespaced(location.pathname)
+        .then(res => {
+          if(res && res.namespaced)
+            window.api.NSArrayCallback.current.push(changeNamespace);
+          else
+            params.namespace = undefined;
+          loadResourceList();
+        });
+    }
+    getDashConfig();
+    if(!props.onRef){
       window.api.DCArrayCallback.current.push(getDashConfig);
     }
-    setOnCustomResource(
-      window.api.CRDs.current.find(CRD => {
-        return params.resource === CRD.spec.names.plural
-      })
-    )
+    setOnCustomResource(() => {
+      if(params.resource && params.group){
+        return window.api.getCRDFromName(params.resource + '.' + params.group);
+      }
+    })
 
     return () => {
       setLoading(true);
@@ -64,7 +67,7 @@ function ResourceList(props) {
         return func !== getDashConfig;
       });
     }
-  }, [location.pathname]);
+  }, [location.pathname, render]);
 
   useEffect(() => {
     manageColumnHeaders();
@@ -253,12 +256,19 @@ function ResourceList(props) {
       (window.api.namespace.current ? 'namespaces/' + window.api.namespace.current + '/' : '') +
       params.resource;
 
-    history.push(path);
+    if(!props.onRef)
+      history.push(path);
+    else {
+      location.pathname = path;
+      params.namespace = window.api.namespace.current
+      setRender(prev => !prev);
+    }
   }
 
   const loadResourceList = () => {
     window.api.getGenericResource(location.pathname)
       .then(res => {
+        setResource({...res});
         setKind(res.kind.slice(0, -4));
         if(props.onRef) {
           res.items = filterResource(props, res.items);
@@ -348,6 +358,7 @@ function ResourceList(props) {
           key: 'NewColumn',
           title:
             <KubernetesSchemaAutocomplete kind={kind}
+                                          CRD={onCustomResource}
                                           updateFunc={updateDashConfig}
                                           cancelFunc={() => addColumnHeader(false)}
             />,
@@ -368,7 +379,7 @@ function ResourceList(props) {
   return (
     <div>
       {!props.onRef ? (
-        <ListHeader kind={kind} resource={onCustomResource} />
+        <ListHeader kind={kind} resource={onCustomResource} genericResource={resource} />
       ) : null}
       <Table columns={columnHeaders} dataSource={columnContents}
              size={props.onRef ? 'small' : 'default'}

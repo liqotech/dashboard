@@ -14,8 +14,9 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 
 export default function CustomTab(props){
   const [cardList, setCardList] = useState(props.content);
-  let params = useParams();
-  let location = useLocation();
+  let location = props._location ? props._location : useLocation();
+  let params = props._params ? props._params : useParams();
+
 
   useEffect(() => {
     setCardList([...props.content]);

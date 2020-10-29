@@ -1,6 +1,6 @@
 import { Modal, Tabs, Alert } from 'antd';
 import React from 'react';
-import FormViewer from '../widgets/form/FormViewer';
+import FormViewer from '../../widgets/form/FormViewer';
 import ToolOutlined from '@ant-design/icons/lib/icons/ToolOutlined';
 
 /**

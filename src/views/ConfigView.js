@@ -9,7 +9,6 @@ import CustomFieldTemplate from '../editors/OAPIV3FormGenerator/CustomFieldTempl
 import { fields } from '../editors/OAPIV3FormGenerator/CustomField';
 import LoadingIndicator from '../common/LoadingIndicator';
 import { splitCamelCaseAndUp } from '../services/stringUtils';
-import { APP_NAME } from '../constants';
 
 const Form = withTheme(AntDTheme);
 

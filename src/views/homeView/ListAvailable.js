@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Alert, Button, Divider, Modal, message, PageHeader, Tabs, Tooltip, Typography } from 'antd';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
-import FormGenerator from '../editors/OAPIV3FormGenerator/FormGenerator';
+import FormGenerator from '../../editors/OAPIV3FormGenerator/FormGenerator';
 import AvailablePeer from './AvailablePeer';
 import { checkAdvertisement, checkPeeringRequest } from './HomeUtils';
-import { APP_NAME } from '../constants';
-import DraggableWrapper from '../common/DraggableWrapper';
+import { APP_NAME } from '../../constants';
+import DraggableWrapper from '../../common/DraggableWrapper';
 
 function ListAvailable(props) {
 

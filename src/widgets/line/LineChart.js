@@ -1,6 +1,6 @@
 import React from 'react';
 import { Chart, LineAdvance, Legend, Axis, Slider } from 'bizcharts';
-import { addZero } from '../../home/HomeUtils';
+import { addZero } from '../../views/homeView/HomeUtils';
 
 function LineChart(props){
 

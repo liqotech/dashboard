@@ -8,7 +8,7 @@ import HomeOutlined from '@ant-design/icons/lib/icons/HomeOutlined';
 import GlobalOutlined from '@ant-design/icons/lib/icons/GlobalOutlined';
 import { getColor } from './HomeUtils';
 import ExclamationCircleTwoTone from '@ant-design/icons/lib/icons/ExclamationCircleTwoTone';
-import { getColumnSearchProps } from '../services/TableUtils';
+import { getColumnSearchProps } from '../../services/TableUtils';
 
 const n = Math.pow(10, 6);
 

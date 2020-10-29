@@ -3,9 +3,9 @@ import { Alert, Button, Divider, PageHeader, Space, Tooltip, Typography } from '
 import FilterOutlined from '@ant-design/icons/lib/icons/FilterOutlined';
 import ConnectedPeer from './ConnectedPeer';
 import { checkAdvertisement, checkPeeringRequest } from './HomeUtils';
-import { LIQO_LABEL_ENABLED } from '../constants';
-import LoadingIndicator from '../common/LoadingIndicator';
-import DraggableWrapper from '../common/DraggableWrapper';
+import { LIQO_LABEL_ENABLED } from '../../constants';
+import LoadingIndicator from '../../common/LoadingIndicator';
+import DraggableWrapper from '../../common/DraggableWrapper';
 
 function ListConnected(props){
   
