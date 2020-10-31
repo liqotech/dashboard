@@ -1,5 +1,6 @@
-import { AutoComplete, Select } from 'antd';
+import { Select } from 'antd';
 import React, { useEffect, useState } from 'react';
+import Utils from '../services/Utils';
 
 export function ResourceAutocomplete(props){
   const [autocomplete, setAutocomplete] = useState([]);
@@ -20,10 +21,14 @@ export function ResourceAutocomplete(props){
                 label: resource.name
               })
           });
-          setAutocomplete(prev => [...prev, {
-            label: group.name,
-            options: tempRes
-          }])
+          setAutocomplete(prev => {
+            if(!prev.find(item => Utils().arraysEqual(item.options, tempRes)))
+              return [...prev, {
+                label: group.name,
+                options: tempRes
+              }];
+            else return prev;
+          })
         })
       })
     }).catch(error => console.log(error))
@@ -38,10 +43,14 @@ export function ResourceAutocomplete(props){
               label: resource.name
             })
         })
-        setAutocomplete(prev => [...prev, {
-          label: 'api',
-          options: tempRes
-        }])
+        setAutocomplete(prev => {
+          if(!prev.find(item => Utils().arraysEqual(item.options, tempRes)))
+            return [...prev, {
+              label: 'api',
+              options: tempRes
+            }]
+          else return prev;
+        })
       }).catch(error => console.log(error));
   }
 

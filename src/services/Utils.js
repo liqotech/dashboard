@@ -134,6 +134,22 @@ export default function Utils() {
     return origResource;
   }
 
+  function arraysEqual(a, b) {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length !== b.length) return false;
+
+    a.sort();
+    b.sort();
+
+    for (let i = 0; i < a.length; ++i) {
+      if(!_.isEqual(a[i], b[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   return{
     setRealProperties,
     OAPIV3toJSONSchema,
@@ -141,5 +157,6 @@ export default function Utils() {
     getSelectedProperties,
     fromDotToObject,
     replaceObject,
+    arraysEqual,
   }
 }
