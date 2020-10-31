@@ -8,14 +8,17 @@ import {
 import { Link } from 'react-router-dom';
 import {
   ExclamationCircleOutlined, LoadingOutlined,
-  DragOutlined, PushpinOutlined, DeleteOutlined
+  DragOutlined, PushpinOutlined, DeleteOutlined,
+  EditOutlined
 } from '@ant-design/icons';
 import ResourceBreadcrumb from '../common/ResourceBreadcrumb';
 import FavouriteButton from '../common/buttons/FavouriteButton';
+import UpdateCR from '../../editors/CRD/UpdateCR';
 
 function ResourceHeader(props) {
   const [isPinned, setIsPinned] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showUpdate, setShowUpdate] = useState(false);
 
   /*const editDescription = async (value) => {
     props.resource.metadata.annotations = {...props.resource.metadata.annotations, description: value};
@@ -52,7 +55,7 @@ function ResourceHeader(props) {
           <Col span={20}>
             <Row align={'bottom'}>
               <Col>
-                {!props.onCustomView ? <ResourceBreadcrumb /> : null}
+                <ResourceBreadcrumb />
               </Col>
               <Col>
                 <Tooltip title={props.resource.metadata.name} placement={'top'}>
@@ -85,6 +88,20 @@ function ResourceHeader(props) {
           <Col span={4}>
             <div style={{float: "right"}}>
               <Space align={'center'}>
+                {props.onCustomResource ? (
+                  <div>
+                    <Button icon={<EditOutlined/>}
+                            type={'primary'}
+                            onClick={() => setShowUpdate(true)}
+                    >
+                      EDIT
+                    </Button>
+                    <UpdateCR CR={props.resource} CRD={props.onCustomResource}
+                              setShowUpdate={setShowUpdate}
+                              showUpdate={showUpdate}
+                    />
+                  </div> ) : null
+                }
                 <Popconfirm
                   placement="topRight"
                   title="Are you sure?"

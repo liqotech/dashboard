@@ -15,7 +15,7 @@ export default function ApiInterface(_user, props) {
   const namespace = {current: null};
   const watches = {current: []};
   /** Callback for the autocomplete search bar */
-  const autoCompleteCallback = {current: null};
+  const autoCompleteCallback = {current: []};
   /** Callback array for CRDs in CRD view */
   const CRDArrayCallback = {current: []};
   /** Callback for the favourites CRDs in the sidebar */
@@ -385,8 +385,9 @@ export default function ApiInterface(_user, props) {
 
   const manageCallbackCRDs = (object, type) => {
     /** update CRDs in the search bar */
-    if(autoCompleteCallback.current)
-      autoCompleteCallback.current(CRDs.current);
+    autoCompleteCallback.current.forEach(cb => {
+      cb();
+    })
 
     /** update CRDs in the CRD views */
     CRDArrayCallback.current.forEach(func => {

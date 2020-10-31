@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import './Login.css';
 import { Button, Form, Input, Typography } from 'antd';
 import ApiInterface from '../services/api/ApiInterface';
-import AppFooter from '../common/AppFooter';
 
 function Login(props){
 

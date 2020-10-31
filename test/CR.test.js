@@ -131,6 +131,21 @@ describe('CR', () => {
     expect(await screen.findByText('Resource Version')).toBeInTheDocument();
   }, testTimeout)
 
+  test('Additional properties are showed in the CR', async () => {
+    mockFetch();
+    await setup(true);
+
+    expect(await screen.findByLabelText('cr')).toBeInTheDocument();
+    userEvent.click(screen.getByText(/advertisement-/i));
+    userEvent.click(await screen.findByText('Spec'));
+    userEvent.click(await screen.findByText('General'));
+    userEvent.click(await screen.findByText('Limit Range'));
+    userEvent.click(await screen.findByText('Limits'));
+    let general = await screen.findAllByText('General');
+    userEvent.click(general[1]);
+    userEvent.click(await screen.findByText('Max'));
+  }, testTimeout)
+
   test('CR date-time picker works', async () => {
     mockFetch();
     await setup(true);

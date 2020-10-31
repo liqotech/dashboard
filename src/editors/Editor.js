@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import YAML from 'yaml';
 import 'ace-builds/webpack-resolver';
 import 'ace-builds/src-noconflict/mode-json';
-import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-dawn';
 
 export default function Editor(props){
@@ -13,19 +12,16 @@ export default function Editor(props){
   const onClick = () => {
     let item;
 
-    if(!props.mode){
+    try {
+      item = JSON.parse(value);
+    } catch(error) {
       try {
-        item = JSON.parse(value);
-      } catch(error) {
-        try {
-          item = YAML.parse(value);
-        } catch(error){
-          message.error('JSON or YAML not valid');
-          return;
-        }
+        item = YAML.parse(value);
+      } catch(error){
+        message.error('JSON or YAML not valid');
+        return;
       }
-    } else
-      item = value;
+    }
 
     props.onClick(item);
   }
@@ -41,7 +37,7 @@ export default function Editor(props){
   return (
     <div>
       <AceEditor
-        mode={props.mode ? props.mode : 'json'}
+        mode={'json'}
         theme="dawn"
         fontSize={16}
         value={value}

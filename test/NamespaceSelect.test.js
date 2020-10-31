@@ -4,7 +4,7 @@ import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import ViewMockResponse from '../__mocks__/views.json';
 import Error401 from '../__mocks__/401.json';
 import NamespaceResponse from '../__mocks__/namespaces.json';
-import { alwaysPresentGET, generalHomeGET, loginTest, mockCRDAndViewsExtended, setup_login } from './RTLUtils';
+import { alwaysPresentGET, generalHomeGET, setup_login } from './RTLUtils';
 import Cookies from 'js-cookie';
 import { testTimeout } from '../src/constants';
 import React from 'react';
@@ -58,6 +58,37 @@ beforeEach(() => {
 });
 
 describe('Namespace Select', () => {
+  test('Namespace change error', async () => {
+    counter = 0;
+    await setup_extended(true);
+
+    expect(await screen.findByLabelText('crd')).toBeInTheDocument();
+
+    expect(await screen.findByText('awesome-view')).toBeInTheDocument();
+
+    const ns = screen.getByText('all namespaces');
+    userEvent.click(ns);
+
+    const ns_liqo = await screen.findByText('liqo');
+    const ns_default = await screen.findAllByText('default');
+
+    expect(ns_liqo).toBeInTheDocument();
+    expect(await screen.findByText('test')).toBeInTheDocument();
+    expect(ns_default[1]).toBeInTheDocument();
+
+    await act(async () => {
+      counter++;
+      fireEvent.mouseOver(ns_liqo);
+      fireEvent.click(ns_liqo);
+
+      await new Promise((r) => setTimeout(r, 1000));
+    })
+
+    expect(await screen.queryByText('awesome-view')).not.toBeInTheDocument();
+    expect(await screen.findByText('401')).toBeInTheDocument();
+
+  }, testTimeout)
+
   test('Namespace change resource displayed', async () => {
     await setup_extended();
 
@@ -83,6 +114,13 @@ describe('Namespace Select', () => {
     })
 
     expect(await screen.queryByText('awesome-view')).not.toBeInTheDocument();
+
+    let view = ViewMockResponse.items[0];
+    view.metadata.name = 'test-view-2'
+
+    window.api.customViews.current.push(view);
+
+    window.api.apiManager.current.sendAddedSignal('views', view);
 
   }, testTimeout)
 
@@ -116,37 +154,6 @@ describe('Namespace Select', () => {
     })
 
     expect(window.api.namespace.current).toBeNull();
-
-  }, testTimeout)
-
-  test('Namespace change error', async () => {
-    counter = 0;
-    await setup_extended(true);
-
-    expect(await screen.findByLabelText('crd')).toBeInTheDocument();
-
-    expect(await screen.findByText('awesome-view')).toBeInTheDocument();
-
-    const ns = screen.getByText('all namespaces');
-    userEvent.click(ns);
-
-    const ns_liqo = await screen.findByText('liqo');
-    const ns_default = await screen.findAllByText('default');
-
-    expect(ns_liqo).toBeInTheDocument();
-    expect(await screen.findByText('test')).toBeInTheDocument();
-    expect(ns_default[1]).toBeInTheDocument();
-
-    await act(async () => {
-      counter++;
-      fireEvent.mouseOver(ns_liqo);
-      fireEvent.click(ns_liqo);
-
-      await new Promise((r) => setTimeout(r, 1000));
-    })
-
-    expect(await screen.queryByText('awesome-view')).not.toBeInTheDocument();
-    expect(await screen.findByText('401')).toBeInTheDocument();
 
   }, testTimeout)
 
