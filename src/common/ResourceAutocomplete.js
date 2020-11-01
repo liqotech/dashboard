@@ -6,7 +6,6 @@ export function ResourceAutocomplete(props){
   const [autocomplete, setAutocomplete] = useState([]);
 
   const autoCompleteSearch = () => {
-    setAutocomplete([]);
     window.api.getApis('/').then(res => {
       res.body.groups.forEach(group => {
         window.api.getGenericResource(
@@ -29,7 +28,7 @@ export function ResourceAutocomplete(props){
               }];
             else return prev;
           })
-        })
+        }).catch(error => console.log(error))
       })
     }).catch(error => console.log(error))
 
@@ -55,8 +54,12 @@ export function ResourceAutocomplete(props){
   }
 
   useEffect(() => {
-    window.api.autoCompleteCallback.current = autoCompleteSearch;
+    window.api.autoCompleteCallback.current.push(autoCompleteSearch);
     autoCompleteSearch();
+
+    return () => {
+      window.api.autoCompleteCallback.current = window.api.autoCompleteCallback.current.filter(cb => cb !== autoCompleteSearch);
+    }
   }, []);
 
   return(

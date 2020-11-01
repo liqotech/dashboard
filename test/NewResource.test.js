@@ -241,6 +241,43 @@ describe('NewResource', () => {
     await check_new_CR();
   }, testTimeout)
 
+  test('Correct creation of a CR from form without namespace', async () => {
+    await setup_resources();
+
+    userEvent.click(screen.getByLabelText('plus'));
+
+    const form = await screen.findByText('Form Wizard');
+    userEvent.click(form);
+
+    let textbox = await screen.findAllByRole('textbox', {name: ''});
+
+    expect(textbox).toHaveLength(2);
+
+    await userEvent.type(textbox[0], 'test');
+
+    userEvent.click(await screen.findByText('Item'));
+
+    userEvent.click(await screen.findByText('Add Item'));
+
+    await screen.findByText('Cost');
+
+    textbox = await screen.findAllByRole('textbox', {name: ''});
+
+    await userEvent.type(textbox[2], '1');
+    await userEvent.type(textbox[3], 'cyan');
+
+    userEvent.click(await screen.findByText('Add Item'));
+
+    textbox = await screen.findAllByRole('textbox', {name: ''});
+
+    await userEvent.type(textbox[4], '2');
+    await userEvent.type(textbox[5], 'orange');
+
+    userEvent.click(screen.getByRole('button', {name: 'Submit'}));
+
+    await check_new_CR();
+  }, testTimeout)
+
   test('Error notification when 409', async () => {
     await setup_resources('409', 'POST');
 

@@ -1,4 +1,4 @@
-import ToolOutlined from '@ant-design/icons/lib/icons/ToolOutlined';
+import {ToolOutlined} from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import{  Input, Alert, Card } from 'antd';
 import FormViewer from '../../widgets/form/FormViewer';

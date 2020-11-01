@@ -23,6 +23,9 @@ import NamespaceResponse from '../__mocks__/namespaces.json';
 import ApiV1MockResponse from '../__mocks__/apiv1.json';
 import ApisMockResponse from '../__mocks__/apis.json';
 import AppsResponse from '../__mocks__/apps.json';
+import APIGroupList from '../src/resources/APIGroup/APIGroupList';
+import ApiInterface from '../src/services/api/ApiInterface';
+import APIResourceList from '../src/resources/APIResourceList/APIResourceList';
 
 fetchMock.enableMocks();
 
@@ -151,6 +154,36 @@ describe('APIGroupList', () => {
     );
 
     expect(await screen.findByText('401')).toBeInTheDocument();
+
+  }, testTimeout)
+
+  test('Error apis loading list', async () => {
+    mocks(true);
+
+    Cookies.set('token', 'password');
+
+    window.api = ApiInterface({id_token: 'test'});
+
+    render(
+      <MemoryRouter>
+        <APIGroupList />
+      </MemoryRouter>
+    );
+
+  }, testTimeout)
+
+  test('Error api loading list', async () => {
+    mocks(undefined, true);
+
+    Cookies.set('token', 'password');
+
+    window.api = ApiInterface({id_token: 'test'});
+
+    render(
+      <MemoryRouter>
+        <APIResourceList />
+      </MemoryRouter>
+    );
 
   }, testTimeout)
 })

@@ -19,6 +19,9 @@ describe('Header', () => {
     expect(await screen.findByLabelText('logout')).toBeInTheDocument();
 
     await screen.findByLabelText('autocompletesearch');
+
+    window.api.autoCompleteCallback.current[0]();
+
     await userEvent.type(screen.getAllByRole('combobox')[0], 'liqodashtest');
     let test = await screen.findByText('liqodashtests');
     fireEvent.mouseOver(test);

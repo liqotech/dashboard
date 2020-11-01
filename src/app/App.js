@@ -125,7 +125,7 @@ function App(props) {
     <Route key={'login'}
            exact path="/login"
            render={(props) => {
-             return (window.OIDC_PROVIDER_URL ?
+             return (window.OIDC_PROVIDER_URL && !Cookies.get('token')  ?
                <CallBackHandler func={authManager.current.login} /> :
                <Login {...props} func={manageToken} />)}
            }
@@ -133,7 +133,7 @@ function App(props) {
     <Route key={'callback'}
            path="/callback"
            render={() => {
-             return (window.OIDC_PROVIDER_URL ?
+             return (window.OIDC_PROVIDER_URL && !Cookies.get('token')  ?
                <CallBackHandler func={authManager.current.completeLogin} /> :
                <Redirect to="/" />)}
            }
@@ -234,7 +234,7 @@ function App(props) {
   } else {
     routes.push(
       <Route key={'other'}
-             render={() => window.OIDC_PROVIDER_URL ?
+             render={() => window.OIDC_PROVIDER_URL && !Cookies.get('token')  ?
                <Redirect to={'/login'} /> :
                <LoadingIndicator />}
       />

@@ -48,7 +48,7 @@ export function getNamespaced(path){
           return item.name === resource;
         }).namespaced
       }
-    }).catch(error => console.log(error));
+    }).catch(error => Promise.reject(error));
 }
 
 export function filterResource(props, res){

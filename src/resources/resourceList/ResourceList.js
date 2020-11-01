@@ -43,6 +43,11 @@ function ResourceList(props) {
           else
             params.namespace = undefined;
           loadResourceList();
+        })
+        .catch(error => {
+          console.log(error);
+          params.namespace = undefined;
+          loadResourceList();
         });
     }
     getDashConfig();
