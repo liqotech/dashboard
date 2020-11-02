@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { setup_login } from './RTLUtils';
+import { setup_login, token } from './RTLUtils';
 import { testTimeout } from '../src/constants';
 import Error401 from '../__mocks__/401.json';
 import userEvent from '@testing-library/user-event';
@@ -31,7 +31,7 @@ describe('Login', () => {
 
     /** Input mock password */
     const tokenInput = screen.getByLabelText('lab');
-    await userEvent.type(tokenInput, 'password');
+    await userEvent.type(tokenInput, token);
 
     /** Click on login button */
     const submitButton = screen.getByRole('button');

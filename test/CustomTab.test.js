@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { generalMocks } from './RTLUtils';
+import { generalMocks, setToken } from './RTLUtils';
 import { act, findByText, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../src/app/App';
@@ -14,7 +14,7 @@ import DeploymentMock from '../__mocks__/deployments.json';
 fetchMock.enableMocks();
 
 async function setup() {
-  Cookies.set('token', 'password');
+  setToken();
   window.history.pushState({}, 'Page Title', '/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9');
 
   return render(

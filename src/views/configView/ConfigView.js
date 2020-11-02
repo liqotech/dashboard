@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Badge, Button, Layout, message, Space, Tabs, Typography } from 'antd';
 import { withTheme } from '@rjsf/core';
 import { Theme as AntDTheme } from '@rjsf/antd';
-import Utils from '../services/Utils';
+import Utils from '../../services/Utils';
 import ToolOutlined from '@ant-design/icons/lib/icons/ToolOutlined';
-import { widgets } from '../editors/OAPIV3FormGenerator/CustomWidget';
-import CustomFieldTemplate from '../editors/OAPIV3FormGenerator/CustomFieldTemplate';
-import { fields } from '../editors/OAPIV3FormGenerator/CustomField';
-import LoadingIndicator from '../common/LoadingIndicator';
-import { splitCamelCaseAndUp } from '../services/stringUtils';
+import { widgets } from '../../editors/OAPIV3FormGenerator/CustomWidget';
+import CustomFieldTemplate from '../../editors/OAPIV3FormGenerator/CustomFieldTemplate';
+import { fields } from '../../editors/OAPIV3FormGenerator/CustomField';
+import LoadingIndicator from '../../common/LoadingIndicator';
+import { splitCamelCaseAndUp } from '../../services/stringUtils';
 
 const Form = withTheme(AntDTheme);
 

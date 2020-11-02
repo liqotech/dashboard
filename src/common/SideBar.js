@@ -51,23 +51,25 @@ function SideBar() {
   /** If there are custom views, show them in the sider */
   if(CV.length !== 0) {
     CV.forEach(item => {
-      cv.push(
-        <Menu.Item key={item.metadata.name} style={{ marginTop: 0, marginBottom: 0}}
-                   icon={<LayoutOutlined style={{ fontSize: '20px' }} />}
-        >
-          <Link to={{
-            pathname: '/customview/' +  item.metadata.name,
-          }}>
-            {
-              item.spec.viewName ? (
-                <span>{ item.spec.viewName }</span>
-              ) : (
-                <span>{ item.metadata.name }</span>
-              )
-            }
-          </Link>
-        </Menu.Item>
-      )
+      if(item.spec.enabled){
+        cv.push(
+          <Menu.Item key={item.metadata.name} style={{ marginTop: 0, marginBottom: 0}}
+                     icon={<CustomIcon icon={item.spec.icon ? item.spec.icon : 'LayoutOutlined'} size={20} />}
+          >
+            <Link to={{
+              pathname: '/customview/' +  item.metadata.name,
+            }}>
+              {
+                item.spec.viewName ? (
+                  <span>{ item.spec.viewName }</span>
+                ) : (
+                  <span>{ item.metadata.name }</span>
+                )
+              }
+            </Link>
+          </Menu.Item>
+        )
+      }
     });
   }
 

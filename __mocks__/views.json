@@ -12,6 +12,7 @@
       },
       "spec": {
         "viewName": "Liqo View",
+        "enabled": true,
         "crds": [
           {
             "crdAltName": "Test",

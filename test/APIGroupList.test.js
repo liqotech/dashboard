@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { alwaysPresentGET, metricsPODs } from './RTLUtils';
+import { alwaysPresentGET, metricsPODs, setToken } from './RTLUtils';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
@@ -88,7 +88,7 @@ describe('APIGroupList', () => {
   test('General api views', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
 
     render(
       <MemoryRouter>
@@ -130,7 +130,7 @@ describe('APIGroupList', () => {
   test('Error api views', async () => {
     mocks(true);
 
-    Cookies.set('token', 'password');
+    setToken();
 
     render(
       <MemoryRouter>
@@ -145,7 +145,7 @@ describe('APIGroupList', () => {
   test('Error apis views', async () => {
     mocks(undefined, true);
 
-    Cookies.set('token', 'password');
+    setToken();
 
     render(
       <MemoryRouter>
@@ -160,7 +160,7 @@ describe('APIGroupList', () => {
   test('Error apis loading list', async () => {
     mocks(true);
 
-    Cookies.set('token', 'password');
+    setToken();
 
     window.api = ApiInterface({id_token: 'test'});
 
@@ -175,7 +175,7 @@ describe('APIGroupList', () => {
   test('Error api loading list', async () => {
     mocks(undefined, true);
 
-    Cookies.set('token', 'password');
+    setToken();
 
     window.api = ApiInterface({id_token: 'test'});
 

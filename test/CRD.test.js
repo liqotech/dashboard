@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { alwaysPresentGET, generalHomeGET, loginTest, mockCRDAndViewsExtended } from './RTLUtils';
+import { alwaysPresentGET, generalHomeGET, loginTest, mockCRDAndViewsExtended, setToken } from './RTLUtils';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
@@ -28,7 +28,7 @@ import App from '../src/app/App';
 fetchMock.enableMocks();
 
 async function setup(crd) {
-  Cookies.set('token', 'password');
+  setToken();
   window.history.pushState({}, 'Page Title', crd);
 
   render(
@@ -43,7 +43,7 @@ async function setup_extended() {
     return mocks(req);
   })
 
-  Cookies.set('token', 'password');
+  setToken();
   window.history.pushState({}, 'Page Title', '/customresources/advertisements.protocol.liqo.io');
 
   render(
@@ -106,7 +106,7 @@ async function setup_only_CRD(error, template, noview) {
     return mocks(req, error, template, noview);
   })
 
-  Cookies.set('token', 'password');
+  setToken();
   window.history.pushState({}, 'Page Title', '/customresources/liqodashtests.dashboard.liqo.io');
 
   render(

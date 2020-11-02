@@ -1,7 +1,7 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { testTimeout } from '../src/constants';
-import { generalMocks, loginTest, mockCRDAndViewsExtended } from './RTLUtils';
+import { generalMocks, loginTest, mockCRDAndViewsExtended, setToken } from './RTLUtils';
 import Cookies from 'js-cookie';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../src/app/App';
@@ -184,7 +184,7 @@ describe('Favourites and Icons', () => {
   test('Manage favourites when resource not in the config', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -210,7 +210,7 @@ describe('Favourites and Icons', () => {
   test('Manage icons when resource not in the config', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(

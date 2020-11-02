@@ -1,6 +1,4 @@
 .app-content {
-  margin-left: 20px;
-  margin-right: 20px;
   min-height: calc(88vh - 64px);
-  margin-top: 84px;
+  margin: 84px 20px 20px;
 }

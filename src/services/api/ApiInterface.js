@@ -1,6 +1,7 @@
 import { TEMPLATE_GROUP } from '../../constants';
 import { message } from 'antd';
 import ApiManager from './ApiManager';
+import { resourceNotifyEvent } from '../../resources/common/ResourceUtils';
 
 /**
  * Class to manage all the interaction with the cluster
@@ -547,6 +548,53 @@ export default function ApiInterface(_user, props) {
       .catch(error => console.log(error));
   }
 
+  /**
+   *
+   * @param name: the name of the CRD to retrieve
+   * @param setItems: the function to set items results
+   * @param notifyFunc: the notify function for the watch
+   * @param setLoading: the function to set loading true or false
+   */
+  const loadCRD = (name, setItems, notifyFunc, setLoading) => {
+    let CRD;
+
+    if(!notifyFunc){
+      notifyFunc = (type, object) => {
+        resourceNotifyEvent(setItems, type, object);
+      }
+    }
+
+    if(setLoading) setLoading(true);
+
+    CRD = getCRDFromName(name);
+
+    if(CRD){
+      getCustomResourcesAllNamespaces(CRD).then(res => {
+
+        setItems(res.body.items);
+
+        /** Then set up a watch to watch changes in the CRs of the CRD */
+        watchResource(
+          'apis',
+          CRD.spec.group,
+          undefined,
+          CRD.spec.version,
+          CRD.spec.names.plural,
+          undefined,
+          notifyFunc
+        );
+
+        if(setLoading) setLoading(false);
+
+      }).catch(error => {
+        console.log(error);
+        if(setLoading) setLoading(false);
+      })
+    } else {
+      if(setLoading) setLoading(false);
+    }
+  }
+
   return {
     user,
     CRDs,
@@ -593,6 +641,7 @@ export default function ApiInterface(_user, props) {
     deleteGenericResource,
     getPodLogs,
     getKubernetesJSONSchema,
+    loadCRD,
   }
 
 }

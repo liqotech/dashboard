@@ -34,6 +34,7 @@ export default function NamespaceSelect(){
     <Select
       style={{paddingRight: 20, minWidth: '10em'}}
       bordered={false}
+      showSearch
       aria-label={'select-namespace'}
       placeholder={'Select namespace'}
       value={

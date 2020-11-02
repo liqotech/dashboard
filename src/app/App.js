@@ -14,7 +14,7 @@ import Authenticator from '../services/api/Authenticator';
 import ErrorRedirect from '../error-handles/ErrorRedirect';
 import Login from '../login/Login';
 import Cookies from 'js-cookie';
-import ConfigView from '../views/ConfigView';
+import ConfigView from '../views/configView/ConfigView';
 import LoadingIndicator from '../common/LoadingIndicator';
 import ApiInterface from '../services/api/ApiInterface';
 import APIGroupList from '../resources/APIGroup/APIGroupList';
@@ -23,6 +23,8 @@ import ResourceList from '../resources/resourceList/ResourceList';
 import ResourceGeneral from '../resources/resource/ResourceGeneral';
 import CustomView from '../views/CustomView';
 import AppFooter from '../common/AppFooter';
+import Utils from '../services/Utils';
+import CustomViewLoader from '../views/CustomViewLoader';
 
 function CallBackHandler(props) {
   props.func();
@@ -93,6 +95,7 @@ function App(props) {
     if(api.user.current.id_token !== '') return;
     let user = { id_token: token };
     let _api = ApiInterface(user, props);
+    Utils().parseJWT(token);
     /** Get the CRDs at the start of the app */
     _api.getCRDs().
     then(() => {
@@ -164,7 +167,7 @@ function App(props) {
       <Route key={'customview'}
              exact path="/customview/:viewName/"
              render={(props) =>
-               <CustomView {...props} />
+               <CustomViewLoader {...props} />
              }/>,
       <Route key={'api'}
              exact path={'/apis'}
