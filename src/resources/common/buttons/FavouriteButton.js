@@ -1,5 +1,6 @@
 import { Rate } from 'antd';
 import React from 'react';
+import './FavouriteButton.css';
 import { useParams, useLocation } from 'react-router-dom';
 import { createNewConfig, getResourceConfig, updateResourceConfig } from '../DashboardConfigUtils';
 import _ from 'lodash';
@@ -42,7 +43,7 @@ export default function FavouriteButton(props){
   }
 
   return(
-    <Rate className="favourite-star" count={1}
+    <Rate className={props.favourite === 0 ? "favourite-star" : null} count={1}
           value={props.favourite === 1 ? 1 : 0}
           onChange={props.list ? handleClickResourceListFav : handleClickResourceFav}
           style={props.list ? {marginLeft: 10} : {marginLeft: 0, marginTop: -16}}

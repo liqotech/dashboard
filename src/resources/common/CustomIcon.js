@@ -3,7 +3,9 @@ import React from 'react';
 export default function CustomIcon(props){
   const Icon = ({type, ...rest}) => {
     const icons = require(`@ant-design/icons`);
-    const Component = icons[type];
+    let Component = icons[type];
+    if(!Component)
+      Component = icons['CloseOutlined'];
     return <Component {...rest} />;
   }
 
