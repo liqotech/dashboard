@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { testTimeout } from '../src/constants';
-import { generalMocks, loginTest, mockCRDAndViewsExtended } from './RTLUtils';
+import { generalMocks, loginTest, mockCRDAndViewsExtended, setToken } from './RTLUtils';
 import Cookies from 'js-cookie';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../src/app/App';
@@ -67,7 +67,7 @@ describe('Column Customization', () => {
   test('Add a column when config do not already exist', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -85,7 +85,7 @@ describe('Column Customization', () => {
   test('Add a column when config already exist but no render column', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -109,7 +109,7 @@ describe('Column Customization', () => {
   test('Add then remove column', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -153,7 +153,7 @@ describe('Column Customization', () => {
   test('Add then modify column title', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -198,7 +198,7 @@ describe('Column Customization', () => {
   test('Add column with text', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -232,7 +232,7 @@ describe('Column Customization', () => {
   test('Add column with object', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -265,7 +265,7 @@ describe('Column Customization', () => {
   test('Add column with object and text', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -300,7 +300,7 @@ describe('Column Customization', () => {
   test('Add column with object and text then delete', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -338,7 +338,7 @@ describe('Column Customization', () => {
   test('Add column with array (of object)', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -372,7 +372,7 @@ describe('Column Customization', () => {
   test('Add column with booleans', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -407,7 +407,7 @@ describe('Column Customization', () => {
   test('Add column with array but empty', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -440,7 +440,7 @@ describe('Column Customization', () => {
   test('Add column with array (of bool)', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -473,7 +473,7 @@ describe('Column Customization', () => {
   test('Add column with empty objects', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(
@@ -517,7 +517,7 @@ describe('Column Customization', () => {
   test('Cancel add column', async () => {
     mocks();
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
     render(

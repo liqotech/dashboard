@@ -2,7 +2,7 @@ import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { alwaysPresentGET, generalHomeGET, loginTest, mockCRDAndViewsExtended } from './RTLUtils';
+import { alwaysPresentGET, generalHomeGET, loginTest, mockCRDAndViewsExtended, setToken } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import CRDmockResponse from '../__mocks__/crd_fetch_long.json';
 import CRDmockEmpty from '../__mocks__/crd_empty.json';
@@ -174,7 +174,7 @@ describe('Resource List', () => {
       } else return Promise.reject();
     })
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/apis/apiextensions.k8s.io/v1/customresourcedefinitions');
 
     render(
@@ -213,7 +213,7 @@ describe('Resource List', () => {
       } else return Promise.reject();
     })
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/apis/apiextensions.k8s.io/v1/customresourcedefinitions');
 
     render(
@@ -245,7 +245,7 @@ describe('Resource List', () => {
       } else return Promise.reject();
     })
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/api/v1/pods/hello-world-deployment-6756549f5-x66v9');
 
     render(
@@ -277,7 +277,7 @@ describe('Resource List', () => {
       } else return Promise.reject();
     })
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/apis/apps/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9');
 
     render(
@@ -309,7 +309,7 @@ describe('Resource List', () => {
       } else return Promise.reject();
     })
 
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/apis/apps/v1/namespaces/test/pods/');
 
     render(

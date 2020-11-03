@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { generalMocks } from './RTLUtils';
+import { generalMocks, setToken } from './RTLUtils';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../src/app/App';
@@ -13,7 +13,7 @@ import PodMockResponse from '../__mocks__/pod.json';
 fetchMock.enableMocks();
 
 async function setup() {
-  Cookies.set('token', 'password');
+  setToken();
   window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
   return render(

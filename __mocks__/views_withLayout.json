@@ -10,6 +10,7 @@
         "selfLink": "/apis/test/v1/namespaces/default/views/awesome-view"
       },
       "spec": {
+        "enabled": true,
         "layout": {
           "lg": [
             {

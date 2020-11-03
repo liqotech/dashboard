@@ -8,7 +8,7 @@ import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import LiqoDashNewMockResponse from '../__mocks__/liqodashtest_new.json';
 import NoAnnNoResNoSch from '../__mocks__/no_Ann_noRes_noSch.json';
 import userEvent from '@testing-library/user-event';
-import { mockCRDAndViewsExtended } from './RTLUtils';
+import { mockCRDAndViewsExtended, setToken } from './RTLUtils';
 import NewResource from '../src/editors/CRD/NewResource';
 import { testTimeout } from '../src/constants';
 import Cookies from 'js-cookie';
@@ -73,7 +73,7 @@ beforeEach(() => {
 
 async function setup_resources(error, method, crd){
   mockCRDAndViewsExtended(error, method, crd);
-  Cookies.set('token', 'password');
+  setToken();
   window.history.pushState({}, 'Page Title', '/customresources/liqodashtests.dashboard.liqo.io');
 
   render(

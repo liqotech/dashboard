@@ -11,6 +11,7 @@
       },
       "spec": {
         "viewName": "Test Custom View",
+        "enabled": true,
         "crds": [
           {
             "crdName": "advertisements.protocol.liqo.io"

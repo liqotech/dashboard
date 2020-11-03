@@ -11,7 +11,7 @@ import SchedNodesMockResponse from '../__mocks__/schedulingnodes.json';
 import PieMockResponse from '../__mocks__/piecharts.json';
 import Error409 from '../__mocks__/409.json'
 import userEvent from '@testing-library/user-event';
-import { mockCRDAndViewsExtended } from './RTLUtils';
+import { mockCRDAndViewsExtended, setToken } from './RTLUtils';
 import DesignEditorCRD from '../src/editors/CRD/DesignEditorCRD';
 import { MemoryRouter } from 'react-router-dom';
 import { testTimeout } from '../src/constants';
@@ -97,7 +97,7 @@ beforeEach(() => {
 
 async function setup_resources(){
   mockCRDAndViewsExtended();
-  Cookies.set('token', 'password');
+  setToken();
   window.history.pushState({}, 'Page Title', '/customresources/liqodashtests.dashboard.liqo.io');
 
   render(

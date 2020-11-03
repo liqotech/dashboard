@@ -11,7 +11,7 @@ import PRMockResponse from '../__mocks__/peeringrequest.json';
 import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
-import ConfigView from '../src/views/ConfigView';
+import ConfigView from '../src/views/configView/ConfigView';
 import NodesMockResponse from '../__mocks__/nodes.json';
 import NodesMetricsMockResponse from '../__mocks__/nodes_metrics.json';
 import PodsMockResponse from '../__mocks__/pods.json';

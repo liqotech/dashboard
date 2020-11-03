@@ -4,7 +4,12 @@ import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import ViewMockResponse from '../__mocks__/views.json';
 import Error401 from '../__mocks__/401.json';
 import NamespaceResponse from '../__mocks__/namespaces.json';
-import { alwaysPresentGET, generalHomeGET, setup_login } from './RTLUtils';
+import {
+  alwaysPresentGET,
+  generalHomeGET,
+  setToken,
+  setup_login, token
+} from './RTLUtils';
 import Cookies from 'js-cookie';
 import { testTimeout } from '../src/constants';
 import React from 'react';
@@ -21,7 +26,7 @@ async function setup_extended(errorCRD) {
     return mocks(req, undefined, errorCRD);
   })
 
-  Cookies.set('token', 'password');
+  setToken();
   window.history.pushState({}, 'Page Title', '/customresources/views.dashboard.liqo.io');
 
   render(
@@ -129,7 +134,7 @@ describe('Namespace Select', () => {
       return mocks(req);
     })
 
-    Cookies.set('token', 'password');
+    setToken();
     window.api =  ApiInterface({id_token: 'test'});
     window.api.namespace.current = 'liqo';
 
@@ -166,7 +171,7 @@ describe('Namespace Select', () => {
 
     /** Input mock password */
     const tokenInput = screen.getByLabelText('lab');
-    await userEvent.type(tokenInput, 'password');
+    await userEvent.type(tokenInput, token);
 
     /** Click on login button */
     const submitButton = screen.getByRole('button');

@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { alwaysPresentGET, metricsPODs, mockCRDAndViewsExtended } from './RTLUtils';
+import { alwaysPresentGET, metricsPODs, mockCRDAndViewsExtended, setToken } from './RTLUtils';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
@@ -84,7 +84,7 @@ describe('App', () => {
 
   test('Login with path', async () => {
     mocks();
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/apis/apiextensions.k8s.io/v1/customresourcedefinitions');
 
     render(
@@ -98,7 +98,7 @@ describe('App', () => {
 
   test('Access /login path when already logged redirect to Home', async () => {
     mockCRDAndViewsExtended();
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/login');
 
     render(
@@ -112,7 +112,7 @@ describe('App', () => {
 
   test('Access /error path when already logged redirect to Home', async () => {
     mockCRDAndViewsExtended();
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/error');
 
     render(
@@ -128,7 +128,7 @@ describe('App', () => {
     window.OIDC_PROVIDER_URL = 'test-url';
     window.OIDC_CLIENT_ID = 'test-id';
     mockCRDAndViewsExtended();
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/callback?state=1234567890');
 
     render(
@@ -142,7 +142,7 @@ describe('App', () => {
 
   test('Access an unknown route redirect to 404', async () => {
     mockCRDAndViewsExtended();
-    Cookies.set('token', 'password');
+    setToken();
     window.history.pushState({}, 'Page Title', '/other');
 
     render(
