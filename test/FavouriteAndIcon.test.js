@@ -55,7 +55,7 @@ describe('Favourites and Icons', () => {
 
     let stars = await screen.findAllByLabelText('star');
 
-    userEvent.click(stars[2]);
+    userEvent.click(stars[1]);
 
     await act(async () => {
       await new Promise((r) => setTimeout(r, 1000));
@@ -63,7 +63,7 @@ describe('Favourites and Icons', () => {
 
     expect(await screen.queryByText('Custom Resources')).not.toBeInTheDocument();
 
-    userEvent.click(stars[2]);
+    userEvent.click(stars[1]);
 
     await act(async () => {
       await new Promise((r) => setTimeout(r, 1000));
@@ -139,7 +139,7 @@ describe('Favourites and Icons', () => {
 
     let stars = await screen.findAllByLabelText('star');
 
-    userEvent.click(stars[2]);
+    userEvent.click(stars[1]);
 
     await act(async () => {
       await new Promise((r) => setTimeout(r, 1000));
@@ -147,7 +147,7 @@ describe('Favourites and Icons', () => {
 
     expect(await screen.queryByText('Custom Resources')).not.toBeInTheDocument();
 
-    userEvent.click(stars[2]);
+    userEvent.click(stars[1]);
 
     await act(async () => {
       await new Promise((r) => setTimeout(r, 1000));
@@ -207,7 +207,7 @@ describe('Favourites and Icons', () => {
       await new Promise((r) => setTimeout(r, 1000));
     })
 
-    expect(await screen.findAllByText('Pod')).toHaveLength(2);
+    expect(await screen.findAllByText('Pod')).toHaveLength(1);
 
   }, testTimeout)
 

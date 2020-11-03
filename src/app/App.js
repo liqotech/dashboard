@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import './App.css';
 import {
   Route,
   withRouter,
@@ -19,6 +18,10 @@ import AppFooter from '../common/AppFooter';
 import Utils from '../services/Utils';
 import PluginLoader from '../views/PluginLoader';
 import DefaultRoutes from '../services/api/DefaultRoutes';
+import './App.css';
+import './CRD.css';
+import './CRDList.css';
+import './CR.css';
 
 function CallBackHandler(props) {
   props.func();
@@ -90,7 +93,9 @@ function App(props) {
     if(api.user.current.id_token !== '') return;
     let user = { id_token: token };
     let _api = ApiInterface(user, props);
-    if(!Utils().parseJWT(token)) {
+    try {
+      Utils().parseJWT(token)
+    } catch(error){
       tokenLogout();
     }
     _api.loadDashboardCRs('DashboardConfig');

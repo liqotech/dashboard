@@ -12,9 +12,10 @@
       "spec": {
         "viewName": "Test Custom View",
         "enabled": true,
-        "crds": [
+        "resources": [
           {
-            "crdName": "advertisements.protocol.liqo.io"
+            "resourceName": "Advertisement",
+            "resourcePath": "/apis/net.liqo.io/v1alpha1/advertisements.protocol.liqo.io"
           }
         ]
       }

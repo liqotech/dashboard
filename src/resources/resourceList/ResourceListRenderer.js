@@ -2,15 +2,12 @@ import { Row, Col, Tag, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import React from 'react';
 import _ from 'lodash';
-import { useParams, useLocation } from 'react-router-dom';
 import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 
 export const renderResourceList = (text, record, dataIndex, resourceList) => {
-  let params = useParams();
-  let location = useLocation();
   let resource = resourceList.find(item => {return item.metadata.name === record.Name});
 
   if(Array.isArray(text)){
@@ -87,12 +84,7 @@ export const renderResourceList = (text, record, dataIndex, resourceList) => {
   return (
     dataIndex === 'Name' ? (
       <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
-        pathname: '/' + location.pathname.split('/')[1] + '/' +
-          (params.group ? params.group + '/' : '') +
-          params.version + '/' +
-          (resource.metadata.namespace ? 'namespaces/' + resource.metadata.namespace + '/' : '') +
-          params.resource + '/' +
-          resource.metadata.name
+        pathname: resource.metadata.selfLink
       }} >
         <Typography.Text strong>{text}</Typography.Text>
       </Link>

@@ -1,31 +1,17 @@
 import ReactResizeDetector from 'react-resize-detector';
 import React from 'react';
 
-export function onDrag(_layout, oldLayoutItem, layoutItem, CRDs, setCRDs, layout, setLayout, newBr){
-  if(!_.isEqual(oldLayoutItem, layoutItem)){
-    CRDs.forEach(CRD => {
-      let l = _layout.find(item => {return item.i === CRD.metadata.name});
-      CRD.x = l.x;
-      CRD.y = l.y;
-    })
-    setLayout(prev => {
-      prev[newBr] = _layout;
-      return {...prev}
-    });
-  }
-}
-
-export function onResize(_layout, oldLayoutItem, layoutItem, CRDs, setCRDs, layout, setLayout, newBr) {
+export function onResize(_layout, oldLayoutItem, layoutItem, resources, setResources, layout, setLayout, newBr) {
   if(!oldLayoutItem) return;
-  let index = CRDs.indexOf(CRDs.find(item => {return item.metadata.name === layoutItem.i}));
+  let index = resources.indexOf(resources.find(item => {return item.metadata.name === layoutItem.i}));
 
   /** When changing width */
   if(oldLayoutItem.w !== layoutItem.w){
-    CRDs[index].width = layoutItem.w;
+    resources[index].width = layoutItem.w;
   }
   /** When changing height */
   if(oldLayoutItem.h !== layoutItem.h){
-    CRDs[index].height = layoutItem.h;
+    resources[index].height = layoutItem.h;
   }
 
   setLayout(prev => {

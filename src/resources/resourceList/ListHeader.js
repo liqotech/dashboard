@@ -1,4 +1,4 @@
-import { Col, Row, Typography, Button, Tooltip } from 'antd';
+import { Col, Row, Typography, Button, Tooltip, Space } from 'antd';
 import React, { useRef, useState } from 'react';
 import ResourceBreadcrumb from '../common/ResourceBreadcrumb';
 import { useParams, useLocation } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { createNewConfig, getResourceConfig, updateResourceConfig } from '../com
 import FavouriteButton from '../common/buttons/FavouriteButton';
 import IconButton from '../common/buttons/IconButton';
 import CustomIcon from '../common/CustomIcon';
+import CustomViewButton from '../common/buttons/CustomViewButton';
 import _ from 'lodash';
 
 export default function ListHeader(props){
@@ -99,14 +100,19 @@ export default function ListHeader(props){
         <Col span={12}>
           <div style={{float: 'right'}}>
             {params.resource ? (
-              <Tooltip title={'Create ' + props.kind} placement={'topRight'}>
-                <Button type={'primary'}
-                        icon={<PlusOutlined/>}
-                        onClick={() => {
-                          setOnAddResource(true);
-                        }}
-                />
-              </Tooltip>
+              <Space align={'center'}>
+                <div>
+                  <CustomViewButton resource={props.genericResource} />
+                </div>
+                <Tooltip title={'Create new ' + props.kind} placement={'topRight'}>
+                  <Button type={'primary'}
+                          icon={<PlusOutlined/>}
+                          onClick={() => {
+                            setOnAddResource(true);
+                          }}
+                  />
+                </Tooltip>
+              </Space>
             ) : null}
           </div>
         </Col>

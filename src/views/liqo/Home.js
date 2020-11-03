@@ -9,7 +9,6 @@ import Status from './Status';
 import LoadingIndicator from '../../common/LoadingIndicator';
 import 'react-resizable/css/styles.css';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import { resizeDetector } from '../CustomViewUtils';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -269,7 +268,6 @@ function Home(){
         <div>
           <div className="home-container">
             <LiqoHeader config={config.length !== 0 ? config[0] : null} />
-            { resizeDetector() }
             <ResponsiveGridLayout className="react-grid-layout" layouts={layouts} margin={[20, 20]}
                                   breakpoints={{lg: 1000, md: 796, sm: 568, xs: 280, xxs: 0}}
                                   cols={{lg: 6, md: 3, sm: 2, xs: 1, xxs: 1}}

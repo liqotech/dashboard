@@ -13,6 +13,18 @@ jest.mock('./src/widgets/graph/GraphNet', () => {
   }
 });
 
+jest.mock('./src/themes/ColorPicker', () => {
+  return function ColorPicker() {return <div/>}
+})
+
+jest.mock('./src/themes/ThemeModifier', () => {
+  return function ThemeModifier() {return <div/>}
+})
+
+jest.mock('./src/themes/ThemeUploader', () => {
+  return function ThemeUploader() {return <div/>}
+})
+
 jest.mock('./src/services/TimeUtils', () => {
   function calculateAge() {
     return '1d';
@@ -67,7 +79,7 @@ jest.mock('react-github-btn', () => {
   }
 })
 
-jest.mock('./src/views/CustomViewUtils', () => {
+jest.mock('./src/customView/CustomViewUtils', () => {
   const onDrag = () => {}
   const onResize = () => {}
   const resizeDetector = () => {}

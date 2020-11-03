@@ -11,31 +11,18 @@
       },
       "spec": {
         "enabled": true,
-        "layout": {
-          "lg": [
-            {
-              "h": 1,
-              "i": "advertisements.protocol.liqo.io",
-              "w": 1,
-              "x": 0,
-              "y": 0,
-              "s": true
+        "resources": [
+          {
+            "layout": {
+              "lg": {
+                "h": 10,
+                "w": 10,
+                "x": 0,
+                "y": 0
+              }
             },
-            {
-              "h": 1,
-              "i": "foreignclusters.discovery.liqo.io",
-              "w": 1,
-              "x": 1,
-              "y": 0
-            }
-          ]
-        },
-        "crds": [
-          {
-            "crdName": "advertisements.protocol.liqo.io"
-          },
-          {
-            "crdName": "foreignclusters.discovery.liqo.io"
+            "resourceName": "Advertisement",
+            "resourcePath": "/apis/net.liqo.io/v1alpha1/advertisements.protocol.liqo.io"
           }
         ]
       }

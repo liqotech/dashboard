@@ -235,6 +235,7 @@ export default function CustomTab(props){
               ) : (
                 <div style={{marginTop: 4}}>
                   <KubernetesSchemaAutocomplete kind={getKind()}
+                                                params={params}
                                                 onSearch={onSearch}
                                                 single
                                                 CRD={props.onCustomResource}

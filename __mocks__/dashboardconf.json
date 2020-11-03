@@ -31,10 +31,10 @@
           "alternativeTitle": "",
           "menu": [
             {
-              "enabled": false,
+              "enabled": true,
               "icon": "FolderOutlined",
               "itemDescription": "MyDrive",
-              "link": "https://crownlabs.polito.it/cloud"
+              "link": "https://example.com"
             },
             {
               "enabled": false,
@@ -49,7 +49,7 @@
               "link": "/"
             },
             {
-              "enabled": false,
+              "enabled": true,
               "icon": "CrownOutlined",
               "itemDescription": "Professor View",
               "link": "/professor"
@@ -318,12 +318,20 @@
         "sidebar": {
           "enabled": true,
           "alternativeTitle": "LiqoDash",
-          "menu": [{
-            "enabled": true,
-            "icon": "SettingOutlined",
-            "itemDescription": "Settings",
-            "link": "/settings"
-          }]
+          "menu": [
+            {
+              "enabled": true,
+              "icon": "SettingOutlined",
+              "itemDescription": "Settings",
+              "link": "/settings"
+            },
+            {
+              "enabled": true,
+              "icon": "FolderOutlined",
+              "itemDescription": "MyDrive",
+              "link": "https://example.com"
+            }
+          ]
         }
       }
     }

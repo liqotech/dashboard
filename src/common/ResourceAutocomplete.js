@@ -68,6 +68,8 @@ export function ResourceAutocomplete(props){
         filterOption={(inputValue, option) => {
           return option.label.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
         }}
+        mode={props.multiple ? 'multiple' : null}
+        onDeselect={props.onDeselect}
         allowClear
         showSearch
         size={props.size}

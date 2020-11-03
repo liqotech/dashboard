@@ -1,5 +1,4 @@
-import React, { Suspense, useEffect, useRef, useState } from 'react';
-import CustomView from './CustomView';
+import React, { Suspense, useEffect, useState } from 'react';
 import LoadingIndicator from '../common/LoadingIndicator';
 import { Alert } from 'antd';
 

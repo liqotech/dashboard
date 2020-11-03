@@ -4,7 +4,7 @@ import GridLayout from 'react-grid-layout';
 import DraggableWrapper from '../../common/DraggableWrapper';
 import { pruneLayout } from '../../resources/common/LayoutUtils';
 import _ from 'lodash';
-import { resizeDetector } from '../../views/CustomViewUtils';
+import { resizeDetector } from '../../customView/CustomViewUtils';
 
 export default function DraggableLayout(props){
   const [items, setItems] = useState([]);
@@ -75,7 +75,7 @@ export default function DraggableLayout(props){
     let counter = 0;
     props.children.forEach(child => {
       prevLayout.push({
-        ...child.props['data-grid'][breakpoint],
+        ...child.props['data-grid'] && !_.isEmpty(child.props['data-grid']) && child.props['data-grid'][breakpoint] ? child.props['data-grid'][breakpoint] : {},
         i: 'draggable_item_' + child.key
       })
       counter++;
@@ -85,7 +85,11 @@ export default function DraggableLayout(props){
 
     if(props.children && !_.isEqual(layoutPruned, prevLayout)){
       layoutPruned.forEach(child => {
-        if(props.children.find(item => 'draggable_item_' + item.key === child.i)){
+        if(props.children.find(item => 'draggable_item_' + item.key === child.i) &&
+          props.customView.spec.resources.find(res => 'draggable_item_' + res.resourcePath === child.i)
+        ){
+          if(!props.customView.spec.resources.find(res => 'draggable_item_' + res.resourcePath === child.i).layout)
+            props.customView.spec.resources.find(res => 'draggable_item_' + res.resourcePath === child.i).layout = {};
           props.customView.spec.resources.find(res => 'draggable_item_' + res.resourcePath === child.i).layout[breakpoint] = child;
         }
       })
@@ -98,7 +102,9 @@ export default function DraggableLayout(props){
         array[6],
         props.customView.metadata.name,
         props.customView
-      ).catch(error => console.log(error))
+      ).then( res => {
+        props.customView.metadata = res.body.metadata;
+      }).catch(error => console.log(error))
     }
   }
 

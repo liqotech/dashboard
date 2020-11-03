@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './CR.css';
 import {
   Button,
   message,

@@ -125,11 +125,11 @@ export function alwaysPresentGET(url) {
   } else if (url === 'http://localhost/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions' ||
     url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
   ) {
-    return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+    //return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
   } else if (url === 'http://localhost/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/default-config' ||
     url === 'http://localhost:/apiserver/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/default-config'
   ) {
-    return Promise.resolve(new Response(JSON.stringify(DashboardConfig.items[0])));
+    //return Promise.resolve(new Response(JSON.stringify(DashboardConfig.items[0])));
   } else if (url === 'http://localhost:3001/clustercustomobject/dashboardconfigs') {
     let dashconf = JSON.parse(JSON.stringify(DashboardConfig));
     if(window.api && !_.isEmpty(window.api.dashConfigs.current)) {
@@ -160,7 +160,9 @@ export function generalHomeGET(url) {
     return Promise.resolve(new Response(JSON.stringify({ body: FCMockResponse })));
   } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
     return Promise.resolve(new Response(JSON.stringify({ body: AdvMockResponse })));
-  } else if (url === 'http://localhost:3001/clustercustomobject/peeringrequests') {
+  } else if (url === 'http://localhost/apiserver/apis/net.liqo.io/v1alpha1/advertisements.protocol.liqo.io') {
+    //return Promise.resolve(new Response(JSON.stringify(AdvMockResponse)));
+  }else if (url === 'http://localhost:3001/clustercustomobject/peeringrequests') {
     return Promise.resolve(new Response(JSON.stringify({ body: PRMockResponse })));
   } else if (url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
     return Promise.resolve(new Response(JSON.stringify({ body: ConfigMockResponse })));
@@ -216,7 +218,9 @@ export function generalMocks(url){
     return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
   } else if (url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
     return Promise.resolve(new Response(JSON.stringify({body: FCMockResponse})));
-  } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
+  } else if (url === 'http://localhost:3001/clustercustomobject/advertisements' ||
+    url === 'http://localhost/apiserver/apis/net.liqo.io/v1alpha1/advertisements.protocol.liqo.io'
+  ) {
     return Promise.resolve(new Response(JSON.stringify({body: AdvMockResponse})));
   } else if (url === 'http://localhost:3001/clustercustomobject/peeringrequests') {
     return Promise.resolve(new Response(JSON.stringify({body: PRMockResponse})));
@@ -241,6 +245,7 @@ export function generalMocks(url){
 
 export function mockCRDAndViewsExtended(error, method, crd, view) {
   fetch.mockResponse(req => {
+    //console.log(req.url)
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
       return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
     } else if (req.url === 'http://localhost:3001/namespaces') {
@@ -253,7 +258,7 @@ export function mockCRDAndViewsExtended(error, method, crd, view) {
           return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})));
         }
       } else if (req.method === 'PUT'){
-        return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})));
+        //return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})));
       } else if (req.method === 'POST'){
         return Promise.resolve(new Response(JSON.stringify({body: NewViewMockResponse})));
       }
@@ -337,7 +342,9 @@ export async function setup_cv(view) {
     } else if (url === 'http://localhost:3001/clustercustomobject/views') {
       return Promise.resolve(new Response(JSON.stringify({ body: view })))
     } else if (url === 'http://localhost:3001/clustercustomobject/tunnelendpoints') {
-      return Promise.resolve(new Response(JSON.stringify({ body: TunnMockResponse })))
+      //return Promise.resolve(new Response(JSON.stringify({ body: TunnMockResponse })))
+    } else if (url === 'http://localhost/apiserver/apis/net.liqo.io/v1alpha1/tunnelendpoints.liqonet.liqo.io') {
+      //return Promise.resolve(new Response(JSON.stringify(TunnMockResponse)))
     } else if(alwaysPresentGET(url)){
       return alwaysPresentGET(url)
     } else {

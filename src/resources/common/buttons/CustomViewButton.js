@@ -1,5 +1,5 @@
-import { Dropdown, Menu, message, Tooltip } from 'antd';
-import AddCustomView from '../../../views/AddCustomView';
+import { Button, Dropdown, Menu, message, Tooltip } from 'antd';
+import AddCustomView from '../../../customView/AddCustomView';
 import React, { useEffect, useState } from 'react';
 import LayoutOutlined from '@ant-design/icons/lib/icons/LayoutOutlined';
 
@@ -28,10 +28,10 @@ export default function CustomViewButton(props){
       return item.metadata.name === e;
     });
 
-    if(cv.spec.crds){
-      return !!cv.spec.crds.find(item => {
+    if(cv.spec.resources && props.resource.metadata){
+      return !!cv.spec.resources.find(item => {
         if(item)
-          return item.crdName === props.resource.metadata.name;
+          return item.resourcePath === props.resource.metadata.selfLink;
       });
     }
   }
@@ -43,25 +43,25 @@ export default function CustomViewButton(props){
     });
     let index = -1;
 
-    if(cv.spec.crds){
+    if(cv.spec.resources){
       /** Search if the resource is in the view */
-      index = cv.spec.crds.indexOf(
-        cv.spec.crds.find(item => {
-          if(item)
-            return item.crdName === props.resource.metadata.name;
+      index = cv.spec.resources.indexOf(
+        cv.spec.resources.find(item => {
+          if(item && props.resource.metadata)
+            return item.resourcePath === props.resource.metadata.selfLink;
         }));
     } else {
-      cv.spec.crds = [];
+      cv.spec.resources = [];
     }
 
     /** If the resource is in the view, remove it
      *  or else, add it in the view
      */
     if(index !== -1){
-      cv.spec.crds[index] = null;
+      cv.spec.resources[index] = null;
     } else {
-      cv.spec.crds.push({
-        crdName: props.resource.metadata.name
+      cv.spec.resources.push({
+        resourcePath: props.resource.metadata.selfLink
       });
     }
 
@@ -115,16 +115,18 @@ export default function CustomViewButton(props){
     <Menu>
       {items}
       <Menu.Item key="addCV">
-        <AddCustomView selected={props.resource.metadata.name}/>
+        <AddCustomView selected={ props.resource.metadata ? props.resource.metadata.selfLink : null}/>
       </Menu.Item>
     </Menu>
   );
 
   return (
-    <Tooltip title={'Add or Remove to View'} placement={'topLeft'}>
-      <Dropdown.Button overlay={menu} placement="bottomCenter"
-                       style={{paddingTop: 6}}
-                       trigger={['click']} icon={<LayoutOutlined />} />
+    <Tooltip title={'Add or Remove to View'} >
+      <Dropdown overlay={menu} placement="bottomRight"
+                trigger={['click']}
+      >
+        <Button icon={<LayoutOutlined />} />
+      </Dropdown>
     </Tooltip>
   )
 }

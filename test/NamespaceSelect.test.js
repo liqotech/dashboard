@@ -178,4 +178,25 @@ describe('Namespace Select', () => {
     userEvent.click(submitButton);
 
   }, testTimeout)
+
+  test('Namespace from a token namespace', async () => {
+    fetch.mockResponse(req => {
+      return mocks(req);
+    })
+
+    const token = 'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJUdHFQUThaZ2NjcURqQXJ0RG1WX0FQS0lLSFJBaEVQSm9RSmxvOVZIQ3Q4In0.eyJqdGkiOiIxNmI4NjliMi0xMzFkLTQwNjktYjcyMC01YzdkOGI3MzA4MDMiLCJleHAiOjE2MDU5NzY3ODUsIm5iZiI6MCwiaWF0IjoxNjA1OTY5NTg1LCJpc3MiOiJodHRwczovL2F1dGguY3Jvd25sYWJzLnBvbGl0by5pdC9hdXRoL3JlYWxtcy9jcm93bmxhYnMiLCJhdWQiOiJrOHMiLCJzdWIiOiI5NjdjMWM2NC0yNmQ3LTRjY2ItOWI4Yi0wMjMzNDcxNDdkN2EiLCJ0eXAiOiJJRCIsImF6cCI6Ims4cyIsImF1dGhfdGltZSI6MTYwNTk2OTU4NCwic2Vzc2lvbl9zdGF0ZSI6Ijc4ZjcxYjYxLTM3MjUtNDg0ZC1hMmVhLWFiMWUxNDhjYmNiOSIsImFjciI6IjEiLCJ1c2VyX2VtYWlsIjoiYWxlc3NhbmRyby5uYXBvbGV0YW5vMTk5NUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6IkFsZXNzYW5kcm8gTmFwb2xldGFubyIsIm5hbWVzcGFjZSI6WyJ0ZW5hbnQtYWxlc3NhbmRyby1uYXBvbGV0YW5vIl0sImdyb3VwcyI6WyJrdWJlcm5ldGVzOmNvdXJzZS1zaWQtYWRtaW4iLCJrdWJlcm5ldGVzOmNvdXJzZS1zaWQiLCJrdWJlcm5ldGVzOmFkbWluIl0sInByZWZlcnJlZF91c2VybmFtZSI6ImFsZXNzYW5kcm8ubmFwb2xldGFubyIsIm1lbWJlcnNoaXAiOlsiL2NvdXJzZS1zaWQiLCIvY291cnNlLXNpZC1hZG1pbiJdLCJnaXZlbl9uYW1lIjoiQWxlc3NhbmRybyIsImZhbWlseV9uYW1lIjoiTmFwb2xldGFubyIsImVtYWlsIjoiYWxlc3NhbmRyby5uYXBvbGV0YW5vMTk5NUBnbWFpbC5jb20iLCJncmFmYW5hX3JvbGUiOlsiY291cnNlLXNpZC1hZG1pbiIsImNvdXJzZS1zaWQiLCJhZG1pbiJdfQ.gKlXMHARf2jIQgWET8gnI5itSKupJkNJf5EIpH7tLR09cL50vt0USz9nX0YJrU9n-NI9SEJp2V2wpvJHaL8e6Nk2k8tQ_'
+
+    Cookies.set('token', token);
+    window.api =  ApiInterface({id_token: 'test'});
+    window.api.namespace.current = 'liqo';
+
+    render(
+      <MemoryRouter>
+        <NamespaceSelect />
+      </MemoryRouter>
+    );
+
+
+
+  }, testTimeout)
 })

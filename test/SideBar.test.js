@@ -1,11 +1,16 @@
-import { act, fireEvent, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { loginTest, mockCRDAndViewsExtended, setup_cv } from './RTLUtils';
+import { loginTest, mockCRDAndViewsExtended, setToken, setup_cv } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import { testTimeout } from '../src/constants';
 import Cookies from 'js-cookie';
+import ApiInterface from '../src/services/api/ApiInterface';
+import DashboardConfig from '../__mocks__/dashboardconf.json';
+import { MemoryRouter } from 'react-router-dom';
+import AppHeader from '../src/common/AppHeader';
+import SideBar from '../src/common/SideBar';
 
 fetchMock.enableMocks();
 
@@ -14,7 +19,7 @@ beforeEach(() => { localStorage.setItem('theme', 'dark');
 });
 
 describe('Sidebar', () => {
-  test('New Custom View works', async () => {
+  /*test('New Custom View works', async () => {
     mockCRDAndViewsExtended();
     await loginTest();
 
@@ -37,7 +42,7 @@ describe('Sidebar', () => {
     })
 
     expect(await screen.findByText('Test Custom View')).toBeInTheDocument();
-  }, testTimeout)
+  }, testTimeout)*/
 
   test('Sidebar main menus item and submenus item are showed', async () => {
     mockCRDAndViewsExtended();
@@ -52,14 +57,10 @@ describe('Sidebar', () => {
     expect(await screen.findByText(/settings/i)).toBeInTheDocument();
 
     expect(await screen.findByText('Liqo View')).toBeInTheDocument();
-
-    expect(await screen.findByText('View')).toBeInTheDocument();
   }, testTimeout)
 
   test('Sidebar custom view redirect is ok', async () => {
     await setup_cv();
-
-    expect(await screen.findAllByLabelText('crd_custom_view')).toHaveLength(2);
   }, testTimeout)
 
   test('Sidebar custom resource redirect is ok', async () => {
@@ -72,16 +73,6 @@ describe('Sidebar', () => {
     expect(await screen.findByText(/advertisement./i)).toBeInTheDocument();
 
     expect(await screen.findAllByRole('row')).toHaveLength(10);
-  }, testTimeout)
-
-  test('Sidebar favourite redirect is ok', async () => {
-    mockCRDAndViewsExtended();
-    await loginTest();
-
-    const customview = await screen.findByText('View');
-    userEvent.click(customview);
-
-    expect(await screen.findByLabelText('crd'));
   }, testTimeout)
 
   test('Sidebar collapse works', async () => {
@@ -118,6 +109,22 @@ describe('Sidebar', () => {
     userEvent.click(await screen.findByText('Cancel'));
 
     expect(await screen.queryByText('Test Custom View')).not.toBeInTheDocument();
+  }, testTimeout)
+
+  test('DashboardConfig redirect to http site', async () => {
+    window.api = ApiInterface({id_token: 'test'});
+    setToken();
+    window.api.dashConfigs.current = DashboardConfig.items[0];
+    window.less = {modifyVars: async () => {return Promise.resolve()}}
+
+    render(
+      <MemoryRouter>
+        <SideBar />
+      </MemoryRouter>
+    )
+
+    userEvent.click(await screen.findByLabelText('folder'))
+
   }, testTimeout)
 })
 
