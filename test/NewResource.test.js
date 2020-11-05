@@ -168,6 +168,8 @@ describe('NewResource', () => {
 
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
     userEvent.click(screen.getByText('JSON/YAML'));
+    const _JSON = await screen.findAllByText('JSON');
+    userEvent.click(_JSON[0]);
 
     await userEvent.type(screen.getByLabelText('editor'), '{"name": "test", "namespace": "test"}');
 
@@ -181,6 +183,8 @@ describe('NewResource', () => {
 
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
     userEvent.click(screen.getByText('JSON/YAML'));
+    const _JSON = await screen.findAllByText('JSON');
+    userEvent.click(_JSON[0]);
 
     await userEvent.type(screen.getByLabelText('editor'), 'name: "test", {"namespace" test');
 
@@ -195,6 +199,8 @@ describe('NewResource', () => {
     userEvent.click(screen.getByLabelText('plus'));
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
     userEvent.click(screen.getByText('JSON/YAML'));
+    const _JSON = await screen.findAllByText('JSON');
+    userEvent.click(_JSON[2]);
 
     await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashNewMockResponse));
 
@@ -284,6 +290,8 @@ describe('NewResource', () => {
     userEvent.click(screen.getByLabelText('plus'));
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
     userEvent.click(screen.getByText('JSON/YAML'));
+    const _JSON = await screen.findAllByText('JSON');
+    userEvent.click(_JSON[2]);
 
     await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashNewMockResponse));
 
