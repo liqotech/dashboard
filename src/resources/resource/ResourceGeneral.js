@@ -144,7 +144,7 @@ function ResourceGeneral(props){
         </div>
       ),
       JSON: (
-        <div style={{padding: 12}}>
+        <div>
           <Editor value={JSON.stringify(resource[0], null, 2)}
                   onClick={submit}
           />

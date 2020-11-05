@@ -64,6 +64,8 @@ describe('UpdateCR', () => {
     userEvent.click(screen.getAllByLabelText('edit')[1]);
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
     userEvent.click(screen.getByText('JSON/YAML'));
+    const _JSON = await screen.findAllByText('JSON');
+    userEvent.click(_JSON[2]);
 
     await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashUpdatedMockResponse));
 
@@ -92,18 +94,36 @@ describe('UpdateCR', () => {
     expect(textboxes[3]).toHaveAttribute('value', 'purple');
   }, testTimeout)
 
-  test('Editor throws error when not valid body', async () => {
+  test('Editor throws error when not valid body (YAML)', async () => {
     await setup_resource();
 
     userEvent.click(screen.getAllByLabelText('edit')[1]);
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
     userEvent.click(screen.getByText('JSON/YAML'));
+    const YAML = await screen.findAllByText('YAML');
+    userEvent.click(YAML[0]);
+
+    await userEvent.type(screen.getByLabelText('editor'), 'item: [cost: 11:: _name: green]');
+
+    userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+    expect(await screen.findByText('YAML not valid')).toBeInTheDocument();
+  }, testTimeout)
+
+  test('Editor throws error when not valid body (JSON)', async () => {
+    await setup_resource();
+
+    userEvent.click(screen.getAllByLabelText('edit')[1]);
+    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+    userEvent.click(screen.getByText('JSON/YAML'));
+    const _JSON = await screen.findAllByText('JSON');
+    userEvent.click(_JSON[2]);
 
     await userEvent.type(screen.getByLabelText('editor'), '{"item": [{"cost": 11 "name": "green"}]}');
 
     userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
-    expect(await screen.findByText('JSON or YAML not valid')).toBeInTheDocument();
+    expect(await screen.findByText('JSON not valid')).toBeInTheDocument();
   }, testTimeout)
 
   test('Error notification when 409', async () => {
@@ -112,6 +132,8 @@ describe('UpdateCR', () => {
     userEvent.click(screen.getAllByLabelText('edit')[1]);
     expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
     userEvent.click(screen.getByText('JSON/YAML'));
+    const _JSON = await screen.findAllByText('JSON');
+    userEvent.click(_JSON[2]);
 
     await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashUpdatedMockResponse));
 
