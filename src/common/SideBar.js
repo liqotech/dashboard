@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { Layout, Menu, Typography } from 'antd';
 import './SideBar.css';
+import _ from 'lodash';
 import {
   DashboardOutlined, SettingOutlined,
   LayoutOutlined, StarOutlined, ApiOutlined, BlockOutlined
@@ -107,82 +108,91 @@ function SideBar() {
     });
   }
 
+  let width = 250;
+
+  if( _.isEmpty(window.api.dashConfigs.current) ||
+    !window.api.dashConfigs.current.spec.sidebar ||
+    !window.api.dashConfigs.current.spec.sidebar.enabled
+  )
+    width = 0;
+
   return (
     <div>
-      <Sider className="sidebar" width={250}
-             theme={'light'}
+      <Sider className="sidebar" width={width}
              collapsible collapsed={collapsed}
-             onCollapse={onCollapse}
+             onCollapse={width === 0 ? null : onCollapse}
              breakpoint="lg"
       >
-        <div className="app-title" align="middle">
-          <img src={require('../assets/logo_4.png')}
-               className="image" alt="image"
-               style={collapsed ? {marginLeft: 22} : null}
-          />
-          {!collapsed ? (
-            <Link to="/">
-              <img src={require('../assets/name.png')}
-                   alt="image"
-                   style={{height: 30, width: 120}}
-              />
-            </Link>
-          ) : null}
-        </div>
-        <Menu mode="inline" defaultOpenKeys={['sub_fav', 'resources', 'APIs', 'customViews']}
-              defaultSelectedKeys={'1'} style={{ marginTop: 16}}>
-          <Menu.Item key="home" style={{ marginBottom: 0}}
-                     icon={<DashboardOutlined style={{ fontSize: '20px' }} />}
-          >
-            <Link to="/">
-              <span>Home</span>
-            </Link>
-          </Menu.Item>
-          <Menu.Divider/>
-          <Menu.SubMenu key={"customViews"}
-                        title={
-                          collapsed ? <LayoutOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
-                            <Typography.Text type={'secondary'}>Custom Views</Typography.Text>
-                        }
-          >
-            {cv}
-            <Menu.Item key="addCV" style={{ marginTop: 0, marginBottom: 0}}>
-              <AddCustomView  />
-            </Menu.Item>
-          </Menu.SubMenu>
-          <Menu.Divider/>
-          <Menu.SubMenu key={"APIs"}
-                        title={
-                          collapsed ? <ApiOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
-                          <Typography.Text type={'secondary'}>APIs</Typography.Text>
-                        }
-          >
-            <Menu.Item key="apis"
-                       icon={<ApiOutlined style={{ fontSize: '20px' }} />}
+        {width !== 0 ? (
+          <>
+          <div className="app-title" align="middle">
+            <img src={require('../assets/logo_4.png')}
+                 className="image" alt="image"
+                 style={collapsed ? {marginLeft: 22} : null}
+            />
+            {!collapsed ? (
+              <Link to="/">
+                <img src={require('../assets/name.png')}
+                     alt="image"
+                     style={{height: 30, width: 120}}
+                />
+              </Link>
+            ) : null}
+          </div>
+          <Menu mode="inline" defaultOpenKeys={['sub_fav', 'resources', 'APIs', 'customViews']}
+                defaultSelectedKeys={'1'} style={{ marginTop: 16, borderRight: '0px solid'}}>
+            <Menu.Item key="home" style={{ marginBottom: 0}}
+                       icon={<DashboardOutlined style={{ fontSize: '20px' }} />}
             >
-              <Link to="/apis">
-                <span>Apis</span>
+              <Link to="/">
+                <span>Home</span>
               </Link>
             </Menu.Item>
-            <Menu.Item key="api"
-                       icon={<ApiOutlined style={{ fontSize: '20px' }} />}
+            <Menu.Divider/>
+            <Menu.SubMenu key={"customViews"}
+                          title={
+                            collapsed ? <LayoutOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
+                              <Typography.Text type={'secondary'}>Custom Views</Typography.Text>
+                          }
             >
-              <Link to="/api/v1">
-                <span>Api V1</span>
-              </Link>
-            </Menu.Item>
-          </Menu.SubMenu>
-          <Menu.Divider/>
-          <Menu.SubMenu key={"resources"}
-                        title={
-                          collapsed ? <BlockOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
-                          <Typography.Text type={'secondary'}>Resources</Typography.Text>
-                        }
-          >
-            {favR}
-          </Menu.SubMenu>
-          <Menu.Divider/>
-          <Menu.SubMenu key={"sub_fav"}
+              {cv}
+              <Menu.Item key="addCV" style={{ marginTop: 0, marginBottom: 0}}>
+                <AddCustomView  />
+              </Menu.Item>
+            </Menu.SubMenu>
+            <Menu.Divider/>
+            <Menu.SubMenu key={"APIs"}
+                          title={
+                            collapsed ? <ApiOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
+                              <Typography.Text type={'secondary'}>APIs</Typography.Text>
+                          }
+            >
+              <Menu.Item key="apis"
+                         icon={<ApiOutlined style={{ fontSize: '20px' }} />}
+              >
+                <Link to="/apis">
+                  <span>Apis</span>
+                </Link>
+              </Menu.Item>
+              <Menu.Item key="api"
+                         icon={<ApiOutlined style={{ fontSize: '20px' }} />}
+              >
+                <Link to="/api/v1">
+                  <span>Api V1</span>
+                </Link>
+              </Menu.Item>
+            </Menu.SubMenu>
+            <Menu.Divider/>
+            <Menu.SubMenu key={"resources"}
+                          title={
+                            collapsed ? <BlockOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
+                              <Typography.Text type={'secondary'}>Resources</Typography.Text>
+                          }
+            >
+              {favR}
+            </Menu.SubMenu>
+            <Menu.Divider/>
+            <Menu.SubMenu key={"sub_fav"}
                         title={
                           collapsed ? <StarOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
                           <Typography.Text type={'secondary'}>Favourites</Typography.Text>
@@ -191,14 +201,16 @@ function SideBar() {
             {fav}
           </Menu.SubMenu>
           <Menu.Divider/>
-          <Menu.Item key="settings" style={{ marginTop: 0, marginBottom: 0}}
-                     icon={<SettingOutlined style={{ fontSize: '20px' }} />}
-          >
-            <Link to="/settings">
-              <span>Settings</span>
-            </Link>
-          </Menu.Item>
-        </Menu>
+            <Menu.Item key="settings" style={{ marginTop: 0, marginBottom: 0}}
+                       icon={<SettingOutlined style={{ fontSize: '20px' }} />}
+            >
+              <Link to="/settings">
+                <span>Settings</span>
+              </Link>
+            </Menu.Item>
+          </Menu>
+          </>
+        ) : null}
       </Sider>
     </div>
   );

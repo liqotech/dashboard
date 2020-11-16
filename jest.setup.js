@@ -55,6 +55,12 @@ jest.mock('ace-builds/src-noconflict/mode-markdown', () => { return null});
 jest.mock('ace-builds/src-noconflict/mode-javascript', () => { return null});
 jest.mock('ace-builds/src-noconflict/theme-dawn', () => { return null});
 
+jest.mock('react-github-btn', () => {
+  return () => {
+    return <div/>
+  }
+})
+
 jest.mock('./src/views/CustomViewUtils', () => {
   const onDrag = () => {}
   const onResize = () => {}

@@ -11,6 +11,46 @@
         "selfLink":"/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/liqodash-config"
       },
       "spec":{
+        "footer": {
+          "enabled": true,
+          "footerDescription": "This software has been proudly developed at Politecnico di Torino",
+          "githubRef": true,
+          "link": "https://github.com/netgroup-polito/CrownLabs"
+        },
+        "header": {
+          "alternativeLogo": "",
+          "alternativeTitle": "",
+          "menu": [
+            {
+              "enabled": false,
+              "icon": "FolderOutlined",
+              "itemDescription": "MyDrive",
+              "link": "https://crownlabs.polito.it/cloud"
+            },
+            {
+              "enabled": false,
+              "icon": "BarChartOutlined",
+              "itemDescription": "Grafana",
+              "link": "https://grafana.crownlabs.polito.it/"
+            },
+            {
+              "enabled": false,
+              "icon": "UserOutlined",
+              "itemDescription": "Student View",
+              "link": "/"
+            },
+            {
+              "enabled": false,
+              "icon": "CrownOutlined",
+              "itemDescription": "Professor View",
+              "link": "/professor"
+            }
+          ],
+          "namespaceSelector": true,
+          "resourceSearch": true,
+          "themeModifier": true,
+          "themeSwitcher": true
+        },
         "resources":[
           {
             "favourite":true,
@@ -265,7 +305,10 @@
             "resourceName":"Service",
             "resourcePath":"/api/v1/services"
           }
-        ]
+        ],
+        "sidebar": {
+          "enabled": true
+        }
       }
     }
   ],

@@ -112,7 +112,6 @@ function App(props) {
       .catch((error) => {
       console.log(error)
     });
-
   }
 
   const manageOIDCSession = () => {
@@ -267,7 +266,7 @@ function App(props) {
             {routes}
           </Switch>
         </Layout.Content>
-        {api.user.current.id_token === '' ? (
+        {api.user.current.id_token !== '' ? (
           <AppFooter />
         ) : null}
       </Layout>

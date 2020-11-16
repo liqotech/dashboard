@@ -21,7 +21,7 @@ export default function DraggableLayout(props){
                 }
                 size={props.headerSmall ? 'small' : 'default'}
                 type={'inner'}
-                style={{overflowY: 'auto', height: '100%', overflowX: 'hidden', backgroundColor: '#fff'}}
+                style={{overflowY: 'auto', height: '100%', overflowX: 'hidden'}}
                 headStyle={{position: 'fixed', zIndex: 20, width: '100%'}}
                 bodyStyle={{height: '100%', position: 'relative', padding: 0}}
                 className={'scrollbar'}

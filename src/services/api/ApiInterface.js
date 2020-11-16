@@ -161,7 +161,15 @@ export default function ApiInterface(_user, props) {
         apiVersion: CRD.spec.group + '/' + CRD.spec.version,
         kind: CRD.spec.names.kind,
         metadata: { name: 'default-config' },
-        spec: { resources: [] }
+        spec: {
+          footer: { enabled: false },
+          sidebar: { enabled: true },
+          header: {
+            namespaceSelector: true,
+            resourceSearch: true
+          },
+          resources: []
+        }
       }
     ).then(res => {
       dashConfigs.current = res.body;

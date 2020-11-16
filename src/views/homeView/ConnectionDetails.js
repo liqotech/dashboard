@@ -7,7 +7,7 @@ import InfoCircleOutlined from '@ant-design/icons/lib/icons/InfoCircleOutlined';
 import HomeOutlined from '@ant-design/icons/lib/icons/HomeOutlined';
 import GlobalOutlined from '@ant-design/icons/lib/icons/GlobalOutlined';
 import { getColor } from './HomeUtils';
-import ExclamationCircleTwoTone from '@ant-design/icons/lib/icons/ExclamationCircleTwoTone';
+import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 import { getColumnSearchProps } from '../../services/TableUtils';
 
 const n = Math.pow(10, 6);
@@ -51,7 +51,7 @@ function ConnectionDetails(props) {
               { podNoRes && !podNoRes.resourcesRequestsPresent ? (
                 <Col>
                   <Tooltip title={'POD doesn\'t have a resource limit'}>
-                    <ExclamationCircleTwoTone style={{marginLeft: 4}} twoToneColor="#f5222d" />
+                    <ExclamationCircleOutlined style={{marginLeft: 4, color: '#ff4d4f'}} />
                   </Tooltip>
                 </Col>
               ) : null }
@@ -174,11 +174,11 @@ function ConnectionDetails(props) {
               <Card title={'Resources Used'} style={{marginRight: 20}}
                     extra={role ? (props.metricsNotAvailableIncoming ? (
                       <Tooltip title={'Precise metrics not available in your cluster'}>
-                        <ExclamationCircleTwoTone twoToneColor="#f5222d" />
+                        <ExclamationCircleOutlined style={{color: '#ff4d4f'}} />
                       </Tooltip>
                     ) : null) : (props.metricsNotAvailableOutgoing ? (
                       <Tooltip title={'Precise metrics not available in this cluster'}>
-                        <ExclamationCircleTwoTone twoToneColor="#f5222d" />
+                        <ExclamationCircleOutlined style={{color: '#ff4d4f'}} />
                       </Tooltip>
                     ) : null)}
               >

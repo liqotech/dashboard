@@ -10,6 +10,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { CodeOutlined, InfoCircleOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { createNewConfig, getResourceConfig, updateResourceConfig } from '../common/DashboardConfigUtils';
 import CustomTab from './CustomTab';
+import { secondaryColor } from '../../services/Colors';
 
 function ResourceGeneral(props){
   const [container, setContainer] = useState(null);
@@ -319,22 +320,15 @@ function ResourceGeneral(props){
                     tabList={tabList}
                     tabProps={{
                       onEdit: onEditTab,
-                      tabBarStyle: {
-                        backgroundColor: '#f0f2f5'
-                      },
                       type: 'editable-card',
                       size: 'small',
                       animated: true
                     }}
-                    tabBarExtraContent={(currentTab !== 'General' && currentTab !== 'JSON') ?
-                      <Button icon={<SettingOutlined />} size={'large'}/>
-                      : null
-                    }
                     size={'small'}
-                    type={'inner'}
                     activeTabKey={currentTab}
                     onTabChange={key => {if(changeTabFlag.current) setCurrentTab(key); else changeTabFlag.current = true}}
                     style={{overflow: 'hidden'}}
+                    bordered={false}
               >
                 {contentList[currentTab]}
               </Card>

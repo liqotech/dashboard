@@ -1,10 +1,11 @@
 .sidebar {
     height: 100vh;
+    max-height: 100vh;
     position: sticky;
     left: 0;
     top: 0;
     z-index: 11;
-    box-shadow: 1px 0 0 0 #f0f1f2;
+    box-shadow: 0 0 0 0 #303030;
 }
 
 .image {
@@ -41,22 +42,22 @@
 
 .ant-menu .ant-menu-submenu .ant-menu-submenu-title {
     padding-left: 16px !important;
-    margin-top: 0;
-    margin-bottom: 0;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
 }
 
 .ant-menu .ant-menu-submenu .ant-menu-item {
     padding-left: 24px !important;
-    margin-top: 0;
-    margin-bottom: 0;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
 }
 
 .ant-menu-vertical .ant-menu-item:not(:last-child), .ant-menu-vertical-left .ant-menu-item:not(:last-child), .ant-menu-vertical-right .ant-menu-item:not(:last-child), .ant-menu-inline .ant-menu-item:not(:last-child){
-    margin-top: 0;
-    margin-bottom: 0;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
 }
 
 .ant-menu-vertical .ant-menu-item, .ant-menu-vertical-left .ant-menu-item, .ant-menu-vertical-right .ant-menu-item, .ant-menu-inline .ant-menu-item, .ant-menu-vertical .ant-menu-submenu-title, .ant-menu-vertical-left .ant-menu-submenu-title, .ant-menu-vertical-right .ant-menu-submenu-title, .ant-menu-inline .ant-menu-submenu-title{
-    margin-top: 0;
-    margin-bottom: 0;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
 }

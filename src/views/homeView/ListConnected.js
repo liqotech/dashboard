@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Button, Divider, PageHeader, Space, Tooltip, Typography } from 'antd';
+import { Alert, Button, Card, Divider, PageHeader, Space, Tooltip, Typography } from 'antd';
 import FilterOutlined from '@ant-design/icons/lib/icons/FilterOutlined';
 import ConnectedPeer from './ConnectedPeer';
 import { checkAdvertisement, checkPeeringRequest } from './HomeUtils';
@@ -106,8 +106,8 @@ function ListConnected(props){
   });
 
   return (
-    <div className="home-header">
-      <div style={{position: 'fixed', zIndex: 10, width: '100%', backgroundColor: 'white'}}>
+    <Card bodyStyle={{height: '100%', padding: 0}} style={{overflowY: 'auto', height: '100%', overflowX: 'hidden'}}>
+      <div style={{position: 'fixed', zIndex: 10, width: '100%'}}>
         <DraggableWrapper>
           <PageHeader style={{ paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16 }}
                       title={
@@ -145,7 +145,7 @@ function ListConnected(props){
           <div>{connectedPeers}</div>
         )}
       </div>
-    </div>
+    </Card>
   )
 
 }

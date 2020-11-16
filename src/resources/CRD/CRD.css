@@ -13,13 +13,13 @@
 
 .ant-typography ul,
 .ant-typography ol {
-    margin: 0 0 0 0;
-    padding: 0;
+    margin: 0 0 0 0 !important;;
+    padding: 0 !important;;
 }
 
 .ant-typography ul li, .ant-typography ol li {
-    margin: 0 0 0 10px;
-    padding: 0 0 0 4px;
+    margin: 0 0 0 10px !important;
+    padding: 0 0 0 4px !important;
 }
 
 .crd-container {

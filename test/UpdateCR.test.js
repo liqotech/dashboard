@@ -44,7 +44,7 @@ async function setup() {
   });
 }
 
-beforeEach(() => {
+beforeEach(() => { localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
@@ -75,7 +75,9 @@ describe('UpdateCR', () => {
 
     expect(test).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('switch'));
+    const switcher = await screen.findAllByRole('switch');
+
+    userEvent.click(switcher[1]);
 
     userEvent.click(test);
 

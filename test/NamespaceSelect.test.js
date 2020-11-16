@@ -58,7 +58,7 @@ function mocks(req, error, errorCRD) {
   }
 }
 
-beforeEach(() => {
+beforeEach(() => { localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 

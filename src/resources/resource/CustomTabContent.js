@@ -14,6 +14,7 @@ import ResourceList from '../resourceList/ResourceList';
 import { ResourceAutocomplete } from '../../common/ResourceAutocomplete';
 import KubernetesSchemaAutocomplete from '../common/KubernetesSchemaAutocomplete';
 import DraggableWrapper from '../../common/DraggableWrapper';
+import { primaryColor } from '../../services/Colors';
 
 export default function CustomTab(props){
   const [deleting, setDeleting] = useState(false);
@@ -194,10 +195,10 @@ export default function CustomTab(props){
               )
             }
             size={'small'}
-            type={'inner'}
-            style={{overflowY: 'auto', height: '100%', overflowX: 'hidden', backgroundColor: '#fff'}}
+            style={{overflowY: 'auto', height: '100%', overflowX: 'hidden'}}
             headStyle={{position: 'fixed', zIndex: 20, width: '100%'}}
             bodyStyle={{height: '100%', position: 'relative'}}
+            bordered={false}
             extra={[
               <Tooltip title={'Edit Content'} key={'edit_content'}>
                 <EditOutlined onClick={() => setOnContentEdit(prev => !prev)}

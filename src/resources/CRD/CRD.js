@@ -22,6 +22,7 @@ import DesignEditorCRD from '../../editors/CRD/DesignEditorCRD';
 import Editor from '../../editors/Editor';
 import CustomViewButton from '../common/buttons/CustomViewButton';
 import { resourceNotifyEvent } from '../common/ResourceUtils';
+import { primaryColor } from '../../services/Colors';
 
 function CRD(props) {
 
@@ -413,10 +414,10 @@ function CRD(props) {
     <div>
       <div>
         <div className="crd-header">
-          <Layout style={{background: '#fff'}}>
+          <Layout>
             {header()}
           </Layout>
-          <Layout style={{background: '#fff'}}>
+          <Layout>
             <Layout.Content>
               { props.onCustomView ? (
                 <div>

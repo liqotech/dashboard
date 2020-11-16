@@ -91,6 +91,7 @@ async function setup_from_ConfigView(error) {
 }
 
 beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
@@ -126,7 +127,7 @@ describe('ConfigView', () => {
 
     let switchButton = screen.getAllByRole('switch');
 
-    userEvent.click(switchButton[0]);
+    userEvent.click(switchButton[1]);
     userEvent.click(screen.getByText('Save configuration'));
 
     expect(await screen.findByText('Could not update the configuration'))
@@ -137,8 +138,8 @@ describe('ConfigView', () => {
 
     let switchButton = screen.getAllByRole('switch');
 
-    expect(switchButton[0]).toHaveAttribute('aria-checked', 'true');
-    userEvent.click(switchButton[0]);
+    expect(switchButton[1]).toHaveAttribute('aria-checked', 'true');
+    userEvent.click(switchButton[1]);
 
     let textbox = screen.getAllByRole('textbox');
 
@@ -154,7 +155,7 @@ describe('ConfigView', () => {
 
     switchButton = screen.getAllByRole('switch');
 
-    expect(switchButton[0]).toHaveAttribute('aria-checked', 'false');
+    expect(switchButton[1]).toHaveAttribute('aria-checked', 'false');
 
   }, testTimeout)
 })

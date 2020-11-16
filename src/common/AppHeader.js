@@ -1,31 +1,123 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  withRouter, useHistory
+  withRouter, useHistory, Link
 } from 'react-router-dom';
 import './AppHeader.css';
-import { Select, Modal, Col, Layout, Menu, Row, Input, AutoComplete, Typography, Button } from 'antd';
-import { GithubOutlined, QuestionCircleOutlined, SelectOutlined } from '@ant-design/icons';
+import { Switch, Modal, Col, Layout, Menu, Row, Typography, Tooltip } from 'antd';
+import { GithubOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import LogoutOutlined from '@ant-design/icons/lib/icons/LogoutOutlined';
 import NamespaceSelect from './NamespaceSelect';
 import { ResourceAutocomplete } from './ResourceAutocomplete';
+import _ from 'lodash';
+import CustomIcon from '../resources/common/CustomIcon';
+import Utils from '../services/Utils';
 const Header = Layout.Header;
+import dark from '../themes/dark.json';
+import light from '../themes/light.json';
+import ThemeModifier from '../themes/ThemeModifier';
 
 function AppHeader(props) {
+  const [isDarkMode, setIsDarkMode] = React.useState(localStorage.getItem("theme") === 'dark' || !localStorage.getItem("theme"));
   const [infoModal, setInfoModal] = useState(false);
+  const [, setConfig] = useState(window.api.dashConfigs.current);
   let history = useHistory();
   let menuItems;
 
-  menuItems =
-    [
-      <Menu.Item key="namespace" style={{ margin: 0 }}>
-        <NamespaceSelect />
-      </Menu.Item>,
-      <Menu.Item key="question" onClick={() => setInfoModal(true)}
-                 style={{ margin: 0 }}
-      >
-        <QuestionCircleOutlined style={{ fontSize: '20px', padding: 20 }} />
+  const toggleTheme = (isChecked) => {
+    setIsDarkMode(isChecked);
+    if(isChecked)
+      window.less.modifyVars(dark)
+        .then(() => localStorage.setItem("theme", "dark"));
+    else
+      window.less.modifyVars(light)
+        .then(() => localStorage.setItem("theme", "light"));
+  };
+
+  useEffect(() => {
+    window.api.DCArrayCallback.current.push(() => setConfig(window.api.dashConfigs.current));
+  }, []);
+
+  menuItems = [];
+
+  if(Utils().parseJWT())
+    menuItems.push(
+      <Menu.Item key="welcome" style={{ margin: 0 }}>
+        <Typography.Text strong style={{fontStyle: 'italic', fontSize: 18, marginLeft: 20, marginRight: 20}}>
+          {'Welcome back' + (Utils().parseJWT().given_name ? (' ' + Utils().parseJWT().given_name) : '') + '!'}
+        </Typography.Text>
       </Menu.Item>
-    ];
+    )
+
+  if(!_.isEmpty(window.api.dashConfigs.current)){
+    if(window.api.dashConfigs.current.spec.header && window.api.dashConfigs.current.spec.header.namespaceSelector)
+      menuItems.push(
+        <Menu.Item key="namespace" style={{ margin: 0 }}>
+          <NamespaceSelect />
+        </Menu.Item>
+      )
+
+    if(window.api.dashConfigs.current.spec.header &&
+      window.api.dashConfigs.current.spec.header.menu &&
+      window.api.dashConfigs.current.spec.header.menu.length !== 0){
+      window.api.dashConfigs.current.spec.header.menu.forEach(item => {
+        if(item.enabled){
+          menuItems.push(
+            <Menu.Item key={item.link + item.itemDescription + item.icon} style={{ margin: 0}}
+                       onClick={() => {
+                         if(item.link.includes('http'))
+                           window.open(item.link, "_blank");
+                         else
+                           history.push(item.link)
+                       }}
+            >
+              {item.link ? (
+                <Tooltip title={item.itemDescription}>
+                  <CustomIcon icon={item.icon ? item.icon : 'LayoutOutlined'} style={{ padding: 20, fontSize: 20 }}/>
+                </Tooltip>
+              ) : (
+                <div>{item.itemDescription}</div>
+              )}
+            </Menu.Item>
+          )
+        }
+      })
+    }
+  }
+
+  if(!_.isEmpty(window.api.dashConfigs.current) &&
+    window.api.dashConfigs.current.spec.header &&
+    window.api.dashConfigs.current.spec.header.themeModifier){
+    menuItems.push(
+      <Menu.Item key="theme_mod" style={{ margin: 0 }}>
+        <ThemeModifier />
+      </Menu.Item>
+    )
+  }
+
+  if(!_.isEmpty(window.api.dashConfigs.current) &&
+    window.api.dashConfigs.current.spec.header &&
+    window.api.dashConfigs.current.spec.header.themeSwitcher){
+    menuItems.push(
+      <Menu.Item key="theme" style={{ margin: 0 }}>
+        <Tooltip title={'Switch theme'} >
+          <Switch checked={isDarkMode}
+                  style={{ marginLeft: 20, marginRight: 20, marginTop: -5 }}
+                  onChange={toggleTheme} size={'small'}
+          />
+        </Tooltip>
+      </Menu.Item>
+    )
+  }
+
+  menuItems.push(
+    <Menu.Item key="question" onClick={() => setInfoModal(true)}
+               style={{ margin: 0 }}
+    >
+      <Tooltip title={'Info'} >
+        <QuestionCircleOutlined style={{ fontSize: '20px', padding: 20 }} />
+      </Tooltip>
+    </Menu.Item>
+  );
 
   if(props.logged){
     menuItems.push(
@@ -34,7 +126,9 @@ function AppHeader(props) {
                  onClick={() => {
         props.tokenLogout();
       }}>
-        <LogoutOutlined style={{ fontSize: '20px', padding: 20 }}/>
+        <Tooltip title={'Logout'} >
+          <LogoutOutlined style={{ fontSize: '20px', padding: 20 }}/>
+        </Tooltip>
       </Menu.Item>
     )
   }
@@ -49,9 +143,36 @@ function AppHeader(props) {
       <Header className="app-header">
         <div className="container">
           <Row className="app-title" align="middle">
-            <Col>
-              <ResourceAutocomplete onSearch={onSearch} style={{ width: '22vw', marginLeft: 5, lineHeight: '31px' }}/>
-            </Col>
+            {(!_.isEmpty(window.api.dashConfigs.current) &&
+              window.api.dashConfigs.current.spec.header &&
+              window.api.dashConfigs.current.spec.header.alternativeLogo) ? (
+              <Col>
+                <Link to={'/'}>
+                  <img src={window.api.dashConfigs.current.spec.header.alternativeLogo}
+                       style={{margin: '8px 16px 16px 0px', filter: 'drop-shadow(0px 0px 2px black)', height: 40}}
+                       alt="image"
+                  />
+                </Link>
+              </Col>
+            ) : null}
+            {(!_.isEmpty(window.api.dashConfigs.current) &&
+              window.api.dashConfigs.current.spec.header &&
+              window.api.dashConfigs.current.spec.header.alternativeTitle) ? (
+              <Col>
+                <Link to={'/'}>
+                  <div style={{margin: '8px 16px 16px 0px'}}>
+                    <Typography.Title level={2} style={{fontWeight: 'bold'}}>{window.api.dashConfigs.current.spec.header.alternativeTitle}</Typography.Title>
+                  </div>
+                </Link>
+              </Col>
+            ) : null}
+            {(!_.isEmpty(window.api.dashConfigs.current) &&
+              window.api.dashConfigs.current.spec.header &&
+              window.api.dashConfigs.current.spec.header.resourceSearch) ? (
+              <Col>
+                <ResourceAutocomplete onSearch={onSearch} style={{ width: '22vw', marginLeft: 5, lineHeight: '31px' }}/>
+              </Col>
+            ) : null}
           </Row>
         </div>
       </Header>

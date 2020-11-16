@@ -6,6 +6,7 @@ import 'ace-builds/webpack-resolver';
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/theme-dawn';
+import 'ace-builds/src-noconflict/theme-monokai';
 
 export default function Editor(props){
   const initValue = {metadata: {name: ''}};
@@ -74,7 +75,7 @@ export default function Editor(props){
       >
         <AceEditor
           mode={currentTab === 'YAML' ? 'yaml' : 'json'}
-          theme="dawn"
+          theme={localStorage.getItem("theme") !== 'light' ? 'monokai' : 'dawn'}
           fontSize={16}
           value={currentTab === 'YAML' ? valueYAML : value}
           readOnly={!props.onClick}

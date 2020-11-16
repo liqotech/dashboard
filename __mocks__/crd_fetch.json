@@ -1374,6 +1374,66 @@
                   "spec": {
                     "type": "object",
                     "properties": {
+                      "footer": {
+                        "type": "object",
+                        "properties": {
+                          "enabled": {
+                            "type": "boolean"
+                          },
+                          "footerDescription": {
+                            "type": "string"
+                          },
+                          "githubRef": {
+                            "type": "boolean"
+                          },
+                          "link": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "header": {
+                        "type": "object",
+                        "properties": {
+                          "alternativeLogo": {
+                            "type": "string"
+                          },
+                          "alternativeTitle": {
+                            "type": "string"
+                          },
+                          "menu": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "enabled": {
+                                  "type": "boolean"
+                                },
+                                "icon": {
+                                  "type": "string"
+                                },
+                                "itemDescription": {
+                                  "type": "string"
+                                },
+                                "link": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "namespaceSelector": {
+                            "type": "boolean"
+                          },
+                          "resourceSearch": {
+                            "type": "boolean"
+                          },
+                          "themeModifier": {
+                            "type": "boolean"
+                          },
+                          "themeSwitcher": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
                       "resources": {
                         "type": "array",
                         "items": {
@@ -1463,6 +1523,17 @@
                             "resourcePath": {
                               "type": "string"
                             }
+                          }
+                        }
+                      },
+                      "sidebar": {
+                        "type": "object",
+                        "properties": {
+                          "alternativeLogo": {
+                            "type": "string"
+                          },
+                          "enabled": {
+                            "type": "boolean"
                           }
                         }
                       }

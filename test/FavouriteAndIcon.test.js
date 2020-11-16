@@ -37,7 +37,7 @@ function mocks(errorPATCH, errorPUT){
   })
 }
 
-beforeEach(() => {
+beforeEach(() => { localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
