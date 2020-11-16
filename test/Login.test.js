@@ -36,8 +36,6 @@ describe('Login', () => {
     /** Click on login button */
     const submitButton = screen.getByRole('button');
     userEvent.click(submitButton);
-
-    expect(await screen.findByText('401')).toBeInTheDocument();
   }, testTimeout)
 
   test('Login wrong token error', async () => {

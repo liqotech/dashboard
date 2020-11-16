@@ -217,8 +217,6 @@ describe('CR', () => {
     expect(await screen.findByText('Are you sure?')).toBeInTheDocument();
     const yes = await screen.findByText('Yes');
     userEvent.click(yes);
-
-    expect(await screen.findByText(/401/i)).toBeInTheDocument();
   }, testTimeout)
 
 })

@@ -1,7 +1,7 @@
 import React from 'react';
 import './Login.css';
 import { Button, Form, Input, Typography } from 'antd';
-import ApiInterface from '../services/api/ApiInterface';
+import Utils from '../services/Utils';
 
 function Login(props){
 
@@ -10,12 +10,11 @@ function Login(props){
   }
 
   const validator = (rule, value) => {
-    let api = ApiInterface({id_token: value}, props)
-    return api.getNodes().then(() => {
-      return Promise.resolve();
-    }).catch(() => {
+    try{
+      Utils().parseJWT(value)
+    } catch {
       return Promise.reject('Token is not valid');
-    })
+    }
   }
 
   return (

@@ -96,7 +96,7 @@ describe('Column Customization', () => {
 
     let stars = await screen.findAllByLabelText('star');
 
-    userEvent.click(stars[2]);
+    userEvent.click(stars[1]);
 
     await act(async () => {
       await new Promise((r) => setTimeout(r, 1000));

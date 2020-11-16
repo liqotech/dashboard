@@ -3,11 +3,13 @@ import { Typography, Table } from 'antd';
 import { Link, withRouter, useLocation } from 'react-router-dom';
 import { getColumnSearchProps } from '../../services/TableUtils';
 import ListHeader from '../resourceList/ListHeader';
+import ErrorRedirect from '../../error-handles/ErrorRedirect';
 
 function APIGroupList() {
   /**
    * @param: loading: boolean
    */
+  const [error, setError] = useState();
   const [loading, setLoading] = useState(true);
   const [APIGroups, setAPIGroups] = useState([]);
 
@@ -23,7 +25,9 @@ function APIGroupList() {
         setAPIGroups(res.body.groups);
         setLoading(false);
       })
-      .catch(error => console.log(error));
+      .catch(error =>
+        setError(error)
+      );
   }
 
   const renderAPIGroups = (text, record, dataIndex) => {
@@ -66,6 +70,9 @@ function APIGroupList() {
       ...getColumnSearchProps('Preferred Version', renderAPIGroups)
     }
   ]
+
+  if(error)
+    return <ErrorRedirect match={{params: {statusCode: error}}} />
 
   return (
     <div>

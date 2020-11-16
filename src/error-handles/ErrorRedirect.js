@@ -2,13 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Result, Button } from 'antd';
 import './ErrorRedirect.css'
 import LogoutOutlined from '@ant-design/icons/lib/icons/LogoutOutlined';
+import {
+  useHistory
+} from 'react-router-dom';
 
 export default function ErrorRedirect(props) {
   const [description, setDescription] = useState('');
+  let history = useHistory();
 
   useEffect(() => {
     let desc = '';
-    switch(props.match.params.statusCode){
+    switch(props.match.params.statusCode.toString()){
       case '401':
         desc = 'Forbidden, not valid authentication credentials';
         break;
@@ -31,16 +35,14 @@ export default function ErrorRedirect(props) {
         title={props.match.params.statusCode}
         subTitle={description}
         extra={
-          props.match.params.statusCode !== '404' ? (
-              <Button className="go-back-btn"
-                      type="primary" size="large"
-                      icon={<LogoutOutlined />}
-                      onClick={() => {
-                        props.tokenLogout();
-                      }}>
-                Logout
-              </Button>
-            ) : null
+          <Button className="go-back-btn"
+                  type="primary" size="large"
+                  icon={<LogoutOutlined />}
+                  onClick={() => {
+                    props.tokenLogout ? props.tokenLogout() : history.goBack()
+                  }}>
+            {props.tokenLogout ? 'Logout' : 'Go Back'}
+          </Button>
         }
       />
     </div>

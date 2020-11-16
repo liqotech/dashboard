@@ -3,11 +3,13 @@ import { Typography, Table } from 'antd';
 import { Link, withRouter, useLocation } from 'react-router-dom';
 import { getColumnSearchProps } from '../../services/TableUtils';
 import ListHeader from '../resourceList/ListHeader';
+import ErrorRedirect from '../../error-handles/ErrorRedirect';
 
 function APIResourceList() {
   /**
    * @param: loading: boolean
    */
+  const [error, setError] = useState();
   const [loading, setLoading] = useState(true);
   const [APIResourceList, setAPIResourceList] = useState([]);
   const [kind, setKind] = useState('');
@@ -25,7 +27,7 @@ function APIResourceList() {
         setAPIResourceList(res.resources.filter(resource => resource.name.split('/').length === 1));
         setLoading(false);
       })
-      .catch(error => console.log(error));
+      .catch(error => setError(error));
   }
 
   const renderAPIResourceList = (text, record, dataIndex) => {
@@ -82,6 +84,9 @@ function APIResourceList() {
       ...getColumnSearchProps('Namespaced', renderAPIResourceList)
     },
   ]
+
+  if(error)
+    return <ErrorRedirect match={{params: {statusCode: error}}} />
 
   return (
     <div>
