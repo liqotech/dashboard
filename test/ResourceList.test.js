@@ -222,7 +222,7 @@ describe('Resource List', () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByText(/No Data/i)).not.toBeInTheDocument();
+    expect(await screen.findByText(/No Data/i)).toBeInTheDocument();
   }, testTimeout)
 
   test('APIv1 redirect works', async () => {

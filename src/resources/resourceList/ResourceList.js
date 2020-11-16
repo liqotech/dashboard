@@ -12,11 +12,13 @@ import { createNewConfig, getResourceConfig, updateResourceConfig } from '../com
 import FavouriteButton from '../common/buttons/FavouriteButton';
 import KubernetesSchemaAutocomplete from '../common/KubernetesSchemaAutocomplete';
 import { columnContentFunction } from './columnContentFunction';
+import ErrorRedirect from '../../error-handles/ErrorRedirect';
 
 function ResourceList(props) {
   /**
    * @param: loading: boolean
    */
+  const [error, setError] = useState();
   const [editColumn, setEditColumn] = useState('');
   const [loading, setLoading] = useState(true);
   const [resource, setResource] = useState({});
@@ -295,7 +297,8 @@ function ResourceList(props) {
         setLoading(false);
       })
       .catch(error => {
-        history.push('/error/' + error);
+        if(typeof error !== 'object')
+          setError(error);
       });
   }
 
@@ -363,6 +366,7 @@ function ResourceList(props) {
           key: 'NewColumn',
           title:
             <KubernetesSchemaAutocomplete kind={kind}
+                                          params={params}
                                           CRD={onCustomResource}
                                           updateFunc={updateDashConfig}
                                           cancelFunc={() => addColumnHeader(false)}
@@ -380,6 +384,9 @@ function ResourceList(props) {
       })
     }
   }
+
+  if(error)
+    return <ErrorRedirect match={{params: {statusCode: error}}} />
 
   return (
     <div>

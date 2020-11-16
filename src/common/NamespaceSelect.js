@@ -1,6 +1,7 @@
 import { SelectOutlined } from '@ant-design/icons';
 import  { Col, Row, Select } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
+import Utils from '../services/Utils';
 
 export default function NamespaceSelect(){
   const [selectedNS, setSelectedNS] = useState('');
@@ -8,6 +9,14 @@ export default function NamespaceSelect(){
   const NSs = useRef([]);
 
   useEffect(() => {
+    if(Utils().parseJWT() && Utils().parseJWT().namespace){
+      const ns = Utils().parseJWT().namespace[0];
+      NSOptions.current.push(
+        <Select.Option key={ns} value={ns} children={ns}/>
+      )
+      setSelectedNS(ns);
+    }
+
     window.api.getNamespaces().then(res => {
       NSs.current = res.body.items;
 

@@ -80,6 +80,6 @@ describe('ListHeader', () => {
       await new Promise((r) => setTimeout(r, 1000));
     })
 
-    expect(await screen.queryByRole('row')).not.toBeInTheDocument();
+    expect(await screen.findByText(/no data/i)).toBeInTheDocument();
   }, testTimeout)
 })

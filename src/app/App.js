@@ -38,6 +38,7 @@ function App(props) {
   const initialPath = useRef(window.location.pathname);
   const [api, setApi] = useState(ApiInterface({id_token: ''}, props));
   const authManager = useRef(Authenticator());
+  const [, setConfig] = useState(null);
 
   useEffect(() => {
     /** set global configuration for notifications and messages*/
@@ -95,17 +96,23 @@ function App(props) {
     if(api.user.current.id_token !== '') return;
     let user = { id_token: token };
     let _api = ApiInterface(user, props);
-    Utils().parseJWT(token);
+    if(!Utils().parseJWT(token)) {
+      tokenLogout();
+    }
+    _api.loadDashboardCRs('DashboardConfig');
+    _api.loadDashboardCRs('View');
+    window.api = _api;
+    window.api.DCArrayCallback.current.push(() => setConfig(window.api.dashConfigs.current));
+    setApi(_api);
+    message.success('Successfully logged in');
+    Cookies.set('token', token, {secure: true, sameSite: 'strict' })
+
     /** Get the CRDs at the start of the app */
-    _api.getCRDs().
-    then(() => {
-      _api.loadDashboardCRs('DashboardConfig');
-      _api.loadDashboardCRs('View');
-      window.api = _api;
-      setApi(_api);
-      message.success('Successfully logged in');
-      Cookies.set('token', token, {secure: true, sameSite: 'strict' })
-    }).catch((error) => {console.log(error)});
+    _api.getCRDs()
+      .catch((error) => {
+      console.log(error)
+    });
+
   }
 
   const manageOIDCSession = () => {
@@ -128,7 +135,7 @@ function App(props) {
     <Route key={'login'}
            exact path="/login"
            render={(props) => {
-             return (window.OIDC_PROVIDER_URL && !Cookies.get('token')  ?
+             return (window.OIDC_PROVIDER_URL && !Cookies.get('token') ?
                <CallBackHandler func={authManager.current.login} /> :
                <Login {...props} func={manageToken} />)}
            }
@@ -136,7 +143,7 @@ function App(props) {
     <Route key={'callback'}
            path="/callback"
            render={() => {
-             return (window.OIDC_PROVIDER_URL && !Cookies.get('token')  ?
+             return (window.OIDC_PROVIDER_URL && !Cookies.get('token') ?
                <CallBackHandler func={authManager.current.completeLogin} /> :
                <Redirect to="/" />)}
            }
@@ -237,7 +244,7 @@ function App(props) {
   } else {
     routes.push(
       <Route key={'other'}
-             render={() => window.OIDC_PROVIDER_URL && !Cookies.get('token')  ?
+             render={() => window.OIDC_PROVIDER_URL && !Cookies.get('token') ?
                <Redirect to={'/login'} /> :
                <LoadingIndicator />}
       />
@@ -245,7 +252,7 @@ function App(props) {
   }
 
   return (
-    <Layout>
+    <Layout style={{ height: '100vh' }}>
       {api.user.current.id_token !== '' ? (
         <SideBar />
       ) : null}

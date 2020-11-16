@@ -1,4 +1,4 @@
-import { TEMPLATE_GROUP } from '../../constants';
+import { CustomViewCRD, DashboardConfigCRD, TEMPLATE_GROUP } from '../../constants';
 import { message } from 'antd';
 import ApiManager from './ApiManager';
 import { resourceNotifyEvent } from '../../resources/common/ResourceUtils';
@@ -10,7 +10,7 @@ import { resourceNotifyEvent } from '../../resources/common/ResourceUtils';
 
 export default function ApiInterface(_user, props) {
 
-  const CRDs = {current: []};
+  const CRDs = {current: [DashboardConfigCRD, CustomViewCRD]};
   const customViews = {current: []};
   const dashConfigs = {current: {}};
   const namespace = {current: null};
@@ -49,12 +49,11 @@ export default function ApiInterface(_user, props) {
   /** Handle errors: if 401 or 403 log out */
   const handleError = (error) => {
     if(!error)
-      props.history.push('/error/general');
-    else if(error.response && (error.response._fetchResponse.status === 401 ||
-      error.response._fetchResponse.status === 403))
-      props.history.push("/error/" + error.response._fetchResponse.status);
+      return Promise.reject(error);
+    else if(error.response && error.response._fetchResponse.status)
+      return Promise.reject(error.response._fetchResponse.status);
     else if(error === 401 || error === 403)
-      props.history.push("/error/" + error);
+      return Promise.reject(error);
     return Promise.reject(error.response ? error.response._fetchResponse.status : error);
   }
 
@@ -415,19 +414,19 @@ export default function ApiInterface(_user, props) {
           customViews.current = customViews.current.filter(item => {return item.metadata.name !== CV.metadata.name});
           customViews.current.push(object);
           customViews.current.sort((a, b) => a.metadata.name.localeCompare(b.metadata.name));
-          message.success('CR ' + object.metadata.name + ' modified');
+          message.success('View ' + object.metadata.name + ' modified');
           manageCallbackCVs();
         }
       } else {
         customViews.current.push(object);
         customViews.current.sort((a, b) => a.metadata.name.localeCompare(b.metadata.name));
-        message.success('CR ' + object.metadata.name + ' added');
+        message.success('View ' + object.metadata.name + ' added');
         manageCallbackCVs();
       }
     } else if (type === 'DELETED') {
       if(CV) {
         customViews.current = customViews.current.filter(item => {return item.metadata.name !== CV.metadata.name});
-        message.success('CR ' + object.metadata.name + ' deleted');
+        message.success('View ' + object.metadata.name + ' deleted');
         manageCallbackCVs();
       }
     }
