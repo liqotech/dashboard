@@ -60,6 +60,7 @@ async function addImage(){
 }
 
 beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 

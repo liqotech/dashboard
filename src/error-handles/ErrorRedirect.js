@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Result, Button } from 'antd';
+import { Result, Button, Card } from 'antd';
 import './ErrorRedirect.css'
 import LogoutOutlined from '@ant-design/icons/lib/icons/LogoutOutlined';
 import {
@@ -29,7 +29,7 @@ export default function ErrorRedirect(props) {
   }, []);
 
   return(
-    <div className="error-red">
+    <Card>
       <Result
         status="error"
         title={props.match.params.statusCode}
@@ -45,6 +45,6 @@ export default function ErrorRedirect(props) {
           </Button>
         }
       />
-    </div>
+    </Card>
   )
 }

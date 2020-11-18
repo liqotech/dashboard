@@ -5,8 +5,13 @@ import fetchMock from 'jest-fetch-mock';
 import { loginTest, mockCRDAndViewsExtended } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import { testTimeout } from '../src/constants';
+import Cookies from 'js-cookie';
 
 fetchMock.enableMocks();
+
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
+});
 
 describe('Header', () => {
 

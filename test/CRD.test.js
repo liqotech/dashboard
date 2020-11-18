@@ -97,7 +97,7 @@ function mocks(req, error, template, noview) {
   }
 }
 
-beforeEach(() => {
+beforeEach(() => { localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
@@ -153,7 +153,7 @@ describe('CRD', () => {
     await setup('/customresources/advertisements.protocol.liqo.io');
 
     await alwaysPresent('Advertisement', 'No description for this CRD');
-    expect(screen.queryByRole('switch')).not.toBeInTheDocument();
+    expect(await screen.findAllByRole('switch')).toHaveLength(1);
 
   }, testTimeout)
 
@@ -165,7 +165,7 @@ describe('CRD', () => {
     await setup('/customresources/liqodashtests.dashboard.liqo.io');
     /** This CRD contains a custom template and a description, so there has to be a switch and not the default description*/
     await alwaysPresent('LiqoDashTest','A test CRD for some implemetation on the liqo-dashboard');
-    expect(screen.queryByRole('switch')).toBeInTheDocument();
+    expect(await screen.findAllByRole('switch')).toHaveLength(2);
   }, testTimeout)
 
   test('CRD watch unexpectedly aborted', async () => {
@@ -341,20 +341,20 @@ describe('CRD', () => {
     await screen.findByText('LiqoDashTest');
 
     /** This CRD contains a custom template and a description, so there has to be a switch and not the default description*/
-    const switcher = await screen.findByRole('switch');
-    expect(switcher).toBeInTheDocument();
+    const switcher = await screen.findAllByRole('switch');
+    expect(switcher[1]).toBeInTheDocument();
 
     userEvent.click(screen.getByText('test-1'));
     expect(await screen.findByLabelText('piechart')).toBeInTheDocument();
 
-    userEvent.click(switcher);
+    userEvent.click(switcher[1]);
     userEvent.click(screen.getByText('Spec'));
     expect(await screen.findByLabelText('form_spec'));
 
     userEvent.click(screen.getByText('Status'));
     expect(await screen.findByLabelText('form_status'));
 
-    userEvent.click(switcher);
+    userEvent.click(switcher[1]);
     userEvent.click(screen.getByText('test-1'));
     expect(await screen.findByLabelText('piechart')).toBeInTheDocument();
   }, testTimeout)
@@ -381,9 +381,9 @@ describe('CRD', () => {
     await screen.findByText('LiqoDashTest');
 
     /** This CRD contains a custom template and a description, so there has to be a switch and not the default description*/
-    const switcher = await screen.findByRole('switch');
-    expect(switcher).toBeInTheDocument();
-    userEvent.click(switcher);
+    const switcher = await screen.findAllByRole('switch');
+    expect(switcher[1]).toBeInTheDocument();
+    userEvent.click(switcher[1]);
 
     userEvent.click(screen.getByText('test-1'));
 

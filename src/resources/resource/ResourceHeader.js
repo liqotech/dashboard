@@ -14,6 +14,7 @@ import {
 import ResourceBreadcrumb from '../common/ResourceBreadcrumb';
 import FavouriteButton from '../common/buttons/FavouriteButton';
 import UpdateCR from '../../editors/CRD/UpdateCR';
+import CustomViewButton from '../common/buttons/CustomViewButton';
 
 function ResourceHeader(props) {
   const [isPinned, setIsPinned] = useState(false);
@@ -50,7 +51,7 @@ function ResourceHeader(props) {
 
   return (
     <Alert.ErrorBoundary>
-      <div style={{width: '100%', backgroundColor: '#f0f2f5', paddingBottom: 16, paddingTop: 20}}>
+      <div style={{width: '100%', paddingBottom: 16, paddingTop: 20}}>
         <Row align={'bottom'}>
           <Col span={20}>
             <Row align={'bottom'}>

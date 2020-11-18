@@ -33,7 +33,7 @@ async function setup() {
   expect(screen.getAllByRole('row')).toHaveLength(10);
 }
 
-beforeEach(() => {
+beforeEach(() => { localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 

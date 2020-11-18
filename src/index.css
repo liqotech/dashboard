@@ -1,7 +1,6 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
 }
 
 .container {
@@ -12,8 +11,7 @@ body {
   padding-right: 15px;
 }
 
-@media (max-width: 768px) {
-  h1 {
-    font-size: 1.7em;
-  }
+.vsc-initialized {
+  background: #f0f2f5;
 }
+

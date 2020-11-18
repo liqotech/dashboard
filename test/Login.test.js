@@ -13,7 +13,7 @@ import App from '../src/app/App';
 
 fetchMock.enableMocks();
 
-beforeEach(() => {
+beforeEach(() => { localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 

@@ -43,7 +43,6 @@ export function customFieldTemplateGeneral(props){
           <Collapse defaultActiveKey={id === 'root' ? ('collapse_' + id) : null}>
             <Collapse.Panel
               key={'collapse_' + id}
-              style={{ borderBottomColor: '#f0f0f0' }}
               header={ <div>
                 {label ? <Typography.Text strong>
                   {splitCamelCaseAndUp(label)}
@@ -68,7 +67,6 @@ export function customFieldTemplateGeneral(props){
         <Collapse defaultActiveKey={id === 'root' ? ('collapse_' + id) : null}>
           <Collapse.Panel
             key={'collapse_' + id}
-            style={{ borderBottomColor: '#f0f0f0' }}
             header={ <div>
               {label ? <Typography.Text strong>
                 {splitCamelCaseAndUp(label)}

@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import React from 'react';
 import _ from 'lodash';
 import { useParams, useLocation } from 'react-router-dom';
-import { CheckCircleTwoTone, ExclamationCircleTwoTone } from '@ant-design/icons';
+import {
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 
 export const renderResourceList = (text, record, dataIndex, resourceList) => {
   let params = useParams();
@@ -23,10 +26,10 @@ export const renderResourceList = (text, record, dataIndex, resourceList) => {
       text.forEach(item => {
         if (typeof item === "boolean"){
           items.push(
-            item ? <CheckCircleTwoTone key={'array_' + record.Name + '_' + item + '_' + counter}
-                                       twoToneColor="#52c41a"
-            /> : <ExclamationCircleTwoTone key={'array_' + record.Name + '_' + item + '_' + counter}
-                                           twoToneColor="#f5222d"
+            item ? <CheckCircleOutlined key={'array_' + record.Name + '_' + item + '_' + counter}
+                                        style={{color: "#52c41a"}}
+            /> : <ExclamationCircleOutlined key={'array_' + record.Name + '_' + item + '_' + counter}
+                                           style={{color: '#ff4d4f'}}
             />
           );
         }
@@ -44,8 +47,8 @@ export const renderResourceList = (text, record, dataIndex, resourceList) => {
     )
   } else if(typeof text === "boolean"){
     return (
-      text ? <CheckCircleTwoTone twoToneColor="#52c41a" /> :
-        <ExclamationCircleTwoTone twoToneColor="#f5222d" />
+      text ? <CheckCircleOutlined style={{color: "#52c41a"}} /> :
+        <ExclamationCircleOutlined style={{color: '#ff4d4f'}} />
     )
   } else if(typeof text === 'object'){
     if(_.isEmpty(text))

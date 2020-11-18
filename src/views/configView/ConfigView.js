@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Badge, Button, Layout, message, Space, Tabs, Typography } from 'antd';
+import { Alert, Badge, Button, Card, Layout, message, Space, Tabs, Typography } from 'antd';
 import { withTheme } from '@rjsf/core';
 import { Theme as AntDTheme } from '@rjsf/antd';
 import Utils from '../../services/Utils';
@@ -93,46 +93,46 @@ function ConfigView() {
   }
 
   return(
-    <div className="crds-container" style={{maxWidth: '60%'}}>
-      <div className={'crd-content'}>
-        <Layout style={{background: '#fff'}}>
+    <Card>
+      <div style={{marginBottom: 20}}>
+        <div>
           <Space align="center">
             <Badge color='#1890FF' />
             <Typography.Title level={2} style={{marginTop: 15}}>
               Liqo configuration
             </Typography.Title>
           </Space>
+        </div>
+        <div>
           <Typography.Text type="secondary" style={{marginBottom: 20, marginLeft: 25}}>
             Choose the best configuration for your system
           </Typography.Text>
-        </Layout>
-        <Layout style={{background: '#fff'}}>
-          <Layout.Content>
-            { !loading ? (
-              CRD ? (
-                prevConfig ? (
-                  <Tabs onChange={(key) => {currentConfig.current = key}}>
-                    {configs}
-                  </Tabs>
-                ) : (
-                  <Alert
-                    message="Error"
-                    description="No configuration file has been found."
-                    type="error"
-                    showIcon
-                  />)
-              ) : (
-                <Alert
-                  message="Error"
-                  description="No configuration CRD has been found."
-                  type="error"
-                  showIcon
-                />)
-            ) : <LoadingIndicator/>}
-          </Layout.Content>
-        </Layout>
+        </div>
       </div>
-    </div>
+      <div>
+        { !loading ? (
+          CRD ? (
+            prevConfig ? (
+              <Tabs onChange={(key) => {currentConfig.current = key}}>
+                {configs}
+              </Tabs>
+            ) : (
+              <Alert
+                message="Error"
+                description="No configuration file has been found."
+                type="error"
+                showIcon
+              />)
+          ) : (
+            <Alert
+              message="Error"
+              description="No configuration CRD has been found."
+              type="error"
+              showIcon
+            />)
+        ) : <LoadingIndicator/>}
+      </div>
+    </Card>
   );
 }
 

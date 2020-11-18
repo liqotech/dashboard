@@ -47,7 +47,9 @@ async function check_new_CR(){
 
   expect(test).toBeInTheDocument();
 
-  userEvent.click(screen.getByRole('switch'));
+  const switcher = await screen.findAllByRole('switch');
+
+  userEvent.click(switcher[1]);
 
   userEvent.click(test);
 
@@ -67,7 +69,7 @@ async function check_new_CR(){
   expect(textboxes[3]).toHaveAttribute('value', 'orange');
 }
 
-beforeEach(() => {
+beforeEach(() => { localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 

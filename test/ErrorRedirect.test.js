@@ -44,7 +44,7 @@ async function setup(error) {
   userEvent.click(await screen.findByText('liqodashtests.dashboard.liqo.io'));
 }
 
-beforeEach(() => {
+beforeEach(() => { localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 

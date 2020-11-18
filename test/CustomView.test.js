@@ -92,6 +92,7 @@ describe('CustomView', () => {
   }, testTimeout)
 
   test('Pinned card works', async () => {
+    localStorage.setItem('theme', 'dark');
     await setup_cv(ViewMockResponse);
     const pin = await screen.findAllByLabelText('pushpin');
 

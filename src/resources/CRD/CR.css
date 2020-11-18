@@ -15,24 +15,15 @@
     width: 60%;
 }
 
-.ant-collapse-content{
-    border-top-color: #f0f0f0;
-}
-
-.ant-collapse{
-    border-color: #f0f0f0;
-}
-
 .ant-collapse .ant-collapse-item .ant-collapse-header {
-    position: relative;
-    padding: 8px 16px 8px 40px;
-    color: rgba(0, 0, 0, 0.85);
-    line-height: 1.5715;
-    cursor: pointer;
-    -webkit-transition: all 0.3s;
-    transition: all 0.3s;
+    position: relative !important;
+    padding: 8px 16px 8px 40px !important;
+    line-height: 1.5715 !important;
+    cursor: pointer !important;
+    -webkit-transition: all 0.3s !important;
+    transition: all 0.3s !important;
 }
 
 .ant-collapse-content .ant-collapse-content-box {
-    padding: 8px 12px;
+    padding: 8px 12px !important;
 }

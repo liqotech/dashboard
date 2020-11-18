@@ -207,6 +207,7 @@ describe('CR', () => {
   }, testTimeout)
 
   test('CR deletion error catch works', async () => {
+    localStorage.setItem('theme', 'dark');
     await setup_resource('401', 'DELETE', 'liqodashtests');
 
     const del = await screen.findAllByLabelText('delete');

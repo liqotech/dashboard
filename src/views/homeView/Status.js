@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Badge, Col, Collapse, Divider, PageHeader, Row, Space, Typography, Tooltip } from 'antd';
+import { Badge, Col, Collapse, Divider, PageHeader, Row, Space, Typography, Tooltip, Card } from 'antd';
 import QuestionCircleOutlined from '@ant-design/icons/lib/icons/QuestionCircleOutlined';
 import { addZero, convertCPU, convertRAM } from './HomeUtils';
 import LineChart from '../../widgets/line/LineChart';
 import Donut from '../../widgets/donut/Donut';
-import ExclamationCircleTwoTone from '@ant-design/icons/lib/icons/ExclamationCircleTwoTone';
 import DraggableWrapper from '../../common/DraggableWrapper';
+import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 
 function Status(props){
 
@@ -295,8 +295,8 @@ function Status(props){
   )
 
   return(
-    <div className="home-header">
-      <div style={{position: 'fixed', zIndex: 10, width: '100%', backgroundColor: 'white'}}>
+    <Card bodyStyle={{height: '100%', padding: 0}} style={{overflowY: 'auto', height: '100%', overflowX: 'hidden'}}>
+      <div style={{position: 'fixed', zIndex: 10, width: '100%'}}>
         <DraggableWrapper>
           <PageHeader style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}
                       title={
@@ -309,11 +309,10 @@ function Status(props){
         <Divider style={{marginTop: 0, marginBottom: 4}}/>
       </div>
       <div style={{paddingTop: '7vh', paddingBottom: 4, paddingLeft: 16, paddingRight: 16}} >
-        <Collapse defaultActiveKey={['1']} className={'crd-collapse'} style={{backgroundColor: '#fafafa'}}>
-          <Collapse.Panel style={{ borderBottomColor: '#f0f0f0' }}
-                          header={<span>Home  {metricsNotAvailableIncoming.current ? (
+        <Collapse defaultActiveKey={['1']} className={'crd-collapse'}>
+          <Collapse.Panel header={<span>Home  {metricsNotAvailableIncoming.current ? (
                             <Tooltip title={'Precise metrics not available in your cluster'}>
-                            <ExclamationCircleTwoTone twoToneColor="#f5222d" />
+                              <ExclamationCircleOutlined style={{color: '#ff4d4f'}} />
                             </Tooltip>) : null}</span>} key="1"
                           extra={
                             <Tooltip title={'Consumption on your cluster'}
@@ -327,11 +326,10 @@ function Status(props){
           </Collapse.Panel>
         </Collapse>
         {props.config ? (
-          <Collapse defaultActiveKey={['1']} className={'crd-collapse'} style={{backgroundColor: '#fafafa', marginTop: 16}}>
-            <Collapse.Panel style={{ borderBottomColor: '#f0f0f0' }}
-                            header={<span>Foreign (Total)  {metricsNotAvailableOutgoing.current ? (
+          <Collapse defaultActiveKey={['1']} className={'crd-collapse'} style={{marginTop: 16}}>
+            <Collapse.Panel header={<span>Foreign (Total)  {metricsNotAvailableOutgoing.current ? (
                               <Tooltip title={'Precise metrics not available in some of the foreign clusters'}>
-                                <ExclamationCircleTwoTone twoToneColor="#f5222d" />
+                                <ExclamationCircleOutlined style={{color: '#ff4d4f'}} />
                               </Tooltip>) : null}</span>} key="1"
                             extra={
                               <Tooltip title={'Consumption on others\' cluster'}
@@ -346,7 +344,7 @@ function Status(props){
           </Collapse>
         ) : null}
       </div>
-    </div>
+    </Card>
   )
 }
 

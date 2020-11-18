@@ -9,5 +9,5 @@ export default function CustomIcon(props){
     return <Component {...rest} />;
   }
 
-  return <Icon type={props.icon ? props.icon : 'ApiOutlined'} style={{fontSize: props.size}} />
+  return <Icon type={props.icon ? props.icon : 'ApiOutlined'} style={{fontSize: props.size}} {...props} />
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Button, Divider, Modal, message, PageHeader, Tabs, Tooltip, Typography } from 'antd';
+import { Alert, Button, Divider, Modal, message, PageHeader, Tabs, Tooltip, Typography, Card } from 'antd';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
 import FormGenerator from '../../editors/OAPIV3FormGenerator/FormGenerator';
 import AvailablePeer from './AvailablePeer';
@@ -70,7 +70,7 @@ function ListAvailable(props) {
 
   const availablePeersCard = (
     <div>
-      <div style={{position: 'fixed', zIndex: 10, width: '100%', backgroundColor: 'white'}}>
+      <div style={{position: 'fixed', zIndex: 10, width: '100%'}}>
         <DraggableWrapper>
           <PageHeader style={{paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 16}}
                       title={
@@ -112,7 +112,7 @@ function ListAvailable(props) {
   )
 
   return (
-    <div className="home-header">
+    <Card bodyStyle={{height: '100%', padding: 0}} style={{overflowY: 'auto', height: '100%', overflowX: 'hidden'}}>
       {availablePeersCard}
       <div>
         { /** This modal let the user add a peer by creating a new foreign cluster or search domain */ }
@@ -134,7 +134,7 @@ function ListAvailable(props) {
           </Tabs>
         </Modal>
       </div>
-    </div>
+    </Card>
   )
 }
 

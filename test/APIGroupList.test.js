@@ -30,6 +30,7 @@ import APIResourceList from '../src/resources/APIResourceList/APIResourceList';
 fetchMock.enableMocks();
 
 beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
@@ -68,7 +69,6 @@ function mocks(errorApis, errorApi){
         return Promise.resolve(new Response(JSON.stringify(ApiV1MockResponse)));
     } else if (url === 'http://localhost:3001/apis/') {
       if(errorApis) {
-        console.log('ayaya')
         return Promise.reject(Error401.body);
       }
       else

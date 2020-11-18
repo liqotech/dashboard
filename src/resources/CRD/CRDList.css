@@ -10,10 +10,10 @@
 }
 
 .ant-table-filter-trigger-container {
-    width: 3em;
-    right: unset;
+    width: 3em !important;;
+    right: unset !important;;
 }
 
 .ant-table-filter-trigger {
-    width: 3.5em;
+    width: 3.5em !important;;
 }

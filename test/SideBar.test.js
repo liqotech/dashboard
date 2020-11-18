@@ -9,7 +9,7 @@ import Cookies from 'js-cookie';
 
 fetchMock.enableMocks();
 
-beforeEach(() => {
+beforeEach(() => { localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
@@ -47,7 +47,7 @@ describe('Sidebar', () => {
 
     expect(await screen.findByText(/custom resources/i)).toBeInTheDocument();
 
-    expect(await screen.findByText(/favourites/i)).toBeInTheDocument();
+    //expect(await screen.findByText(/favourites/i)).toBeInTheDocument();
 
     expect(await screen.findByText(/settings/i)).toBeInTheDocument();
 

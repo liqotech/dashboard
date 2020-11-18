@@ -91,7 +91,7 @@ async function setup_graphs() {
   });
 }
 
-beforeEach(() => {
+beforeEach(() => { localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 

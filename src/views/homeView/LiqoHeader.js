@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Button, Input, PageHeader, Select, Space, Tag, Tooltip, Typography } from 'antd';
+import { Row, Button, Input, PageHeader, Select, Space, Tag, Tooltip, Typography, Card } from 'antd';
 import AuditOutlined from '@ant-design/icons/lib/icons/AuditOutlined';
 import SettingOutlined from '@ant-design/icons/lib/icons/SettingOutlined';
 import { Link } from 'react-router-dom';
@@ -54,7 +54,7 @@ function LiqoHeader(props) {
   )
 
   return (
-    <div className="home-header" style={{marginBottom: 16, height: '100%'}}>
+    <Card bodyStyle={{padding: 0}} style={{marginBottom: 20}}>
       <PageHeader style={{paddingTop: '0.5em', paddingBottom: '0.5em'}}
                   title={
                     <div>
@@ -114,7 +114,7 @@ function LiqoHeader(props) {
                     ) : null
                   }
       />
-    </div>
+    </Card>
   )
 }
 

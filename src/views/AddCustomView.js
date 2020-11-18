@@ -1,7 +1,6 @@
 import { Alert, Modal, Select, Input, Typography, Row, Col, Badge, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import PlusSquareOutlined from '@ant-design/icons/lib/icons/PlusSquareOutlined';
-import PlusSquareTwoTone from '@ant-design/icons/lib/icons/PlusSquareTwoTone';
 import { dashLowercase } from '../services/stringUtils';
 import { APP_NAME } from '../constants';
 
@@ -73,12 +72,12 @@ function AddCustomView(props){
       <div onClick={() => setShowAddCV(true)}>
         {props.selected ? (
           <Row align={'middle'}>
-            <PlusSquareTwoTone style={{ fontSize: '20px', marginRight: '8px' }} />
+            <PlusSquareOutlined style={{ fontSize: '20px', marginRight: '8px', color: '#1890ff' }} />
             <a>New Custom View</a>
           </Row>
         ) : (
           <div>
-            <PlusSquareOutlined style={{ fontSize: '20px' }} />
+            <PlusSquareOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
             <span>New Custom View</span>
           </div>
         )}

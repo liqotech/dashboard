@@ -455,16 +455,7 @@ function ConnectedPeer(props) {
 
   return(
     <div style={{ paddingTop: '1em', paddingBottom: '1em' }}>
-      <Collapse accordion bordered={false}
-                style={{backgroundColor: backgroundColor}}
-                onChange={(collapsed) => {
-                  if(collapsed){
-                    setBackgroundColor('#e6f7ff');
-                  } else {
-                    setBackgroundColor('white');
-                  }
-                }}
-      >
+      <Collapse accordion bordered={false}>
         <Collapse.Panel header={
           <>
             <Space size={'middle'}>
