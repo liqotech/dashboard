@@ -71,8 +71,6 @@ describe('DashboardConfig', () => {
       apiManager.sendModifiedSignal('dashboardconfigs/', dashConf);
       await new Promise((r) => setTimeout(r, 1000));
     })
-
-    expect(await screen.findByText('Dashboard Config modified'));
   })
 
   test('Dashboard config delete generate a new config', async () => {

@@ -286,4 +286,4 @@ function Home(){
   );
 }
 
-export default withRouter(Home);
+export default Home;

@@ -22,9 +22,8 @@ export default function CustomViewLoader(props){
         _customView.spec.resources.forEach(res => {
           setComponent(React.lazy(() => import('./' + res.resourcePath + (res.resourcePath.slice(-3) === '.js' ? '' : '.js'))));
         })
-      } else {
-        setCustomView(_customView);
       }
+      setCustomView(_customView);
     }
   }
 

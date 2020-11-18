@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import { generalMocks, setToken } from './RTLUtils';
@@ -25,13 +26,32 @@ async function setup() {
 }
 
 beforeEach(() => { localStorage.setItem('theme', 'dark');
+  if(window.api && !_.isEmpty(window.api.dashConfigs.current)) {
+    window.api.dashConfigs.current = {};
+  }
   Cookies.remove('token');
 });
 
 function mocks(error){
   fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/clustercustomobject/dashboardconfigs') {
-      return Promise.resolve(new Response(JSON.stringify({body: DashboardConfig})));
+      let dashconf = JSON.parse(JSON.stringify(DashboardConfig));
+      if(window.api && !_.isEmpty(window.api.dashConfigs.current)) {
+        window.api.dashConfigs.current.metadata.resourceVersion++;
+        if(window.api.dashConfigs.current.spec.resources){
+          window.api.dashConfigs.current.spec.resources.forEach(item => {
+            if(item.render && item.render.columns){
+              item.render.columns = item.render.columns.filter(col => col !== null);
+            }
+            if(item.render && item.render.tabs){
+              item.render.tabs = item.render.tabs.filter(tab => tab !== null);
+            }
+            return item;
+          })
+        }
+        dashconf.items = [window.api.dashConfigs.current];
+      }
+      return Promise.resolve(new Response(JSON.stringify({body: dashconf})));
     }
     else if(generalMocks(req.url))
       return generalMocks(req.url);

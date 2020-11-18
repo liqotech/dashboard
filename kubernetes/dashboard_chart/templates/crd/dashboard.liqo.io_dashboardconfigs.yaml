@@ -36,6 +36,28 @@ spec:
             spec:
               type: object
               properties:
+                default:
+                  type: boolean
+                enabled:
+                  type: boolean
+                plugin:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      URL:
+                        type: string
+                      enabled:
+                        type: boolean
+                      path:
+                        type: string  
+                role:
+                  type: object
+                  properties:
+                    roleName:
+                      type: string
+                    roleType:
+                      type: string
                 footer:
                   type: object
                   properties:

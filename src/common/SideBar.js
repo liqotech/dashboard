@@ -32,9 +32,10 @@ function SideBar() {
   }
 
   const getFavouriteResources = () => {
-    setFavouriteResource(window.api.dashConfigs.current.spec.resources.filter(resource => {
-      return resource.favourite;
-    }));
+    if(window.api.dashConfigs.current.spec && window.api.dashConfigs.current.spec.resources)
+      setFavouriteResource(window.api.dashConfigs.current.spec.resources.filter(resource => {
+        return resource.favourite;
+      }));
   }
 
   const getCustomViews = () => {
@@ -197,10 +198,10 @@ function SideBar() {
                           collapsed ? <StarOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
                           <Typography.Text type={'secondary'}>Favourites</Typography.Text>
                         }
-          >
-            {fav}
-          </Menu.SubMenu>
-          <Menu.Divider/>
+            >
+              {fav}
+            </Menu.SubMenu>
+            <Menu.Divider/>
             <Menu.Item key="settings" style={{ marginTop: 0, marginBottom: 0}}
                        icon={<SettingOutlined style={{ fontSize: '20px' }} />}
             >

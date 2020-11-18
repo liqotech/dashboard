@@ -11,6 +11,15 @@
         "selfLink":"/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/liqodash-config"
       },
       "spec":{
+        "default": true,
+        "enabled": true,
+        "plugin": [
+          {
+            "URL": "/liqo",
+            "enabled": true,
+            "path": "liqo/Home"
+          }
+        ],
         "footer": {
           "enabled": true,
           "footerDescription": "This software has been proudly developed at Politecnico di Torino",

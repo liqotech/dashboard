@@ -16,6 +16,7 @@ import NodesMockResponse from '../__mocks__/nodes.json';
 import Error404 from '../__mocks__/404.json';
 import PodMockResponse from '../__mocks__/pod.json';
 import PodsMockResponse from '../__mocks__/pods.json';
+import DashboardConfig from '../__mocks__/dashboardconf.json';
 
 fetchMock.enableMocks();
 
@@ -74,7 +75,11 @@ describe('Resource List', () => {
         return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
       } else if (url === 'http://localhost:3001/clustercustomobject/dashboardconfigs') {
         return Promise.reject(Error404.body);
-      } else if(alwaysPresentGET(url)){
+      } else if (url === 'http://localhost/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/default-config' ||
+        url === 'http://localhost:/apiserver/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/default-config'
+      ) {
+        return Promise.reject(Error404.body);
+      }  else if(alwaysPresentGET(url)){
         return alwaysPresentGET(url)
       } else {
         return generalHomeGET(url);

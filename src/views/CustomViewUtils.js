@@ -34,11 +34,24 @@ export function onResize(_layout, oldLayoutItem, layoutItem, CRDs, setCRDs, layo
   });
 }
 
-export function resizeDetector(){
+export function resizeDetector(setWidth, setBreakpoint){
   return(
-    <ReactResizeDetector skipOnMount handleWidth
+    <ReactResizeDetector handleWidth
                          refreshMode={'throttle'} refreshRate={150}
-                         onResize={() => {
+                         onResize={(width) => {
+                           let breakpoint;
+                           if(width > 1000)
+                             breakpoint = 'lg';
+                           else if(width < 1000 && width > 796)
+                             breakpoint = 'md';
+                           else if(width < 796 && width > 568)
+                             breakpoint = 'sm';
+                           else if(width < 568 && width > 280)
+                             breakpoint = 'xs';
+                           else if(width < 280 && width > 0)
+                             breakpoint = 'xss';
+                           setWidth(width)
+                           setBreakpoint(breakpoint);
                            window.dispatchEvent(new Event('resize'));
                          }} />
   )

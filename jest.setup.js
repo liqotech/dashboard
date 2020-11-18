@@ -5,6 +5,7 @@ import fetchMock from 'jest-fetch-mock';
 fetchMock.enableMocks();
 
 jest.mock('./src/services/api/ApiManager');
+jest.mock('./src/services/api/DefaultRoutes');
 jest.mock('./src/services/api/Authenticator');
 jest.mock('./src/widgets/graph/GraphNet', () => {
   return function GraphNet() {
