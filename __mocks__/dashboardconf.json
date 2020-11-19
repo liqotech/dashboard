@@ -316,7 +316,14 @@
           }
         ],
         "sidebar": {
-          "enabled": true
+          "enabled": true,
+          "alternativeTitle": "LiqoDash",
+          "menu": [{
+            "enabled": true,
+            "icon": "SettingOutlined",
+            "itemDescription": "Settings",
+            "link": "/settings"
+          }]
         }
       }
     }

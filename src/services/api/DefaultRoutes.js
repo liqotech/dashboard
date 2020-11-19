@@ -1,5 +1,4 @@
 import { Route } from 'react-router-dom';
-import CRD from '../../resources/CRD/CRD';
 import CustomViewLoader from '../../views/CustomViewLoader';
 import APIGroupList from '../../resources/APIGroup/APIGroupList';
 import APIResourceList from '../../resources/APIResourceList/APIResourceList';

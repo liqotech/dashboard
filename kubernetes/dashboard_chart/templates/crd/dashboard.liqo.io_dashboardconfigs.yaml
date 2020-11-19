@@ -161,8 +161,23 @@ spec:
                   properties:
                     alternativeLogo:
                       type: string
+                    alternativeTitle:
+                      type: string
                     enabled:
                       type: boolean
+                    menu:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                          icon:
+                            type: string
+                          itemDescription:
+                            type: string
+                          link:
+                            type: string
     served: true
     storage: true
     subresources:
