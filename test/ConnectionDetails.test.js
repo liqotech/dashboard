@@ -5,7 +5,7 @@ import { render, screen } from '@testing-library/react';
 import ViewMockResponse from '../__mocks__/views.json';
 import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
-import Home from '../src/views/homeView/Home';
+import Home from '../src/views/liqo/Home';
 import FCMockResponse from '../__mocks__/foreigncluster.json';
 import FCMockResponseNoIn from '../__mocks__/foreigncluster_noIncoming.json';
 import FCMockResponseNoOut from '../__mocks__/foreigncluster_noOutgoing.json';

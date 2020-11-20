@@ -1241,6 +1241,12 @@
                   "spec": {
                     "type": "object",
                     "properties": {
+                      "default": {
+                        "type": "boolean"
+                      },
+                      "enabled": {
+                        "type": "boolean"
+                      },
                       "footer": {
                         "type": "object",
                         "properties": {

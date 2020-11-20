@@ -8,23 +8,17 @@ import {
 import AppHeader from '../common/AppHeader';
 import SideBar from '../common/SideBar';
 import { Layout, notification, message } from 'antd';
-import Home from '../views/homeView/Home';
-import CRD from '../resources/CRD/CRD';
+import _ from 'lodash';
 import Authenticator from '../services/api/Authenticator';
 import ErrorRedirect from '../error-handles/ErrorRedirect';
 import Login from '../login/Login';
 import Cookies from 'js-cookie';
-import ConfigView from '../views/configView/ConfigView';
 import LoadingIndicator from '../common/LoadingIndicator';
 import ApiInterface from '../services/api/ApiInterface';
-import APIGroupList from '../resources/APIGroup/APIGroupList';
-import APIResourceList from '../resources/APIResourceList/APIResourceList';
-import ResourceList from '../resources/resourceList/ResourceList';
-import ResourceGeneral from '../resources/resource/ResourceGeneral';
-import CustomView from '../views/CustomView';
 import AppFooter from '../common/AppFooter';
 import Utils from '../services/Utils';
-import CustomViewLoader from '../views/CustomViewLoader';
+import PluginLoader from '../views/PluginLoader';
+import DefaultRoutes from '../services/api/DefaultRoutes';
 
 function CallBackHandler(props) {
   props.func();
@@ -159,85 +153,27 @@ function App(props) {
 
   /** Routes present only if logged in and apiManager created */
   if(api.user.current.id_token !== ''){
+    if(!_.isEmpty(window.api.dashConfigs.current) && window.api.dashConfigs.current.spec.plugin){
+      window.api.dashConfigs.current.spec.plugin.forEach(plugin => {
+        if(plugin.enabled && plugin.URL && plugin.path){
+          routes.push(
+            <Route key={plugin.URL}
+                   exact path={plugin.URL}
+                   render={() =>
+                     <PluginLoader resourcePath={plugin.path} />
+                   }/>
+          )
+        }
+      })
+    }
+
     routes.push(
-      <Route key={'home'}
-             exact path="/"
-             render={(props) =>
-               <Home {...props} />
-             }/>,
-      <Route key={'crd'}
-             exact path="/customresources/:crdName"
-             render={(props) =>
-               <CRD {...props} />
-             }/>,
-      <Route key={'customview'}
-             exact path="/customview/:viewName/"
-             render={(props) =>
-               <CustomViewLoader {...props} />
-             }/>,
-      <Route key={'api'}
-             exact path={'/apis'}
-             render={(props) =>
-               < APIGroupList {...props} />
-             }/>,
-      <Route key={'APIV1ResourceList'}
-             exact path={'/api/:version'}
-             render={(props) =>
-               < APIResourceList {...props} />
-             }/>,
-      <Route key={'APIResourceList'}
-             exact path={'/apis/:group/:version'}
-             render={(props) =>
-               < APIResourceList {...props} />
-             }/>,
-      <Route key={'ResourceListNamespaced'}
-             exact path={'/apis/:group/:version/namespaces/:namespace/:resource'}
-             render={(props) =>
-               < ResourceList {...props} />
-             }/>,
-      <Route key={'ResourceListNamespacedAPIV1'}
-             exact path={'/api/:version/namespaces/:namespace/:resource'}
-             render={(props) =>
-               < ResourceList {...props} />
-             }/>,
-      <Route key={'ResourceList'}
-             exact path={'/apis/:group/:version/:resource'}
-             render={(props) =>
-               < ResourceList {...props} />
-             }/>,
-      <Route key={'ResourceListAPIV1'}
-             exact path={'/api/:version/:resource'}
-             render={(props) =>
-               < ResourceList {...props} />
-             }/>,
-      <Route key={'Resource'}
-             exact path={'/apis/:group/:version/:resource/:resourceName'}
-             render={(props) =>
-               < ResourceGeneral {...props} />
-             }/>,
-      <Route key={'ResourceAPIV1'}
-             exact path={'/api/:version/:resource/:resourceName'}
-             render={(props) =>
-               < ResourceGeneral {...props} />
-             }/>,
-      <Route key={'ResourceNamespaced'}
-             exact path={'/apis/:group/:version/namespaces/:namespace/:resource/:resourceName'}
-             render={(props) =>
-               < ResourceGeneral {...props} />
-             }/>,
-      <Route key={'ResourceNamespacedAPIV1'}
-             exact path={'/api/:version/namespaces/:namespace/:resource/:resourceName'}
-             render={(props) =>
-               < ResourceGeneral {...props} />
-             }/>,
-      <Route key={'settings'}
-             exact path="/settings"
-             render={(props) =>
-               <ConfigView {...props} />
-             }/>,
+      DefaultRoutes(),
       <Route key={'other'}
              component={() =>
-               <ErrorRedirect match={{params: {statusCode: '404'}}} tokenLogout={tokenLogout} />
+               !_.isEmpty(window.api.dashConfigs.current) ?
+                 <ErrorRedirect match={{params: {statusCode: '404'}}} tokenLogout={tokenLogout} /> :
+                 <LoadingIndicator />
              }/>
     )
   } else {

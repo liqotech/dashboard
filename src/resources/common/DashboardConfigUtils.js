@@ -28,6 +28,8 @@ export const createNewConfig = (params, props, location) => {
 
 export function getResourceConfig(params, location){
   if(!_.isEmpty(window.api.dashConfigs.current)){
+    if(!window.api.dashConfigs.current.spec.resources)
+      window.api.dashConfigs.current.spec.resources = [];
     let conf = window.api.dashConfigs.current.spec.resources.find(resource => {
       return resource.resourcePath === location.pathname;
     })

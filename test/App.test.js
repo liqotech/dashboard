@@ -97,7 +97,19 @@ describe('App', () => {
     expect(await screen.findByText('Name'));
   })
 
-  test('Access /login path when already logged redirect to Home', async () => {
+  test('Plugin loader works', async () => {
+    mocks();
+    setToken();
+    window.history.pushState({}, 'Page Title', '/liqo');
+
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
+  })
+
+  test('Access /login path when already logged redirect to /', async () => {
     mockCRDAndViewsExtended();
     setToken();
     window.history.pushState({}, 'Page Title', '/login');
@@ -111,7 +123,7 @@ describe('App', () => {
     expect(await screen.findByText('Available Peers'));
   })
 
-  test('Access /error path when already logged redirect to Home', async () => {
+  test('Access /error path when already logged redirect to /', async () => {
     mockCRDAndViewsExtended();
     setToken();
     window.history.pushState({}, 'Page Title', '/error');
@@ -125,7 +137,7 @@ describe('App', () => {
     expect(await screen.findByText('Available Peers'));
   })
 
-  test('Access /callback path when already logged redirect to Home', async () => {
+  test('Access /callback path when already logged redirect to /', async () => {
     window.OIDC_PROVIDER_URL = 'test-url';
     window.OIDC_CLIENT_ID = 'test-id';
     mockCRDAndViewsExtended();

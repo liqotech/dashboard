@@ -1,7 +1,8 @@
-import { CustomViewCRD, DashboardConfigCRD, TEMPLATE_GROUP } from '../../constants';
+import { CustomViewCRD, DashboardConfigCRD, defaultConfig, TEMPLATE_GROUP } from '../../constants';
 import { message } from 'antd';
 import ApiManager from './ApiManager';
 import { resourceNotifyEvent } from '../../resources/common/ResourceUtils';
+import Utils from '../Utils';
 
 /**
  * Class to manage all the interaction with the cluster
@@ -114,10 +115,8 @@ export default function ApiInterface(_user, props) {
       return getCustomResourcesAllNamespaces(CRD)
         .then((res) => {
           if(kind === 'DashboardConfig'){
-            if(res.body.items[0]){
-              dashConfigs.current = res.body.items[0];
-              /** update CDs in the views */
-              manageCallbackDCs();
+            if(res.body.items.length > 0){
+              manageDC(res.body.items);
             } else {
               /** If there is no config, create one */
               createNewDC(CRD);
@@ -146,8 +145,43 @@ export default function ApiInterface(_user, props) {
               undefined,
               CVsNotifyEvent);
           }
-        }).catch(error => console.log(error));
+        }).catch(error => {
+          if(kind === 'DashboardConfig'){
+            return getGenericResource('/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/default-config')
+              .then(res => {
+                dashConfigs.current = res;
+                /** update CDs in the views */
+                manageCallbackDCs();
+              }).catch(error => console.log(error));
+          }
+        });
     }
+  }
+
+  const manageDC = res => {
+    let defaultConfig;
+    let enabledConfigs = res.filter(item => item.spec.enabled);
+    if(enabledConfigs) {
+      defaultConfig = enabledConfigs.find(item => item.spec.default);
+      enabledConfigs.forEach(config => {
+        const role = config.spec.role;
+        if(role && role.roleType && role.roleName && Utils().parseJWT()){
+          if(Utils().parseJWT()[role.roleType] === role.roleName ||
+            Utils().parseJWT()[role.roleType].includes(role.roleName)
+          ) {
+            defaultConfig = config;
+          }
+        }
+      })
+    }
+
+    if (!defaultConfig) {
+      defaultConfig = res[0];
+    }
+
+    dashConfigs.current = defaultConfig;
+    /** update CDs in the views */
+    manageCallbackDCs();
   }
 
   const createNewDC = (CRD) => {
@@ -157,20 +191,7 @@ export default function ApiInterface(_user, props) {
       CRD.spec.version,
       undefined,
       CRD.spec.names.plural,
-      {
-        apiVersion: CRD.spec.group + '/' + CRD.spec.version,
-        kind: CRD.spec.names.kind,
-        metadata: { name: 'default-config' },
-        spec: {
-          footer: { enabled: false },
-          sidebar: { enabled: true },
-          header: {
-            namespaceSelector: true,
-            resourceSearch: true
-          },
-          resources: []
-        }
-      }
+      defaultConfig
     ).then(res => {
       dashConfigs.current = res.body;
       /** update CDs in the views */
@@ -448,14 +469,7 @@ export default function ApiInterface(_user, props) {
   }
 
   const DCsNotifyEvent = (type, object) => {
-    if (type === 'MODIFIED') {
-      dashConfigs.current = object;
-      message.success('Dashboard Config modified');
-      manageCallbackDCs();
-    } else if (type === 'DELETED') {
-      dashConfigs.current = undefined;
-      createNewDC(getCRDFromKind('DashboardConfig'));
-    }
+    loadDashboardCRs('DashboardConfig');
   }
 
   const manageCallbackDCs = () =>{
@@ -516,10 +530,42 @@ export default function ApiInterface(_user, props) {
       .catch(error => handleError(error));
   }
 
-  const getGenericResource = (partialPath) => {
+  const getGenericResource = (partialPath, setItems, notifyFunc) => {
     let path = window.APISERVER_URL + partialPath;
 
     return apiManager.current.fetchRaw(path, 'GET')
+      .then(res => {
+        if(setItems){
+          if(!notifyFunc){
+            notifyFunc = (type, object) => {
+              resourceNotifyEvent(setItems, type, object);
+            }
+          }
+          const array = partialPath.split('/');
+          if(array[1] === 'api'){
+            watchResource(
+              array[1],
+              undefined,
+              array[3] === 'namespaces' ? array[4] : undefined,
+              array[2],
+              array[3] === 'namespaces' ? array[5] : array[3],
+              array[3] === 'namespaces' ? array[6] : array[4],
+              notifyFunc
+            )
+          }else{
+            watchResource(
+              array[1],
+              array[2],
+              array[4] === 'namespaces' ? array[5] : undefined,
+              array[3],
+              array[4] === 'namespaces' ? array[6] : array[4],
+              array[4] === 'namespaces' ? array[7] : array[5],
+              notifyFunc
+            )
+          }
+        }
+        return res;
+      })
       .catch(error => handleError(error));
   }
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { Link, useHistory, withRouter } from 'react-router-dom';
 import { Layout, Menu, Typography } from 'antd';
 import './SideBar.css';
 import _ from 'lodash';
@@ -20,6 +20,7 @@ function SideBar() {
     return item.metadata.annotations && item.metadata.annotations.favourite;
   }))
   const [collapsed, setCollapsed] = useState(false)
+  let history = useHistory();
 
   useEffect(() => {
     window.api.CVArrayCallback.current.push(getCustomViews);
@@ -32,9 +33,10 @@ function SideBar() {
   }
 
   const getFavouriteResources = () => {
-    setFavouriteResource(window.api.dashConfigs.current.spec.resources.filter(resource => {
-      return resource.favourite;
-    }));
+    if(window.api.dashConfigs.current.spec && window.api.dashConfigs.current.spec.resources)
+      setFavouriteResource(window.api.dashConfigs.current.spec.resources.filter(resource => {
+        return resource.favourite;
+      }));
   }
 
   const getCustomViews = () => {
@@ -116,6 +118,30 @@ function SideBar() {
   )
     width = 0;
 
+  const menuItems = [];
+
+  if(!_.isEmpty(window.api.dashConfigs.current) &&
+    window.api.dashConfigs.current.spec.sidebar &&
+    window.api.dashConfigs.current.spec.sidebar.menu){
+    window.api.dashConfigs.current.spec.sidebar.menu.forEach(item => {
+      if(item.enabled){
+        menuItems.push(
+          <Menu.Item key={item.link + item.itemDescription + item.icon}
+                     onClick={() => {
+                       if(item.link.includes('http'))
+                         window.open(item.link, "_blank");
+                       else
+                         history.push(item.link)
+                     }}
+                     icon={<CustomIcon icon={item.icon ? item.icon : 'LayoutOutlined'} style={{ fontSize: 20 }}/>}
+          >
+            <span>{item.itemDescription}</span>
+          </Menu.Item>
+        )
+      }
+    })
+  }
+
   return (
     <div>
       <Sider className="sidebar" width={width}
@@ -126,17 +152,38 @@ function SideBar() {
         {width !== 0 ? (
           <>
           <div className="app-title" align="middle">
-            <img src={require('../assets/logo_4.png')}
-                 className="image" alt="image"
-                 style={collapsed ? {marginLeft: 22} : null}
-            />
-            {!collapsed ? (
-              <Link to="/">
-                <img src={require('../assets/name.png')}
+            {(!_.isEmpty(window.api.dashConfigs.current) &&
+              window.api.dashConfigs.current.spec.sidebar &&
+              window.api.dashConfigs.current.spec.sidebar.alternativeLogo) ? (
+              <Link to={'/'}>
+                <img src={window.api.dashConfigs.current.spec.sidebar.alternativeLogo}
+                     style={{margin: '0px 16px 16px 16px', filter: 'drop-shadow(0px 0px 2px black)', height: 35}}
                      alt="image"
-                     style={{height: 30, width: 120}}
                 />
               </Link>
+              ) : (
+                <img src={require('../assets/logo_4.png')}
+                     className="image" alt="image"
+                     style={collapsed ? {marginLeft: 22} : null}
+                />
+              )}
+            {!collapsed ? (
+              (!_.isEmpty(window.api.dashConfigs.current) &&
+                window.api.dashConfigs.current.spec.sidebar &&
+                window.api.dashConfigs.current.spec.sidebar.alternativeTitle) ? (
+                <Link to={'/'}>
+                  <div style={{margin: '0px 16px 16px 0px'}}>
+                    <Typography.Title level={3} style={{fontWeight: 'bold'}}>{window.api.dashConfigs.current.spec.sidebar.alternativeTitle}</Typography.Title>
+                  </div>
+                </Link>
+                ) : (
+                  <Link to="/">
+                    <img src={require('../assets/name.png')}
+                         alt="image"
+                         style={{height: 40}}
+                    />
+                  </Link>
+                )
             ) : null}
           </div>
           <Menu mode="inline" defaultOpenKeys={['sub_fav', 'resources', 'APIs', 'customViews']}
@@ -148,6 +195,7 @@ function SideBar() {
                 <span>Home</span>
               </Link>
             </Menu.Item>
+            {menuItems}
             <Menu.Divider/>
             <Menu.SubMenu key={"customViews"}
                           title={
@@ -197,17 +245,10 @@ function SideBar() {
                           collapsed ? <StarOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
                           <Typography.Text type={'secondary'}>Favourites</Typography.Text>
                         }
-          >
-            {fav}
-          </Menu.SubMenu>
-          <Menu.Divider/>
-            <Menu.Item key="settings" style={{ marginTop: 0, marginBottom: 0}}
-                       icon={<SettingOutlined style={{ fontSize: '20px' }} />}
             >
-              <Link to="/settings">
-                <span>Settings</span>
-              </Link>
-            </Menu.Item>
+              {fav}
+            </Menu.SubMenu>
+            <Menu.Divider/>
           </Menu>
           </>
         ) : null}

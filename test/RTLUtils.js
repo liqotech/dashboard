@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../src/app/App';
+import _ from 'lodash';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import ViewMockResponseLayout from '../__mocks__/views_withLayout.json';
 import ViewMockResponse from '../__mocks__/views.json';
@@ -121,12 +122,28 @@ export function alwaysPresentGET(url) {
     url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
   ) {
     return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-  } /*else if (url === 'http://localhost/apiserver/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs' ||
-    url === 'http://localhost:/apiserver/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs'
+  } else if (url === 'http://localhost/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/default-config' ||
+    url === 'http://localhost:/apiserver/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/default-config'
   ) {
-    return Promise.resolve(new Response(JSON.stringify(DashboardConfig)));
-  }*/ else if (url === 'http://localhost:3001/clustercustomobject/dashboardconfigs') {
-    return Promise.resolve(new Response(JSON.stringify({body: DashboardConfig})));
+    return Promise.resolve(new Response(JSON.stringify(DashboardConfig.items[0])));
+  } else if (url === 'http://localhost:3001/clustercustomobject/dashboardconfigs') {
+    let dashconf = JSON.parse(JSON.stringify(DashboardConfig));
+    if(window.api && !_.isEmpty(window.api.dashConfigs.current)) {
+      window.api.dashConfigs.current.metadata.resourceVersion++;
+      if(window.api.dashConfigs.current.spec.resources){
+        window.api.dashConfigs.current.spec.resources.forEach(item => {
+          if(item.render && item.render.columns){
+            item.render.columns = item.render.columns.filter(col => col !== null);
+          }
+          if(item.render && item.render.tabs){
+            item.render.tabs = item.render.tabs.filter(tab => tab !== null);
+          }
+          return item;
+        })
+      }
+      dashconf.items = [window.api.dashConfigs.current];
+    }
+    return Promise.resolve(new Response(JSON.stringify({body: dashconf})));
   } else if (url === 'http://localhost:/apiserver/apis/apps/v1/deployments' ||
     url === 'http://localhost/apiserver/apis/apps/v1/deployments'
   ) {
@@ -279,7 +296,7 @@ export const loginTest = async () => {
   setup_login();
 
   /** Input mock password */
-  const tokenInput = screen.getByLabelText('lab');
+  const tokenInput = await screen.findByLabelText('lab');
   await userEvent.type(tokenInput, token);
 
   /** Click on login button */

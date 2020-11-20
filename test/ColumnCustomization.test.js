@@ -9,6 +9,7 @@ import React from 'react';
 import fetchMock from 'jest-fetch-mock';
 import Error401 from '../__mocks__/401.json';
 import K8sSchemaDefinitions from '../__mocks__/kubernetesjsonschema.json';
+import _ from 'lodash';
 
 fetchMock.enableMocks();
 
@@ -61,6 +62,9 @@ async function addImage(){
 
 beforeEach(() => {
   localStorage.setItem('theme', 'dark');
+  if(window.api && !_.isEmpty(window.api.dashConfigs.current)) {
+    window.api.dashConfigs.current = {};
+  }
   Cookies.remove('token');
 });
 

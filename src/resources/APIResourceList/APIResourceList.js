@@ -27,7 +27,10 @@ function APIResourceList() {
         setAPIResourceList(res.resources.filter(resource => resource.name.split('/').length === 1));
         setLoading(false);
       })
-      .catch(error => setError(error));
+      .catch(error => {
+        if(typeof error !== 'object')
+          setError(error)
+      });
   }
 
   const renderAPIResourceList = (text, record, dataIndex) => {

@@ -53,7 +53,6 @@ export default function ThemeModifier(){
   }
 
   useEffect(() => {
-    console.log('oyo')
     setTheme();
   }, [visible])
 

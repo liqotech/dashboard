@@ -5,7 +5,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ViewMockResponse from '../__mocks__/views.json';
 import { MemoryRouter } from 'react-router-dom';
-import Home from '../src/views/homeView/Home';
+import Home from '../src/views/liqo/Home';
 import FCMockResponse from '../__mocks__/foreigncluster_noJoin.json';
 import PRMockResponse from '../__mocks__/peeringrequest.json';
 import AdvMockResponse from '../__mocks__/advertisement.json';

@@ -8,6 +8,7 @@ import App from '../src/app/App';
 import React from 'react';
 import fetchMock from 'jest-fetch-mock';
 import Error401 from '../__mocks__/401.json';
+import _ from 'lodash';
 
 fetchMock.enableMocks();
 
@@ -38,6 +39,9 @@ function mocks(errorPATCH, errorPUT){
 }
 
 beforeEach(() => { localStorage.setItem('theme', 'dark');
+  if(window.api && !_.isEmpty(window.api.dashConfigs.current)) {
+    window.api.dashConfigs.current = {};
+  }
   Cookies.remove('token');
 });
 
