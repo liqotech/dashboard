@@ -17,7 +17,6 @@ export default function ThemeModifier(){
     let theme = {...JSON.parse(localStorage.getItem('theme')), [key]: color};
     window.less.modifyVars(theme)
       .then(() => {
-        console.log(theme);
         localStorage.setItem('theme', JSON.stringify(theme));
       });
   }

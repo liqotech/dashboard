@@ -38,8 +38,8 @@ function App(props) {
     /** set global configuration for notifications and messages*/
     setGlobalConfig();
 
-    if(Cookies.get('token')){
-      manageToken(Cookies.get('token'));
+    if(Utils().getCookie()){
+      manageToken(Utils().getCookie());
     } else if(window.OIDC_PROVIDER_URL) {
       /** all is needed to manage an OIDC session */
       manageOIDCSession();
@@ -60,7 +60,7 @@ function App(props) {
 
   /** Remove everything and redirect to the login page */
   const tokenLogout = () => {
-    Cookies.remove('token');
+    Utils().removeCookie();
     if(!window.OIDC_PROVIDER_URL){
       window.api = ApiInterface({id_token: ''}, props);
       api.setUser({id_token: ''})
@@ -99,7 +99,7 @@ function App(props) {
     window.api.DCArrayCallback.current.push(() => setConfig(window.api.dashConfigs.current));
     setApi(_api);
     message.success('Successfully logged in');
-    Cookies.set('token', token, {secure: true, sameSite: 'strict' })
+    Utils().setCookie(token);
 
     /** Get the CRDs at the start of the app */
     _api.getCRDs()
@@ -116,9 +116,9 @@ function App(props) {
     /** Refresh token (or logout is silent sign in is not enabled) */
     authManager.current.manager.events.addAccessTokenExpiring(() => {
       authManager.current.manager.signinSilent().then(user => {
-        Cookies.remove('token');
+        Utils().removeCookie();
         window.api = ApiInterface(user, props);
-        Cookies.set('token', user.id_token, {secure: true, sameSite: 'strict' });
+        Utils().setCookie(user.id_token);
       }).catch(() => tokenLogout());
     });
   }

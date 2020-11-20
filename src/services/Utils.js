@@ -152,8 +152,8 @@ export default function Utils() {
   }
 
   function parseJWT(t) {
-    let token = t ? t : Cookies.get('token');
-    if(token){
+    let token = t ? t : getCookie();
+    if (token) {
       const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
       return JSON.parse(
         decodeURIComponent(
@@ -168,7 +168,55 @@ export default function Utils() {
     }
   }
 
-  return{
+  function getCookie() {
+    let counter = 1;
+    let token = Cookies.get('token');
+
+    if (!token)
+      return false;
+    else {
+      while (counter > 0) {
+        let chunk = Cookies.get('token_' + counter);
+        if (!chunk)
+          counter = 0;
+        else {
+          token = token + chunk;
+          counter++;
+        }
+      }
+    }
+    return token;
+  }
+
+  function removeCookie() {
+    let counter = 1;
+    Cookies.remove('token');
+
+    while (counter > 0) {
+      let chunk = Cookies.get('token_' + counter);
+      if (!chunk)
+        counter = 0;
+      else {
+        Cookies.remove('token_' + counter);
+        counter++;
+      }
+    }
+  }
+
+  function setCookie(token) {
+    let counter = 0;
+    let props = { secure: true, sameSite: 'strict' };
+
+    token.match(/(.|[\r\n]){1,4000}/g).forEach(chunk => {
+      if (counter === 0)
+        Cookies.set('token', chunk, props)
+      else
+        Cookies.set('token_' + counter, chunk, props)
+      counter++;
+    });
+  }
+
+  return {
     setRealProperties,
     OAPIV3toJSONSchema,
     index,
@@ -176,6 +224,9 @@ export default function Utils() {
     fromDotToObject,
     replaceObject,
     arraysEqual,
-    parseJWT
+    parseJWT,
+    setCookie,
+    getCookie,
+    removeCookie
   }
 }

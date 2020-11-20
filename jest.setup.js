@@ -17,8 +17,13 @@ jest.mock('./src/services/TimeUtils', () => {
   function calculateAge() {
     return '1d';
   }
+
+  function compareAge(a, b) {
+    return a - b;
+  }
   return {
-    calculateAge
+    calculateAge,
+    compareAge
   };
 });
 
