@@ -9,7 +9,6 @@ export default function ThemeUploader(props){
       const theme = JSON.parse(e.target.result.toString());
       window.less.modifyVars(theme)
         .then(() => {
-          console.log(theme);
           localStorage.setItem('theme', e.target.result.toString());
           props.changeItems(theme);
         });

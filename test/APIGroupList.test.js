@@ -26,6 +26,7 @@ import AppsResponse from '../__mocks__/apps.json';
 import APIGroupList from '../src/resources/APIGroup/APIGroupList';
 import ApiInterface from '../src/services/api/ApiInterface';
 import APIResourceList from '../src/resources/APIResourceList/APIResourceList';
+import Utils from '../src/services/Utils';
 
 fetchMock.enableMocks();
 

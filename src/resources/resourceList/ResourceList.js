@@ -7,7 +7,7 @@ import { getColumnSearchProps } from '../../services/TableUtils';
 import ListHeader from './ListHeader';
 import { getNamespaced, filterResource, resourceNotifyEvent } from '../common/ResourceUtils';
 import { renderResourceList } from './ResourceListRenderer';
-import { calculateAge } from '../../services/TimeUtils';
+import { calculateAge, compareAge } from '../../services/TimeUtils';
 import { createNewConfig, getResourceConfig, updateResourceConfig } from '../common/DashboardConfigUtils';
 import FavouriteButton from '../common/buttons/FavouriteButton';
 import KubernetesSchemaAutocomplete from '../common/KubernetesSchemaAutocomplete';
@@ -214,7 +214,7 @@ function ResourceList(props) {
       ellipsis: true,
       width: '5em',
       sorter: {
-        compare: (a, b) => a.Age.slice(0, -1) - b.Age.slice(0, -1),
+        compare: (a, b) => compareAge(a.Age, b.Age),
       }
     })
 

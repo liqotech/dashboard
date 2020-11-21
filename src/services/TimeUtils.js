@@ -16,3 +16,22 @@ export function calculateAge(timestamp){
     } else return Math.floor(diffTime + 1) + 'd';
   } else return Math.floor(diffTime) + 'M';
 }
+
+const ageReplacer = a => {
+  const date = a.slice(-1);
+  if(date === 's')
+    return a.slice(0, -1) / (1000*60*60*24*30)
+  else if(date === 'm')
+    return a.slice(0, -1) / (60*60*24*30)
+  else if(date === 'h')
+    return a.slice(0, -1) / (60*24*30)
+  else if(date === 'd')
+    return a.slice(0, -1) / (24*30)
+  return a.slice(0, -1);
+}
+
+export function compareAge(a, b){
+  a = ageReplacer(a);
+  b = ageReplacer(b);
+  return a - b
+}

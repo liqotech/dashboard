@@ -25,7 +25,6 @@ export default function DraggableLayout(props){
       if(child.props['data-grid'] && child.props['data-grid'].w){
         child.props['data-grid'][breakpoint] = child.props['data-grid'];
       }
-      //console.log(child.props['data-grid'])
       let layout = (child.props['data-grid'] && !_.isEmpty(child.props['data-grid'][breakpoint])) ?
         child.props['data-grid'][breakpoint] : defaultLayout[breakpoint];
       setItems(prev => [...prev,
