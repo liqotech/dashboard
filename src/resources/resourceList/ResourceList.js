@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import _ from 'lodash';
 import { Button, Input, Table, Tooltip } from 'antd';
 import { withRouter, useLocation, useHistory, useParams } from 'react-router-dom';
@@ -29,9 +29,16 @@ function ResourceList(props) {
   const [columnContents, setColumnsContents] = useState([]);
   const [onCustomResource, setOnCustomResource] = useState(false);
   const [render, setRender] = useState(false);
+  const isMounted = useRef(true);
   let location = props._location ? props._location : useLocation();
   let history = useHistory();
   let params = props._params ? props._params : useParams();
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    }
+  })
 
   useEffect(() => {
     if(params.namespace) {

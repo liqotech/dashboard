@@ -14,15 +14,12 @@
         "enabled": true,
         "crds": [
           {
-            "crdAltName": "Test",
-            "crdName": "advertisements.protocol.liqo.io"
+            "resourceName": "Test",
+            "resourcePath": "/apis/net.liqo.io/v1alpha1/advertisements.protocol.liqo.io"
           },
           {
-            "crdName": "tunnelendpoints.liqonet.liqo.io"
-          },
-          {
-            "crdName": "liqodashtests.dashboard.liqo.io",
-            "template": "dashboard.liqo.io/v1/histocharts/histo-test"
+            "resourceName": "Test2",
+            "resourcePath": "/apis/net.liqo.io/v1alpha1/tunnelendpoints.liqonet.liqo.io"
           }
         ]
       }

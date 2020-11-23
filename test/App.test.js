@@ -19,6 +19,7 @@ import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 import Cookies from 'js-cookie';
 import userEvent from '@testing-library/user-event';
 import NamespaceResponse from '../__mocks__/namespaces.json';
+import ApiInterface from '../src/services/api/ApiInterface';
 
 fetchMock.enableMocks();
 
@@ -34,6 +35,8 @@ async function setup() {
 }
 
 beforeEach(() => {
+  window.OIDC_PROVIDER_URL = null;
+  window.OIDC_CLIENT_ID = null;
   localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
@@ -73,6 +76,20 @@ function mocks(){
 }
 
 describe('App', () => {
+  test('Token wrong format', async () => {
+    Cookies.set('token', 'token')
+    window.OIDC_PROVIDER_URL = 'test-url';
+    window.OIDC_CLIENT_ID = 'test-id';
+    window.api = ApiInterface({id_token: 'test'});
+    window.history.pushState({}, 'Page Title', '/callback');
+
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
+  })
+
   test('Login with OIDC', async () => {
     mocks();
 
@@ -81,6 +98,17 @@ describe('App', () => {
     /** Assert that a success notification has spawned */
     //expect(await screen.findByText(/custom views/i)).toBeInTheDocument();
     await userEvent.click(screen.getByLabelText('logout'));
+  }, testTimeout)
+
+  test('Login with OIDC error', async () => {
+    mocks();
+
+    window.error = true;
+
+    await setup();
+    await userEvent.click(screen.getByLabelText('logout'));
+
+    window.error = false;
   }, testTimeout)
 
   test('Login with path', async () => {
@@ -121,6 +149,19 @@ describe('App', () => {
     );
 
     expect(await screen.findByText('Available Peers'));
+  })
+
+  test('Access /login path when not logged redirect to callback func', async () => {
+    mockCRDAndViewsExtended();
+    window.OIDC_PROVIDER_URL = 'test-url';
+    window.OIDC_CLIENT_ID = 'test-id';
+    window.history.pushState({}, 'Page Title', '/error');
+
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
   })
 
   test('Access /error path when already logged redirect to /', async () => {
@@ -165,5 +206,19 @@ describe('App', () => {
     );
 
     expect(await screen.findByText('404'));
+  })
+
+  test('/callback', async () => {
+    mockCRDAndViewsExtended();
+    window.OIDC_PROVIDER_URL = 'test-url';
+    window.OIDC_CLIENT_ID = 'test-id';
+    window.api = ApiInterface({id_token: 'test'});
+    window.history.pushState({}, 'Page Title', '/callback');
+
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
   })
 })

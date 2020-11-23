@@ -7,7 +7,7 @@ import {
   DashboardOutlined, SettingOutlined,
   LayoutOutlined, StarOutlined, ApiOutlined, BlockOutlined
 } from '@ant-design/icons';
-import AddCustomView from '../views/AddCustomView';
+import AddCustomView from '../customView/AddCustomView';
 import CustomIcon from '../resources/common/CustomIcon';
 
 const Sider = Layout.Sider;
@@ -229,18 +229,18 @@ function SideBar() {
                   <span>Api V1</span>
                 </Link>
               </Menu.Item>
-            </Menu.SubMenu>
-            <Menu.Divider/>
-            <Menu.SubMenu key={"resources"}
-                          title={
-                            collapsed ? <BlockOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
-                              <Typography.Text type={'secondary'}>Resources</Typography.Text>
-                          }
-            >
-              {favR}
-            </Menu.SubMenu>
-            <Menu.Divider/>
-            <Menu.SubMenu key={"sub_fav"}
+          </Menu.SubMenu>
+          <Menu.Divider/>
+          <Menu.SubMenu key={"resources"}
+                        title={
+                          collapsed ? <BlockOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
+                          <Typography.Text type={'secondary'}>Resources</Typography.Text>
+                        }
+          >
+            {favR}
+          </Menu.SubMenu>
+          <Menu.Divider/>
+          {/*<Menu.SubMenu key={"sub_fav"}
                         title={
                           collapsed ? <StarOutlined style={{ fontSize: '20px', marginLeft: 16 }} />:
                           <Typography.Text type={'secondary'}>Favourites</Typography.Text>
@@ -248,7 +248,7 @@ function SideBar() {
             >
               {fav}
             </Menu.SubMenu>
-            <Menu.Divider/>
+            <Menu.Divider/>*/}
           </Menu>
           </>
         ) : null}

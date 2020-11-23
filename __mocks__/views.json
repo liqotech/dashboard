@@ -13,13 +13,18 @@
       "spec": {
         "viewName": "Liqo View",
         "enabled": true,
-        "crds": [
+        "resources": [
           {
-            "crdAltName": "Test",
-            "crdName": "advertisements.protocol.liqo.io"
+            "resourceName": "Advertisement",
+            "resourcePath": "/apis/net.liqo.io/v1alpha1/advertisements.protocol.liqo.io"
           },
           {
-            "crdName": "tunnelendpoints.liqonet.liqo.io"
+            "resourceName": "Test2",
+            "resourcePath": "/apis/net.liqo.io/v1alpha1/tunnelendpoints.liqonet.liqo.io"
+          },
+          {
+            "resourceName": "PodsTest",
+            "resourcePath": "/api/v1/pods"
           }
         ]
       }

@@ -1,11 +1,14 @@
-import { act, fireEvent, screen } from '@testing-library/react';
+import { act, fireEvent, screen, render } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { loginTest, mockCRDAndViewsExtended } from './RTLUtils';
+import { loginTest, mockCRDAndViewsExtended, setToken } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import { testTimeout } from '../src/constants';
-import Cookies from 'js-cookie';
+import AppHeader from '../src/common/AppHeader';
+import { MemoryRouter } from 'react-router-dom';
+import ApiInterface from '../src/services/api/ApiInterface';
+import DashboardConfig from '../__mocks__/dashboardconf.json';
 
 fetchMock.enableMocks();
 
@@ -56,6 +59,36 @@ describe('Header', () => {
       userEvent.click(close[1]);
       await new Promise((r) => setTimeout(r, 500));
     })
+
+  }, testTimeout)
+
+  test('Toggle dark/light', async () => {
+    window.api = ApiInterface({id_token: 'test'});
+    setToken();
+    window.api.dashConfigs.current = DashboardConfig.items[0];
+    window.less = {modifyVars: async () => {return Promise.resolve()}}
+
+    render(
+      <MemoryRouter>
+        <AppHeader />
+      </MemoryRouter>
+    )
+
+    const switcher = await screen.findByRole('switch');
+
+    await act(async () => {
+      userEvent.click(switcher)
+      await new Promise((r) => setTimeout(r, 500));
+    })
+
+    await act(async () => {
+      userEvent.click(switcher)
+      await new Promise((r) => setTimeout(r, 500));
+    })
+
+    userEvent.click(await screen.findByLabelText('crown'))
+
+    userEvent.click(await screen.findByLabelText('folder'))
 
   }, testTimeout)
 })

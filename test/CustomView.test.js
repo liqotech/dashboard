@@ -2,15 +2,13 @@ import CRDmockResponse from '../__mocks__/crd_fetch.json';
 import ViewMockResponse from '../__mocks__/views.json';
 import ViewMockResponseLayout from '../__mocks__/views_withLayout.json';
 import ViewMockModified from '../__mocks__/views_modified.json';
-import ViewMockAltTemplate from '../__mocks__/views_alt_template.json';
 import { act, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { alwaysPresentGET, mockCRDAndViewsExtended, setup_cv } from './RTLUtils';
 import fetchMock from 'jest-fetch-mock';
 import ApiInterface from '../src/services/api/ApiInterface';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
-import CustomView from '../src/views/CustomView';
+import CustomView from '../src/customView/CustomView';
 import AdvMockResponse from '../__mocks__/advertisement.json';
 import FCMockResponse from '../__mocks__/foreigncluster.json';
 import TunnMockResponse from '../__mocks__/tunnelendpoints.json';
@@ -18,6 +16,8 @@ import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import PieMockResponse from '../__mocks__/piecharts.json';
 import HistoMockResponse from '../__mocks__/histocharts.json';
 import { testTimeout } from '../src/constants';
+import CustomViewLoader from '../src/views/CustomViewLoader';
+import userEvent from '@testing-library/user-event';
 
 fetchMock.enableMocks();
 
@@ -39,13 +39,20 @@ function mocks(view){
       return Promise.resolve(new Response(JSON.stringify({ body: PieMockResponse })))
     } else if (url === 'http://localhost:3001/clustercustomobject/histocharts') {
       return Promise.resolve(new Response(JSON.stringify({body: HistoMockResponse })))
-    } else if(alwaysPresentGET(url)){
+    } else if (url === 'http://localhost/apiserver/apis/net.liqo.io/v1alpha1/advertisements.protocol.liqo.io') {
+      return Promise.resolve(new Response(JSON.stringify( AdvMockResponse)));
+    } else if (url === 'http://localhost/apiserver/apis/net.liqo.io/v1alpha1/tunnelendpoints.liqonet.liqo.io') {
+      return Promise.resolve(new Response(JSON.stringify(TunnMockResponse)))
+    } else if (url === 'http://localhost/apiserver/apis/net.liqo.io/v1alpha1/liqodashtests.dashboard.liqo.io') {
+      return Promise.resolve(new Response(JSON.stringify( AdvMockResponse)));
+    }  else if(alwaysPresentGET(url)){
       return alwaysPresentGET(url)
     }
   })
 }
 
 async function setup(error) {
+  window.APISERVER_URL = window.location.protocol + '//' + window.location.hostname + '/apiserver';
   window.api = ApiInterface({id_token: 'test'});
   window.api.getCRDs().then(() => {
     window.api.loadDashboardCRs('View').then(() => {
@@ -53,8 +60,8 @@ async function setup(error) {
 
       render(
         <MemoryRouter>
-          <CustomView match={{params: {viewName: 'awesome-view'}}}
-                      history={[]}
+          <CustomViewLoader match={{params: {viewName: 'awesome-view'}}}
+                            history={[]}
           />
         </MemoryRouter>
       )
@@ -70,9 +77,7 @@ describe('CustomView', () => {
     window.api.customViews.current = JSON.parse(JSON.stringify(ViewMockResponse.items));
     window.api.manageCallbackCVs();
     expect(await screen.findByText('Advertisement')).toBeInTheDocument();
-
     await window.api.updateCustomResourceDefinition(null, window.api.getCRDFromKind('Advertisement'));
-
     expect(await screen.findByText(/CRD advertisements.protocol.liqo.io modified/i));
   }, testTimeout)
 
@@ -80,7 +85,7 @@ describe('CustomView', () => {
     mocks(ViewMockResponse);
     await setup();
 
-    expect(await screen.findByText('Test')).toBeInTheDocument();
+    expect(await screen.findByText('Advertisement')).toBeInTheDocument();
 
     /** Modify the custom view */
     window.api.customViews.current = JSON.parse(JSON.stringify(ViewMockModified.items));
@@ -89,15 +94,6 @@ describe('CustomView', () => {
     })
 
     expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
-  }, testTimeout)
-
-  test('Pinned card works', async () => {
-    localStorage.setItem('theme', 'dark');
-    await setup_cv(ViewMockResponse);
-    const pin = await screen.findAllByLabelText('pushpin');
-
-    userEvent.click(pin[0]);
-
   }, testTimeout)
 
   test('Custom view is empty if no Custom view', async () => {
@@ -128,39 +124,5 @@ describe('CustomView', () => {
     expect(await screen.findByText('Advertisement')).toBeInTheDocument();
   }, testTimeout)
 
-  test('Change CR on custom view', async () => {
-    mockCRDAndViewsExtended(null, 'PUT', 'advertisements', true);
-    await setup();
 
-    window.api.customViews.current = JSON.parse(JSON.stringify(ViewMockResponse.items));
-    window.api.manageCallbackCVs();
-
-    expect(await screen.findByText('Advertisement')).toBeInTheDocument();
-
-    await window.api.updateCustomResource(null, null, null, 'advertisements', null, AdvMockResponse);
-
-    expect(await screen.findAllByText(/modified/i));
-  }, testTimeout)
-
-  test('Custom view shows alternative template', async () => {
-    mocks(ViewMockAltTemplate);
-    await setup();
-
-    expect(await screen.findByText('Test')).toBeInTheDocument();
-  }, testTimeout)
-
-  test('Custom view gracefully unmount if CV has been deleted', async () => {
-    mocks(ViewMockResponse);
-    await setup();
-
-    expect(await screen.findByText('Test')).toBeInTheDocument();
-
-    let apiManager = window.api.apiManager.current;
-
-    act(() => {
-      apiManager.sendDeletedSignal('views/', ViewMockResponse.items[0]);
-    })
-
-    expect(await screen.findByText('TunnelEndpoint')).toBeInTheDocument();
-  }, testTimeout)
 })

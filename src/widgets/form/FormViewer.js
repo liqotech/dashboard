@@ -49,7 +49,6 @@ function FormViewer(props) {
     let item = {}
 
     item[props.show] = value.formData
-
     if(props.origResource) {
       if(props.onDotNotation)
         item = Utils().fromDotToObject(item, props.origResource);
@@ -58,6 +57,8 @@ function FormViewer(props) {
     }
 
     let promise;
+
+    console.log(item)
 
     if(props.CRD){
       promise = window.api.updateCustomResource(

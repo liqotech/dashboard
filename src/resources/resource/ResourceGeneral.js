@@ -141,6 +141,7 @@ function ResourceGeneral(props){
           <ResourceForm resource={JSON.parse(JSON.stringify(resource[0]))}
                         updateFunc={updateResource} kind={resource[0].kind}
                         CRD={onCustomResource}
+                        params={props._params ? params : null}
           />
         </div>
       ),
@@ -295,7 +296,7 @@ function ResourceGeneral(props){
       {loading ? <LoadingIndicator /> : (
         resource[0] ? (
           <div aria-label={'crd'} key={resource[0].metadata.name} ref={setContainer}
-               style={{height: '92vh', overflow: 'auto', marginLeft: -20, marginRight: -20, marginTop: -20}}
+               style={{height: props._params ? '80%' : '92vh', overflow: 'auto', marginLeft: -20, marginRight: -20, marginTop: -20}}
           >
             <div style={{marginLeft: 20, marginRight: 20}}>
               {!props.onRef ? (

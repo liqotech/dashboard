@@ -128,7 +128,7 @@ export default function ResourceForm(props){
           type={'inner'}
           activeTabKey={currentTab}
           onTabChange={key => {onTabChange(key)}}
-          style={{overflow: 'hidden', minHeight: '72vh'}}
+          style={{overflow: 'hidden', minHeight: props.params ? '100%' : '72vh'}}
     >
       {contentList[currentTab]}
     </Card>

@@ -6,7 +6,7 @@ import _ from 'lodash';
 let definitions;
 
 export default function KubernetesSchemaAutocomplete(props){
-  let params = useParams();
+  let params = props.params ? props.params : useParams();
   const [totItems, setTotItems] = useState([]);
   let tot = [];
   let columnValue = '';

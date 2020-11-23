@@ -1,6 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import './CRD.css';
-import './CRDList.css';
 import _ from 'lodash';
 import {
   Space, Alert,

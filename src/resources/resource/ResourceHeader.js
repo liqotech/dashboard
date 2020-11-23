@@ -89,6 +89,7 @@ function ResourceHeader(props) {
           <Col span={4}>
             <div style={{float: "right"}}>
               <Space align={'center'}>
+                <CustomViewButton resource={props.resource} />
                 {props.onCustomResource ? (
                   <div>
                     <Button icon={<EditOutlined/>}

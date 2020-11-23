@@ -1,5 +1,6 @@
 import { message } from 'antd';
 import _ from 'lodash';
+import React from 'react';
 
 export function resourceNotifyEvent(func, type, object){
   if(object.metadata.namespace && object.metadata.namespace !== window.api.namespace.current && window.api.namespace.current)
@@ -52,7 +53,7 @@ export function getNamespaced(path){
 }
 
 export function filterResource(props, res){
-  if(props.onRef.filter  === 'labels'){
+  if(props.onRef.filter === 'labels'){
     res = res.filter(item => {
       let flag = 0;
       _.keys(props.onRef.filterValues).forEach(key => {
@@ -64,4 +65,45 @@ export function filterResource(props, res){
     })
   }
   return res;
+}
+
+export function searchDirectReferences(resource){
+  let result = [];
+  recursiveSearch(resource);
+
+  function recursiveSearch(obj){
+    _.keys(obj).forEach(key => {
+      if(key.slice(-3) === 'Ref' && key.split('/').length === 2){
+        result.push({
+          [key]: obj[key]
+        })
+      }
+      if(typeof obj[key] === 'object'){
+        recursiveSearch(obj[key])
+      } else if(Array.isArray(obj[key])){
+        obj[key].forEach(_obj => {
+          recursiveSearch(_obj);
+        })
+      }
+    })
+  }
+
+  return result;
+}
+
+export function searchResourceByKindAndGroup(kind, group){
+  return window.api.getApis('/')
+    .then(res => {
+      let version = res.body.groups.find(_group => _group.name === group).preferredVersion.groupVersion;
+      return window.api.getGenericResource('/apis/' +
+        version + '/'
+      ).then(res => {
+        let resource = res.resources.find(r => r.kind === kind);
+        return window.api.getGenericResource('/apis/' +
+          version + '/' + resource.name
+        ).then(res => {
+          return res;
+        })
+      })
+    })
 }

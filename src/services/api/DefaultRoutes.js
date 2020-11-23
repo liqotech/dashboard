@@ -10,7 +10,7 @@ export default function DefaultRoutes (){
   return [
     <Route key={'customview'}
            exact path="/customview/:viewName/"
-           render={(props) =>
+           component={(props) =>
              <CustomViewLoader {...props} />
            }/>,
     <Route key={'api'}

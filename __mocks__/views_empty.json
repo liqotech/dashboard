@@ -12,7 +12,7 @@
       "spec": {
         "viewName": "Liqo View",
         "enabled": true,
-        "crds": []
+        "resources": []
       }
     }
   ],
