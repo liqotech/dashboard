@@ -1,39 +1,37 @@
-# Docker Image which is used as foundation to create
-# builder image for the k8s_library js
+# Builder image for the webservice
+FROM node:14-alpine as builder
 
-# This first stage downloads and installs the k8s_library from the LiqoTech repo and is necessary
-# because for some reasons just "npm install" do not properly install it from the repo
-FROM node:14-alpine as builder_k8s
 # Download git to fetch the kubernetes repo
 RUN apk add --no-cache --update git openssh
-RUN git clone https://github.com/LiqoTech/kubernetes-client-javascript.git
-WORKDIR /kubernetes-client-javascript
-RUN npm install --silent --unsafe-perm
+
+## Switch to an unprivileged user (avoids problems with npm)
+USER node
+
+## Set the working directory and copy the source code
+RUN mkdir --parent /tmp/webservice
+COPY --chown=node:node . /tmp/webservice
+WORKDIR /tmp/webservice
+
+## Install the dependencies and build
+RUN npm install
 RUN npm run build
 
-## a custom Docker Image with this Dockerfile
-FROM node:14-alpine as build-deps
-# Download git to fetch the kubernetes repo
-RUN apk add --no-cache --update git openssh
-# A directory within the virtualized Docker environment
-# Becomes more relevant when using Docker Compose later
-WORKDIR /app
-# Copies package.json and package-lock.json to Docker environment
-COPY package*.json ./
-# Installs all node packages
-RUN npm install --silent --unsafe-perm
-# Copy the dist folder from the previous k8s_library install in the node_modules
-COPY --from=builder_k8s /kubernetes-client-javascript/dist ./node_modules/@kubernetes/client-node/dist
-# Copies everything over to Docker environment
-COPY . ./
-RUN npm run build
-
+# Final image to export the service
 FROM nginx:1.19
-COPY --chown=101:101 --from=build-deps /app/dist /usr/share/nginx/html
-COPY --chown=101:101 nginx.conf /etc/nginx/conf.d/default.conf
-COPY --chown=101:101 docker-entrypoint.sh /
-COPY --chown=101:101 generate_config_js.sh /
 
-RUN chmod +x docker-entrypoint.sh generate_config_js.sh
+## Copy the different files
+COPY --chown=nginx:nginx --from=builder /tmp/webservice/dist /usr/share/nginx/html
+COPY --chown=nginx:nginx nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chown=nginx:nginx docker-entrypoint.sh /
+
+## Add permissions for the nginx user
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx && \
+    chown -R nginx:nginx /etc/nginx/conf.d && \
+    touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/run/nginx.pid
+
+RUN chmod +x docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]

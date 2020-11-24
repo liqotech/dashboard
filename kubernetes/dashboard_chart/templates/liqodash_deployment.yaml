@@ -32,13 +32,36 @@ spec:
         - name: shared-data
           emptyDir: { }
       initContainers:
-        - name: proxy-cert
-          image: nginx
+        - name: generate-certificate
+          image: emberstack/openssl@sha256:1fad327428e28ac1138444fca06000c2bf04b5efb56e85440f5cbfb25e40a122
           volumeMounts:
             - name: shared-data
               mountPath: /etc/nginx/ssl/
-          command: [ "/bin/sh" ]
-          args: [ "-c", 'openssl req -x509 -subj "/C=IT/ST=Turin/O=Liqo" -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.cert' ]
+          command:
+          - openssl
+          args:
+          - req
+          - -x509
+          - -subj
+          - /C=IT/ST=Turin/O=Liqo
+          - -nodes
+          - -days
+          - "365"
+          - -newkey
+          - rsa:2048
+          - -keyout
+          - /etc/nginx/ssl/nginx.key
+          - -out
+          - /etc/nginx/ssl/nginx.cert
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            allowPrivilegeEscalation: false
+            privileged: false
+            runAsNonRoot: true
+            runAsGroup: 101
+            runAsUser: 101
       containers:
         - image: {{ .Values.image.repository }}:{{ .Values.version | default .Values.version }}
           volumeMounts:
@@ -47,9 +70,28 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: liqo-dashboard
           ports:
-            - containerPort: 80
-              name: http
+            - containerPort: 8443
+              name: https
               protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: https
+              scheme: HTTPS
+            initialDelaySeconds: 3
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 1
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            allowPrivilegeEscalation: false
+            privileged: false
+            runAsNonRoot: true
+            runAsGroup: 101
+            runAsUser: 101
           env:
             - name: OIDC_PROVIDER_URL
               valueFrom:
@@ -89,7 +131,7 @@ spec:
     - name: https
       protocol: TCP
       port: 443
-      targetPort: 443
+      targetPort: https
 
 ---
 
