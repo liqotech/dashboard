@@ -296,7 +296,10 @@ function ResourceGeneral(props){
       {loading ? <LoadingIndicator /> : (
         resource[0] ? (
           <div aria-label={'crd'} key={resource[0].metadata.name} ref={setContainer}
-               style={{height: props._params ? '80%' : '92vh', overflow: 'auto', marginLeft: -20, marginRight: -20, marginTop: -20}}
+               style={{height: props._params ? '80%' :
+                   (window.api.dashConfigs.current.spec && window.api.dashConfigs.current.spec.footer && window.api.dashConfigs.current.spec.footer.enabled) ?
+                     'calc(91vh - 50px)' : '91vh',
+                 overflow: 'auto', marginLeft: -20, marginRight: -20, marginTop: -20}}
           >
             <div style={{marginLeft: 20, marginRight: 20}}>
               {!props.onRef ? (
