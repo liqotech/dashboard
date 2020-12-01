@@ -28,11 +28,17 @@ export default function NamespaceSelect(){
         <Select.Option key={'all namespaces'} value={'all namespaces'} children={'all namespaces'}/>
       )
 
-      if(!window.api.namespace.current)
-        setSelectedNS('all namespaces');
-      else setSelectedNS(window.api.namespace.current);
+      handleExternalChangeNS();
+
+      window.api.NSArrayCallback.current.push(handleExternalChangeNS);
     }).catch(error => console.log(error));
   }, [])
+
+  const handleExternalChangeNS = () => {
+    if(!window.api.namespace.current)
+      setSelectedNS('all namespaces');
+    else setSelectedNS(window.api.namespace.current);
+  }
 
   const handleChangeNS = item => {
     window.api.setNamespace(item);

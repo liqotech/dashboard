@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Table } from 'antd';
+import { Typography, Table, List } from 'antd';
 import { Link, withRouter, useLocation } from 'react-router-dom';
 import { getColumnSearchProps } from '../../services/TableUtils';
 import ListHeader from '../resourceList/ListHeader';
 import ErrorRedirect from '../../error-handles/ErrorRedirect';
+import { RightOutlined } from '@ant-design/icons';
 
 function APIGroupList() {
   /**
@@ -60,7 +61,7 @@ function APIGroupList() {
       key: 'Name',
       title: <div style={{marginLeft: '2em'}}>Name</div>,
       fixed: true,
-      ...getColumnSearchProps('Name', renderAPIGroups)
+      ...getColumnSearchProps('Name', renderAPIGroups),
     },
     {
       dataIndex: 'Preferred Version',
@@ -70,6 +71,35 @@ function APIGroupList() {
       ...getColumnSearchProps('Preferred Version', renderAPIGroups)
     }
   ]
+
+  const expandedRowRender = (record) => {
+    let versions = APIGroups.find(item => item.name === record.key).versions;
+    const data = [];
+
+    versions.forEach(version => {
+      data.push(
+        <div>
+          <RightOutlined style={{paddingRight: 20}}/>
+          <Link style={{ color: 'rgba(0, 0, 0, 0.85)'}} to={{
+            pathname: location.pathname + '/' + version.groupVersion
+          }} >
+            <Typography.Text strong>{version.groupVersion}</Typography.Text>
+          </Link>
+        </div>
+      )
+    })
+
+    return <List
+      style={{marginTop: -16, marginBottom: -16}}
+      bordered={false}
+      dataSource={data}
+      renderItem={item => (
+        <List.Item>
+          {item}
+        </List.Item>
+      )}
+    />;
+  };
 
   if(error)
     return <ErrorRedirect match={{params: {statusCode: error}}} />
@@ -82,6 +112,7 @@ function APIGroupList() {
                hideOnSinglePage: APIGroupViews < 11,
                showSizeChanger: true,
              }} showSorterTooltip={false}
+             expandable={{ expandedRowRender }}
              loading={loading}
       />
     </div>

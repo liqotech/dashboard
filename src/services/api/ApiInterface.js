@@ -9,7 +9,7 @@ import Utils from '../Utils';
  *
  */
 
-export default function ApiInterface(_user, props) {
+export default function ApiInterface(_user, tokenLogout) {
 
   const CRDs = {current: [DashboardConfigCRD, CustomViewCRD]};
   const customViews = {current: []};
@@ -47,8 +47,16 @@ export default function ApiInterface(_user, props) {
     NSArrayCallback.current.forEach(cb => cb());
   }
 
+  const checkTokenExp = () => {
+    if(tokenLogout && Utils().parseJWT() && Utils().parseJWT().exp &&
+      (Utils().parseJWT().exp - (Date.now()/1000)) <= 0
+    )
+      tokenLogout();
+  }
+
   /** Handle errors: if 401 or 403 log out */
   const handleError = (error) => {
+    checkTokenExp();
     if(!error)
       return Promise.reject(error);
     else if(error.response && error.response._fetchResponse.status)
@@ -530,7 +538,7 @@ export default function ApiInterface(_user, props) {
       .catch(error => handleError(error));
   }
 
-  const getGenericResource = (partialPath, setItems, notifyFunc) => {
+  const getGenericResource = (partialPath, setItems, noNamespaceCheck, notifyFunc) => {
     let path = window.APISERVER_URL + partialPath;
 
     return apiManager.current.fetchRaw(path, 'GET')
@@ -538,7 +546,7 @@ export default function ApiInterface(_user, props) {
         if(setItems){
           if(!notifyFunc){
             notifyFunc = (type, object) => {
-              resourceNotifyEvent(setItems, type, object);
+              resourceNotifyEvent(setItems, type, object, noNamespaceCheck);
             }
           }
           const array = partialPath.split('/');

@@ -2,8 +2,8 @@ import { message } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 
-export function resourceNotifyEvent(func, type, object){
-  if(object.metadata.namespace && object.metadata.namespace !== window.api.namespace.current && window.api.namespace.current)
+export function resourceNotifyEvent(func, type, object, noNamespaceCheck){
+  if(!noNamespaceCheck && object.metadata.namespace && object.metadata.namespace !== window.api.namespace.current && window.api.namespace.current)
     return;
 
   func(prev => {
