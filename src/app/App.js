@@ -33,7 +33,7 @@ function App(props) {
   window.APISERVER_URL = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/apiserver';
 
   const initialPath = useRef(window.location.pathname);
-  const [api, setApi] = useState(ApiInterface({id_token: ''}, props));
+  const [api, setApi] = useState(ApiInterface({id_token: ''}));
   const authManager = useRef(Authenticator());
   const [, setConfig] = useState(null);
 
@@ -65,7 +65,7 @@ function App(props) {
   const tokenLogout = () => {
     Utils().removeCookie();
     if(!window.OIDC_PROVIDER_URL){
-      window.api = ApiInterface({id_token: ''}, props);
+      window.api = ApiInterface({id_token: ''});
       api.setUser({id_token: ''})
       setApi({...api});
       props.history.push('/login');
@@ -90,27 +90,27 @@ function App(props) {
   }
 
   const manageToken = (token) => {
-    if(api.user.current.id_token !== '') return;
+    if (api.user.current.id_token !== '') return;
     let user = { id_token: token };
-    let _api = ApiInterface(user, props);
+    let _api = ApiInterface(user, tokenLogout);
     try {
       Utils().parseJWT(token)
-    } catch(error){
+      _api.loadDashboardCRs('DashboardConfig');
+      _api.loadDashboardCRs('View');
+      window.api = _api;
+      window.api.DCArrayCallback.current.push(() => setConfig(window.api.dashConfigs.current));
+      setApi(_api);
+      message.success('Successfully logged in');
+      Utils().setCookie(token);
+
+      /** Get the CRDs at the start of the app */
+      _api.getCRDs()
+        .catch((error) => {
+          console.log(error)
+        });
+    } catch (error) {
       tokenLogout();
     }
-    _api.loadDashboardCRs('DashboardConfig');
-    _api.loadDashboardCRs('View');
-    window.api = _api;
-    window.api.DCArrayCallback.current.push(() => setConfig(window.api.dashConfigs.current));
-    setApi(_api);
-    message.success('Successfully logged in');
-    Utils().setCookie(token);
-
-    /** Get the CRDs at the start of the app */
-    _api.getCRDs()
-      .catch((error) => {
-      console.log(error)
-    });
   }
 
   const manageOIDCSession = () => {
@@ -122,7 +122,7 @@ function App(props) {
     authManager.current.manager.events.addAccessTokenExpiring(() => {
       authManager.current.manager.signinSilent().then(user => {
         Utils().removeCookie();
-        window.api = ApiInterface(user, props);
+        window.api = ApiInterface(user, tokenLogout);
         Utils().setCookie(user.id_token);
       }).catch(() => tokenLogout());
     });

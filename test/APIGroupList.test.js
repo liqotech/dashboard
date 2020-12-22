@@ -103,11 +103,12 @@ describe('APIGroupList', () => {
 
     userEvent.click(await screen.findByText('Apis'));
     expect(await screen.findByText('apps')).toBeInTheDocument();
+    let expande = await screen.findAllByLabelText('Expand row');
+    userEvent.click(expande[4]);
     userEvent.click(await screen.findByText('apps'));
     expect(await screen.findByText('deployments')).toBeInTheDocument();
     userEvent.click(await screen.findByText('apis'));
     userEvent.click(await screen.findByLabelText('home'));
-
     userEvent.click(await screen.findByText(/Api v1/i));
     expect(await screen.findByText('pods')).toBeInTheDocument();
     userEvent.click(await screen.findByText('pods'));

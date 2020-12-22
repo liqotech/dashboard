@@ -146,7 +146,7 @@ spec:
                                             type: integer
                                           x:
                                             type: integer
-                                          y:
+                                          "y":
                                             type: integer
                                       cardTitle:
                                         type: string

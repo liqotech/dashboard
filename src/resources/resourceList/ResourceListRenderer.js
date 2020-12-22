@@ -8,7 +8,10 @@ import {
 } from '@ant-design/icons';
 
 export const renderResourceList = (text, record, dataIndex, resourceList) => {
-  let resource = resourceList.find(item => {return item.metadata.name === record.Name});
+  let resource;
+  if(record.Namespace)
+    resource = resourceList.find(item => {return (item.metadata.name === record.Name && item.metadata.namespace === record.Namespace)});
+  else resource = resourceList.find(item => {return (item.metadata.name === record.Name)});
 
   if(Array.isArray(text)){
     if(text.length === 0)

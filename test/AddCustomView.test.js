@@ -2,14 +2,13 @@ import { act, fireEvent, screen, render } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { alwaysPresentGET, loginTest, mockCRDAndViewsExtended, setToken } from './RTLUtils';
+import { alwaysPresentGET, mockCRDAndViewsExtended, setToken } from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import { testTimeout } from '../src/constants';
 import { MemoryRouter } from 'react-router-dom';
 import ApiInterface from '../src/services/api/ApiInterface';
 import DashboardConfig from '../__mocks__/dashboardconf.json';
 import AddCustomView from '../src/customView/AddCustomView';
-import CRDmockResponse from '../__mocks__/crd_fetch.json';
 
 fetchMock.enableMocks();
 
@@ -32,24 +31,24 @@ describe('Header', () => {
       </MemoryRouter>
     )
 
-    userEvent.click(await screen.findByText(/view/i))
+    userEvent.click(await screen.findByText(/new custom view/i))
 
     await userEvent.type(screen.getAllByRole('input')[0], 'deployments');
 
     await userEvent.type(screen.getAllByRole('combobox')[0], 'deployment');
     let test = await screen.findByText('deployments');
     fireEvent.mouseOver(test);
-    fireEvent.click(test);
+    userEvent.click(test);
 
     await userEvent.type(screen.getAllByRole('combobox')[0], 'deployment');
     test = await screen.findAllByText('deployments');
     fireEvent.mouseOver(test[1]);
-    fireEvent.click(test[1]);
+    fireEvent.keyPress(test[1], { key: "Enter", code: 13, charCode: 13 });
 
     await userEvent.type(screen.getAllByRole('combobox')[0], 'deployment');
     test = await screen.findByText('deployments');
     fireEvent.mouseOver(test);
-    fireEvent.click(test);
+    fireEvent.keyPress(test, { key: "Enter", code: 13, charCode: 13 });
 
     await act(async () => {
       userEvent.click(screen.getByText('OK'));
@@ -76,17 +75,17 @@ describe('Header', () => {
       </MemoryRouter>
     )
 
-    userEvent.click(await screen.findByText(/view/i))
+    userEvent.click(await screen.findByText(/new custom view/i))
 
     await userEvent.type(screen.getAllByRole('input')[0], 'deployments');
 
     await userEvent.type(screen.getAllByRole('combobox')[0], 'deployment');
     let test = await screen.findByText('deployments');
     fireEvent.mouseOver(test);
-    fireEvent.click(test);
+    fireEvent.keyPress(test, { key: "Enter", code: 13, charCode: 13 });
 
     await act(async () => {
-      userEvent.click(screen.getByText('OK'));
+      userEvent.click(await screen.findByText('OK'));
       await new Promise((r) => setTimeout(r, 500));
     })
 
