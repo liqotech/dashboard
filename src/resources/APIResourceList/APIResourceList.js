@@ -68,21 +68,18 @@ function APIResourceList() {
     {
       dataIndex: 'Name',
       key: 'Name',
-      fixed: true,
       title: <div style={{marginLeft: '2em'}}>Name</div>,
       ...getColumnSearchProps('Name', renderAPIResourceList)
     },
     {
       dataIndex: 'Kind',
       key: 'Kind',
-      fixed: true,
       title: <div style={{marginLeft: '2em'}}>Kind</div>,
       ...getColumnSearchProps('Kind', renderAPIResourceList)
     },
     {
       dataIndex: 'Namespaced',
       key: 'Namespaced',
-      fixed: true,
       title: <div style={{marginLeft: '2em'}}>Namespaced</div>,
       ...getColumnSearchProps('Namespaced', renderAPIResourceList)
     },
