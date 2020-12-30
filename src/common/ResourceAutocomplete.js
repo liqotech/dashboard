@@ -8,27 +8,29 @@ export function ResourceAutocomplete(props){
   const autoCompleteSearch = () => {
     window.api.getApis('/').then(res => {
       res.body.groups.forEach(group => {
-        window.api.getGenericResource(
-          '/apis/' +
-          group.preferredVersion.groupVersion
-        ).then(_res => {
-          let tempRes = [];
-          _res.resources.forEach(resource => {
-            if(resource.name.split('/').length === 1)
-              tempRes.push({
-                value: '/apis/' + group.preferredVersion.groupVersion + '/' + resource.name,
-                label: resource.name
-              })
-          });
-          setAutocomplete(prev => {
-            if(!prev.find(item => Utils().arraysEqual(item.options, tempRes)))
-              return [...prev, {
-                label: group.name,
-                options: tempRes
-              }];
-            else return prev;
-          })
-        }).catch(error => console.log(error))
+        group.versions.forEach(version => {
+          window.api.getGenericResource(
+            '/apis/' +
+            version.groupVersion
+          ).then(_res => {
+            let tempRes = [];
+            _res.resources.forEach(resource => {
+              if(resource.name.split('/').length === 1)
+                tempRes.push({
+                  value: '/apis/' + version.groupVersion + '/' + resource.name,
+                  label: resource.name
+                })
+            });
+            setAutocomplete(prev => {
+              if(!prev.find(item => Utils().arraysEqual(item.options, tempRes)))
+                return [...prev, {
+                  label: version.groupVersion,
+                  options: tempRes
+                }];
+              else return prev;
+            })
+          }).catch(error => console.log(error))
+        })
       })
     }).catch(error => console.log(error))
 
