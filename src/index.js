@@ -19,7 +19,7 @@ const main = document.createElement('div');
 document.body.appendChild(main);
 main.setAttribute('id', 'main');
 ReactDOM.render(
-    <Router>
+    <Router basename={process.env.PUBLIC_PATH}>
       <App />
     </Router>
   , main
