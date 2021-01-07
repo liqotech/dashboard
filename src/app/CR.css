@@ -24,6 +24,11 @@
     transition: all 0.3s !important;
 }
 
+.ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-arrow {
+    padding: 6px 16px 6px 0 !important;
+    top: inherit !important;
+}
+
 .ant-collapse-content .ant-collapse-content-box {
     padding: 8px 12px !important;
 }

@@ -98,6 +98,7 @@ module.exports = {
     themePlugin,
     new AntdDayjsWebpackPlugin(),
     new webpack.DefinePlugin({
+      'process.env.PUBLIC_PATH': JSON.stringify(''),
       OIDC_PROVIDER_URL: JSON.stringify(process.env.OIDC_PROVIDER_URL),
       OIDC_CLIENT_ID: JSON.stringify(process.env.OIDC_CLIENT_ID),
       OIDC_REDIRECT_URI: JSON.stringify(process.env.OIDC_REDIRECT_URI),

@@ -32,7 +32,7 @@ function App(props) {
   /** Set the URL to which we make the call to the proxy */
   window.APISERVER_URL = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/apiserver';
 
-  const initialPath = useRef(window.location.pathname);
+  const initialPath = useRef(window.location.pathname.replace(process.env.PUBLIC_PATH, ''));
   const [api, setApi] = useState(ApiInterface({id_token: ''}));
   const authManager = useRef(Authenticator());
   const [, setConfig] = useState(null);
