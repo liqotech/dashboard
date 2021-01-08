@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs, message, Badge, Drawer } from 'antd';
 import FormGenerator from '../OAPIV3FormGenerator/FormGenerator';
 import Editor from '../Editor';
+import NewFromFile from './NewFromFile';
 
 function NewResource(props) {
 
@@ -24,7 +25,6 @@ function NewResource(props) {
     }
 
     if(props.resource){
-      /** A new cr from a crd */
 
       if (props.resource.spec.scope === 'Namespaced' && !namespace) {
         namespace = 'default';
@@ -73,6 +73,9 @@ function NewResource(props) {
             <FormGenerator CRD={props.resource} submit={submit}/>
           </Tabs.TabPane>
         ) : null}
+        <Tabs.TabPane tab="Import File" key="3">
+          <NewFromFile {...props} />
+        </Tabs.TabPane>
       </Tabs>
     </Drawer>
   );

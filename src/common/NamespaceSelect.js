@@ -3,7 +3,7 @@ import  { Col, Row, Select } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import Utils from '../services/Utils';
 
-export default function NamespaceSelect(){
+export default function NamespaceSelect(props){
   const [selectedNS, setSelectedNS] = useState('');
   const NSOptions = useRef([]);
   const NSs = useRef([]);
@@ -24,13 +24,16 @@ export default function NamespaceSelect(){
         <Select.Option key={NS.metadata.name} value={NS.metadata.name} children={NS.metadata.name}/>
       ));
 
-      NSOptions.current.push(
-        <Select.Option key={'all namespaces'} value={'all namespaces'} children={'all namespaces'}/>
-      )
+      if(props.defaultNS){
+        setSelectedNS(props.defaultNS);
+      } else {
+        NSOptions.current.push(
+          <Select.Option key={'all namespaces'} value={'all namespaces'} children={'all namespaces'}/>
+        )
 
-      handleExternalChangeNS();
-
-      window.api.NSArrayCallback.current.push(handleExternalChangeNS);
+        handleExternalChangeNS();
+        window.api.NSArrayCallback.current.push(handleExternalChangeNS);
+      }
     }).catch(error => console.log(error));
   }, [])
 
@@ -41,14 +44,17 @@ export default function NamespaceSelect(){
   }
 
   const handleChangeNS = item => {
-    window.api.setNamespace(item);
     setSelectedNS(item);
+
+    if(props.handleChangeNS)
+      props.handleChangeNS(item);
+    else window.api.setNamespace(item);
   };
 
   return(
     <Select
-      style={{paddingRight: 20, minWidth: '10em'}}
-      bordered={false}
+      style={props.style ? props.style : {paddingRight: 20, minWidth: '10em'}}
+      bordered={!!props.bordered}
       showSearch
       aria-label={'select-namespace'}
       placeholder={'Select namespace'}
