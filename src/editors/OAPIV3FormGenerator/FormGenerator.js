@@ -6,7 +6,6 @@ import { Button, Card, message, Typography } from 'antd';
 import { widgets } from './CustomWidget';
 import {  fields } from './CustomField';
 import CustomFieldTemplate from './CustomFieldTemplate';
-import { json } from 'generate-schema';
 
 const Form = withTheme(AntDTheme);
 
@@ -16,6 +15,7 @@ function FormGenerator(props) {
   let currentMetadata = {};
 
   const onSubmit = value => {
+
     if(!props.onUpdate){
       let metadata = currentMetadata;
 
@@ -36,12 +36,26 @@ function FormGenerator(props) {
     }
   }
 
-  let metadata = {
+  let formData = {
     name: ''
   }
 
+  let metadata = {
+    type: 'object',
+    properties: {
+      name: {
+        type: 'string',
+        description: 'The name of the resource. It is a string that uniquely identifies this object within the current namespace (if the resource is namespaced).'
+      }
+    }
+  }
+
   if(props.CRD.spec.scope !== 'Cluster'){
-    metadata.namespace = '';
+    metadata.properties.namespace = {
+      type: 'string',
+      description: 'The namespace of the resource. A namespace is a DNS compatible label that objects are subdivided into. The default namespace is \'default\'. '
+    };
+    formData.namespace = 'default';
   }
 
   return(
@@ -52,7 +66,8 @@ function FormGenerator(props) {
               style={{marginBottom: 10}}
         >
           <Form
-            schema={json(metadata)}
+            formData={formData}
+            schema={metadata}
             fields={fields}
             FieldTemplate={CustomFieldTemplate}
             widgets={widgets}

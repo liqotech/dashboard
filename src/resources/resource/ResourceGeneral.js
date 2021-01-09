@@ -7,10 +7,11 @@ import ResourceForm from './ResourceForm';
 import _ from 'lodash';
 import { resourceNotifyEvent } from '../common/ResourceUtils';
 import { useLocation, useParams } from 'react-router-dom';
-import { CodeOutlined, InfoCircleOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
+import { CodeOutlined, InfoCircleOutlined, PlusOutlined, LinkOutlined } from '@ant-design/icons';
 import { createNewConfig, getResourceConfig, updateResourceConfig } from '../common/DashboardConfigUtils';
 import CustomTab from './CustomTab';
 import { secondaryColor } from '../../services/Colors';
+import ReferenceTab from './ReferenceTab';
 
 function ResourceGeneral(props){
   const [container, setContainer] = useState(null);
@@ -28,14 +29,17 @@ function ResourceGeneral(props){
   const changeTabFlag = useRef(true);
 
   useEffect(() => {
-    loadResource();
-    getDashConfig();
-    window.api.DCArrayCallback.current.push(getDashConfig);
     setOnCustomResource(() => {
       if(params.resource && params.group){
         return window.api.getCRDFromName(params.resource + '.' + params.group);
       }
     })
+  }, [window.api.CRDs.current])
+
+  useEffect(() => {
+    loadResource();
+    getDashConfig();
+    window.api.DCArrayCallback.current.push(getDashConfig);
 
     /** When unmounting, eliminate every callback and watch */
     return () => {
@@ -115,6 +119,14 @@ function ResourceGeneral(props){
             <CodeOutlined />JSON
           </span>
         )
+      },
+      {
+        key: 'LinkedResources',
+        tab: (
+          <span>
+            <LinkOutlined />LinkedResources
+          </span>
+        )
       }
     ]
 
@@ -152,6 +164,13 @@ function ResourceGeneral(props){
           />
         </div>
       ),
+      LinkedResources: (
+        <div style={{padding: 12}}>
+          <ReferenceTab resource={resource[0]} kind={resource[0].kind}
+                        onCustomResource={onCustomResource}
+          />
+        </div>
+      )
     }
 
     if(resourceConfig.render && resourceConfig.render.tabs){

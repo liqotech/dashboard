@@ -2,6 +2,7 @@ import React from 'react';
 import { Badge, Col, Collapse, Input, Row, Tooltip, Typography } from 'antd';
 import { rootSplitCamelCaseAndUp, splitCamelCaseAndUp } from '../../services/stringUtils';
 import { QuestionCircleOutlined } from '@ant-design/icons';
+import ReferenceHandler from './ReferenceHandler';
 
 export function checkChildren(props){
   if(!props.schema.properties)
@@ -16,7 +17,33 @@ export function checkChildren(props){
   return i === 0 || i === Object.keys(props.schema.properties).length;
 }
 
-export function customFieldTemplateGeneral(props){
+
+function customObject(props){
+  return (
+    <div className={props.classNames} id={props.id} style={{ marginBottom: 5, marginTop: 5 }}>
+      <Collapse defaultActiveKey={props.id === 'root' ? ('collapse_' + props.id) : null}>
+        <Collapse.Panel
+          key={'collapse_' + props.id}
+          header={ <div>
+            {props.label ? <Typography.Text strong>
+              {splitCamelCaseAndUp(props.label)}
+              {props.schema.description ? (
+                <Tooltip placement="top" title={props.schema.description}>
+                  <QuestionCircleOutlined style={{ marginLeft: 5 }}/>
+                </Tooltip>
+              ) : null}
+            </Typography.Text> : <Typography.Text strong>General</Typography.Text>}
+          </div>}
+        >
+          { props.children }
+        </Collapse.Panel>
+      </Collapse>
+      {props.errors}
+    </div>
+  )
+}
+
+export function customFieldTemplateGeneral(props, onViewer){
   const { id, classNames, label, errors, children } = props;
 
   if (!props.schema.type && !label) {
@@ -38,28 +65,11 @@ export function customFieldTemplateGeneral(props){
         </div>
       )
     } else {
-      return (
-        <div className={classNames} id={id} style={{ marginBottom: 5, marginTop: 5 }}>
-          <Collapse defaultActiveKey={id === 'root' ? ('collapse_' + id) : null}>
-            <Collapse.Panel
-              key={'collapse_' + id}
-              header={ <div>
-                {label ? <Typography.Text strong>
-                  {splitCamelCaseAndUp(label)}
-                  {props.schema.description ? (
-                    <Tooltip placement="top" title={props.schema.description}>
-                      <QuestionCircleOutlined style={{ marginLeft: 5 }}/>
-                    </Tooltip>
-                  ) : null}
-                </Typography.Text> : <Typography.Text strong>General</Typography.Text>}
-              </div>}
-            >
-              { children }
-            </Collapse.Panel>
-          </Collapse>
-          {errors}
-        </div>
-      )
+      /** An object reference is like this: group/kindRef */
+      if(label && label.slice(-3) === 'Ref' && label.split('/')[1]){
+        return <ReferenceHandler {...props} onViewer={onViewer} />
+      }
+      return customObject(props);
     }
   } else if (props.schema.type === 'array') {
     return (

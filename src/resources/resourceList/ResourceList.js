@@ -41,6 +41,14 @@ function ResourceList(props) {
   })
 
   useEffect(() => {
+    setOnCustomResource(() => {
+      if(params.resource && params.group){
+        return window.api.getCRDFromName(params.resource + '.' + params.group);
+      }
+    })
+  }, [window.api.CRDs.current, location.pathname])
+
+  useEffect(() => {
     if(params.namespace) {
       window.api.NSArrayCallback.current.push(changeNamespace);
       loadResourceList();
@@ -63,11 +71,6 @@ function ResourceList(props) {
     if(!props.onRef){
       window.api.DCArrayCallback.current.push(getDashConfig);
     }
-    setOnCustomResource(() => {
-      if(params.resource && params.group){
-        return window.api.getCRDFromName(params.resource + '.' + params.group);
-      }
-    })
 
     return () => {
       setLoading(true);

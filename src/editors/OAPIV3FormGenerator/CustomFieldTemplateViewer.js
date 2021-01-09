@@ -7,7 +7,7 @@ import { customFieldTemplateGeneral } from './CustomFieldTemplate';
 function CustomFieldTemplateViewer(props){
   const { id, classNames, label, required, errors, children } = props;
 
-  let render = customFieldTemplateGeneral(props);
+  let render = customFieldTemplateGeneral(props, true);
 
   if(!render){
     return (

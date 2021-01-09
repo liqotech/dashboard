@@ -1,5 +1,6 @@
 import { message } from 'antd';
 import _ from 'lodash';
+import ReferenceHandler from '../../editors/OAPIV3FormGenerator/ReferenceHandler';
 import React from 'react';
 
 export function resourceNotifyEvent(func, type, object, noNamespaceCheck){
@@ -52,13 +53,13 @@ export function getNamespaced(path){
     }).catch(error => Promise.reject(error));
 }
 
-export function filterResource(props, res){
-  if(props.onRef.filter === 'labels'){
+export function filterResource(props, res) {
+  if (props.onRef.filter === 'labels') {
     res = res.filter(item => {
       let flag = 0;
       _.keys(props.onRef.filterValues).forEach(key => {
-        if(key.includes('app.kubernetes')) return;
-        if(item.metadata.labels && item.metadata.labels[key] === props.onRef.filterValues[key])
+        if (key.includes('app.kubernetes')) return;
+        if (item.metadata.labels && item.metadata.labels[key] === props.onRef.filterValues[key])
           flag++;
       })
       return flag > 0;
@@ -94,16 +95,30 @@ export function searchDirectReferences(resource){
 export function searchResourceByKindAndGroup(kind, group){
   return window.api.getApis('/')
     .then(res => {
-      let version = res.body.groups.find(_group => _group.name === group).preferredVersion.groupVersion;
-      return window.api.getGenericResource('/apis/' +
-        version + '/'
-      ).then(res => {
-        let resource = res.resources.find(r => r.kind === kind);
+      let promises = res.body.groups.find(_group => _group.name === group).versions.map(version => {
         return window.api.getGenericResource('/apis/' +
-          version + '/' + resource.name
+          version.groupVersion + '/'
         ).then(res => {
-          return res;
+          let resource = res.resources.find(r => r.kind === kind);
+          if(resource){
+            return window.api.getGenericResource('/apis/' +
+              version.groupVersion + '/' + resource.name
+            ).then(res => {
+              return res;
+            })
+          }
         })
-      })
+      });
+
+      return Promise.all(promises).then(
+        res => {
+          let result;
+          res.forEach(r => {
+            if(r) result = r;
+          })
+          return result;
+        }
+      )
+
     })
 }

@@ -5,11 +5,9 @@ import {
   Typography, Tooltip,
   message,
 } from 'antd';
-import { Link } from 'react-router-dom';
 import {
   ExclamationCircleOutlined, LoadingOutlined,
-  DragOutlined, PushpinOutlined, DeleteOutlined,
-  EditOutlined
+  DeleteOutlined, EditOutlined
 } from '@ant-design/icons';
 import ResourceBreadcrumb from '../common/ResourceBreadcrumb';
 import FavouriteButton from '../common/buttons/FavouriteButton';
@@ -17,19 +15,8 @@ import UpdateCR from '../../editors/CRD/UpdateCR';
 import CustomViewButton from '../common/buttons/CustomViewButton';
 
 function ResourceHeader(props) {
-  const [isPinned, setIsPinned] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
-
-  /*const editDescription = async (value) => {
-    props.resource.metadata.annotations = {...props.resource.metadata.annotations, description: value};
-
-    await props.updateFunc(
-      props.resource.metadata.name,
-      props.resource.metadata.namespace,
-      props.resource
-    )
-  }*/
 
   /** Delete the Resource */
   const handleClick_delete = () => {
@@ -121,21 +108,6 @@ function ResourceHeader(props) {
           </Col>
         </Row>
       </div>
-        {/*<Row>
-          <Col>
-            <Descriptions style={{marginTop: 10, marginLeft: 15}}>
-              <Descriptions.Item>
-                <Typography.Paragraph editable={{ onChange: editDescription }} type={'secondary'} style={{marginBottom: 0}}>
-                  {props.resource.metadata.annotations && props.resource.metadata.annotations.description ?
-                    props.resource.metadata.annotations.description :
-                    'No description for this CRD'
-                  }
-                </Typography.Paragraph >
-              </Descriptions.Item>
-            </Descriptions>
-          </Col>
-        </Row>
-        <Divider style={{marginTop: 0, marginBottom: 15}} />*/}
     </Alert.ErrorBoundary>
   );
 }
