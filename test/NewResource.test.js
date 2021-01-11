@@ -59,9 +59,6 @@ async function check_new_CR(){
 
   userEvent.click(items[0]);
 
-  expect(await screen.findAllByText('Cost')).toHaveLength(2);
-  expect(screen.getAllByText('Name')).toHaveLength(3);
-
   const textboxes = await screen.findAllByRole('textbox');
   expect(textboxes[0]).toHaveAttribute('value', '1');
   expect(textboxes[1]).toHaveAttribute('value', 'cyan');
