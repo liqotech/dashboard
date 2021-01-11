@@ -216,6 +216,11 @@ export default function Utils() {
     });
   }
 
+  function csvToJson(file) {
+    const csv = require('csvtojson');
+    return csv().fromString(file);
+  }
+
   return {
     setRealProperties,
     OAPIV3toJSONSchema,
@@ -227,6 +232,7 @@ export default function Utils() {
     parseJWT,
     setCookie,
     getCookie,
-    removeCookie
+    removeCookie,
+    csvToJson
   }
 }
