@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { Button, Input, Table, Tooltip } from 'antd';
 import { withRouter, useLocation, useHistory, useParams } from 'react-router-dom';
 import { InsertRowRightOutlined } from '@ant-design/icons';
-import { getColumnSearchProps } from '../../services/TableUtils';
+import { getColumnSearchProps, ResizableTitle } from '../../services/TableUtils';
 import ListHeader from './ListHeader';
 import { getNamespaced, filterResource, resourceNotifyEvent } from '../common/ResourceUtils';
 import { renderResourceList } from './ResourceListRenderer';
@@ -126,11 +126,8 @@ function ResourceList(props) {
         columns.push({
           dataIndex: column.columnTitle,
           key: column.columnContent,
-          width: '10em',
-          ellipsis: true,
-          fixed: (index === 0 ? 'left' : false),
           ...getColumnSearchProps(column.columnTitle, (text, record, dataIndex) =>
-            renderResourceList(text, record, dataIndex, resourceList)
+            renderResourceList(text, record, dataIndex, resourceList), setColumnHeaders
           ),
           title: (
             editColumn === column.columnContent ? (
@@ -182,7 +179,7 @@ function ResourceList(props) {
           ellipsis: true,
           fixed: 'left',
           ...getColumnSearchProps('Name', (text, record, dataIndex) =>
-            renderResourceList(text, record, dataIndex, resourceList)
+            renderResourceList(text, record, dataIndex, resourceList), setColumnHeaders
           ),
         },
         {
@@ -205,9 +202,8 @@ function ResourceList(props) {
               </span>
             </div>
           ),
-          ellipsis: true,
           ...getColumnSearchProps('Namespace', (text, record, dataIndex) =>
-            renderResourceList(text, record, dataIndex, resourceList)
+            renderResourceList(text, record, dataIndex, resourceList), setColumnHeaders
           ),
         }
       )
@@ -402,7 +398,12 @@ function ResourceList(props) {
       ) : null}
       <Table columns={columnHeaders} dataSource={columnContents}
              size={props.onRef ? 'small' : 'default'}
-             bordered scroll={{ x: 'max-content' }} sticky
+             components={{
+               header: {
+                 cell: ResizableTitle
+               }
+             }}
+             scroll={{ x: 'max-content' }} sticky
              pagination={{ position: ['bottomCenter'],
                hideOnSinglePage: columnContents.length < 11,
                showSizeChanger: true,

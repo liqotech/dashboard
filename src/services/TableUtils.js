@@ -1,6 +1,8 @@
 import { Button, Input, Space } from 'antd';
 import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
 import React from 'react';
+import { Resizable } from 'react-resizable';
+import Measure from 'react-measure';
 
 let searchText = '';
 let searchedColumn = '';
@@ -16,7 +18,62 @@ const handleReset = clearFilters => {
   searchText = '' ;
 };
 
-export const getColumnSearchProps = (dataIndex, renderFunc) => ({
+export const ResizableTitle = (props) => {
+  const { onResize, width, ...restProps } = props;
+
+  if(!onResize)
+    return <th {...restProps} />
+
+  if(!width)
+    return (
+      <Measure
+        bounds
+        onResize={contentRect => {
+          onResize(null, {}, contentRect.bounds);
+        }}
+      >
+        {({ measureRef }) => (
+          <th ref={measureRef} {...restProps} />
+        )}
+      </Measure>
+    )
+
+  return (
+    <Resizable
+      width={width}
+      height={0}
+      handleSize={[0, 0]}
+      handle={
+        <span
+          className="react-resizable-handle"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        />
+      }
+      onResize={onResize}
+      draggableOpts={{ enableUserSelectHack: false }}
+    >
+      <th {...restProps} />
+    </Resizable>
+  );
+};
+
+const handleResize = (column, setColumns) => (e, { size }, bounds) => {
+  if(!size && bounds)
+    size = bounds;
+
+  setColumns(prev => {
+    let index = prev.indexOf(prev.find(item => item.key === column.key));
+    prev[index] = {
+      ...prev[index],
+      width: size.width
+    }
+    return [...prev];
+  })
+};
+
+export const getColumnSearchProps = (dataIndex, renderFunc, setColumns) => ({
   filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => {
     return (
       <div style={{ padding: 8 }}>
@@ -55,6 +112,10 @@ export const getColumnSearchProps = (dataIndex, renderFunc) => ({
       setTimeout(() => searchText.select());
     }
   },
+  onHeaderCell: setColumns ? (column) => ({
+    width: column.width,
+    onResize: handleResize(column, setColumns)
+  }) : null,
   render: (text, record) => {
     return renderFunc(text, record, dataIndex);
   }

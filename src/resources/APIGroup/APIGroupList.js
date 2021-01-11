@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Table, List } from 'antd';
 import { Link, withRouter, useLocation } from 'react-router-dom';
-import { getColumnSearchProps } from '../../services/TableUtils';
+import { getColumnSearchProps, ResizableTitle } from '../../services/TableUtils';
 import ListHeader from '../resourceList/ListHeader';
 import ErrorRedirect from '../../error-handles/ErrorRedirect';
 import { RightOutlined } from '@ant-design/icons';
@@ -10,6 +10,7 @@ function APIGroupList() {
   /**
    * @param: loading: boolean
    */
+  const [columns, setColumns] = useState([])
   const [error, setError] = useState();
   const [loading, setLoading] = useState(true);
   const [APIGroups, setAPIGroups] = useState([]);
@@ -19,6 +20,23 @@ function APIGroupList() {
   useEffect(() => {
     loadAPIGroups();
   }, []);
+
+  useEffect(() => {
+    if(APIGroups.length > 0){
+      setColumns([{
+        dataIndex: 'Name',
+        key: 'Name',
+        title: <div style={{marginLeft: '2em'}}>Name</div>,
+        ...getColumnSearchProps('Name', renderAPIGroups, setColumns),
+      },
+      {
+        dataIndex: 'Preferred Version',
+        key: 'Preferred Version',
+        title: <div style={{marginLeft: '2em'}}>Preferred Version</div>,
+        ...getColumnSearchProps('Preferred Version', renderAPIGroups),
+      }])
+    }
+  }, [APIGroups])
 
   const loadAPIGroups = () => {
     window.api.getApis()
@@ -55,21 +73,6 @@ function APIGroupList() {
     });
   });
 
-  const columns = [
-    {
-      dataIndex: 'Name',
-      key: 'Name',
-      title: <div style={{marginLeft: '2em'}}>Name</div>,
-      ...getColumnSearchProps('Name', renderAPIGroups),
-    },
-    {
-      dataIndex: 'Preferred Version',
-      key: 'Preferred Version',
-      title: <div style={{marginLeft: '2em'}}>Preferred Version</div>,
-      ...getColumnSearchProps('Preferred Version', renderAPIGroups)
-    }
-  ]
-
   const expandedRowRender = (record) => {
     let versions = APIGroups.find(item => item.name === record.key).versions;
     const data = [];
@@ -99,20 +102,36 @@ function APIGroupList() {
     />;
   };
 
+  const dragProps = {
+    onDragEnd(fromIndex, toIndex) {
+      const item = columns.splice(fromIndex, 1)[0];
+      columns.splice(toIndex, 0, item);
+    },
+    nodeSelector: "th",
+    handleSelector: ".dragHandler",
+    ignoreSelector: "react-resizable-handle"
+  };
+
   if(error)
     return <ErrorRedirect match={{params: {statusCode: error}}} />
 
   return (
     <div>
       <ListHeader kind={'Apis'} />
-      <Table columns={columns} dataSource={APIGroupViews}
-             pagination={{ position: ['bottomCenter'],
-               hideOnSinglePage: APIGroupViews < 11,
-               showSizeChanger: true,
-             }} showSorterTooltip={false}
-             expandable={{ expandedRowRender }}
-             loading={loading}
-      />
+        <Table columns={columns} dataSource={APIGroupViews}
+               components={{
+                 header: {
+                   cell: ResizableTitle
+                 }
+               }}
+               bordered
+               pagination={{ position: ['bottomCenter'],
+                 hideOnSinglePage: APIGroupViews < 11,
+                 showSizeChanger: true,
+               }} showSorterTooltip={false}
+               expandable={{ expandedRowRender }}
+               loading={loading}
+        />
     </div>
   );
 }

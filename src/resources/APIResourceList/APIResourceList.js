@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Table } from 'antd';
 import { Link, withRouter, useLocation } from 'react-router-dom';
-import { getColumnSearchProps } from '../../services/TableUtils';
+import { getColumnSearchProps, ResizableTitle } from '../../services/TableUtils';
 import ListHeader from '../resourceList/ListHeader';
 import ErrorRedirect from '../../error-handles/ErrorRedirect';
 
@@ -9,6 +9,7 @@ function APIResourceList() {
   /**
    * @param: loading: boolean
    */
+  const [columns, setColumns] = useState([])
   const [error, setError] = useState();
   const [loading, setLoading] = useState(true);
   const [APIResourceList, setAPIResourceList] = useState([]);
@@ -19,6 +20,29 @@ function APIResourceList() {
   useEffect(() => {
     loadAPIResourceList();
   }, []);
+
+  useEffect(() => {
+    if(APIResourceList.length > 0){
+      setColumns([{
+        dataIndex: 'Name',
+        key: 'Name',
+        title: <div style={{marginLeft: '2em'}}>Name</div>,
+        ...getColumnSearchProps('Name', renderAPIResourceList, setColumns)
+      },
+        {
+          dataIndex: 'Kind',
+          key: 'Kind',
+          title: <div style={{marginLeft: '2em'}}>Kind</div>,
+          ...getColumnSearchProps('Kind', renderAPIResourceList, setColumns)
+        },
+        {
+          dataIndex: 'Namespaced',
+          key: 'Namespaced',
+          title: <div style={{marginLeft: '2em'}}>Namespaced</div>,
+          ...getColumnSearchProps('Namespaced', renderAPIResourceList)
+        }])
+    }
+  }, [APIResourceList])
 
   const loadAPIResourceList = () => {
     window.api.getGenericResource(location.pathname)
@@ -64,27 +88,6 @@ function APIResourceList() {
     });
   });
 
-  const columns = [
-    {
-      dataIndex: 'Name',
-      key: 'Name',
-      title: <div style={{marginLeft: '2em'}}>Name</div>,
-      ...getColumnSearchProps('Name', renderAPIResourceList)
-    },
-    {
-      dataIndex: 'Kind',
-      key: 'Kind',
-      title: <div style={{marginLeft: '2em'}}>Kind</div>,
-      ...getColumnSearchProps('Kind', renderAPIResourceList)
-    },
-    {
-      dataIndex: 'Namespaced',
-      key: 'Namespaced',
-      title: <div style={{marginLeft: '2em'}}>Namespaced</div>,
-      ...getColumnSearchProps('Namespaced', renderAPIResourceList)
-    },
-  ]
-
   if(error)
     return <ErrorRedirect match={{params: {statusCode: error}}} />
 
@@ -92,10 +95,16 @@ function APIResourceList() {
     <div>
       <ListHeader kind={kind} />
       <Table columns={columns} dataSource={APIResourceViews}
+             components={{
+               header: {
+                 cell: ResizableTitle
+               }
+             }}
              pagination={{ position: ['bottomCenter'],
                hideOnSinglePage: APIResourceViews < 11,
                showSizeChanger: true,
              }} showSorterTooltip={false}
+             bordered
              loading={loading}
       />
     </div>
