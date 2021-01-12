@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import Utils from '../../services/Utils';
 import { withTheme } from '@rjsf/core';
 import { Theme as AntDTheme } from '@rjsf/antd';
@@ -12,7 +12,14 @@ const Form = withTheme(AntDTheme);
 function FormGenerator(props) {
   const util = Utils();
   let schema = util.OAPIV3toJSONSchema(props.CRD.spec.validation.openAPIV3Schema).properties.spec;
-  let currentMetadata = {};
+  let [currentMetadata, setCurrentMetadata] = useState(() => {
+    let formData = { name: '' }
+    if(props.CRD.spec.scope !== 'Cluster'){
+      formData.namespace = 'default'
+    }
+    return formData;
+  });
+  let [currentSpec, setCurrentSpec] = useState(() => props.onUpdate ? props.CR.spec : null);
 
   const onSubmit = value => {
 
@@ -36,10 +43,6 @@ function FormGenerator(props) {
     }
   }
 
-  let formData = {
-    name: ''
-  }
-
   let metadata = {
     type: 'object',
     properties: {
@@ -55,7 +58,6 @@ function FormGenerator(props) {
       type: 'string',
       description: 'The namespace of the resource. A namespace is a DNS compatible label that objects are subdivided into. The default namespace is \'default\'. '
     };
-    formData.namespace = 'default';
   }
 
   return(
@@ -66,12 +68,12 @@ function FormGenerator(props) {
               style={{marginBottom: 10}}
         >
           <Form
-            formData={formData}
+            formData={currentMetadata}
             schema={metadata}
             fields={fields}
             FieldTemplate={CustomFieldTemplate}
             widgets={widgets}
-            onChange={(value) => {currentMetadata = value.formData}}
+            onChange={(value) => {setCurrentMetadata(value.formData)}}
           >
             <div/>
           </Form>
@@ -79,11 +81,12 @@ function FormGenerator(props) {
       ) : null}
       <Form
         schema={schema}
-        formData={props.onUpdate ? props.CR.spec : null}
+        formData={currentSpec}
         fields={fields}
         FieldTemplate={CustomFieldTemplate}
         widgets={widgets}
         onSubmit={onSubmit}
+        onChange={(value) => {setCurrentSpec(value.formData)}}
       >
         <Button type="primary" htmlType={'submit'} style={{marginTop: 10}}>Submit</Button>
       </Form>

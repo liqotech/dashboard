@@ -53,8 +53,10 @@ export default function Utils() {
   }
 
   /**
-   * The field 'format' is not accepted in the Json schema,
-   * so we get rid of it before converting
+   * The field 'format' is not accepted in the Json schema
+   * so we get rid of it before converting,
+   * Change the anyOf and oneOf type to default string,
+   * Add to boolean the field 'default = false' if there is no default value
    * @param schema
    */
   const formatSchema = schema => {
@@ -63,6 +65,8 @@ export default function Utils() {
         if(schema[key].type){
           if(schema[key].type === 'object' || schema[key].type === 'array'){
             formatSchema(schema[key]);
+          } else if (schema[key].type === 'boolean' && !schema[key].default) {
+            schema[key].default = false;
           } else {
             if(schema[key].format){
               delete schema[key].format;
