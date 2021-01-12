@@ -58,8 +58,6 @@ function FormViewer(props) {
 
     let promise;
 
-    console.log(item)
-
     if(props.CRD){
       promise = window.api.updateCustomResource(
         props.CRD.spec.group,

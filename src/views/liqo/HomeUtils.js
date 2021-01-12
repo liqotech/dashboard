@@ -1,16 +1,15 @@
 import { message } from 'antd';
-import { APP_NAME } from '../../constants';
 import React from 'react';
-import { colors } from '../../services/Colors';
+import { colorsBasic } from '../../services/Colors';
 
 /** Return the right color from the percentage given */
 export function getColor(percent, allocatable) {
   if(percent < 70) {
-    return colors[allocatable];
+    return colorsBasic[allocatable];
   } else if (percent >= 70 && percent < 90) {
-    return colors[31 + allocatable];
+    return colorsBasic[31 + allocatable];
   } else if (percent >=90) {
-    return colors[33 + allocatable];
+    return colorsBasic[33 + allocatable];
   }
 }
 

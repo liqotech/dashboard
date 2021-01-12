@@ -90,7 +90,7 @@ describe('CustomTabs', () => {
     let close = await screen.findAllByLabelText('close');
 
     await act(async () => {
-      userEvent.click(close[3]);
+      userEvent.click(close[4]);
     })
 
     expect(await screen.queryByText('NewTab')).not.toBeInTheDocument();
@@ -173,7 +173,7 @@ describe('CustomTabs', () => {
     let close = await screen.findAllByLabelText('close');
 
     await act(async () => {
-      userEvent.click(close[4]);
+      userEvent.click(close[5]);
       await new Promise((r) => setTimeout(r, 500));
     })
 
@@ -226,7 +226,7 @@ describe('CustomTabs', () => {
     let close = await screen.findAllByLabelText('close');
 
     await act(async () => {
-      userEvent.click(close[3]);
+      userEvent.click(close[4]);
       await new Promise((r) => setTimeout(r, 500));
     })
 

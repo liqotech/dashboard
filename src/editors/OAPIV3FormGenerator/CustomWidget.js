@@ -36,16 +36,20 @@ const CustomInputNumber = function(props){
 const CustomText = function(props) {
   if(props.schema.type === 'integer'){
     if(props.schema.maximum && (props.schema.minimum || props.schema.minimum === 0)){
-      if(props.schema.maximum === 100 && props.schema.minimum === 0){
+      let percent;
+      if(props.schema.maximum === 100 && (props.schema.minimum === 0 || props.schema.minimum === 1))
+        percent = true;
+
+      if((props.schema.maximum <= 100 || props.schema.maximum >= 0) && (props.schema.minimum >= 0 || props.schema.minimum <= 100)){
         return (
           <Row>
             <Col span={19}>
               <Slider id={props.id}
                       disabled={props.disabled}
-                      min={0}
-                      max={100}
+                      min={props.schema.minimum}
+                      max={props.schema.maximum}
                       onChange={(value) => {if(!props.readonly) props.onChange(value)}}
-                      value={typeof props.value === 'number' ? props.value : 0}
+                      value={typeof props.value === 'number' ? props.value : props.schema.minimum}
               />
             </Col>
             <Col span={5}>
@@ -53,12 +57,12 @@ const CustomText = function(props) {
                 style={{float: 'right'}}
                 disabled={props.disabled}
                 role={'textbox'}
-                formatter={value => `${value}%`}
+                formatter={value => percent ? `${value}%` : value}
                 parser={value => value.replace('%', '')}
                 size={'small'}
-                min={0}
-                max={100}
-                value={typeof props.value === 'number' ? props.value : 0}
+                min={props.schema.minimum}
+                max={props.schema.maximum}
+                value={typeof props.value === 'number' ? props.value : props.schema.minimum}
                 onChange={(value) => {if(!props.readonly) props.onChange(value)}}
               />
             </Col>

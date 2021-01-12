@@ -7,7 +7,7 @@ import {
   Axis,
   Coordinate
 } from 'bizcharts';
-import { colors } from '../../services/Colors';
+import { colorsBasic } from '../../services/Colors';
 
 function Donut(props){
 
@@ -47,7 +47,7 @@ function Donut(props){
         shape="sliceShape"
         color={['fc', (d)=>{
           if(d === 'Free') return '#f3f3f3';
-          return colors[props.data.indexOf(props.data.find(datum => {return datum.fc === d}))];
+          return colorsBasic[props.data.indexOf(props.data.find(datum => {return datum.fc === d}))];
         }]}
         animate={false}
       />

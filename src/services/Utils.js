@@ -61,7 +61,7 @@ export default function Utils() {
     Object.keys(schema).forEach(key => {
       if(schema[key] && key !== 'description' && key !== 'type' && key !== 'required'){
         if(schema[key].type){
-          if(schema[key].type === 'object'){
+          if(schema[key].type === 'object' || schema[key].type === 'array'){
             formatSchema(schema[key]);
           } else {
             if(schema[key].format){
@@ -69,6 +69,14 @@ export default function Utils() {
             }
           }
         } else {
+          if(schema[key].anyOf) {
+            delete schema[key].anyOf;
+            schema[key].type = 'string';
+          }
+          if(schema[key].oneOf) {
+            delete schema[key].oneOf;
+            schema[key].type = 'string';
+          }
           formatSchema(schema[key]);
         }
       }
@@ -225,8 +233,8 @@ export default function Utils() {
     setRealProperties,
     OAPIV3toJSONSchema,
     index,
-    getSelectedProperties,
     fromDotToObject,
+    getSelectedProperties,
     replaceObject,
     arraysEqual,
     parseJWT,
