@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import _ from 'lodash';
-import { Button, Input, Table, Tooltip } from 'antd';
+import { Button, Input, Table, Tooltip, Row, Col } from 'antd';
 import { withRouter, useLocation, useHistory, useParams } from 'react-router-dom';
-import { InsertRowRightOutlined } from '@ant-design/icons';
+import { DeleteOutlined, InsertRowRightOutlined } from '@ant-design/icons';
 import { getColumnSearchProps, ResizableTitle } from '../../services/TableUtils';
 import ListHeader from './ListHeader';
 import { getNamespaced, filterResource, resourceNotifyEvent } from '../common/ResourceUtils';
@@ -110,7 +110,6 @@ function ResourceList(props) {
           width: '1em',
           sortDirections: ['descend'],
           align: 'center',
-          ellipsis: true,
           sorter: {
             compare: (a, b) => a.Favourite - b.Favourite,
           },
@@ -124,7 +123,6 @@ function ResourceList(props) {
     }
 
     if(!_.isEmpty(resourceConfig) && resourceConfig.render && resourceConfig.render.columns){
-      let index = 0;
       resourceConfig.render.columns.forEach(column => {
         columns.push({
           dataIndex: column.columnTitle,
@@ -134,17 +132,30 @@ function ResourceList(props) {
           ),
           title: (
             editColumn === column.columnContent ? (
-              <div style={{marginLeft: '2em'}} onClick={() => setEditColumn(column.columnContent)}>
-                <Input placeholder={'Remove ' + column.columnTitle} size={'small'} autoFocus
-                       defaultValue={column.columnTitle} aria-label={'editColumn'}
-                       onBlur={(e) => {
-                         updateDashConfig(column.columnContent, e.target.value)
-                       }}
-                       onPressEnter={(e) => {
-                         updateDashConfig(column.columnContent, e.target.value)
-                       }}
-                />
-              </div>
+              <Row>
+                <Col>
+                  <div style={{marginLeft: '2em'}} onClick={() => setEditColumn(column.columnContent)}>
+                    <Input placeholder={'Remove ' + column.columnTitle} size={'small'} autoFocus
+                           defaultValue={column.columnTitle} aria-label={'editColumn'}
+                           onBlur={(e) => {
+                             updateDashConfig(column.columnContent, e.target.value)
+                           }}
+                           onPressEnter={(e) => {
+                             updateDashConfig(column.columnContent, e.target.value)
+                           }}
+                    />
+                  </div>
+                </Col>
+                <Col>
+                  <Tooltip title={'Delete Column'}>
+                    <Button type={'danger'} icon={<DeleteOutlined />}
+                            onMouseDown={() => updateDashConfig(column.columnContent, '')}
+                            size={'small'}
+                            style={{marginLeft: 4}}
+                    />
+                  </Tooltip>
+                </Col>
+              </Row>
             ) : (
               <div style={{marginLeft: '2em'}} >
                 <span onClick={() => {
@@ -153,25 +164,10 @@ function ResourceList(props) {
                 }}>
                   {column.columnTitle}
                 </span>
-                {index === resourceConfig.render.columns.length - 1 && !props.onRef ? (
-                  <span style={{float: 'right'}}>
-                    { /** The one to last column is where the 'add a column' button is located */ }
-                    <Tooltip title={'Add column'} >
-                      <Button icon={<InsertRowRightOutlined style={{fontSize: 20}}/>}
-                              style={{marginRight: '-1em', border: 0}}
-                              size={'small'}
-                              onClick={() => {
-                                addColumnHeader(true);
-                              }}
-                      />
-                    </Tooltip>
-                  </span>
-                ) : null}
               </div>
             )
           ),
         })
-        index++;
       })
     } else {
       columns.push(
@@ -179,8 +175,6 @@ function ResourceList(props) {
           dataIndex: 'Name',
           key: 'Name',
           title: <div style={{marginLeft: '2em'}}>Name</div>,
-          ellipsis: true,
-          fixed: 'left',
           ...getColumnSearchProps('Name', (text, record, dataIndex) =>
             renderResourceList(text, record, dataIndex, resourceList), setColumnHeaders
           ),
@@ -188,23 +182,7 @@ function ResourceList(props) {
         {
           dataIndex: 'Namespace',
           key: 'Namespace',
-          title: (
-            <div style={{marginLeft: '2em'}}>
-              <span>Namespace</span>
-              <span style={{float: 'right'}}>
-                { /** The one to last column is where the 'add a column' button is located */ }
-                <Tooltip title={'Add column'} >
-                      <Button icon={<InsertRowRightOutlined style={{fontSize: 20}}/>}
-                              style={{marginRight: '-1em', border: 0}}
-                              size={'small'}
-                              onClick={() => {
-                                addColumnHeader(true);
-                              }}
-                      />
-                </Tooltip>
-              </span>
-            </div>
-          ),
+          title: <div style={{marginLeft: '2em'}}>Namespace</div>,
           ...getColumnSearchProps('Namespace', (text, record, dataIndex) =>
             renderResourceList(text, record, dataIndex, resourceList), setColumnHeaders
           ),
@@ -215,10 +193,26 @@ function ResourceList(props) {
     columns.push({
       dataIndex: 'Age',
       key: 'Age',
-      title: 'Age',
+      title: (
+        <Row>
+          <Col>
+            <Tooltip title={'Add column'} >
+              <Button icon={<InsertRowRightOutlined style={{fontSize: 20}}/>}
+                      style={{marginRight: 10, border: 0}}
+                      size={'small'}
+                      onClick={() => {
+                        addColumnHeader(true);
+                      }}
+              />
+            </Tooltip>
+          </Col>
+          <Col>
+            Age
+          </Col>
+        </Row>
+      ),
+      width: '10em',
       fixed: 'right',
-      ellipsis: true,
-      width: '5em',
       sorter: {
         compare: (a, b) => compareAge(a.Age, b.Age),
       }
@@ -311,6 +305,19 @@ function ResourceList(props) {
   const updateDashConfig = (value, name) => {
     setEditColumn('');
 
+    if(name){
+      let indexName = name.replace(/\s\([0-9]*\)/g, '');
+      let i = 2;
+
+      columnHeaders.filter(column => column.key !== value)
+        .forEach(column => {
+        while(column.dataIndex === name){
+          name = indexName + ' (' + i +')';
+          i++;
+        }
+      })
+    }
+
     if(value === '')
       return;
 
@@ -400,6 +407,7 @@ function ResourceList(props) {
         <ListHeader kind={kind} resource={onCustomResource} genericResource={resource} />
       ) : null}
       <Table columns={columnHeaders} dataSource={columnContents}
+             key={location.pathname}
              size={props.onRef ? 'small' : 'default'}
              components={{
                header: {
