@@ -4,6 +4,8 @@ metadata:
   name: liqo-dashboard-configmap
   namespace: {{ .Release.Namespace }}
 data:
+  app_favicon: ""
+  app_title: ""
   oidc_client_id: ""
   oidc_provider_url: ""
   oidc_client_secret: ""
@@ -93,6 +95,16 @@ spec:
             runAsGroup: 101
             runAsUser: 101
           env:
+            - name: APP_FAVICON
+              valueFrom:
+                configMapKeyRef:
+                  name: liqo-dashboard-configmap
+                  key: app_favicon
+            - name: APP_TITLE
+              valueFrom:
+                configMapKeyRef:
+                  name: liqo-dashboard-configmap
+                  key: app_title      
             - name: OIDC_PROVIDER_URL
               valueFrom:
                 configMapKeyRef:
