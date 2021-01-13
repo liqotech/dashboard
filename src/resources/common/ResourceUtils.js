@@ -1,6 +1,5 @@
 import { message } from 'antd';
 import _ from 'lodash';
-import ReferenceHandler from '../../editors/OAPIV3FormGenerator/ReferenceHandler';
 import React from 'react';
 
 export function resourceNotifyEvent(func, type, object, noNamespaceCheck){
@@ -9,13 +8,13 @@ export function resourceNotifyEvent(func, type, object, noNamespaceCheck){
 
   func(prev => {
     let resource = prev.find((item) => {
-      return item.metadata.name === object.metadata.name;
+      return item.metadata.selfLink === object.metadata.selfLink;
     });
 
     if(type === 'MODIFIED' || type === 'ADDED') {
       if(resource) {
         if(resource.metadata.resourceVersion !== object.metadata.resourceVersion){
-          prev = prev.filter(item => item.metadata.name !== object.metadata.name);
+          prev = prev.filter(item => item.metadata.selfLink !== object.metadata.selfLink);
           prev.push(object);
           prev.sort((a, b) => a.metadata.name.localeCompare(b.metadata.name));
           message.success(object.kind + ' ' + object.metadata.name + ' modified');
@@ -29,7 +28,7 @@ export function resourceNotifyEvent(func, type, object, noNamespaceCheck){
       }
     } else if (type === 'DELETED') {
       if(resource){
-        prev = prev.filter(item => item.metadata.name !== resource.metadata.name);
+        prev = prev.filter(item => item.metadata.selfLink !== resource.metadata.selfLink);
         message.success(object.kind + ' ' + object.metadata.name + ' deleted');
         return [...prev];
       }
