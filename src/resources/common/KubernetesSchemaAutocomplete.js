@@ -50,6 +50,16 @@ export default function KubernetesSchemaAutocomplete(props){
     );
   }
 
+  const groupItems = tot => {
+    let temp = _.chain(tot).groupBy('label').map((value, key) => ({label: key, value:key + '.', options: value})).value();
+    temp.forEach(item => {
+      let ops = [];
+      item.options.forEach(op => ops.push(...op.options))
+      item.options = ops;
+    })
+    setTotItems(temp);
+  }
+
   const fillItems = (obj, path, counter) => {
     for (let key in obj) {
       // skip loop if the property is from prototype
@@ -75,7 +85,7 @@ export default function KubernetesSchemaAutocomplete(props){
     }
 
     if(path === '') {
-      setTotItems(tot);
+      groupItems(tot);
     }
   }
 
