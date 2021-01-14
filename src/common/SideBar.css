@@ -1,7 +1,9 @@
 .sidebar {
-    height: 100vh;
-    max-height: 100vh;
+    height: calc(100vh - 46px);
+    margin-bottom: 46px;
     position: sticky;
+    overflow-y: auto;
+    overflow-x: hidden;
     left: 0;
     top: 0;
     z-index: 11;
