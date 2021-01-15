@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory, withRouter } from 'react-router-dom';
-import { Layout, Menu, Typography } from 'antd';
+import { Affix, Layout, Menu, Typography } from 'antd';
 import './SideBar.css';
 import _ from 'lodash';
 import {
@@ -143,7 +143,7 @@ function SideBar() {
   }
 
   return (
-    <div>
+    <Affix offsetTop={0}>
       <Sider className="sidebar" width={width}
              collapsible collapsed={collapsed}
              onCollapse={width === 0 ? null : onCollapse}
@@ -253,7 +253,7 @@ function SideBar() {
           </>
         ) : null}
       </Sider>
-    </div>
+    </Affix>
   );
 }
 
