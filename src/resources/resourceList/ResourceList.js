@@ -190,28 +190,13 @@ function ResourceList(props) {
       )
     }
 
-    columns.push({
+    columns.push(
+      addColumn(),
+      {
       dataIndex: 'Age',
       key: 'Age',
-      title: (
-        <Row>
-          <Col>
-            <Tooltip title={'Add column'} >
-              <Button icon={<InsertRowRightOutlined style={{fontSize: 20}}/>}
-                      style={{marginRight: 10, border: 0}}
-                      size={'small'}
-                      onClick={() => {
-                        addColumnHeader(true);
-                      }}
-              />
-            </Tooltip>
-          </Col>
-          <Col>
-            Age
-          </Col>
-        </Row>
-      ),
-      width: '10em',
+      title: 'Age',
+      width: '6em',
       fixed: 'right',
       sorter: {
         compare: (a, b) => compareAge(a.Age, b.Age),
@@ -219,6 +204,25 @@ function ResourceList(props) {
     })
 
     setColumnHeaders(columns);
+  }
+
+  const addColumn = disabled => {
+    return {
+      dataIndex: 'AddColumn',
+      key: 'AddColumn',
+      title: (
+        <Tooltip title={'Add column'} >
+          <Button icon={<InsertRowRightOutlined style={{fontSize: 20}}/>}
+                  style={{marginRight: 10, border: 0}}
+                  size={'small'}
+                  disabled={disabled}
+                  onClick={() => addColumnHeader(true)}
+          />
+        </Tooltip>
+      ),
+      width: '3em',
+      fixed: 'right',
+    }
   }
 
   const manageColumnContents = () => {
@@ -368,13 +372,15 @@ function ResourceList(props) {
   const addColumnHeader = (setNew) => {
     if(setNew){
       setColumnHeaders(prev => {
-        prev[prev.length - 2].title = (
+        prev[prev.length - 3].title = (
           <div style={{marginLeft: '2em'}}>
-            {prev[prev.length - 2].dataIndex}
+            {prev[prev.length - 3].dataIndex}
           </div>
         )
 
-        prev.splice(-1, 0, {
+        prev[prev.length - 2] = addColumn(true);
+
+        prev.splice(-2, 0, {
           dataIndex: 'NewColumn',
           key: 'NewColumn',
           title:
@@ -391,7 +397,7 @@ function ResourceList(props) {
       });
     } else {
       setColumnHeaders(prev => {
-        prev.splice(-2, 1);
+        prev.splice(-3, 1);
         manageColumnHeaders();
         return [...prev];
       })
