@@ -32,12 +32,14 @@ export default function ApiManager(user) {
    * @param namespace is the namespace of the CRD
    * @returns a list of the custom resources
    */
-  const getCustomResources = (item, namespace) => {
+  const getCustomResources = (item, namespace, fieldSelector) => {
     return apiCRD.listNamespacedCustomObject(
       item.spec.group,
       item.spec.version,
       namespace,
-      item.spec.names.plural
+      item.spec.names.plural,
+      undefined,
+      fieldSelector
     );
   }
 
@@ -47,11 +49,13 @@ export default function ApiManager(user) {
    * @param item is the CRD
    * @returns a list of the custom resources
    */
-  const getCustomResourcesAllNamespaces = item => {
+  const getCustomResourcesAllNamespaces = (item, fieldSelector) => {
     return apiCRD.listClusterCustomObject(
       item.spec.group,
       item.spec.version,
       item.spec.names.plural,
+      undefined,
+      fieldSelector
     );
   }
 
