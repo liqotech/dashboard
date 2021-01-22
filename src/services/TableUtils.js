@@ -1,4 +1,4 @@
-import { Button, Input, Space } from 'antd';
+import { Button, Input, Space, Typography } from 'antd';
 import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
 import React from 'react';
 import { Resizable } from 'react-resizable';
@@ -20,6 +20,8 @@ const handleReset = clearFilters => {
 
 export const ResizableTitle = (props) => {
   const { onResize, width, ...restProps } = props;
+
+  restProps.title = '';
 
   if(!onResize)
     return <th {...restProps} />
@@ -117,6 +119,11 @@ export const getColumnSearchProps = (dataIndex, renderFunc, setColumns) => ({
     onResize: handleResize(column, setColumns)
   }) : null,
   render: (text, record) => {
-    return renderFunc(text, record, dataIndex);
+    return {
+      children: renderFunc(text, record, dataIndex),
+      props: {
+        title: ''
+      }
+    }
   }
 });
