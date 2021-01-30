@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Drawer, Button, Tooltip, Col, Badge, Typography, Row, Input, Space, Popover, Popconfirm } from 'antd';
-import { EditOutlined, SettingOutlined } from '@ant-design/icons';
+import { Drawer, Button, Tooltip, Col, Badge, Typography, Row, Space, Popover, Popconfirm } from 'antd';
+import { SettingOutlined } from '@ant-design/icons';
 import dark from '../themes/dark.json';
 import light from '../themes/light.json';
 import _ from 'lodash';
 import ColorPicker from './ColorPicker';
 import { handleSave } from '../services/SaveUtils';
 import ThemeUploader from './ThemeUploader';
-import darkTheme from './dark-theme.less';
 
-export default function ThemeModifier(){
+export default function ThemeModifier(props){
   const [visible, setVisible] = useState(false);
   const [items, setItems] = useState([]);
 
@@ -66,6 +65,7 @@ export default function ThemeModifier(){
         <SettingOutlined onClick={() => setVisible(prev => !prev)}
                          style={{fontSize: 20, paddingLeft: 20, paddingRight: 10}}
         />
+        {props.showDescription ? 'Modify Theme' : null}
       </Tooltip>
       <Drawer
         title={'Theme customizer'}

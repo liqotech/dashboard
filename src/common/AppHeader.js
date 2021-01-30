@@ -3,8 +3,8 @@ import {
   withRouter, useHistory, Link
 } from 'react-router-dom';
 import './AppHeader.css';
-import { Switch, Modal, Col, Layout, Menu, Row, Typography, Tooltip } from 'antd';
-import { GithubOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Switch, Modal, Col, Layout, Menu, Row, Typography, Tooltip, Dropdown } from 'antd';
+import { EllipsisOutlined, GithubOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import LogoutOutlined from '@ant-design/icons/lib/icons/LogoutOutlined';
 import NamespaceSelect from './NamespaceSelect';
 import { ResourceAutocomplete } from './ResourceAutocomplete';
@@ -15,13 +15,16 @@ const Header = Layout.Header;
 import dark from '../themes/dark.json';
 import light from '../themes/light.json';
 import ThemeModifier from '../themes/ThemeModifier';
+import { resizeDetector } from '../customView/CustomViewUtils';
 
 function AppHeader(props) {
   const [isDarkMode, setIsDarkMode] = React.useState(localStorage.getItem("theme") === 'dark' || !localStorage.getItem("theme"));
   const [infoModal, setInfoModal] = useState(false);
+  const [breakpoint, setBreakpoint] = useState('lg');
   const [, setConfig] = useState(window.api.dashConfigs.current);
   let history = useHistory();
   let menuItems;
+  let namespaceSelector;
 
   const toggleTheme = (isChecked) => {
     setIsDarkMode(isChecked);
@@ -41,7 +44,7 @@ function AppHeader(props) {
 
   if(Utils().parseJWT())
     menuItems.push(
-      <Menu.Item key="welcome" style={{ margin: 0 }}>
+      <Menu.Item key="welcome" style={ breakpoint !== 'lg' ? {padding: 20} : { margin: 0 } }>
         <Typography.Text strong style={{fontStyle: 'italic', fontSize: 18, marginLeft: 20, marginRight: 20}}>
           {'Welcome back' + (Utils().parseJWT().given_name ? (' ' + Utils().parseJWT().given_name) : '') + '!'}
         </Typography.Text>
@@ -49,12 +52,16 @@ function AppHeader(props) {
     )
 
   if(!_.isEmpty(window.api.dashConfigs.current)){
-    if(window.api.dashConfigs.current.spec.header && window.api.dashConfigs.current.spec.header.namespaceSelector)
-      menuItems.push(
+    if(window.api.dashConfigs.current.spec.header && window.api.dashConfigs.current.spec.header.namespaceSelector){
+      namespaceSelector = (
         <Menu.Item key="namespace" style={{ margin: 0 }}>
           <NamespaceSelect />
         </Menu.Item>
       )
+
+      if(breakpoint === 'lg')
+        menuItems.push(namespaceSelector)
+    }
 
     if(window.api.dashConfigs.current.spec.header &&
       window.api.dashConfigs.current.spec.header.menu &&
@@ -71,8 +78,9 @@ function AppHeader(props) {
                        }}
             >
               {item.link ? (
-                <Tooltip title={item.itemDescription}>
-                  <CustomIcon icon={item.icon ? item.icon : 'LayoutOutlined'} style={{ padding: 20, fontSize: 20 }}/>
+                <Tooltip title={breakpoint !== 'lg' ? '' : item.itemDescription}>
+                  <CustomIcon icon={item.icon ? item.icon : 'LayoutOutlined'} style={breakpoint !== 'lg' ? { padding: 6, fontSize: 20} : { padding: 20, fontSize: 20 }}/>
+                  { breakpoint !== 'lg' ? <span>{item.itemDescription}</span> : null }
                 </Tooltip>
               ) : (
                 <div>{item.itemDescription}</div>
@@ -88,8 +96,8 @@ function AppHeader(props) {
     window.api.dashConfigs.current.spec.header &&
     window.api.dashConfigs.current.spec.header.themeModifier){
     menuItems.push(
-      <Menu.Item key="theme_mod" style={{ margin: 0 }}>
-        <ThemeModifier />
+      <Menu.Item key="theme_mod" style={ breakpoint !== 'lg' ? {padding: 10, paddingLeft: 0} : { margin: 0 }}>
+        <ThemeModifier showDescription={breakpoint !== 'lg'} />
       </Menu.Item>
     )
   }
@@ -98,12 +106,13 @@ function AppHeader(props) {
     window.api.dashConfigs.current.spec.header &&
     window.api.dashConfigs.current.spec.header.themeSwitcher){
     menuItems.push(
-      <Menu.Item key="theme" style={{ margin: 0 }}>
-        <Tooltip title={'Switch theme'} >
+      <Menu.Item key="theme" style={ breakpoint !== 'lg' ? {padding: 10, paddingLeft: 14} : { margin: 0 }}>
+        <Tooltip title={breakpoint !== 'lg' ? '' : 'Switch theme'} >
           <Switch checked={isDarkMode}
-                  style={{ marginLeft: 20, marginRight: 20, marginTop: -5 }}
+                  style={ breakpoint !== 'lg' ? {} : { marginLeft: 20, marginRight: 20, marginTop: -5 }}
                   onChange={toggleTheme} size={'small'}
           />
+          { breakpoint !== 'lg' ? <span style={{paddingLeft: 10}}>Switch Theme</span> : null }
         </Tooltip>
       </Menu.Item>
     )
@@ -113,8 +122,9 @@ function AppHeader(props) {
     <Menu.Item key="question" onClick={() => setInfoModal(true)}
                style={{ margin: 0 }}
     >
-      <Tooltip title={'Info'} >
-        <QuestionCircleOutlined style={{ fontSize: '20px', padding: 20 }} />
+      <Tooltip title={breakpoint !== 'lg' ? '' : 'Info'} >
+        <QuestionCircleOutlined style={breakpoint !== 'lg' ? {  fontSize: '20px', padding: 6 } : { fontSize: '20px', padding: 20 }} />
+        { breakpoint !== 'lg' ? <span>Info</span> : null }
       </Tooltip>
     </Menu.Item>
   );
@@ -126,8 +136,9 @@ function AppHeader(props) {
                  onClick={() => {
         props.tokenLogout();
       }}>
-        <Tooltip title={'Logout'} >
-          <LogoutOutlined style={{ fontSize: '20px', padding: 20 }}/>
+        <Tooltip title={breakpoint !== 'lg' ? '' : 'Logout'} >
+          <LogoutOutlined style={breakpoint !== 'lg' ? {  fontSize: '20px', padding: 6 } : { fontSize: '20px', padding: 20 }}/>
+          { breakpoint !== 'lg' ? <span>Logout</span> : null }
         </Tooltip>
       </Menu.Item>
     )
@@ -138,8 +149,36 @@ function AppHeader(props) {
       history.push(option.value);
   }
 
+  const menu = (
+    <Menu
+      className="app-menu"
+      selectable={false}
+      style={{ lineHeight: '58px' }}
+      mode="horizontal" >
+      { breakpoint !== 'lg' ? (
+        <>
+          {namespaceSelector}
+          <Menu.Item style={{ margin: 0}}>
+            <Dropdown overlay={() => (
+              <Menu mode={'vertical'}>
+                {menuItems}
+              </Menu>
+            )}
+                      trigger={'click'}
+            >
+              <div>
+                <EllipsisOutlined style={{ fontSize: 20, padding: 20, paddingLeft: 40, paddingRight: 40, margin: 0}} />
+              </div>
+            </Dropdown>
+          </Menu.Item>
+        </>
+      ) : menuItems}
+    </Menu>
+  )
+
   return (
     <div>
+      {resizeDetector(() => {}, setBreakpoint)}
       <Header className="app-header">
         <div className="container">
           <Row className="app-title" align="middle">
@@ -176,13 +215,7 @@ function AppHeader(props) {
           </Row>
         </div>
       </Header>
-      <Menu
-        className="app-menu"
-        selectable={false}
-        style={{ lineHeight: '58px' }}
-        mode="horizontal" >
-        {menuItems}
-      </Menu>
+      {menu}
       <Modal
         title="LiqoDash Information"
         visible={infoModal}
