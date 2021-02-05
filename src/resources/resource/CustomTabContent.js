@@ -1,4 +1,4 @@
-import { Alert, Row, Col, Button, Card, Input, Tooltip, Divider } from 'antd';
+import { Alert, Row, Col, Button, Card, Input, Tooltip, Divider, Switch } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import FormViewer from '../../widgets/form/FormViewer';
 import _ from 'lodash';
@@ -14,7 +14,6 @@ import ResourceList from '../resourceList/ResourceList';
 import { ResourceAutocomplete } from '../../common/ResourceAutocomplete';
 import KubernetesSchemaAutocomplete from '../common/KubernetesSchemaAutocomplete';
 import DraggableWrapper from '../../common/DraggableWrapper';
-import { primaryColor } from '../../services/Colors';
 
 export default function CustomTab(props){
   const [deleting, setDeleting] = useState(false);
@@ -200,6 +199,20 @@ export default function CustomTab(props){
             bodyStyle={{height: '100%', position: 'relative'}}
             bordered={false}
             extra={[
+              <Tooltip title={'Automatic Resize'} key={'auto_size'}>
+                <Switch style={{marginRight: '1em'}}
+                        size={'small'}
+                        checkedChildren={'ON'}
+                        unCheckedChildren={'OFF'}
+                        defaultChecked={props.autoSize}
+                        onClick={(checked) => {
+                          props.setCardList(prev => {
+                            prev.find(item => item.cardTitle === props.cardTitle).autoSize = checked;
+                            return [...prev];
+                          })
+                        }}
+                />
+              </Tooltip>,
               <Tooltip title={'Edit Content'} key={'edit_content'}>
                 <EditOutlined onClick={() => setOnContentEdit(prev => !prev)}
                               style={{marginRight: '1em'}}
