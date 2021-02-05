@@ -20,21 +20,28 @@ export function onResize(_layout, oldLayoutItem, layoutItem, resources, setResou
   });
 }
 
-export function resizeDetector(setWidth, setBreakpoint){
+export function resizeDetector(setWidth, setBreakpoint, brCustom){
   return(
     <ReactResizeDetector handleWidth
                          refreshMode={'throttle'} refreshRate={150}
                          onResize={(width) => {
+                           let brWidth = {
+                             lg: brCustom && brCustom['lg'] ? brCustom['lg'] : 1000,
+                             md: brCustom && brCustom['md'] ? brCustom['md'] : 796,
+                             sm: brCustom && brCustom['sm'] ? brCustom['sm'] : 568,
+                             xs: brCustom && brCustom['xs'] ? brCustom['xs'] : 280,
+                             xss: brCustom && brCustom['xss'] ? brCustom['xss'] : 0
+                           }
                            let breakpoint;
-                           if(width > 1000)
+                           if(width > brWidth['lg'])
                              breakpoint = 'lg';
-                           else if(width < 1000 && width > 796)
+                           else if(width < brWidth['lg'] && width > brWidth['md'])
                              breakpoint = 'md';
-                           else if(width < 796 && width > 568)
+                           else if(width < brWidth['md'] && width > brWidth['sm'])
                              breakpoint = 'sm';
-                           else if(width < 568 && width > 280)
+                           else if(width < brWidth['sm'] && width > brWidth['xs'])
                              breakpoint = 'xs';
-                           else if(width < 280 && width > 0)
+                           else if(width < brWidth['xs'] && width > brWidth['xss'])
                              breakpoint = 'xss';
                            setWidth(width)
                            setBreakpoint(breakpoint);
