@@ -214,8 +214,8 @@ export default function ApiInterface(_user, tokenLogout) {
    * @param namespace is the namespace of the resource
    * @returns a list of the custom resources
    */
-  const getCustomResources = (item, namespace) => {
-    return apiManager.current.getCustomResources(item, namespace)
+  const getCustomResources = (item, namespace, fieldSelector) => {
+    return apiManager.current.getCustomResources(item, namespace, fieldSelector)
       .catch(error => handleError(error));
   }
 
@@ -225,12 +225,12 @@ export default function ApiInterface(_user, tokenLogout) {
    * @param item is the CRD
    * @returns a list of the custom resources
    */
-  const getCustomResourcesAllNamespaces = item => {
+  const getCustomResourcesAllNamespaces = (item, fieldSelector) => {
     if(namespace.current && item.spec.scope === 'Namespaced')
-      return getCustomResources(item, namespace.current)
+      return getCustomResources(item, namespace.current, fieldSelector)
         .catch(error => handleError(error));
     else
-      return apiManager.current.getCustomResourcesAllNamespaces(item)
+      return apiManager.current.getCustomResourcesAllNamespaces(item, fieldSelector)
         .catch(error => handleError(error));
   }
 

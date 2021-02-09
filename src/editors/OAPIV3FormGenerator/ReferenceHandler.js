@@ -17,10 +17,13 @@ function ReferenceHandler(props) {
   let CRD = useRef();
   let CROptions = useRef([]);
   let NSOptions = useRef([]);
+  let kind = useRef('');
 
   useEffect(() => {
 
     CRD.current = window.api.getCRDFromKind(props.label.split('/')[1].slice(0, -3));
+
+    kind.current = CRD.current.spec.names.kind;
 
     if(CRD.current){
       if(onViewer || CRD.current.spec.scope !== 'Namespaced'){
@@ -49,35 +52,37 @@ function ReferenceHandler(props) {
   
   const getCRs = () => {
     setLoading(true);
-    if(onViewer || selectedNS === 'all namespaces'){
-      window.api.getCustomResourcesAllNamespaces(CRD.current).then(res => {
-        if(!onViewer) {
+
+    if(onViewer){
+      window.api.getCustomResourcesAllNamespaces(CRD.current, 'metadata.name=' + props.children.props.children[0].props.formData.name).then(res => {
+        CR.current = res.body.items[0];
+        setSelectedCR(CR.current.metadata.name);
+        setLoading(false);
+      });
+    } else {
+      if(selectedNS === 'all namespaces'){
+        window.api.getCustomResourcesAllNamespaces(CRD.current).then(res => {
           CRs.current = res.body.items;
 
           CROptions.current = [];
           CRs.current.forEach(CR => CROptions.current.push(
             <Select.Option key={CR.metadata.name} value={CR.metadata.name} children={CR.metadata.name}/>
           ));
-        } else {
-          CR.current = res.body.items.find(item => {
-            return item.metadata.name === props.children.props.children[0].props.formData.name
-          })
-          setSelectedCR(CR.current.metadata.name);
-        }
 
-        setLoading(false);
-      })
-    } else {
-      window.api.getCustomResources(CRD.current, selectedNS).then(res => {
-        CRs.current = res.body.items;
+          setLoading(false);
+        })
+      } else {
+        window.api.getCustomResources(CRD.current, selectedNS).then(res => {
+          CRs.current = res.body.items;
 
-        CROptions.current = [];
-        CRs.current.forEach(CR => CROptions.current.push(
-          <Select.Option key={CR.metadata.name} value={CR.metadata.name} children={CR.metadata.name}/>
-        ));
+          CROptions.current = [];
+          CRs.current.forEach(CR => CROptions.current.push(
+            <Select.Option key={CR.metadata.name} value={CR.metadata.name} children={CR.metadata.name}/>
+          ));
 
-        setLoading(false);
-      })
+          setLoading(false);
+        })
+      }
     }
   }
 
@@ -95,7 +100,7 @@ function ReferenceHandler(props) {
 
   return (
     window.api.getCRDFromKind(props.label.split('/')[1].slice(0, -3)) ? (
-      <div>
+      <div style={{marginBottom: 5}}>
         <div>
           { NSs.current.length > 0 ? (
             <Row align="middle" gutter={[0, 6]}>
@@ -228,7 +233,7 @@ function ReferenceHandler(props) {
               NSs.current.length === 0 ? (
                 <Row align="middle">
                   <Col span={24}>
-                    <Alert message={'No resource ' + props.children.props.children[0].props.formData.kind + ' found.'}
+                    <Alert message={'No resource ' + kind.current + ' found.'}
                            type="warning" showIcon closable
                     />
                   </Col>
@@ -236,7 +241,7 @@ function ReferenceHandler(props) {
               ) : (
                 <Row align="middle">
                   <Col span={24}>
-                    <Alert message={'No resource ' + props.children.props.children[0].props.formData.kind +
+                    <Alert message={'No resource ' + kind.current +
                     ' found in namespace ' + selectedNS + '.'}
                            type="warning" showIcon closable
                     />
