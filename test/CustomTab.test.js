@@ -211,65 +211,6 @@ describe('CustomTabs', () => {
 
   }, testTimeout)
 
-  test('Add reference', async () => {
-    mocks();
-
-    await setup();
-
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
-    expect(await screen.findByText('NewTab')).toBeInTheDocument();
-
-    userEvent.click(await screen.findByText('NewTab'));
-
-    expect(await screen.findByText('Deployments')).toBeInTheDocument();
-
-    let close = await screen.findAllByLabelText('close');
-
-    await act(async () => {
-      userEvent.click(close[4]);
-      await new Promise((r) => setTimeout(r, 500));
-    })
-
-    await act(async () => {
-      fireEvent.contextMenu(screen.getByText('Containers'));
-    })
-    const add = await screen.findByText('Add Reference');
-
-    await act(async () => {
-      await fireEvent.mouseOver(add);
-      await fireEvent.click(add);
-      await new Promise((r) => setTimeout(r, 500));
-    })
-
-    expect(screen.findByText(/new ref/i));
-
-    await new Promise((r) => setTimeout(r, 500));
-
-    await act(async () => {
-      userEvent.click(await screen.findByText(/new ref/i));
-      await userEvent.type(await screen.findByRole('input'), '2{enter}');
-    })
-
-    await act(async () => {
-      let select = await screen.getAllByRole('combobox');
-      userEvent.click(select[2]);
-      await userEvent.type(select[2], 'deployments');
-      await new Promise((r) => setTimeout(r, 500));
-    })
-
-    let deployments = await screen.findAllByText('deployments');
-
-    fireEvent.mouseOver(deployments[0]);
-    await act(async () => {
-      fireEvent.click(deployments[0]);
-      await new Promise((r) => setTimeout(r, 500));
-    })
-
-    expect(await screen.findByText('image')).toBeInTheDocument();
-    expect(await screen.findByText('Age')).toBeInTheDocument();
-
-  }, testTimeout)
-
   test('Add deployment', async () => {
     mocks();
 
