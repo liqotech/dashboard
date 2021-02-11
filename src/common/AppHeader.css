@@ -6,7 +6,7 @@
 }
 
 .app-menu {
-  position:fixed;
+  position: fixed;
   right: 0;
   z-index: 11;
 }
@@ -29,7 +29,6 @@
 }
 
 @media (max-width: 768px) {
-
   .app-menu > li {
     padding: 0 15px;
   }
@@ -38,4 +37,4 @@
     padding: 0 15px;
     margin: 0 -15px;
   }
-}  
+}

@@ -1,22 +1,22 @@
 .error-red {
-    max-width: 30vw;
-    margin: 50px auto;
-    padding: 40px;
-    border: 1px solid #c8c8c8;
-    text-align: center;
+  max-width: 30vw;
+  margin: 50px auto;
+  padding: 40px;
+  border: 1px solid #c8c8c8;
+  text-align: center;
 }
 
 .error-red .title {
-    font-size: 50px;
-    letter-spacing: 10px;
-    margin: 16px;
+  font-size: 50px;
+  letter-spacing: 10px;
+  margin: 16px;
 }
 
 .error-red .desc {
-    font-size: 20px;
-    margin-bottom: 20px;
+  font-size: 20px;
+  margin-bottom: 20px;
 }
 
 .go-back-btn {
-    min-width: 160px;
+  min-width: 160px;
 }

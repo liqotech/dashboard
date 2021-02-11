@@ -22,9 +22,7 @@
         "clusterId": "8d73c01a-f23a-45dc-822b-7d3232683f53",
         "images": [
           {
-            "names": [
-              "docker.io/kindest/kindnetd:0.5.4"
-            ],
+            "names": ["docker.io/kindest/kindnetd:0.5.4"],
             "sizeBytes": 113207016
           },
           {

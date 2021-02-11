@@ -1,7 +1,12 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { testTimeout } from '../src/constants';
-import { generalMocks, loginTest, mockCRDAndViewsExtended, setToken } from './RTLUtils';
+import {
+  generalMocks,
+  loginTest,
+  mockCRDAndViewsExtended,
+  setToken
+} from './RTLUtils';
 import Cookies from 'js-cookie';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../src/app/App';
@@ -27,19 +32,22 @@ async function setup() {
   expect(screen.getAllByRole('row')).toHaveLength(10);
 }
 
-function mocks(errorSchema){
+function mocks(errorSchema) {
   fetch.mockResponse(req => {
-    if (req.url === 'https://kubernetesjsonschema.dev/master/_definitions.json'){
-      if(!errorSchema)
-        return Promise.resolve(new Response(JSON.stringify(K8sSchemaDefinitions)))
+    if (
+      req.url === 'https://kubernetesjsonschema.dev/master/_definitions.json'
+    ) {
+      if (!errorSchema)
+        return Promise.resolve(
+          new Response(JSON.stringify(K8sSchemaDefinitions))
+        );
       else return Promise.reject(404);
     }
-    if(generalMocks(req.url))
-      return generalMocks(req.url);
-  })
+    if (generalMocks(req.url)) return generalMocks(req.url);
+  });
 }
 
-async function addImage(){
+async function addImage() {
   userEvent.click(await screen.findByLabelText('insert-row-right'));
 
   expect(await screen.findByLabelText('save')).toBeInTheDocument();
@@ -57,488 +65,539 @@ async function addImage(){
   userEvent.click(await screen.findByLabelText('save'));
 
   expect(await screen.findByText('Image')).toBeInTheDocument();
-  expect(await screen.findAllByText('nappozord/kube-test:v0.1')).toHaveLength(4)
+  expect(await screen.findAllByText('nappozord/kube-test:v0.1')).toHaveLength(
+    4
+  );
 }
 
 beforeEach(() => {
   localStorage.setItem('theme', 'dark');
-  if(window.api && !_.isEmpty(window.api.dashConfigs.current)) {
+  if (window.api && !_.isEmpty(window.api.dashConfigs.current)) {
     window.api.dashConfigs.current = {};
   }
   Cookies.remove('token');
 });
 
 describe('Column Customization', () => {
-  test('Add a column when config do not already exist', async () => {
-    mocks();
+  test(
+    'Add a column when config do not already exist',
+    async () => {
+      mocks();
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    expect(await screen.findByText('Pod')).toBeInTheDocument();
+      expect(await screen.findByText('Pod')).toBeInTheDocument();
 
-    await addImage();
+      await addImage();
+    },
+    testTimeout
+  );
 
-  }, testTimeout)
+  test(
+    'Add a column when config already exist but no render column',
+    async () => {
+      mocks();
 
-  test('Add a column when config already exist but no render column', async () => {
-    mocks();
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      let stars = await screen.findAllByLabelText('star');
 
-    let stars = await screen.findAllByLabelText('star');
+      userEvent.click(stars[1]);
 
-    userEvent.click(stars[1]);
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+      await addImage();
+    },
+    testTimeout
+  );
 
-    await addImage();
+  test(
+    'Add then remove column',
+    async () => {
+      mocks();
 
-  }, testTimeout)
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-  test('Add then remove column', async () => {
-    mocks();
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      userEvent.click(await screen.findByLabelText('insert-row-right'));
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      expect(await screen.findByLabelText('save')).toBeInTheDocument();
+      expect(await screen.findByLabelText('close')).toBeInTheDocument();
 
-    userEvent.click(await screen.findByLabelText('insert-row-right'));
+      let select = await screen.findAllByLabelText('select-k8s');
+      userEvent.click(select[1]);
+      await userEvent.type(select[1], 'resourceVersion');
 
-    expect(await screen.findByLabelText('save')).toBeInTheDocument();
-    expect(await screen.findByLabelText('close')).toBeInTheDocument();
+      let resourceVersion = await screen.findAllByText('resourceVersion');
 
-    let select = await screen.findAllByLabelText('select-k8s');
-    userEvent.click(select[1]);
-    await userEvent.type(select[1], 'resourceVersion');
+      fireEvent.mouseOver(resourceVersion[3]);
+      fireEvent.click(resourceVersion[3]);
 
-    let resourceVersion = await screen.findAllByText('resourceVersion');
+      userEvent.click(await screen.findByLabelText('save'));
 
-    fireEvent.mouseOver(resourceVersion[3]);
-    fireEvent.click(resourceVersion[3]);
+      expect(await screen.findByText('Resourceversion')).toBeInTheDocument();
+      userEvent.click(await screen.findByText('Resourceversion'));
 
-    userEvent.click(await screen.findByLabelText('save'));
+      let textbox = await screen.findByLabelText('editColumn');
 
-    expect(await screen.findByText('Resourceversion')).toBeInTheDocument();
-    userEvent.click(await screen.findByText('Resourceversion'));
+      textbox.setSelectionRange(0, 20);
+      await userEvent.type(textbox, '{backspace}{enter}');
 
-    let textbox = await screen.findByLabelText('editColumn');
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    textbox.setSelectionRange(0, 20);
-    await userEvent.type(textbox, '{backspace}{enter}');
+      expect(
+        await screen.queryByText('Resourceversion')
+      ).not.toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+  test(
+    'Add then modify column title',
+    async () => {
+      mocks();
 
-    expect(await screen.queryByText('Resourceversion')).not.toBeInTheDocument();
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-  }, testTimeout)
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-  test('Add then modify column title', async () => {
-    mocks();
+      userEvent.click(await screen.findByLabelText('insert-row-right'));
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      expect(await screen.findByLabelText('save')).toBeInTheDocument();
+      expect(await screen.findByLabelText('close')).toBeInTheDocument();
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      let select = await screen.findAllByLabelText('select-k8s');
+      userEvent.click(select[1]);
+      await userEvent.type(select[1], 'resourceVersion');
 
-    userEvent.click(await screen.findByLabelText('insert-row-right'));
+      let resourceVersion = await screen.findAllByText('resourceVersion');
 
-    expect(await screen.findByLabelText('save')).toBeInTheDocument();
-    expect(await screen.findByLabelText('close')).toBeInTheDocument();
+      fireEvent.mouseOver(resourceVersion[3]);
+      fireEvent.click(resourceVersion[3]);
 
-    let select = await screen.findAllByLabelText('select-k8s');
-    userEvent.click(select[1]);
-    await userEvent.type(select[1], 'resourceVersion');
+      userEvent.click(await screen.findByLabelText('save'));
 
-    let resourceVersion = await screen.findAllByText('resourceVersion');
+      expect(await screen.findByText('Resourceversion')).toBeInTheDocument();
+      userEvent.click(await screen.findByText('Resourceversion'));
 
-    fireEvent.mouseOver(resourceVersion[3]);
-    fireEvent.click(resourceVersion[3]);
+      let textbox = await screen.findByLabelText('editColumn');
 
-    userEvent.click(await screen.findByLabelText('save'));
+      await userEvent.type(textbox, '2');
 
-    expect(await screen.findByText('Resourceversion')).toBeInTheDocument();
-    userEvent.click(await screen.findByText('Resourceversion'));
+      userEvent.click(screen.getByText('Namespace'));
 
-    let textbox = await screen.findByLabelText('editColumn');
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    await userEvent.type(textbox, '2');
+      expect(await screen.queryByText('Resourceversion2')).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    userEvent.click(screen.getByText('Namespace'));
+  test(
+    'Add column with text',
+    async () => {
+      mocks();
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    expect(await screen.queryByText('Resourceversion2')).toBeInTheDocument();
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-  }, testTimeout)
+      userEvent.click(await screen.findByLabelText('insert-row-right'));
 
-  test('Add column with text', async () => {
-    mocks();
+      expect(await screen.findByLabelText('save')).toBeInTheDocument();
+      expect(await screen.findByLabelText('close')).toBeInTheDocument();
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      let select = await screen.findAllByLabelText('select-k8s');
+      userEvent.click(select[1]);
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      await userEvent.type(select[1], "'/'{enter}");
+      await userEvent.type(select[1], 'resourceVersion');
 
-    userEvent.click(await screen.findByLabelText('insert-row-right'));
+      let resourceVersion = await screen.findAllByText('resourceVersion');
 
-    expect(await screen.findByLabelText('save')).toBeInTheDocument();
-    expect(await screen.findByLabelText('close')).toBeInTheDocument();
+      fireEvent.mouseOver(resourceVersion[3]);
+      fireEvent.click(resourceVersion[3]);
 
-    let select = await screen.findAllByLabelText('select-k8s');
-    userEvent.click(select[1]);
+      userEvent.click(await screen.findByLabelText('save'));
 
-    await userEvent.type(select[1], "'/'{enter}");
-    await userEvent.type(select[1], 'resourceVersion');
+      expect(await screen.findByText(/Resourceversion/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    let resourceVersion = await screen.findAllByText('resourceVersion');
+  test(
+    'Add column with object',
+    async () => {
+      mocks();
 
-    fireEvent.mouseOver(resourceVersion[3]);
-    fireEvent.click(resourceVersion[3]);
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    userEvent.click(await screen.findByLabelText('save'));
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    expect(await screen.findByText(/Resourceversion/i)).toBeInTheDocument();
+      userEvent.click(await screen.findByLabelText('insert-row-right'));
 
-  }, testTimeout)
+      expect(await screen.findByLabelText('save')).toBeInTheDocument();
+      expect(await screen.findByLabelText('close')).toBeInTheDocument();
 
-  test('Add column with object', async () => {
-    mocks();
+      let select = await screen.findAllByLabelText('select-k8s');
+      userEvent.click(select[1]);
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      await userEvent.type(select[1], 'metadata');
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      let metadata = await screen.findAllByText('metadata');
 
-    userEvent.click(await screen.findByLabelText('insert-row-right'));
+      fireEvent.mouseOver(metadata[3]);
+      fireEvent.click(metadata[3]);
 
-    expect(await screen.findByLabelText('save')).toBeInTheDocument();
-    expect(await screen.findByLabelText('close')).toBeInTheDocument();
+      userEvent.click(await screen.findByLabelText('save'));
 
-    let select = await screen.findAllByLabelText('select-k8s');
-    userEvent.click(select[1]);
+      expect(await screen.findByText(/metadata/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    await userEvent.type(select[1], 'metadata');
+  test(
+    'Add column with object and text',
+    async () => {
+      mocks();
 
-    let metadata = await screen.findAllByText('metadata');
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    fireEvent.mouseOver(metadata[3]);
-    fireEvent.click(metadata[3]);
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    userEvent.click(await screen.findByLabelText('save'));
+      userEvent.click(await screen.findByLabelText('insert-row-right'));
 
-    expect(await screen.findByText(/metadata/i)).toBeInTheDocument();
+      expect(await screen.findByLabelText('save')).toBeInTheDocument();
+      expect(await screen.findByLabelText('close')).toBeInTheDocument();
 
-  }, testTimeout)
+      let select = await screen.findAllByLabelText('select-k8s');
+      userEvent.click(select[1]);
 
-  test('Add column with object and text', async () => {
-    mocks();
+      await userEvent.type(select[1], "'/'{enter}");
+      await userEvent.type(select[1], 'metadata');
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      let metadata = await screen.findAllByText('metadata');
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      fireEvent.mouseOver(metadata[3]);
+      fireEvent.click(metadata[3]);
 
-    userEvent.click(await screen.findByLabelText('insert-row-right'));
+      userEvent.click(await screen.findByLabelText('save'));
 
-    expect(await screen.findByLabelText('save')).toBeInTheDocument();
-    expect(await screen.findByLabelText('close')).toBeInTheDocument();
+      expect(await screen.findByText(/metadata/i)).toBeInTheDocument();
+      expect(await screen.findAllByText(/object is not/i)).toHaveLength(4);
+    },
+    testTimeout
+  );
 
-    let select = await screen.findAllByLabelText('select-k8s');
-    userEvent.click(select[1]);
+  test(
+    'Add column with object and text then delete',
+    async () => {
+      mocks();
 
-    await userEvent.type(select[1], "'/'{enter}");
-    await userEvent.type(select[1], 'metadata');
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    let metadata = await screen.findAllByText('metadata');
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    fireEvent.mouseOver(metadata[3]);
-    fireEvent.click(metadata[3]);
+      userEvent.click(await screen.findByLabelText('insert-row-right'));
 
-    userEvent.click(await screen.findByLabelText('save'));
+      expect(await screen.findByLabelText('save')).toBeInTheDocument();
+      expect(await screen.findByLabelText('close')).toBeInTheDocument();
 
-    expect(await screen.findByText(/metadata/i)).toBeInTheDocument();
-    expect(await screen.findAllByText(/object is not/i)).toHaveLength(4);
+      let select = await screen.findAllByLabelText('select-k8s');
+      userEvent.click(select[1]);
 
-  }, testTimeout)
+      await userEvent.type(select[1], "'/'{enter}");
+      await userEvent.type(select[1], 'metadata');
 
-  test('Add column with object and text then delete', async () => {
-    mocks();
+      let metadata = await screen.findAllByText('metadata');
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      fireEvent.mouseOver(metadata[3]);
+      fireEvent.click(metadata[3]);
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      let close = await screen.findAllByLabelText('close');
 
-    userEvent.click(await screen.findByLabelText('insert-row-right'));
+      userEvent.click(close[0]);
+      userEvent.click(close[1]);
+      userEvent.click(await screen.findByLabelText('save'));
 
-    expect(await screen.findByLabelText('save')).toBeInTheDocument();
-    expect(await screen.findByLabelText('close')).toBeInTheDocument();
+      expect(await screen.findByLabelText('save')).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    let select = await screen.findAllByLabelText('select-k8s');
-    userEvent.click(select[1]);
+  test(
+    'Add column with array (of object)',
+    async () => {
+      mocks();
 
-    await userEvent.type(select[1], "'/'{enter}");
-    await userEvent.type(select[1], 'metadata');
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    let metadata = await screen.findAllByText('metadata');
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    fireEvent.mouseOver(metadata[3]);
-    fireEvent.click(metadata[3]);
+      userEvent.click(await screen.findByLabelText('insert-row-right'));
 
-    let close = await screen.findAllByLabelText('close');
+      expect(await screen.findByLabelText('save')).toBeInTheDocument();
+      expect(await screen.findByLabelText('close')).toBeInTheDocument();
 
-    userEvent.click(close[0]);
-    userEvent.click(close[1]);
-    userEvent.click(await screen.findByLabelText('save'));
+      let select = await screen.findAllByLabelText('select-k8s');
+      userEvent.click(select[1]);
 
-    expect(await screen.findByLabelText('save')).toBeInTheDocument();
+      await userEvent.type(select[1], 'containers');
 
-  }, testTimeout)
+      let containers = await screen.findAllByText('containers');
 
-  test('Add column with array (of object)', async () => {
-    mocks();
+      fireEvent.mouseOver(containers[3]);
+      fireEvent.click(containers[3]);
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      userEvent.click(await screen.findByLabelText('save'));
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      expect(await screen.findByText(/containers/i)).toBeInTheDocument();
+      expect(await screen.findAllByText('1')).toHaveLength(4);
+    },
+    testTimeout
+  );
 
-    userEvent.click(await screen.findByLabelText('insert-row-right'));
+  test(
+    'Add column with booleans',
+    async () => {
+      mocks();
 
-    expect(await screen.findByLabelText('save')).toBeInTheDocument();
-    expect(await screen.findByLabelText('close')).toBeInTheDocument();
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    let select = await screen.findAllByLabelText('select-k8s');
-    userEvent.click(select[1]);
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    await userEvent.type(select[1], 'containers');
+      userEvent.click(await screen.findByLabelText('insert-row-right'));
 
-    let containers = await screen.findAllByText('containers');
+      expect(await screen.findByLabelText('save')).toBeInTheDocument();
+      expect(await screen.findByLabelText('close')).toBeInTheDocument();
 
-    fireEvent.mouseOver(containers[3]);
-    fireEvent.click(containers[3]);
+      let select = await screen.findAllByLabelText('select-k8s');
+      userEvent.click(select[1]);
 
-    userEvent.click(await screen.findByLabelText('save'));
+      await userEvent.type(select[1], 'enableServiceLinks');
 
-    expect(await screen.findByText(/containers/i)).toBeInTheDocument();
-    expect(await screen.findAllByText('1')).toHaveLength(4);
+      let enableServiceLinks = await screen.findAllByText('enableServiceLinks');
 
-  }, testTimeout)
+      fireEvent.mouseOver(enableServiceLinks[3]);
+      fireEvent.click(enableServiceLinks[3]);
 
-  test('Add column with booleans', async () => {
-    mocks();
+      userEvent.click(await screen.findByLabelText('save'));
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      expect(
+        await screen.findByText(/enableServiceLinks/i)
+      ).toBeInTheDocument();
+      expect(await screen.findAllByLabelText('check-circle'));
+      expect(
+        await screen.findAllByLabelText('exclamation-circle')
+      ).toHaveLength(1);
+    },
+    testTimeout
+  );
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+  test(
+    'Add column with array but empty',
+    async () => {
+      mocks();
 
-    userEvent.click(await screen.findByLabelText('insert-row-right'));
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    expect(await screen.findByLabelText('save')).toBeInTheDocument();
-    expect(await screen.findByLabelText('close')).toBeInTheDocument();
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    let select = await screen.findAllByLabelText('select-k8s');
-    userEvent.click(select[1]);
+      userEvent.click(await screen.findByLabelText('insert-row-right'));
 
-    await userEvent.type(select[1], 'enableServiceLinks');
+      expect(await screen.findByLabelText('save')).toBeInTheDocument();
+      expect(await screen.findByLabelText('close')).toBeInTheDocument();
 
-    let enableServiceLinks = await screen.findAllByText('enableServiceLinks');
+      let select = await screen.findAllByLabelText('select-k8s');
+      userEvent.click(select[1]);
 
-    fireEvent.mouseOver(enableServiceLinks[3]);
-    fireEvent.click(enableServiceLinks[3]);
+      await userEvent.type(select[1], 'volumes');
 
-    userEvent.click(await screen.findByLabelText('save'));
+      let volumes = await screen.findAllByText('volumes');
 
-    expect(await screen.findByText(/enableServiceLinks/i)).toBeInTheDocument();
-    expect(await screen.findAllByLabelText('check-circle'));
-    expect(await screen.findAllByLabelText('exclamation-circle')).toHaveLength(1);
+      fireEvent.mouseOver(volumes[3]);
+      fireEvent.click(volumes[3]);
 
-  }, testTimeout)
+      userEvent.click(await screen.findByLabelText('save'));
 
-  test('Add column with array but empty', async () => {
-    mocks();
+      expect(await screen.findByText(/volumes/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+  test(
+    'Add column with array (of bool)',
+    async () => {
+      mocks();
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    userEvent.click(await screen.findByLabelText('insert-row-right'));
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    expect(await screen.findByLabelText('save')).toBeInTheDocument();
-    expect(await screen.findByLabelText('close')).toBeInTheDocument();
+      userEvent.click(await screen.findByLabelText('insert-row-right'));
 
-    let select = await screen.findAllByLabelText('select-k8s');
-    userEvent.click(select[1]);
+      expect(await screen.findByLabelText('save')).toBeInTheDocument();
+      expect(await screen.findByLabelText('close')).toBeInTheDocument();
 
-    await userEvent.type(select[1], 'volumes');
+      let select = await screen.findAllByLabelText('select-k8s');
+      userEvent.click(select[1]);
 
-    let volumes = await screen.findAllByText('volumes');
+      await userEvent.type(select[1], 'containerStatuses');
 
-    fireEvent.mouseOver(volumes[3]);
-    fireEvent.click(volumes[3]);
+      let containerStatuses = await screen.findAllByText('containerStatuses');
 
-    userEvent.click(await screen.findByLabelText('save'));
+      fireEvent.mouseOver(containerStatuses[3]);
+      fireEvent.click(containerStatuses[3]);
 
-    expect(await screen.findByText(/volumes/i)).toBeInTheDocument();
+      userEvent.click(await screen.findByLabelText('save'));
 
-  }, testTimeout)
+      expect(await screen.findByText(/containerStatuses/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  test('Add column with array (of bool)', async () => {
-    mocks();
+  test(
+    'Add column with empty objects',
+    async () => {
+      mocks();
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    userEvent.click(await screen.findByLabelText('insert-row-right'));
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 500));
+        window.api.dashConfigs.current.spec.resources.push({
+          resourceName: 'Pod',
+          resourcePath: '/api/v1/pods',
+          favourite: false
+        });
+        window.api.manageCallbackDCs();
+        await new Promise(r => setTimeout(r, 500));
+      });
 
-    expect(await screen.findByLabelText('save')).toBeInTheDocument();
-    expect(await screen.findByLabelText('close')).toBeInTheDocument();
+      userEvent.click(await screen.findByLabelText('insert-row-right'));
 
-    let select = await screen.findAllByLabelText('select-k8s');
-    userEvent.click(select[1]);
+      expect(await screen.findByLabelText('save')).toBeInTheDocument();
+      expect(await screen.findByLabelText('close')).toBeInTheDocument();
 
-    await userEvent.type(select[1], 'containerStatuses');
+      let select = await screen.findAllByLabelText('select-k8s');
+      userEvent.click(select[1]);
 
-    let containerStatuses = await screen.findAllByText('containerStatuses');
+      await userEvent.type(select[1], 'annotations');
 
-    fireEvent.mouseOver(containerStatuses[3]);
-    fireEvent.click(containerStatuses[3]);
+      let annotations = await screen.findAllByText('annotations');
 
-    userEvent.click(await screen.findByLabelText('save'));
+      fireEvent.mouseOver(annotations[3]);
+      fireEvent.click(annotations[3]);
 
-    expect(await screen.findByText(/containerStatuses/i)).toBeInTheDocument();
+      userEvent.click(await screen.findByLabelText('save'));
 
-  }, testTimeout)
+      expect(await screen.findByText(/annotations/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  test('Add column with empty objects', async () => {
-    mocks();
+  test(
+    'Cancel add column',
+    async () => {
+      mocks();
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 500));
-      window.api.dashConfigs.current.spec.resources.push({
-        resourceName: 'Pod',
-        resourcePath: '/api/v1/pods',
-        favourite: false
-      })
-      window.api.manageCallbackDCs();
-      await new Promise((r) => setTimeout(r, 500));
-    })
+      userEvent.click(await screen.findByLabelText('insert-row-right'));
 
-    userEvent.click(await screen.findByLabelText('insert-row-right'));
+      expect(await screen.findByLabelText('save')).toBeInTheDocument();
+      expect(await screen.findByLabelText('close')).toBeInTheDocument();
 
-    expect(await screen.findByLabelText('save')).toBeInTheDocument();
-    expect(await screen.findByLabelText('close')).toBeInTheDocument();
+      userEvent.click(await screen.findByLabelText('save'));
+      userEvent.click(await screen.findByLabelText('close'));
 
-    let select = await screen.findAllByLabelText('select-k8s');
-    userEvent.click(select[1]);
-
-    await userEvent.type(select[1], 'annotations');
-
-    let annotations = await screen.findAllByText('annotations');
-
-    fireEvent.mouseOver(annotations[3]);
-    fireEvent.click(annotations[3]);
-
-    userEvent.click(await screen.findByLabelText('save'));
-
-    expect(await screen.findByText(/annotations/i)).toBeInTheDocument();
-
-  }, testTimeout)
-
-  test('Cancel add column', async () => {
-    mocks();
-
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
-
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
-
-    userEvent.click(await screen.findByLabelText('insert-row-right'));
-
-    expect(await screen.findByLabelText('save')).toBeInTheDocument();
-    expect(await screen.findByLabelText('close')).toBeInTheDocument();
-
-    userEvent.click(await screen.findByLabelText('save'));
-    userEvent.click(await screen.findByLabelText('close'));
-
-    expect(await screen.queryByLabelText('save')).not.toBeInTheDocument();
-  }, testTimeout)
-})
+      expect(await screen.queryByLabelText('save')).not.toBeInTheDocument();
+    },
+    testTimeout
+  );
+});

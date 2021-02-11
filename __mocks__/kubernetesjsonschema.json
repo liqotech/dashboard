@@ -21,9 +21,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "volumeID"
-      ],
+      "required": ["volumeID"],
       "type": "object"
     },
     "io.k8s.api.core.v1.Affinity": {
@@ -56,10 +54,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "name",
-        "devicePath"
-      ],
+      "required": ["name", "devicePath"],
       "type": "object"
     },
     "io.k8s.api.core.v1.AzureDiskVolumeSource": {
@@ -90,10 +85,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "diskName",
-        "diskURI"
-      ],
+      "required": ["diskName", "diskURI"],
       "type": "object"
     },
     "io.k8s.api.core.v1.AzureFilePersistentVolumeSource": {
@@ -116,10 +108,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "secretName",
-        "shareName"
-      ],
+      "required": ["secretName", "shareName"],
       "type": "object"
     },
     "io.k8s.api.core.v1.AzureFileVolumeSource": {
@@ -138,10 +127,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "secretName",
-        "shareName"
-      ],
+      "required": ["secretName", "shareName"],
       "type": "object"
     },
     "io.k8s.api.core.v1.Binding": {
@@ -154,9 +140,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "Binding"
-          ]
+          "enum": ["Binding"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -167,9 +151,7 @@
           "description": "The target object that you want to bind to the standard object."
         }
       },
-      "required": [
-        "target"
-      ],
+      "required": ["target"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -222,10 +204,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "driver",
-        "volumeHandle"
-      ],
+      "required": ["driver", "volumeHandle"],
       "type": "object"
     },
     "io.k8s.api.core.v1.CSIVolumeSource": {
@@ -255,9 +234,7 @@
           "type": "object"
         }
       },
-      "required": [
-        "driver"
-      ],
+      "required": ["driver"],
       "type": "object"
     },
     "io.k8s.api.core.v1.Capabilities": {
@@ -311,9 +288,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "monitors"
-      ],
+      "required": ["monitors"],
       "type": "object"
     },
     "io.k8s.api.core.v1.CephFSVolumeSource": {
@@ -347,9 +322,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "monitors"
-      ],
+      "required": ["monitors"],
       "type": "object"
     },
     "io.k8s.api.core.v1.CinderPersistentVolumeSource": {
@@ -372,9 +345,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "volumeID"
-      ],
+      "required": ["volumeID"],
       "type": "object"
     },
     "io.k8s.api.core.v1.CinderVolumeSource": {
@@ -397,9 +368,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "volumeID"
-      ],
+      "required": ["volumeID"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ClientIPConfig": {
@@ -433,10 +402,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "type",
-        "status"
-      ],
+      "required": ["type", "status"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ComponentStatus": {
@@ -458,9 +424,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "ComponentStatus"
-          ]
+          "enum": ["ComponentStatus"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -493,18 +457,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "ComponentStatusList"
-          ]
+          "enum": ["ComponentStatusList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -543,9 +503,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "ConfigMap"
-          ]
+          "enum": ["ConfigMap"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -591,9 +549,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "key"
-      ],
+      "required": ["key"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ConfigMapList": {
@@ -613,18 +569,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "ConfigMapList"
-          ]
+          "enum": ["ConfigMapList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -658,11 +610,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "namespace",
-        "name",
-        "kubeletConfigKey"
-      ],
+      "required": ["namespace", "name", "kubeletConfigKey"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ConfigMapProjection": {
@@ -771,10 +719,7 @@
             "$ref": "#/definitions/io.k8s.api.core.v1.ContainerPort"
           },
           "type": "array",
-          "x-kubernetes-list-map-keys": [
-            "containerPort",
-            "protocol"
-          ],
+          "x-kubernetes-list-map-keys": ["containerPort", "protocol"],
           "x-kubernetes-list-type": "map",
           "x-kubernetes-patch-merge-key": "containerPort",
           "x-kubernetes-patch-strategy": "merge"
@@ -838,9 +783,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ContainerImage": {
@@ -859,9 +802,7 @@
           "type": "integer"
         }
       },
-      "required": [
-        "names"
-      ],
+      "required": ["names"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ContainerPort": {
@@ -890,9 +831,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "containerPort"
-      ],
+      "required": ["containerPort"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ContainerState": {
@@ -957,9 +896,7 @@
           "description": "Time at which previous execution of the container started"
         }
       },
-      "required": [
-        "exitCode"
-      ],
+      "required": ["exitCode"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ContainerStateWaiting": {
@@ -1017,13 +954,7 @@
           "description": "Details about the container's current condition."
         }
       },
-      "required": [
-        "name",
-        "ready",
-        "restartCount",
-        "image",
-        "imageID"
-      ],
+      "required": ["name", "ready", "restartCount", "image", "imageID"],
       "type": "object"
     },
     "io.k8s.api.core.v1.DaemonEndpoint": {
@@ -1035,9 +966,7 @@
           "type": "integer"
         }
       },
-      "required": [
-        "Port"
-      ],
+      "required": ["Port"],
       "type": "object"
     },
     "io.k8s.api.core.v1.DownwardAPIProjection": {
@@ -1074,9 +1003,7 @@
           "description": "Selects a resource of the container: only resources limits and requests (limits.cpu, limits.memory, requests.cpu and requests.memory) are currently supported."
         }
       },
-      "required": [
-        "path"
-      ],
+      "required": ["path"],
       "type": "object"
     },
     "io.k8s.api.core.v1.DownwardAPIVolumeSource": {
@@ -1131,9 +1058,7 @@
           "description": "Reference to object providing the endpoint."
         }
       },
-      "required": [
-        "ip"
-      ],
+      "required": ["ip"],
       "type": "object"
     },
     "io.k8s.api.core.v1.EndpointPort": {
@@ -1157,9 +1082,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "port"
-      ],
+      "required": ["port"],
       "type": "object"
     },
     "io.k8s.api.core.v1.EndpointSubset": {
@@ -1199,9 +1122,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "Endpoints"
-          ]
+          "enum": ["Endpoints"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -1241,18 +1162,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "EndpointsList"
-          ]
+          "enum": ["EndpointsList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -1296,9 +1213,7 @@
           "description": "Source for the environment variable's value. Cannot be used if value is not empty."
         }
       },
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "type": "object"
     },
     "io.k8s.api.core.v1.EnvVarSource": {
@@ -1446,9 +1361,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "type": "object"
     },
     "io.k8s.api.core.v1.Event": {
@@ -1482,9 +1395,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "Event"
-          ]
+          "enum": ["Event"]
         },
         "lastTimestamp": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Time",
@@ -1527,10 +1438,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "metadata",
-        "involvedObject"
-      ],
+      "required": ["metadata", "involvedObject"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -1557,18 +1465,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "EventList"
-          ]
+          "enum": ["EventList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -1684,9 +1588,7 @@
           "description": "Optional: SecretRef is reference to the secret object containing sensitive information to pass to the plugin scripts. This may be empty if no secret object is specified. If the secret object contains more than one secret, all secrets are passed to the plugin scripts."
         }
       },
-      "required": [
-        "driver"
-      ],
+      "required": ["driver"],
       "type": "object"
     },
     "io.k8s.api.core.v1.FlexVolumeSource": {
@@ -1716,9 +1618,7 @@
           "description": "Optional: SecretRef is reference to the secret object containing sensitive information to pass to the plugin scripts. This may be empty if no secret object is specified. If the secret object contains more than one secret, all secrets are passed to the plugin scripts."
         }
       },
-      "required": [
-        "driver"
-      ],
+      "required": ["driver"],
       "type": "object"
     },
     "io.k8s.api.core.v1.FlockerVolumeSource": {
@@ -1756,9 +1656,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "pdName"
-      ],
+      "required": ["pdName"],
       "type": "object"
     },
     "io.k8s.api.core.v1.GitRepoVolumeSource": {
@@ -1777,9 +1675,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "repository"
-      ],
+      "required": ["repository"],
       "type": "object"
     },
     "io.k8s.api.core.v1.GlusterfsPersistentVolumeSource": {
@@ -1802,10 +1698,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "endpoints",
-        "path"
-      ],
+      "required": ["endpoints", "path"],
       "type": "object"
     },
     "io.k8s.api.core.v1.GlusterfsVolumeSource": {
@@ -1824,10 +1717,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "endpoints",
-        "path"
-      ],
+      "required": ["endpoints", "path"],
       "type": "object"
     },
     "io.k8s.api.core.v1.HTTPGetAction": {
@@ -1857,9 +1747,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "port"
-      ],
+      "required": ["port"],
       "type": "object"
     },
     "io.k8s.api.core.v1.HTTPHeader": {
@@ -1874,10 +1762,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "name",
-        "value"
-      ],
+      "required": ["name", "value"],
       "type": "object"
     },
     "io.k8s.api.core.v1.Handler": {
@@ -1927,9 +1812,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "path"
-      ],
+      "required": ["path"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ISCSIPersistentVolumeSource": {
@@ -1984,11 +1867,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "targetPortal",
-        "iqn",
-        "lun"
-      ],
+      "required": ["targetPortal", "iqn", "lun"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ISCSIVolumeSource": {
@@ -2043,11 +1922,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "targetPortal",
-        "iqn",
-        "lun"
-      ],
+      "required": ["targetPortal", "iqn", "lun"],
       "type": "object"
     },
     "io.k8s.api.core.v1.KeyToPath": {
@@ -2067,10 +1942,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "key",
-        "path"
-      ],
+      "required": ["key", "path"],
       "type": "object"
     },
     "io.k8s.api.core.v1.Lifecycle": {
@@ -2097,9 +1969,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "LimitRange"
-          ]
+          "enum": ["LimitRange"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -2162,9 +2032,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "type"
-      ],
+      "required": ["type"],
       "type": "object"
     },
     "io.k8s.api.core.v1.LimitRangeList": {
@@ -2184,18 +2052,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "LimitRangeList"
-          ]
+          "enum": ["LimitRangeList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -2216,9 +2080,7 @@
           "type": "array"
         }
       },
-      "required": [
-        "limits"
-      ],
+      "required": ["limits"],
       "type": "object"
     },
     "io.k8s.api.core.v1.LoadBalancerIngress": {
@@ -2270,9 +2132,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "path"
-      ],
+      "required": ["path"],
       "type": "object"
     },
     "io.k8s.api.core.v1.NFSVolumeSource": {
@@ -2291,10 +2151,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "server",
-        "path"
-      ],
+      "required": ["server", "path"],
       "type": "object"
     },
     "io.k8s.api.core.v1.Namespace": {
@@ -2307,9 +2164,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "Namespace"
-          ]
+          "enum": ["Namespace"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -2354,10 +2209,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "type",
-        "status"
-      ],
+      "required": ["type", "status"],
       "type": "object"
     },
     "io.k8s.api.core.v1.NamespaceList": {
@@ -2377,18 +2229,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "NamespaceList"
-          ]
+          "enum": ["NamespaceList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -2440,9 +2288,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "Node"
-          ]
+          "enum": ["Node"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -2478,10 +2324,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "type",
-        "address"
-      ],
+      "required": ["type", "address"],
       "type": "object"
     },
     "io.k8s.api.core.v1.NodeAffinity": {
@@ -2529,10 +2372,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "type",
-        "status"
-      ],
+      "required": ["type", "status"],
       "type": "object"
     },
     "io.k8s.api.core.v1.NodeConfigSource": {
@@ -2594,18 +2434,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "NodeList"
-          ]
+          "enum": ["NodeList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -2626,9 +2462,7 @@
           "type": "array"
         }
       },
-      "required": [
-        "nodeSelectorTerms"
-      ],
+      "required": ["nodeSelectorTerms"],
       "type": "object"
     },
     "io.k8s.api.core.v1.NodeSelectorRequirement": {
@@ -2650,10 +2484,7 @@
           "type": "array"
         }
       },
-      "required": [
-        "key",
-        "operator"
-      ],
+      "required": ["key", "operator"],
       "type": "object"
     },
     "io.k8s.api.core.v1.NodeSelectorTerm": {
@@ -2862,9 +2693,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "fieldPath"
-      ],
+      "required": ["fieldPath"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ObjectReference": {
@@ -2911,9 +2740,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "PersistentVolume"
-          ]
+          "enum": ["PersistentVolume"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -2947,9 +2774,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "PersistentVolumeClaim"
-          ]
+          "enum": ["PersistentVolumeClaim"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -2999,10 +2824,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "type",
-        "status"
-      ],
+      "required": ["type", "status"],
       "type": "object"
     },
     "io.k8s.api.core.v1.PersistentVolumeClaimList": {
@@ -3022,18 +2844,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "PersistentVolumeClaimList"
-          ]
+          "enum": ["PersistentVolumeClaimList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -3125,9 +2943,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "claimName"
-      ],
+      "required": ["claimName"],
       "type": "object"
     },
     "io.k8s.api.core.v1.PersistentVolumeList": {
@@ -3147,18 +2963,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "PersistentVolumeList"
-          ]
+          "enum": ["PersistentVolumeList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -3333,9 +3145,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "pdID"
-      ],
+      "required": ["pdID"],
       "type": "object"
     },
     "io.k8s.api.core.v1.Pod": {
@@ -3348,9 +3158,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "Pod"
-          ]
+          "enum": ["Pod"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -3413,9 +3221,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "topologyKey"
-      ],
+      "required": ["topologyKey"],
       "type": "object"
     },
     "io.k8s.api.core.v1.PodAntiAffinity": {
@@ -3466,10 +3272,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "type",
-        "status"
-      ],
+      "required": ["type", "status"],
       "type": "object"
     },
     "io.k8s.api.core.v1.PodDNSConfig": {
@@ -3539,18 +3342,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "PodList"
-          ]
+          "enum": ["PodList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -3568,9 +3367,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "conditionType"
-      ],
+      "required": ["conditionType"],
       "type": "object"
     },
     "io.k8s.api.core.v1.PodSecurityContext": {
@@ -3802,10 +3599,7 @@
             "$ref": "#/definitions/io.k8s.api.core.v1.TopologySpreadConstraint"
           },
           "type": "array",
-          "x-kubernetes-list-map-keys": [
-            "topologyKey",
-            "whenUnsatisfiable"
-          ],
+          "x-kubernetes-list-map-keys": ["topologyKey", "whenUnsatisfiable"],
           "x-kubernetes-list-type": "map",
           "x-kubernetes-patch-merge-key": "topologyKey",
           "x-kubernetes-patch-strategy": "merge"
@@ -3820,9 +3614,7 @@
           "x-kubernetes-patch-strategy": "merge,retainKeys"
         }
       },
-      "required": [
-        "containers"
-      ],
+      "required": ["containers"],
       "type": "object"
     },
     "io.k8s.api.core.v1.PodStatus": {
@@ -3912,9 +3704,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "PodTemplate"
-          ]
+          "enum": ["PodTemplate"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -3951,18 +3741,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "PodTemplateList"
-          ]
+          "enum": ["PodTemplateList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -4002,9 +3788,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "volumeID"
-      ],
+      "required": ["volumeID"],
       "type": "object"
     },
     "io.k8s.api.core.v1.PreferredSchedulingTerm": {
@@ -4020,10 +3804,7 @@
           "type": "integer"
         }
       },
-      "required": [
-        "weight",
-        "preference"
-      ],
+      "required": ["weight", "preference"],
       "type": "object"
     },
     "io.k8s.api.core.v1.Probe": {
@@ -4085,9 +3866,7 @@
           "type": "array"
         }
       },
-      "required": [
-        "sources"
-      ],
+      "required": ["sources"],
       "type": "object"
     },
     "io.k8s.api.core.v1.QuobyteVolumeSource": {
@@ -4118,10 +3897,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "registry",
-        "volume"
-      ],
+      "required": ["registry", "volume"],
       "type": "object"
     },
     "io.k8s.api.core.v1.RBDPersistentVolumeSource": {
@@ -4163,10 +3939,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "monitors",
-        "image"
-      ],
+      "required": ["monitors", "image"],
       "type": "object"
     },
     "io.k8s.api.core.v1.RBDVolumeSource": {
@@ -4208,10 +3981,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "monitors",
-        "image"
-      ],
+      "required": ["monitors", "image"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ReplicationController": {
@@ -4224,9 +3994,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "ReplicationController"
-          ]
+          "enum": ["ReplicationController"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -4274,10 +4042,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "type",
-        "status"
-      ],
+      "required": ["type", "status"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ReplicationControllerList": {
@@ -4297,18 +4062,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "ReplicationControllerList"
-          ]
+          "enum": ["ReplicationControllerList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -4383,9 +4144,7 @@
           "type": "integer"
         }
       },
-      "required": [
-        "replicas"
-      ],
+      "required": ["replicas"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ResourceFieldSelector": {
@@ -4404,9 +4163,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "resource"
-      ],
+      "required": ["resource"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ResourceQuota": {
@@ -4419,9 +4176,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "ResourceQuota"
-          ]
+          "enum": ["ResourceQuota"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -4462,18 +4217,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "ResourceQuotaList"
-          ]
+          "enum": ["ResourceQuotaList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -4613,11 +4364,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "gateway",
-        "system",
-        "secretRef"
-      ],
+      "required": ["gateway", "system", "secretRef"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ScaleIOVolumeSource": {
@@ -4664,11 +4411,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "gateway",
-        "system",
-        "secretRef"
-      ],
+      "required": ["gateway", "system", "secretRef"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ScopeSelector": {
@@ -4703,10 +4446,7 @@
           "type": "array"
         }
       },
-      "required": [
-        "scopeName",
-        "operator"
-      ],
+      "required": ["scopeName", "operator"],
       "type": "object"
     },
     "io.k8s.api.core.v1.Secret": {
@@ -4731,9 +4471,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "Secret"
-          ]
+          "enum": ["Secret"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -4790,9 +4528,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "key"
-      ],
+      "required": ["key"],
       "type": "object"
     },
     "io.k8s.api.core.v1.SecretList": {
@@ -4812,18 +4548,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "SecretList"
-          ]
+          "enum": ["SecretList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -4952,9 +4684,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "Service"
-          ]
+          "enum": ["Service"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -4999,9 +4729,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "ServiceAccount"
-          ]
+          "enum": ["ServiceAccount"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta",
@@ -5043,18 +4771,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "ServiceAccountList"
-          ]
+          "enum": ["ServiceAccountList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -5081,9 +4805,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "path"
-      ],
+      "required": ["path"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ServiceList": {
@@ -5103,18 +4825,14 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "ServiceList"
-          ]
+          "enum": ["ServiceList"]
         },
         "metadata": {
           "$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta",
           "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
         }
       },
-      "required": [
-        "items"
-      ],
+      "required": ["items"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -5154,9 +4872,7 @@
           "description": "Number or name of the port to access on the pods targeted by the service. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME. If this is a string, it will be looked up as a named port in the target Pod's container ports. If this is not specified, the value of the 'port' field is used (an identity map). This field is ignored for services with clusterIP=None, and should be omitted or set equal to the 'port' field. More info: https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service"
         }
       },
-      "required": [
-        "port"
-      ],
+      "required": ["port"],
       "type": "object"
     },
     "io.k8s.api.core.v1.ServiceSpec": {
@@ -5207,10 +4923,7 @@
             "$ref": "#/definitions/io.k8s.api.core.v1.ServicePort"
           },
           "type": "array",
-          "x-kubernetes-list-map-keys": [
-            "port",
-            "protocol"
-          ],
+          "x-kubernetes-list-map-keys": ["port", "protocol"],
           "x-kubernetes-list-type": "map",
           "x-kubernetes-patch-merge-key": "port",
           "x-kubernetes-patch-strategy": "merge"
@@ -5332,10 +5045,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "name",
-        "value"
-      ],
+      "required": ["name", "value"],
       "type": "object"
     },
     "io.k8s.api.core.v1.TCPSocketAction": {
@@ -5350,9 +5060,7 @@
           "description": "Number or name of the port to access on the container. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME."
         }
       },
-      "required": [
-        "port"
-      ],
+      "required": ["port"],
       "type": "object"
     },
     "io.k8s.api.core.v1.Taint": {
@@ -5375,10 +5083,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "key",
-        "effect"
-      ],
+      "required": ["key", "effect"],
       "type": "object"
     },
     "io.k8s.api.core.v1.Toleration": {
@@ -5423,10 +5128,7 @@
           "type": "array"
         }
       },
-      "required": [
-        "key",
-        "values"
-      ],
+      "required": ["key", "values"],
       "type": "object"
     },
     "io.k8s.api.core.v1.TopologySelectorTerm": {
@@ -5463,11 +5165,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "maxSkew",
-        "topologyKey",
-        "whenUnsatisfiable"
-      ],
+      "required": ["maxSkew", "topologyKey", "whenUnsatisfiable"],
       "type": "object"
     },
     "io.k8s.api.core.v1.TypedLocalObjectReference": {
@@ -5486,10 +5184,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "kind",
-        "name"
-      ],
+      "required": ["kind", "name"],
       "type": "object"
     },
     "io.k8s.api.core.v1.Volume": {
@@ -5612,9 +5307,7 @@
           "description": "VsphereVolume represents a vSphere volume attached and mounted on kubelets host machine"
         }
       },
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "type": "object"
     },
     "io.k8s.api.core.v1.VolumeDevice": {
@@ -5629,10 +5322,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "name",
-        "devicePath"
-      ],
+      "required": ["name", "devicePath"],
       "type": "object"
     },
     "io.k8s.api.core.v1.VolumeMount": {
@@ -5663,10 +5353,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "name",
-        "mountPath"
-      ],
+      "required": ["name", "mountPath"],
       "type": "object"
     },
     "io.k8s.api.core.v1.VolumeNodeAffinity": {
@@ -5721,9 +5408,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "volumePath"
-      ],
+      "required": ["volumePath"],
       "type": "object"
     },
     "io.k8s.api.core.v1.WeightedPodAffinityTerm": {
@@ -5739,10 +5424,7 @@
           "type": "integer"
         }
       },
-      "required": [
-        "weight",
-        "podAffinityTerm"
-      ],
+      "required": ["weight", "podAffinityTerm"],
       "type": "object"
     },
     "io.k8s.api.core.v1.WindowsSecurityContextOptions": {
@@ -5783,9 +5465,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "APIGroup"
-          ]
+          "enum": ["APIGroup"]
         },
         "name": {
           "description": "name is the name of the group.",
@@ -5810,10 +5490,7 @@
           "type": "array"
         }
       },
-      "required": [
-        "name",
-        "versions"
-      ],
+      "required": ["name", "versions"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -5840,14 +5517,10 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "APIGroupList"
-          ]
+          "enum": ["APIGroupList"]
         }
       },
-      "required": [
-        "groups"
-      ],
+      "required": ["groups"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -5910,13 +5583,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "name",
-        "singularName",
-        "namespaced",
-        "kind",
-        "verbs"
-      ],
+      "required": ["name", "singularName", "namespaced", "kind", "verbs"],
       "type": "object"
     },
     "io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList": {
@@ -5933,9 +5600,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "APIResourceList"
-          ]
+          "enum": ["APIResourceList"]
         },
         "resources": {
           "description": "resources contains the name of the resources and if they are namespaced.",
@@ -5945,10 +5610,7 @@
           "type": "array"
         }
       },
-      "required": [
-        "groupVersion",
-        "resources"
-      ],
+      "required": ["groupVersion", "resources"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -5968,9 +5630,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "APIVersions"
-          ]
+          "enum": ["APIVersions"]
         },
         "serverAddressByClientCIDRs": {
           "description": "a map of client CIDR to server address that is serving this group. This is to help clients reach servers in the most network-efficient way possible. Clients can use the appropriate server address as per the CIDR that they match. In case of multiple matches, clients should use the longest matching CIDR. The server returns only those CIDRs that it thinks that the client can match. For example: the master will return an internal IP CIDR only, if the client reaches the server using an internal IP. Server looks at X-Forwarded-For header or X-Real-Ip header or request.RemoteAddr (in that order) to get the client IP.",
@@ -5987,10 +5647,7 @@
           "type": "array"
         }
       },
-      "required": [
-        "versions",
-        "serverAddressByClientCIDRs"
-      ],
+      "required": ["versions", "serverAddressByClientCIDRs"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {
@@ -6022,9 +5679,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "DeleteOptions"
-          ]
+          "enum": ["DeleteOptions"]
         },
         "orphanDependents": {
           "description": "Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the \"orphan\" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.",
@@ -6294,10 +5949,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "groupVersion",
-        "version"
-      ],
+      "required": ["groupVersion", "version"],
       "type": "object"
     },
     "io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector": {
@@ -6341,10 +5993,7 @@
           "type": "array"
         }
       },
-      "required": [
-        "key",
-        "operator"
-      ],
+      "required": ["key", "operator"],
       "type": "object"
     },
     "io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta": {
@@ -6523,12 +6172,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "apiVersion",
-        "kind",
-        "name",
-        "uid"
-      ],
+      "required": ["apiVersion", "kind", "name", "uid"],
       "type": "object"
     },
     "io.k8s.apimachinery.pkg.apis.meta.v1.Patch": {
@@ -6561,10 +6205,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "clientCIDR",
-        "serverAddress"
-      ],
+      "required": ["clientCIDR", "serverAddress"],
       "type": "object"
     },
     "io.k8s.apimachinery.pkg.apis.meta.v1.Status": {
@@ -6586,9 +6227,7 @@
         "kind": {
           "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
           "type": "string",
-          "enum": [
-            "Status"
-          ]
+          "enum": ["Status"]
         },
         "message": {
           "description": "A human-readable description of the status of this operation.",
@@ -6684,10 +6323,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "type",
-        "object"
-      ],
+      "required": ["type", "object"],
       "type": "object",
       "x-kubernetes-group-version-kind": [
         {

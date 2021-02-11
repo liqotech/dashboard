@@ -67,9 +67,7 @@
         "serviceAccountName": "default",
         "serviceAccount": "default",
         "nodeName": "liqo-test",
-        "securityContext": {
-
-        },
+        "securityContext": {},
         "schedulerName": "default-scheduler",
         "tolerations": [
           {
@@ -95,10 +93,7 @@
       },
       "status": {
         "phase": "Running",
-        "containerStatuses": [
-          true,
-          false
-        ]
+        "containerStatuses": [true, false]
       }
     },
     {
@@ -160,9 +155,7 @@
         "dnsPolicy": "ClusterFirst",
         "serviceAccountName": "default",
         "serviceAccount": "default",
-        "securityContext": {
-
-        },
+        "securityContext": {},
         "schedulerName": "default-scheduler",
         "tolerations": [
           {
@@ -188,10 +181,7 @@
       },
       "status": {
         "phase": "Running",
-        "containerStatuses": [
-          true,
-          false
-        ]
+        "containerStatuses": [true, false]
       }
     },
     {
@@ -261,9 +251,7 @@
         "serviceAccountName": "default",
         "serviceAccount": "default",
         "nodeName": "node0",
-        "securityContext": {
-
-        },
+        "securityContext": {},
         "affinity": {
           "nodeAffinity": {
             "requiredDuringSchedulingIgnoredDuringExecution": {
@@ -273,9 +261,7 @@
                     {
                       "key": "type",
                       "operator": "NotIn",
-                      "values": [
-                        "virtual-node"
-                      ]
+                      "values": ["virtual-node"]
                     }
                   ]
                 }
@@ -303,10 +289,7 @@
       },
       "status": {
         "phase": "Pending",
-        "containerStatuses": [
-          true,
-          false
-        ]
+        "containerStatuses": [true, false]
       }
     },
     {
@@ -368,9 +351,7 @@
         "serviceAccountName": "default",
         "serviceAccount": "default",
         "nodeName": "liqo1-control-plane",
-        "securityContext": {
-
-        },
+        "securityContext": {},
         "affinity": {
           "nodeAffinity": {
             "requiredDuringSchedulingIgnoredDuringExecution": {
@@ -380,9 +361,7 @@
                     {
                       "key": "type",
                       "operator": "NotIn",
-                      "values": [
-                        "virtual-node"
-                      ]
+                      "values": ["virtual-node"]
                     }
                   ]
                 }
@@ -410,10 +389,7 @@
       },
       "status": {
         "phase": "Running",
-        "containerStatuses": [
-          true,
-          false
-        ]
+        "containerStatuses": [true, false]
       }
     }
   ]

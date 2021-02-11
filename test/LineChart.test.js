@@ -9,12 +9,20 @@ import { testTimeout } from '../src/constants';
 fetchMock.enableMocks();
 
 describe('Status', () => {
-  test('Line chart NaN data', async () => {
-    render(
-      <MemoryRouter>
-        <LineChart data={[{"resource": "CPU", "date": "00:00:00", "value": NaN },
-          {"resource": "RAM", "date": "00:00:00", "value": NaN }]} />
-      </MemoryRouter>
-    )
-  }, testTimeout)
-})
+  test(
+    'Line chart NaN data',
+    async () => {
+      render(
+        <MemoryRouter>
+          <LineChart
+            data={[
+              { resource: 'CPU', date: '00:00:00', value: NaN },
+              { resource: 'RAM', date: '00:00:00', value: NaN }
+            ]}
+          />
+        </MemoryRouter>
+      );
+    },
+    testTimeout
+  );
+});

@@ -25,11 +25,7 @@
       "singularName": "",
       "namespaced": false,
       "kind": "ClusterConfig",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     }
   ]
 }

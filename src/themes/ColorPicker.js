@@ -3,13 +3,13 @@ import { SketchPicker, ChromePicker } from 'react-color';
 import { Col, Input, Popover, Row } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 
-export default function ColorPicker(props){
+export default function ColorPicker(props) {
   const [color, setColor] = useState(props.color);
 
   const onChange = _color => {
     setColor(_color.hex);
     props.updateFunc(props.parameter, _color.hex);
-  }
+  };
 
   const styles = {
     color: {
@@ -29,18 +29,20 @@ export default function ColorPicker(props){
   };
 
   const content = (
-    <div style={{color: 'black'}}>
+    <div style={{ color: 'black' }}>
       <SketchPicker color={color} onChange={onChange} />
     </div>
-  )
+  );
 
-  return(
+  return (
     <Popover trigger={'click'} content={content}>
-      <div style={{width: 16, height: 16, borderRadius: 2, background: color}}>
+      <div
+        style={{ width: 16, height: 16, borderRadius: 2, background: color }}
+      >
         <div style={styles.swatch}>
-          <div style={styles.color}/>
+          <div style={styles.color} />
         </div>
       </div>
     </Popover>
-  )
+  );
 }

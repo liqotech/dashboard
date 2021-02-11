@@ -1,7 +1,12 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { testTimeout } from '../src/constants';
-import { generalMocks, loginTest, mockCRDAndViewsExtended, setToken } from './RTLUtils';
+import {
+  generalMocks,
+  loginTest,
+  mockCRDAndViewsExtended,
+  setToken
+} from './RTLUtils';
 import Cookies from 'js-cookie';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../src/app/App';
@@ -26,224 +31,248 @@ async function setup() {
   expect(screen.getAllByRole('row')).toHaveLength(10);
 }
 
-function mocks(errorPATCH, errorPUT){
+function mocks(errorPATCH, errorPUT) {
   fetch.mockResponse(req => {
-    if(req.method === 'PATCH' && errorPATCH){
+    if (req.method === 'PATCH' && errorPATCH) {
       return Promise.reject();
-    } else if(req.method === 'PUT' && errorPUT){
+    } else if (req.method === 'PUT' && errorPUT) {
       return Promise.reject(Error401.body);
-    }
-    else if(generalMocks(req.url))
-      return generalMocks(req.url);
-  })
+    } else if (generalMocks(req.url)) return generalMocks(req.url);
+  });
 }
 
-beforeEach(() => { localStorage.setItem('theme', 'dark');
-  if(window.api && !_.isEmpty(window.api.dashConfigs.current)) {
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
+  if (window.api && !_.isEmpty(window.api.dashConfigs.current)) {
     window.api.dashConfigs.current = {};
   }
   Cookies.remove('token');
 });
 
 describe('Favourites and Icons', () => {
-  test('Sidebar updates when a resource is added/removed to favourites', async () => {
-    await setup();
+  test(
+    'Sidebar updates when a resource is added/removed to favourites',
+    async () => {
+      await setup();
 
-    let cdown = await screen.findAllByLabelText('caret-down');
-    userEvent.click(cdown[0]);
-    userEvent.click(cdown[1]);
+      let cdown = await screen.findAllByLabelText('caret-down');
+      userEvent.click(cdown[0]);
+      userEvent.click(cdown[1]);
 
-    let stars = await screen.findAllByLabelText('star');
+      let stars = await screen.findAllByLabelText('star');
 
-    userEvent.click(stars[1]);
+      userEvent.click(stars[1]);
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    expect(await screen.queryByText('Custom Resources')).not.toBeInTheDocument();
+      expect(
+        await screen.queryByText('Custom Resources')
+      ).not.toBeInTheDocument();
 
-    userEvent.click(stars[1]);
+      userEvent.click(stars[1]);
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    expect(await screen.queryByText('Custom Resources')).toBeInTheDocument();
+      expect(await screen.queryByText('Custom Resources')).toBeInTheDocument();
 
-    userEvent.click(stars[4]);
+      userEvent.click(stars[4]);
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    userEvent.click(stars[4]);
+      userEvent.click(stars[4]);
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
+    },
+    testTimeout
+  );
 
-  }, testTimeout)
+  test(
+    'Sidebar and List update icons',
+    async () => {
+      await setup();
 
-  test('Sidebar and List update icons', async () => {
-    await setup();
+      expect(await screen.findAllByLabelText('caret-down'));
 
-    expect(await screen.findAllByLabelText('caret-down'));
+      let icons = await screen.findAllByLabelText('file-text');
 
-    let icons = await screen.findAllByLabelText('file-text');
+      userEvent.click(icons[1]);
 
-    userEvent.click(icons[1]);
+      expect(await screen.findByText('Icons'));
 
-    expect(await screen.findByText('Icons'));
+      const textbox = await screen.findByRole('input');
 
-    const textbox = await screen.findByRole('input');
+      await userEvent.type(textbox, 'fileadd');
 
-    await userEvent.type(textbox, 'fileadd');
+      expect(await screen.findByLabelText('file-add')).toBeInTheDocument();
 
-    expect(await screen.findByLabelText('file-add')).toBeInTheDocument();
+      userEvent.click(await screen.findByLabelText('file-add'));
 
-    userEvent.click(await screen.findByLabelText('file-add'));
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+      expect(await screen.findAllByLabelText('file-add')).toHaveLength(2);
+    },
+    testTimeout
+  );
 
-    expect(await screen.findAllByLabelText('file-add')).toHaveLength(2);
+  test(
+    'Close icons modal',
+    async () => {
+      await setup();
 
-  }, testTimeout)
+      expect(await screen.findAllByLabelText('caret-down'));
 
-  test('Close icons modal', async () => {
-    await setup();
+      let icons = await screen.findAllByLabelText('file-text');
 
-    expect(await screen.findAllByLabelText('caret-down'));
+      userEvent.click(icons[1]);
 
-    let icons = await screen.findAllByLabelText('file-text');
+      expect(await screen.findByLabelText('close')).toBeInTheDocument();
+      userEvent.click(await screen.findByLabelText('close'));
+      expect(await screen.queryByText('Icons')).not.toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    userEvent.click(icons[1]);
+  test(
+    'Error on favourites (resource)',
+    async () => {
+      mocks(true);
 
-    expect(await screen.findByLabelText('close')).toBeInTheDocument();
-    userEvent.click(await screen.findByLabelText('close'));
-    expect(await screen.queryByText('Icons')).not.toBeInTheDocument();
+      await loginTest();
 
-  }, testTimeout)
+      const customview = screen.getByText('Custom Resources');
+      userEvent.click(customview);
 
-  test('Error on favourites (resource)', async () => {
-    mocks(true);
+      expect(await screen.findAllByLabelText('caret-down'));
 
-    await loginTest();
+      let stars = await screen.findAllByLabelText('star');
 
-    const customview = screen.getByText('Custom Resources');
-    userEvent.click(customview);
+      userEvent.click(stars[1]);
 
-    expect(await screen.findAllByLabelText('caret-down'));
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    let stars = await screen.findAllByLabelText('star');
+      expect(
+        await screen.queryByText('Custom Resources')
+      ).not.toBeInTheDocument();
 
-    userEvent.click(stars[1]);
+      userEvent.click(stars[1]);
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    expect(await screen.queryByText('Custom Resources')).not.toBeInTheDocument();
+      expect(await screen.queryByText('Custom Resources')).toBeInTheDocument();
 
-    userEvent.click(stars[1]);
+      userEvent.click(stars[4]);
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
+    },
+    testTimeout
+  );
 
-    expect(await screen.queryByText('Custom Resources')).toBeInTheDocument();
+  test(
+    'Error on favourites (config)',
+    async () => {
+      mocks(true, true);
 
-    userEvent.click(stars[4]);
+      await loginTest();
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+      const customview = screen.getByText('Custom Resources');
+      userEvent.click(customview);
 
-  }, testTimeout)
+      expect(await screen.findAllByLabelText('caret-down'));
 
-  test('Error on favourites (config)', async () => {
-    mocks(true, true);
+      let stars = await screen.findAllByLabelText('star');
 
-    await loginTest();
+      userEvent.click(stars[2]);
 
-    const customview = screen.getByText('Custom Resources');
-    userEvent.click(customview);
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    expect(await screen.findAllByLabelText('caret-down'));
+      expect(await screen.findByText('Custom Resources')).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    let stars = await screen.findAllByLabelText('star');
+  test(
+    'Manage favourites when resource not in the config',
+    async () => {
+      mocks();
 
-    userEvent.click(stars[2]);
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    expect(await screen.findByText('Custom Resources')).toBeInTheDocument();
+      expect(await screen.findByText('Pod')).toBeInTheDocument();
 
-  }, testTimeout)
+      let stars = await screen.findAllByLabelText('star');
 
-  test('Manage favourites when resource not in the config', async () => {
-    mocks();
+      userEvent.click(stars[2]);
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      expect(await screen.findAllByText('Pod')).toHaveLength(1);
+    },
+    testTimeout
+  );
 
-    expect(await screen.findByText('Pod')).toBeInTheDocument();
+  test(
+    'Manage icons when resource not in the config',
+    async () => {
+      mocks();
 
-    let stars = await screen.findAllByLabelText('star');
+      setToken();
+      window.history.pushState({}, 'Page Title', '/api/v1/pods');
 
-    userEvent.click(stars[2]);
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+      expect(await screen.findByText('Pod')).toBeInTheDocument();
 
-    expect(await screen.findAllByText('Pod')).toHaveLength(1);
+      let icons = await screen.findAllByLabelText('api');
 
-  }, testTimeout)
+      userEvent.click(icons[2]);
 
-  test('Manage icons when resource not in the config', async () => {
-    mocks();
+      expect(await screen.findByText('Icons'));
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods');
+      const textbox = await screen.findByRole('input');
 
-    render(
-      <MemoryRouter>
-        <App/>
-      </MemoryRouter>
-    )
+      await userEvent.type(textbox, 'fileadd');
 
-    expect(await screen.findByText('Pod')).toBeInTheDocument();
+      expect(await screen.findByLabelText('file-add')).toBeInTheDocument();
 
-    let icons = await screen.findAllByLabelText('api');
+      userEvent.click(await screen.findByLabelText('file-add'));
 
-    userEvent.click(icons[2]);
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    expect(await screen.findByText('Icons'));
-
-    const textbox = await screen.findByRole('input');
-
-    await userEvent.type(textbox, 'fileadd');
-
-    expect(await screen.findByLabelText('file-add')).toBeInTheDocument();
-
-    userEvent.click(await screen.findByLabelText('file-add'));
-
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 1000));
-    })
-
-    expect(await screen.findByLabelText('file-add')).toBeInTheDocument();
-
-  }, testTimeout)
-})
+      expect(await screen.findByLabelText('file-add')).toBeInTheDocument();
+    },
+    testTimeout
+  );
+});

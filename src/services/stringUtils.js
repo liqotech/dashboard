@@ -2,7 +2,7 @@
  * Add space between camelCase text.
  */
 export function unCamelCase(str) {
-  str = str.replace(/([a-z\xE0-\xFF])([A-Z\xC0\xDF])/g, "$1 $2");
+  str = str.replace(/([a-z\xE0-\xFF])([A-Z\xC0\xDF])/g, '$1 $2');
   str = str.toLowerCase(); //add space between camelCase text
   return str;
 }
@@ -36,7 +36,7 @@ export function lowerCase(str) {
 }
 
 export function splitCamelCaseAndUp(str) {
-  if(str) {
+  if (str) {
     str = unCamelCase(str);
     str = properCase(str);
     return str;
@@ -44,18 +44,20 @@ export function splitCamelCaseAndUp(str) {
 }
 
 export function rootSplitCamelCaseAndUp(str) {
-  const array = str.split("_");
+  const array = str.split('_');
   str = splitCamelCaseAndUp(array[array.length - 2]);
   str = str + ' (' + array.pop() + ')';
   return str;
 }
 
 export const hashCode = s => {
-  let hash = 0, i, chr;
+  let hash = 0,
+    i,
+    chr;
   for (i = 0; i < s.length; i++) {
-    chr   = s.charCodeAt(i);
-    hash  = ((hash << 5) - hash) + chr;
+    chr = s.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
     hash |= 0;
   }
   return Math.abs(hash);
-}
+};

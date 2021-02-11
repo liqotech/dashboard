@@ -1,16 +1,16 @@
 {
-  "apiVersion":"dashboard.liqo.io/v1alpha1",
-  "items":[
+  "apiVersion": "dashboard.liqo.io/v1alpha1",
+  "items": [
     {
-      "apiVersion":"dashboard.liqo.io/v1alpha1",
-      "kind":"DashboardConfig",
-      "metadata":{
-        "creationTimestamp":"2020-10-11T17:06:47Z",
-        "name":"liqodash-config",
-        "resourceVersion":"0000000",
-        "selfLink":"/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/liqodash-config"
+      "apiVersion": "dashboard.liqo.io/v1alpha1",
+      "kind": "DashboardConfig",
+      "metadata": {
+        "creationTimestamp": "2020-10-11T17:06:47Z",
+        "name": "liqodash-config",
+        "resourceVersion": "0000000",
+        "selfLink": "/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/liqodash-config"
       },
-      "spec":{
+      "spec": {
         "default": true,
         "enabled": true,
         "plugin": [
@@ -60,259 +60,259 @@
           "themeModifier": true,
           "themeSwitcher": true
         },
-        "resources":[
+        "resources": [
           {
-            "favourite":true,
-            "icon":"AndroidOutlined",
-            "render":{
-              "columns":[
+            "favourite": true,
+            "icon": "AndroidOutlined",
+            "render": {
+              "columns": [
                 {
-                  "columnContent":"param.metadata.name",
-                  "columnTitle":"Name"
+                  "columnContent": "param.metadata.name",
+                  "columnTitle": "Name"
                 },
                 {
-                  "columnContent":"param.metadata.namespace",
-                  "columnTitle":"Namespace"
+                  "columnContent": "param.metadata.namespace",
+                  "columnTitle": "Namespace"
                 },
                 {
-                  "columnContent":"param.metadata.resourceVersion",
-                  "columnTitle":"Resource Version"
+                  "columnContent": "param.metadata.resourceVersion",
+                  "columnTitle": "Resource Version"
                 }
               ],
-              "tabs":[
+              "tabs": [
                 {
-                  "tabContent":[
+                  "tabContent": [
                     {
-                      "cardContent":[
+                      "cardContent": [
                         {
-                          "parameter":"spec.strategy"
+                          "parameter": "spec.strategy"
                         },
                         {
-                          "parameter":"spec.selector"
+                          "parameter": "spec.selector"
                         },
                         {
-                          "parameter":"spec.revisionHistoryLimit"
+                          "parameter": "spec.revisionHistoryLimit"
                         },
                         {
-                          "parameter":"spec.replicas"
+                          "parameter": "spec.replicas"
                         }
                       ],
-                      "cardLayout":{
-                        "h":29,
-                        "w":6,
-                        "x":0,
-                        "y":0
+                      "cardLayout": {
+                        "h": 29,
+                        "w": 6,
+                        "x": 0,
+                        "y": 0
                       },
-                      "cardTitle":"Configuration",
-                      "displayMode":"List"
+                      "cardTitle": "Configuration",
+                      "displayMode": "List"
                     },
                     {
-                      "cardContent":[
+                      "cardContent": [
                         {
-                          "parameter":"status.availableReplicas"
+                          "parameter": "status.availableReplicas"
                         },
                         {
-                          "parameter":"status.readyReplicas"
+                          "parameter": "status.readyReplicas"
                         },
                         {
-                          "parameter":"status.replicas"
+                          "parameter": "status.replicas"
                         },
                         {
-                          "parameter":"status.unavailableReplicas"
+                          "parameter": "status.unavailableReplicas"
                         },
                         {
-                          "parameter":"status.updatedReplicas"
+                          "parameter": "status.updatedReplicas"
                         }
                       ],
-                      "cardLayout":{
-                        "h":29,
-                        "w":6,
-                        "x":6,
-                        "y":0
+                      "cardLayout": {
+                        "h": 29,
+                        "w": 6,
+                        "x": 6,
+                        "y": 0
                       },
-                      "cardTitle":"Status",
-                      "displayMode":"List"
+                      "cardTitle": "Status",
+                      "displayMode": "List"
                     },
                     {
-                      "cardContent":[
+                      "cardContent": [
                         {
-                          "parameter":"spec.template.spec.containers.name"
+                          "parameter": "spec.template.spec.containers.name"
                         },
                         {
-                          "parameter":"spec.template.spec.containers.image"
+                          "parameter": "spec.template.spec.containers.image"
                         },
                         {
-                          "parameter":"spec.template.spec.containers.args"
+                          "parameter": "spec.template.spec.containers.args"
                         },
                         {
-                          "parameter":"spec.template.spec.containers.volumeMounts"
+                          "parameter": "spec.template.spec.containers.volumeMounts"
                         },
                         {
-                          "parameter":"spec.template.spec.containers.ports"
+                          "parameter": "spec.template.spec.containers.ports"
                         }
                       ],
-                      "cardLayout":{
-                        "h":35,
-                        "w":12,
-                        "x":0,
-                        "y":29
+                      "cardLayout": {
+                        "h": 35,
+                        "w": 12,
+                        "x": 0,
+                        "y": 29
                       },
-                      "cardTitle":"Pod Template",
-                      "displayMode":"List"
+                      "cardTitle": "Pod Template",
+                      "displayMode": "List"
                     },
                     {
-                      "cardContent":[
+                      "cardContent": [
                         {
-                          "parameter":"spec.template.spec.volumes.name"
+                          "parameter": "spec.template.spec.volumes.name"
                         },
                         {
-                          "parameter":"spec.template.spec.volumes.configMap"
+                          "parameter": "spec.template.spec.volumes.configMap"
                         }
                       ],
-                      "cardLayout":{
-                        "h":18,
-                        "w":6,
-                        "x":0,
-                        "y":64
+                      "cardLayout": {
+                        "h": 18,
+                        "w": 6,
+                        "x": 0,
+                        "y": 64
                       },
-                      "cardTitle":"Volumes",
-                      "displayMode":"List"
+                      "cardTitle": "Volumes",
+                      "displayMode": "List"
                     },
                     {
-                      "cardContent":[
+                      "cardContent": [
                         {
-                          "parameter":"spec.template.spec.tolerations.key"
+                          "parameter": "spec.template.spec.tolerations.key"
                         }
                       ],
-                      "cardLayout":{
-                        "h":18,
-                        "w":6,
-                        "x":6,
-                        "y":64
+                      "cardLayout": {
+                        "h": 18,
+                        "w": 6,
+                        "x": 6,
+                        "y": 64
                       },
-                      "cardTitle":"Taints and Tolerations",
-                      "displayMode":"List"
+                      "cardTitle": "Taints and Tolerations",
+                      "displayMode": "List"
                     }
                   ],
-                  "tabTitle":"Summary"
+                  "tabTitle": "Summary"
                 }
               ]
             },
-            "resourceName":"Deployment",
-            "resourcePath":"/apis/apps/v1/deployments"
+            "resourceName": "Deployment",
+            "resourcePath": "/apis/apps/v1/deployments"
           },
           {
-            "favourite":true,
-            "icon":"FileTextOutlined",
-            "render":{
-              "columns":[
+            "favourite": true,
+            "icon": "FileTextOutlined",
+            "render": {
+              "columns": [
                 {
-                  "columnContent":"param.metadata.name",
-                  "columnTitle":"Name"
+                  "columnContent": "param.metadata.name",
+                  "columnTitle": "Name"
                 },
                 {
-                  "columnContent":"param.spec.names.kind",
-                  "columnTitle":"Kind"
+                  "columnContent": "param.spec.names.kind",
+                  "columnTitle": "Kind"
                 },
                 {
-                  "columnContent":"param.spec.group",
-                  "columnTitle":"Group"
+                  "columnContent": "param.spec.group",
+                  "columnTitle": "Group"
                 }
               ]
             },
-            "resourceName":"Custom Resources",
-            "resourcePath":"/apis/apiextensions.k8s.io/v1/customresourcedefinitions"
+            "resourceName": "Custom Resources",
+            "resourcePath": "/apis/apiextensions.k8s.io/v1/customresourcedefinitions"
           },
           {
-            "favourite":true,
-            "icon":"CloudServerOutlined",
-            "render":{
-              "columns":[
+            "favourite": true,
+            "icon": "CloudServerOutlined",
+            "render": {
+              "columns": [
                 {
-                  "columnContent":"param.metadata.name",
-                  "columnTitle":"Name"
+                  "columnContent": "param.metadata.name",
+                  "columnTitle": "Name"
                 },
                 {
-                  "columnContent":"param.metadata.namespace",
-                  "columnTitle":"Namespace"
+                  "columnContent": "param.metadata.namespace",
+                  "columnTitle": "Namespace"
                 },
                 {
-                  "columnContent":"param.spec.type",
-                  "columnTitle":"Type"
+                  "columnContent": "param.spec.type",
+                  "columnTitle": "Type"
                 },
                 {
-                  "columnContent":"param.spec.clusterIP",
-                  "columnTitle":"Cluster Ip"
+                  "columnContent": "param.spec.clusterIP",
+                  "columnTitle": "Cluster Ip"
                 },
                 {
-                  "columnContent":"param.spec.externalIPs",
-                  "columnTitle":"External Ips"
+                  "columnContent": "param.spec.externalIPs",
+                  "columnTitle": "External Ips"
                 },
                 {
-                  "columnContent":"param.spec.ports.port",
-                  "columnTitle":"Port"
+                  "columnContent": "param.spec.ports.port",
+                  "columnTitle": "Port"
                 }
               ],
-              "tabs":[
+              "tabs": [
                 {
-                  "tabContent":[
+                  "tabContent": [
                     {
-                      "cardContent":[
+                      "cardContent": [
                         {
-                          "parameter":"spec.clusterIP"
+                          "parameter": "spec.clusterIP"
                         }
                       ],
-                      "cardLayout":{
-                        "h":7,
-                        "w":6,
-                        "x":0,
-                        "y":0
+                      "cardLayout": {
+                        "h": 7,
+                        "w": 6,
+                        "x": 0,
+                        "y": 0
                       },
-                      "cardTitle":"New List #0",
-                      "displayMode":"List"
+                      "cardTitle": "New List #0",
+                      "displayMode": "List"
                     },
                     {
-                      "cardContent":[
+                      "cardContent": [
                         {
-                          "parameter":"spec.ports"
+                          "parameter": "spec.ports"
                         }
                       ],
-                      "cardLayout":{
-                        "h":16,
-                        "w":6,
-                        "x":0,
-                        "y":7
+                      "cardLayout": {
+                        "h": 16,
+                        "w": 6,
+                        "x": 0,
+                        "y": 7
                       },
-                      "cardTitle":"Ports",
-                      "displayMode":"Table"
+                      "cardTitle": "Ports",
+                      "displayMode": "Table"
                     }
                   ],
-                  "tabTitle":"Summary"
+                  "tabTitle": "Summary"
                 },
                 {
-                  "tabContent":[
+                  "tabContent": [
                     {
-                      "cardContent":[
+                      "cardContent": [
                         {
-                          "parameter":"spec.clusterIP"
+                          "parameter": "spec.clusterIP"
                         }
                       ],
-                      "cardLayout":{
-                        "h":7,
-                        "w":6,
-                        "x":0,
-                        "y":0
+                      "cardLayout": {
+                        "h": 7,
+                        "w": 6,
+                        "x": 0,
+                        "y": 0
                       },
-                      "cardTitle":"New List #0",
-                      "displayMode":"List"
+                      "cardTitle": "New List #0",
+                      "displayMode": "List"
                     }
                   ],
-                  "tabTitle":"Tab"
+                  "tabTitle": "Tab"
                 }
               ]
             },
-            "resourceName":"Service",
-            "resourcePath":"/api/v1/services"
+            "resourceName": "Service",
+            "resourcePath": "/api/v1/services"
           }
         ],
         "sidebar": {
@@ -336,10 +336,10 @@
       }
     }
   ],
-  "kind":"DashboardConfigList",
-  "metadata":{
-    "continue":"",
-    "resourceVersion":"000000",
-    "selfLink":"/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs"
+  "kind": "DashboardConfigList",
+  "metadata": {
+    "continue": "",
+    "resourceVersion": "000000",
+    "selfLink": "/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs"
   }
 }

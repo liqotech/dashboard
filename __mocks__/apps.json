@@ -35,12 +35,8 @@
         "update",
         "watch"
       ],
-      "shortNames": [
-        "ds"
-      ],
-      "categories": [
-        "all"
-      ],
+      "shortNames": ["ds"],
+      "categories": ["all"],
       "storageVersionHash": "dd7pWHUlMKQ="
     },
     {
@@ -48,11 +44,7 @@
       "singularName": "",
       "namespaced": true,
       "kind": "DaemonSet",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     },
     {
       "name": "deployments",
@@ -69,12 +61,8 @@
         "update",
         "watch"
       ],
-      "shortNames": [
-        "deploy"
-      ],
-      "categories": [
-        "all"
-      ],
+      "shortNames": ["deploy"],
+      "categories": ["all"],
       "storageVersionHash": "8aSe+NMegvE="
     },
     {
@@ -84,22 +72,14 @@
       "group": "autoscaling",
       "version": "v1",
       "kind": "Scale",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     },
     {
       "name": "deployments/status",
       "singularName": "",
       "namespaced": true,
       "kind": "Deployment",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     },
     {
       "name": "replicasets",
@@ -116,12 +96,8 @@
         "update",
         "watch"
       ],
-      "shortNames": [
-        "rs"
-      ],
-      "categories": [
-        "all"
-      ],
+      "shortNames": ["rs"],
+      "categories": ["all"],
       "storageVersionHash": "P1RzHs8/mWQ="
     },
     {
@@ -131,22 +107,14 @@
       "group": "autoscaling",
       "version": "v1",
       "kind": "Scale",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     },
     {
       "name": "replicasets/status",
       "singularName": "",
       "namespaced": true,
       "kind": "ReplicaSet",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     },
     {
       "name": "statefulsets",
@@ -163,12 +131,8 @@
         "update",
         "watch"
       ],
-      "shortNames": [
-        "sts"
-      ],
-      "categories": [
-        "all"
-      ],
+      "shortNames": ["sts"],
+      "categories": ["all"],
       "storageVersionHash": "H+vl74LkKdo="
     },
     {
@@ -178,22 +142,14 @@
       "group": "autoscaling",
       "version": "v1",
       "kind": "Scale",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     },
     {
       "name": "statefulsets/status",
       "singularName": "",
       "namespaced": true,
       "kind": "StatefulSet",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     }
   ]
 }

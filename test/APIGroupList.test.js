@@ -35,154 +35,214 @@ beforeEach(() => {
   Cookies.remove('token');
 });
 
-function mocks(errorApis, errorApi){
-  fetch.mockImplementation((url) => {
+function mocks(errorApis, errorApi) {
+  fetch.mockImplementation(url => {
     if (url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-    } else if (url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)));
+    } else if (
+      url ===
+      'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
+    ) {
+      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)));
     } else if (url === 'http://localhost:3001/namespaces') {
-      return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
-    } else if (url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
-      return Promise.resolve(new Response(JSON.stringify({body: FCMockResponse})));
-    } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
-      return Promise.resolve(new Response(JSON.stringify({body: AdvMockResponse})));
-    } else if (url === 'http://localhost:3001/clustercustomobject/peeringrequests') {
-      return Promise.resolve(new Response(JSON.stringify({body: PRMockResponse})));
-    } else if (url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: NamespaceResponse }))
+      );
+    } else if (
+      url === 'http://localhost:3001/clustercustomobject/foreignclusters'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: FCMockResponse }))
+      );
+    } else if (
+      url === 'http://localhost:3001/clustercustomobject/advertisements'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: AdvMockResponse }))
+      );
+    } else if (
+      url === 'http://localhost:3001/clustercustomobject/peeringrequests'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: PRMockResponse }))
+      );
+    } else if (
+      url === 'http://localhost:3001/clustercustomobject/clusterconfigs'
+    ) {
       return Promise.reject(Error404.body);
     } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ViewMockResponse }))
+      );
     } else if (url === 'http://localhost:3001/pod') {
-      return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: PodsMockResponse }))
+      );
     } else if (url === 'http://localhost:3001/nodes') {
-      return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: NodesMockResponse }))
+      );
     } else if (url === 'http://localhost:3001/metrics/nodes') {
-      return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+      return Promise.resolve(
+        new Response(JSON.stringify(NodesMetricsMockResponse))
+      );
     } else if (url === 'http://localhost:3001/configmaps/liqo') {
-      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: CMMockResponse }))
+      );
     } else if (url === 'http://localhost:3001/namespaces') {
-      return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
-    } else if (url === 'http://localhost/apiserver/api/v1' || url === 'http://localhost:/apiserver/api/v1') {
-      if(errorApi)
-        return Promise.reject(Error401.body);
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: NamespaceResponse }))
+      );
+    } else if (
+      url === 'http://localhost/apiserver/api/v1' ||
+      url === 'http://localhost:/apiserver/api/v1'
+    ) {
+      if (errorApi) return Promise.reject(Error401.body);
       else
         return Promise.resolve(new Response(JSON.stringify(ApiV1MockResponse)));
     } else if (url === 'http://localhost:3001/apis/') {
-      if(errorApis) {
+      if (errorApis) {
         return Promise.reject(Error401.body);
-      }
-      else
-        return Promise.resolve(new Response(JSON.stringify({body: ApisMockResponse})));
-    } else if (url === 'http://localhost/apiserver/apis/apps/v1' || url === 'http://localhost:/apiserver/apis/apps/v1') {
+      } else
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: ApisMockResponse }))
+        );
+    } else if (
+      url === 'http://localhost/apiserver/apis/apps/v1' ||
+      url === 'http://localhost:/apiserver/apis/apps/v1'
+    ) {
       return Promise.resolve(new Response(JSON.stringify(AppsResponse)));
     } else if (url === 'http://localhost:3001/pod') {
-      return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
-    } else if(alwaysPresentGET(url)){
-      return alwaysPresentGET(url)
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: PodsMockResponse }))
+      );
+    } else if (alwaysPresentGET(url)) {
+      return alwaysPresentGET(url);
     } else {
-      return metricsPODs({url : url});
+      return metricsPODs({ url: url });
     }
-  })
+  });
 }
 
 describe('APIGroupList', () => {
-  test('General api views', async () => {
-    mocks();
+  test(
+    'General api views',
+    async () => {
+      mocks();
 
-    setToken();
+      setToken();
 
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    expect(await screen.findByText(/Api v1/i)).toBeInTheDocument();
-    expect(await screen.findByText('Apis')).toBeInTheDocument();
+      expect(await screen.findByText(/Api v1/i)).toBeInTheDocument();
+      expect(await screen.findByText('Apis')).toBeInTheDocument();
 
-    userEvent.click(await screen.findByText('Apis'));
-    expect(await screen.findByText('apps')).toBeInTheDocument();
-    let expande = await screen.findAllByLabelText('Expand row');
-    userEvent.click(expande[4]);
-    userEvent.click(await screen.findByText('apps'));
-    expect(await screen.findByText('deployments')).toBeInTheDocument();
-    userEvent.click(await screen.findByText('apis'));
-    userEvent.click(await screen.findByLabelText('home'));
-    userEvent.click(await screen.findByText(/Api v1/i));
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    userEvent.click(await screen.findByText('pods'));
-    expect(await screen.findByText('Pod')).toBeInTheDocument();
-    userEvent.click(await screen.findByText('api'));
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    userEvent.click(await screen.findByText('pods'));
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
-    userEvent.click(await screen.findByText('hello-world-deployment-6756549f5-x66v9'));
-    expect(await screen.findAllByText('General')).toHaveLength(2);
-    userEvent.click(await screen.findByText('Metadata'));
-    userEvent.click(await screen.findByText('Spec'));
-    userEvent.click(await screen.findByText('Status'));
-    userEvent.click(await screen.findByText('Logs'));
-    expect(await screen.findByLabelText('log-editor')).toBeInTheDocument();
+      userEvent.click(await screen.findByText('Apis'));
+      expect(await screen.findByText('apps')).toBeInTheDocument();
+      let expande = await screen.findAllByLabelText('Expand row');
+      userEvent.click(expande[4]);
+      userEvent.click(await screen.findByText('apps'));
+      expect(await screen.findByText('deployments')).toBeInTheDocument();
+      userEvent.click(await screen.findByText('apis'));
+      userEvent.click(await screen.findByLabelText('home'));
+      userEvent.click(await screen.findByText(/Api v1/i));
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      userEvent.click(await screen.findByText('pods'));
+      expect(await screen.findByText('Pod')).toBeInTheDocument();
+      userEvent.click(await screen.findByText('api'));
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      userEvent.click(await screen.findByText('pods'));
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
+      userEvent.click(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      );
+      expect(await screen.findAllByText('General')).toHaveLength(2);
+      userEvent.click(await screen.findByText('Metadata'));
+      userEvent.click(await screen.findByText('Spec'));
+      userEvent.click(await screen.findByText('Status'));
+      userEvent.click(await screen.findByText('Logs'));
+      expect(await screen.findByLabelText('log-editor')).toBeInTheDocument();
 
-    userEvent.click(await screen.findByText('pods'));
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
+      userEvent.click(await screen.findByText('pods'));
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  }, testTimeout)
+  test(
+    'Error api views',
+    async () => {
+      mocks(true);
 
-  test('Error api views', async () => {
-    mocks(true);
+      setToken();
 
-    setToken();
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
+    },
+    testTimeout
+  );
 
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+  test(
+    'Error apis views',
+    async () => {
+      mocks(undefined, true);
 
-  }, testTimeout)
+      setToken();
 
-  test('Error apis views', async () => {
-    mocks(undefined, true);
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
+    },
+    testTimeout
+  );
 
-    setToken();
+  test(
+    'Error apis loading list',
+    async () => {
+      mocks(true);
 
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+      setToken();
 
-  }, testTimeout)
+      window.api = ApiInterface({ id_token: 'test' });
 
-  test('Error apis loading list', async () => {
-    mocks(true);
+      render(
+        <MemoryRouter>
+          <APIGroupList />
+        </MemoryRouter>
+      );
+    },
+    testTimeout
+  );
 
-    setToken();
+  test(
+    'Error api loading list',
+    async () => {
+      mocks(undefined, true);
 
-    window.api = ApiInterface({id_token: 'test'});
+      setToken();
 
-    render(
-      <MemoryRouter>
-        <APIGroupList />
-      </MemoryRouter>
-    );
+      window.api = ApiInterface({ id_token: 'test' });
 
-  }, testTimeout)
-
-  test('Error api loading list', async () => {
-    mocks(undefined, true);
-
-    setToken();
-
-    window.api = ApiInterface({id_token: 'test'});
-
-    render(
-      <MemoryRouter>
-        <APIResourceList />
-      </MemoryRouter>
-    );
-
-  }, testTimeout)
-})
+      render(
+        <MemoryRouter>
+          <APIResourceList />
+        </MemoryRouter>
+      );
+    },
+    testTimeout
+  );
+});

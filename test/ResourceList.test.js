@@ -2,7 +2,13 @@ import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { alwaysPresentGET, generalHomeGET, loginTest, mockCRDAndViewsExtended, setToken } from './RTLUtils';
+import {
+  alwaysPresentGET,
+  generalHomeGET,
+  loginTest,
+  mockCRDAndViewsExtended,
+  setToken
+} from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import CRDmockResponse from '../__mocks__/crd_fetch_long.json';
 import CRDmockEmpty from '../__mocks__/crd_empty.json';
@@ -34,295 +40,446 @@ async function setup() {
   expect(screen.getAllByRole('row')).toHaveLength(10);
 }
 
-beforeEach(() => { localStorage.setItem('theme', 'dark');
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
 describe('Resource List', () => {
-  test('CRD list is correctly paginated and updated when page is changed', async () => {
-    fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition') {
-        return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-      } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-        return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-      } else if(alwaysPresentGET(url)){
-        return alwaysPresentGET(url)
-      } else {
-        return generalHomeGET(url);
-      }
-    })
+  test(
+    'CRD list is correctly paginated and updated when page is changed',
+    async () => {
+      fetch.mockImplementation(url => {
+        if (url === 'http://localhost:3001/customresourcedefinition') {
+          return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)));
+        } else if (url === 'http://localhost:3001/clustercustomobject/views') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: ViewMockResponse }))
+          );
+        } else if (alwaysPresentGET(url)) {
+          return alwaysPresentGET(url);
+        } else {
+          return generalHomeGET(url);
+        }
+      });
 
-    await loginTest();
+      await loginTest();
 
-    const customview = screen.getByText('Custom Resources');
-    userEvent.click(customview);
+      const customview = screen.getByText('Custom Resources');
+      userEvent.click(customview);
 
-    expect(await screen.findByText(/advertisement./i)).toBeInTheDocument();
+      expect(await screen.findByText(/advertisement./i)).toBeInTheDocument();
 
-    expect(screen.getAllByRole('row')).toHaveLength(10);
+      expect(screen.getAllByRole('row')).toHaveLength(10);
 
-    userEvent.click(screen.getByText('2'));
+      userEvent.click(screen.getByText('2'));
 
-    expect(await screen.findAllByRole('row')).toHaveLength(3);
+      expect(await screen.findAllByRole('row')).toHaveLength(3);
+    },
+    testTimeout
+  );
 
-  }, testTimeout)
+  test(
+    '404 on dashboardconfig',
+    async () => {
+      fetch.mockImplementation(url => {
+        if (url === 'http://localhost:3001/customresourcedefinition') {
+          return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)));
+        } else if (url === 'http://localhost:3001/clustercustomobject/views') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: ViewMockResponse }))
+          );
+        } else if (
+          url === 'http://localhost:3001/clustercustomobject/dashboardconfigs'
+        ) {
+          return Promise.reject(Error404.body);
+        } else if (
+          url ===
+            'http://localhost/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/default-config' ||
+          url ===
+            'http://localhost:/apiserver/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/default-config'
+        ) {
+          return Promise.reject(Error404.body);
+        } else if (alwaysPresentGET(url)) {
+          return alwaysPresentGET(url);
+        } else {
+          return generalHomeGET(url);
+        }
+      });
 
-  test('404 on dashboardconfig', async () => {
-    fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition') {
-        return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-      } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-        return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-      } else if (url === 'http://localhost:3001/clustercustomobject/dashboardconfigs') {
-        return Promise.reject(Error404.body);
-      } else if (url === 'http://localhost/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/default-config' ||
-        url === 'http://localhost:/apiserver/apis/dashboard.liqo.io/v1alpha1/dashboardconfigs/default-config'
-      ) {
-        return Promise.reject(Error404.body);
-      }  else if(alwaysPresentGET(url)){
-        return alwaysPresentGET(url)
-      } else {
-        return generalHomeGET(url);
-      }
-    })
+      await loginTest();
 
-    await loginTest();
+      expect(
+        await screen.queryByText('Custom Resources')
+      ).not.toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    expect(await screen.queryByText('Custom Resources')).not.toBeInTheDocument();
+  test(
+    'CRD list changes on CRD add',
+    async () => {
+      await setup();
 
-  }, testTimeout)
+      expect(await screen.findByText(/advertisement./i));
 
-  test('CRD list changes on CRD add', async () => {
-    await setup();
+      let apiManager = window.api.apiManager.current;
 
-    expect(await screen.findByText(/advertisement./i));
+      act(() => {
+        apiManager.sendAddedSignal(
+          'customresourcedefinitions',
+          CRDmockResponse.items[11]
+        );
+      });
 
-    let apiManager = window.api.apiManager.current;
+      await act(async () => {
+        apiManager.sendAddedSignal(
+          'customresourcedefinitions/',
+          CRDmockResponse.items[11]
+        );
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    act(() => {
-      apiManager.sendAddedSignal('customresourcedefinitions', CRDmockResponse.items[11]);
-    })
+      expect(await screen.queryByText('SearchDomain')).not.toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    await act(async () => {
-      apiManager.sendAddedSignal('customresourcedefinitions/', CRDmockResponse.items[11]);
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+  test(
+    'CRD add with same resourceVersion of previous CRD',
+    async () => {
+      await setup();
 
-    expect(await screen.queryByText('SearchDomain')).not.toBeInTheDocument();
-  }, testTimeout)
+      expect(await screen.findByText(/advertisement./i));
 
-  test('CRD add with same resourceVersion of previous CRD', async () => {
-    await setup();
+      let apiManager = window.api.apiManager.current;
 
-    expect(await screen.findByText(/advertisement./i));
+      act(() => {
+        apiManager.sendAddedSignal(
+          'customresourcedefinitions',
+          CRDmockResponse.items[0]
+        );
+      });
 
-    let apiManager = window.api.apiManager.current;
+      await act(async () => {
+        apiManager.sendAddedSignal(
+          'customresourcedefinitions/',
+          CRDmockResponse.items[0]
+        );
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    act(() => {
-      apiManager.sendAddedSignal('customresourcedefinitions', CRDmockResponse.items[0]);
-    })
+      expect(await screen.queryByText('SearchDomain')).not.toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    await act(async () => {
-      apiManager.sendAddedSignal('customresourcedefinitions/', CRDmockResponse.items[0]);
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+  test(
+    'CRD watch and View watch return up if unexpectedly aborted',
+    async () => {
+      await setup();
 
-    expect(await screen.queryByText('SearchDomain')).not.toBeInTheDocument();
-  }, testTimeout)
+      expect(await screen.findByText(/advertisement./i));
 
-  test('CRD watch and View watch return up if unexpectedly aborted', async () => {
-    await setup();
+      let apiManager = window.api.apiManager.current;
 
-    expect(await screen.findByText(/advertisement./i));
+      apiManager.sendAbortedConnectionSignal('customresourcedefinitions/');
 
-    let apiManager = window.api.apiManager.current;
+      apiManager.sendAbortedConnectionSignal('views/');
 
-    apiManager.sendAbortedConnectionSignal('customresourcedefinitions/');
+      expect(window.api.watches.current).toHaveLength(4);
+    },
+    testTimeout
+  );
 
-    apiManager.sendAbortedConnectionSignal('views/');
+  test(
+    'CRD list changes on CRD deletion',
+    async () => {
+      await setup();
 
-    expect(window.api.watches.current).toHaveLength(4);
-  }, testTimeout)
+      expect(await screen.findByText(/advertisement./i));
 
-  test('CRD list changes on CRD deletion', async () => {
-    await setup();
+      let apiManager = window.api.apiManager.current;
 
-    expect(await screen.findByText(/advertisement./i));
+      act(() => {
+        apiManager.sendDeletedSignal(
+          'customresourcedefinitions',
+          CRDmockResponse.items[0]
+        );
+      });
 
-    let apiManager = window.api.apiManager.current;
+      await act(async () => {
+        apiManager.sendDeletedSignal(
+          'customresourcedefinitions/',
+          CRDmockResponse.items[0]
+        );
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    act(() => {
-      apiManager.sendDeletedSignal('customresourcedefinitions', CRDmockResponse.items[0]);
-    })
+      expect(await screen.queryByText('Advertisement')).not.toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    await act(async () => {
-      apiManager.sendDeletedSignal('customresourcedefinitions/', CRDmockResponse.items[0]);
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+  test(
+    'Empty notification when no CRDs',
+    async () => {
+      fetch.mockImplementation(url => {
+        if (
+          url === 'http://localhost:3001/customresourcedefinition' ||
+          url ===
+            'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
+        ) {
+          return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)));
+        } else if (url === 'http://localhost:3001/clustercustomobject/views') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: ViewMockResponse }))
+          );
+        } else if (alwaysPresentGET(url)) {
+          return alwaysPresentGET(url);
+        } else if (url === 'http://localhost:3001/namespaces') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: NamespaceResponse }))
+          );
+        } else if (url === 'http://localhost:3001/nodes') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: NodesMockResponse }))
+          );
+        } else return Promise.reject();
+      });
 
-    expect(await screen.queryByText('Advertisement')).not.toBeInTheDocument();
-  }, testTimeout)
+      setToken();
+      window.history.pushState(
+        {},
+        'Page Title',
+        '/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
+      );
 
-  test('Empty notification when no CRDs', async () => {
-    fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition' ||
-        url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {
-        return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
-      } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-        return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-      } else if(alwaysPresentGET(url)){
-        return alwaysPresentGET(url)
-      } else if (url === 'http://localhost:3001/namespaces') {
-        return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
-      } else if (url === 'http://localhost:3001/nodes') {
-        return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
-      } else return Promise.reject();
-    })
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/apis/apiextensions.k8s.io/v1/customresourcedefinitions');
+      expect(await screen.findByText(/No Data/i)).toBeInTheDocument();
 
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+      expect(
+        await screen.findByLabelText('insert-row-right')
+      ).toBeInTheDocument();
 
-    expect(await screen.findByText(/No Data/i)).toBeInTheDocument();
+      await act(async () => {
+        userEvent.click(screen.getByLabelText('insert-row-right'));
+        await new Promise(r => setTimeout(r, 500));
+      });
+    },
+    testTimeout
+  );
 
-    expect(await screen.findByLabelText('insert-row-right')).toBeInTheDocument();
+  test(
+    'Error on namespace get',
+    async () => {
+      fetch.mockImplementation(url => {
+        if (
+          url === 'http://localhost:3001/customresourcedefinition' ||
+          url ===
+            'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
+        ) {
+          return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)));
+        } else if (
+          url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1' ||
+          url === 'http://localhost/apiserver/apis/apiextensions.k8s.io/v1'
+        ) {
+          return Promise.reject(401);
+        } else if (url === 'http://localhost:3001/clustercustomobject/views') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: ViewMockResponse }))
+          );
+        } else if (alwaysPresentGET(url)) {
+          return alwaysPresentGET(url);
+        } else if (url === 'http://localhost:3001/namespaces') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: NamespaceResponse }))
+          );
+        } else if (url === 'http://localhost:3001/nodes') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: NodesMockResponse }))
+          );
+        } else return Promise.reject();
+      });
 
-    await act(async () => {
-      userEvent.click(screen.getByLabelText('insert-row-right'))
-      await new Promise((r) => setTimeout(r, 500));
-    })
-  }, testTimeout)
+      setToken();
+      window.history.pushState(
+        {},
+        'Page Title',
+        '/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
+      );
 
-  test('Error on namespace get', async () => {
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition' ||
-        url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {
-        return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
-      } else if (url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1' ||
-        url === 'http://localhost/apiserver/apis/apiextensions.k8s.io/v1') {
-        return Promise.reject(401)
-      }else if (url === 'http://localhost:3001/clustercustomobject/views') {
-        return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-      } else if(alwaysPresentGET(url)){
-        return alwaysPresentGET(url)
-      } else if (url === 'http://localhost:3001/namespaces') {
-        return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
-      } else if (url === 'http://localhost:3001/nodes') {
-        return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
-      } else return Promise.reject();
-    })
+      expect(await screen.findByText(/No Data/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/apis/apiextensions.k8s.io/v1/customresourcedefinitions');
+  test(
+    'APIv1 redirect works',
+    async () => {
+      fetch.mockImplementation(url => {
+        if (
+          url === 'http://localhost:3001/customresourcedefinition' ||
+          url ===
+            'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
+        ) {
+          return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)));
+        } else if (
+          url ===
+            'http://localhost:/apiserver/api/v1/pods/hello-world-deployment-6756549f5-x66v9' ||
+          url ===
+            'http://localhost/apiserver/api/v1/pods/hello-world-deployment-6756549f5-x66v9'
+        ) {
+          return Promise.resolve(new Response(JSON.stringify(PodMockResponse)));
+        } else if (url === 'http://localhost:3001/clustercustomobject/views') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: ViewMockResponse }))
+          );
+        } else if (alwaysPresentGET(url)) {
+          return alwaysPresentGET(url);
+        } else if (url === 'http://localhost:3001/namespaces') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: NamespaceResponse }))
+          );
+        } else if (url === 'http://localhost:3001/nodes') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: NodesMockResponse }))
+          );
+        } else return Promise.reject();
+      });
 
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+      setToken();
+      window.history.pushState(
+        {},
+        'Page Title',
+        '/api/v1/pods/hello-world-deployment-6756549f5-x66v9'
+      );
 
-    expect(await screen.findByText(/No Data/i)).toBeInTheDocument();
-  }, testTimeout)
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-  test('APIv1 redirect works', async () => {
-    fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition' ||
-        url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {
-        return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
-      } else if (url === 'http://localhost:/apiserver/api/v1/pods/hello-world-deployment-6756549f5-x66v9' ||
-        url === 'http://localhost/apiserver/api/v1/pods/hello-world-deployment-6756549f5-x66v9'
-      ) {
-        return Promise.resolve(new Response(JSON.stringify(PodMockResponse)))
-      }else if (url === 'http://localhost:3001/clustercustomobject/views') {
-        return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-      } else if(alwaysPresentGET(url)){
-        return alwaysPresentGET(url)
-      } else if (url === 'http://localhost:3001/namespaces') {
-        return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
-      } else if (url === 'http://localhost:3001/nodes') {
-        return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
-      } else return Promise.reject();
-    })
+      expect(await screen.findByText(/pod/i));
+    },
+    testTimeout
+  );
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/api/v1/pods/hello-world-deployment-6756549f5-x66v9');
+  test(
+    'Apis resource with namespace redirect works',
+    async () => {
+      fetch.mockImplementation(url => {
+        if (
+          url === 'http://localhost:3001/customresourcedefinition' ||
+          url ===
+            'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
+        ) {
+          return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)));
+        } else if (
+          url ===
+            'http://localhost:/apiserver/apis/apps/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9' ||
+          url ===
+            'http://localhost/apiserver/apis/apps/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'
+        ) {
+          return Promise.resolve(new Response(JSON.stringify(PodMockResponse)));
+        } else if (url === 'http://localhost:3001/clustercustomobject/views') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: ViewMockResponse }))
+          );
+        } else if (alwaysPresentGET(url)) {
+          return alwaysPresentGET(url);
+        } else if (url === 'http://localhost:3001/namespaces') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: NamespaceResponse }))
+          );
+        } else if (url === 'http://localhost:3001/nodes') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: NodesMockResponse }))
+          );
+        } else return Promise.reject();
+      });
 
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+      setToken();
+      window.history.pushState(
+        {},
+        'Page Title',
+        '/apis/apps/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'
+      );
 
-    expect(await screen.findByText(/pod/i));
-  }, testTimeout)
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-  test('Apis resource with namespace redirect works', async () => {
-    fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition' ||
-        url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {
-        return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
-      } else if (url === 'http://localhost:/apiserver/apis/apps/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9' ||
-        url === 'http://localhost/apiserver/apis/apps/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'
-      ) {
-        return Promise.resolve(new Response(JSON.stringify(PodMockResponse)))
-      }else if (url === 'http://localhost:3001/clustercustomobject/views') {
-        return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-      } else if(alwaysPresentGET(url)){
-        return alwaysPresentGET(url)
-      } else if (url === 'http://localhost:3001/namespaces') {
-        return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
-      } else if (url === 'http://localhost:3001/nodes') {
-        return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
-      } else return Promise.reject();
-    })
+      expect(await screen.findByText(/pod/i));
+    },
+    testTimeout
+  );
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/apis/apps/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9');
+  test(
+    'Apis list with namespace redirect works',
+    async () => {
+      fetch.mockImplementation(url => {
+        if (
+          url === 'http://localhost:3001/customresourcedefinition' ||
+          url ===
+            'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
+        ) {
+          return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)));
+        } else if (
+          url ===
+            'http://localhost:/apiserver/apis/apps/v1/namespaces/test/pods/' ||
+          url ===
+            'http://localhost/apiserver/apis/apps/v1/namespaces/test/pods/'
+        ) {
+          return Promise.resolve(
+            new Response(JSON.stringify(PodsMockResponse))
+          );
+        } else if (url === 'http://localhost:3001/clustercustomobject/views') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: ViewMockResponse }))
+          );
+        } else if (alwaysPresentGET(url)) {
+          return alwaysPresentGET(url);
+        } else if (url === 'http://localhost:3001/namespaces') {
+          return Promise.reject(
+            new Response(JSON.stringify({ body: NamespaceResponse }))
+          );
+        } else if (url === 'http://localhost:3001/nodes') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: NodesMockResponse }))
+          );
+        } else return Promise.reject();
+      });
 
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+      setToken();
+      window.history.pushState(
+        {},
+        'Page Title',
+        '/apis/apps/v1/namespaces/test/pods/'
+      );
 
-    expect(await screen.findByText(/pod/i));
-  }, testTimeout)
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-  test('Apis list with namespace redirect works', async () => {
-    fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition' ||
-        url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {
-        return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
-      } else if (url === 'http://localhost:/apiserver/apis/apps/v1/namespaces/test/pods/' ||
-        url === 'http://localhost/apiserver/apis/apps/v1/namespaces/test/pods/'
-      ) {
-        return Promise.resolve(new Response(JSON.stringify(PodsMockResponse)))
-      }else if (url === 'http://localhost:3001/clustercustomobject/views') {
-        return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-      } else if(alwaysPresentGET(url)){
-        return alwaysPresentGET(url)
-      } else if (url === 'http://localhost:3001/namespaces') {
-        return Promise.reject(new Response(JSON.stringify({ body: NamespaceResponse })))
-      } else if (url === 'http://localhost:3001/nodes') {
-        return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
-      } else return Promise.reject();
-    })
-
-    setToken();
-    window.history.pushState({}, 'Page Title', '/apis/apps/v1/namespaces/test/pods/');
-
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
-
-    expect(await screen.findByText(/pod/i));
-  }, testTimeout)
-})
+      expect(await screen.findByText(/pod/i));
+    },
+    testTimeout
+  );
+});

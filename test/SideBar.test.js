@@ -2,7 +2,12 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { loginTest, mockCRDAndViewsExtended, setToken, setup_cv } from './RTLUtils';
+import {
+  loginTest,
+  mockCRDAndViewsExtended,
+  setToken,
+  setup_cv
+} from './RTLUtils';
 import userEvent from '@testing-library/user-event';
 import { testTimeout } from '../src/constants';
 import Cookies from 'js-cookie';
@@ -14,7 +19,8 @@ import SideBar from '../src/common/SideBar';
 
 fetchMock.enableMocks();
 
-beforeEach(() => { localStorage.setItem('theme', 'dark');
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
@@ -44,87 +50,119 @@ describe('Sidebar', () => {
     expect(await screen.findByText('Test Custom View')).toBeInTheDocument();
   }, testTimeout)*/
 
-  test('Sidebar main menus item and submenus item are showed', async () => {
-    mockCRDAndViewsExtended();
-    await loginTest();
+  test(
+    'Sidebar main menus item and submenus item are showed',
+    async () => {
+      mockCRDAndViewsExtended();
+      await loginTest();
 
-    expect(await screen.findAllByText(/Home/i)).toHaveLength(2);
+      expect(await screen.findAllByText(/Home/i)).toHaveLength(2);
 
-    expect(await screen.findByText(/custom resources/i)).toBeInTheDocument();
+      expect(await screen.findByText(/custom resources/i)).toBeInTheDocument();
 
-    //expect(await screen.findByText(/favourites/i)).toBeInTheDocument();
+      //expect(await screen.findByText(/favourites/i)).toBeInTheDocument();
 
-    expect(await screen.findByText(/settings/i)).toBeInTheDocument();
+      expect(await screen.findByText(/settings/i)).toBeInTheDocument();
 
-    expect(await screen.findByText('Liqo View')).toBeInTheDocument();
-  }, testTimeout)
+      expect(await screen.findByText('Liqo View')).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  test('Sidebar custom view redirect is ok', async () => {
-    await setup_cv();
-  }, testTimeout)
+  test(
+    'Sidebar custom view redirect is ok',
+    async () => {
+      await setup_cv();
+    },
+    testTimeout
+  );
 
-  test('Sidebar custom resource redirect is ok', async () => {
-    mockCRDAndViewsExtended();
-    await loginTest();
+  test(
+    'Sidebar custom resource redirect is ok',
+    async () => {
+      mockCRDAndViewsExtended();
+      await loginTest();
 
-    const customview = await screen.findByText('Custom Resources');
-    userEvent.click(customview);
+      const customview = await screen.findByText('Custom Resources');
+      userEvent.click(customview);
 
-    expect(await screen.findByText(/advertisement./i)).toBeInTheDocument();
+      expect(await screen.findByText(/advertisement./i)).toBeInTheDocument();
 
-    expect(await screen.findAllByRole('row')).toHaveLength(10);
-  }, testTimeout)
+      expect(await screen.findAllByRole('row')).toHaveLength(10);
+    },
+    testTimeout
+  );
 
-  test('Sidebar collapse works', async () => {
-    await setup_cv();
+  test(
+    'Sidebar collapse works',
+    async () => {
+      await setup_cv();
 
-    await screen.findAllByRole('img');
+      await screen.findAllByRole('img');
 
-    userEvent.click(await screen.findByLabelText('left'));
+      userEvent.click(await screen.findByLabelText('left'));
 
-    expect(await screen.queryByLabelText('left')).not.toBeInTheDocument();
-  }, testTimeout)
+      expect(await screen.queryByLabelText('left')).not.toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  test('New Custom View with no name throws error', async () => {
-    mockCRDAndViewsExtended();
-    await loginTest();
+  test(
+    'New Custom View with no name throws error',
+    async () => {
+      mockCRDAndViewsExtended();
+      await loginTest();
 
-    userEvent.click(await screen.findByText('New Custom View'));
+      userEvent.click(await screen.findByText('New Custom View'));
 
-    expect(await screen.findAllByText('New Custom View')).toHaveLength(2);
+      expect(await screen.findAllByText('New Custom View')).toHaveLength(2);
 
-    userEvent.click(await screen.findByText('OK'));
+      userEvent.click(await screen.findByText('OK'));
 
-    expect(await screen.findByText(/Please/i)).toBeInTheDocument();
-  }, testTimeout)
+      expect(await screen.findByText(/Please/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  test('New Custom View cancel', async () => {
-    mockCRDAndViewsExtended();
-    await loginTest();
+  test(
+    'New Custom View cancel',
+    async () => {
+      mockCRDAndViewsExtended();
+      await loginTest();
 
-    userEvent.click(await screen.findByText('New Custom View'));
+      userEvent.click(await screen.findByText('New Custom View'));
 
-    expect(await screen.findAllByText('New Custom View')).toHaveLength(2);
+      expect(await screen.findAllByText('New Custom View')).toHaveLength(2);
 
-    userEvent.click(await screen.findByText('Cancel'));
+      userEvent.click(await screen.findByText('Cancel'));
 
-    expect(await screen.queryByText('Test Custom View')).not.toBeInTheDocument();
-  }, testTimeout)
+      expect(
+        await screen.queryByText('Test Custom View')
+      ).not.toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  test('DashboardConfig redirect to http site', async () => {
-    window.api = ApiInterface({id_token: 'test'});
-    setToken();
-    window.api.dashConfigs.current = DashboardConfig.items[0];
-    window.less = {modifyVars: async () => {return Promise.resolve()}}
+  test(
+    'DashboardConfig redirect to http site',
+    async () => {
+      window.api = ApiInterface({ id_token: 'test' });
+      setToken();
+      window.api.dashConfigs.current = DashboardConfig.items[0];
+      window.less = {
+        modifyVars: async () => {
+          return Promise.resolve();
+        }
+      };
 
-    render(
-      <MemoryRouter>
-        <SideBar />
-      </MemoryRouter>
-    )
+      render(
+        <MemoryRouter>
+          <SideBar />
+        </MemoryRouter>
+      );
 
-    userEvent.click(await screen.findByLabelText('folder'))
-
-  }, testTimeout)
-})
-
+      userEvent.click(await screen.findByLabelText('folder'));
+    },
+    testTimeout
+  );
+});

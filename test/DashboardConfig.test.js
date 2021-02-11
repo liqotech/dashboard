@@ -16,31 +16,40 @@ fetchMock.enableMocks();
 
 async function setup() {
   setToken();
-  window.history.pushState({}, 'Page Title', '/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9');
+  window.history.pushState(
+    {},
+    'Page Title',
+    '/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'
+  );
 
   return render(
     <MemoryRouter>
       <App />
     </MemoryRouter>
-  )
+  );
 }
 
-beforeEach(() => { localStorage.setItem('theme', 'dark');
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
-function mocks(){
+function mocks() {
   fetch.mockResponse(req => {
-    if (req.url === 'http://localhost:3001/clustercustomobject/dashboardconfigs') {
-      if(req.method === 'GET')
-        return Promise.resolve(new Response(JSON.stringify({body: {items: []}})));
-      else if(req.method === 'POST'){
-        return Promise.resolve(new Response(JSON.stringify({body: DashboardConfig.items[0]})));
+    if (
+      req.url === 'http://localhost:3001/clustercustomobject/dashboardconfigs'
+    ) {
+      if (req.method === 'GET')
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: { items: [] } }))
+        );
+      else if (req.method === 'POST') {
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: DashboardConfig.items[0] }))
+        );
       }
-    }
-    else if(generalMocks(req.url))
-      return generalMocks(req.url);
-  })
+    } else if (generalMocks(req.url)) return generalMocks(req.url);
+  });
 }
 
 describe('DashboardConfig', () => {
@@ -49,17 +58,21 @@ describe('DashboardConfig', () => {
 
     await setup();
 
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
+    expect(
+      await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+    ).toBeInTheDocument();
 
     expect(window.api.dashConfigs.current).not.toBeNull();
-  })
+  });
 
   test('Dashboard config update works', async () => {
     mocks();
 
     await setup();
 
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
+    expect(
+      await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+    ).toBeInTheDocument();
 
     let apiManager = window.api.apiManager.current;
 
@@ -69,16 +82,18 @@ describe('DashboardConfig', () => {
 
     await act(async () => {
       apiManager.sendModifiedSignal('dashboardconfigs/', dashConf);
-      await new Promise((r) => setTimeout(r, 1000));
-    })
-  })
+      await new Promise(r => setTimeout(r, 1000));
+    });
+  });
 
   test('Dashboard config delete generate a new config', async () => {
     mocks();
 
     await setup();
 
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
+    expect(
+      await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+    ).toBeInTheDocument();
 
     let apiManager = window.api.apiManager.current;
 
@@ -88,9 +103,9 @@ describe('DashboardConfig', () => {
 
     await act(async () => {
       apiManager.sendDeletedSignal('dashboardconfigs/', dashConf);
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+      await new Promise(r => setTimeout(r, 1000));
+    });
 
     expect(window.api.dashConfigs.current).not.toBeNull();
-  })
-})
+  });
+});

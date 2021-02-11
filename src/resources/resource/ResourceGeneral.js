@@ -7,20 +7,29 @@ import ResourceForm from './ResourceForm';
 import _ from 'lodash';
 import { resourceNotifyEvent } from '../common/ResourceUtils';
 import { useLocation, useParams } from 'react-router-dom';
-import { CodeOutlined, InfoCircleOutlined, PlusOutlined, LinkOutlined } from '@ant-design/icons';
-import { createNewConfig, getResourceConfig, updateResourceConfig } from '../common/DashboardConfigUtils';
+import {
+  CodeOutlined,
+  InfoCircleOutlined,
+  PlusOutlined,
+  LinkOutlined
+} from '@ant-design/icons';
+import {
+  createNewConfig,
+  getResourceConfig,
+  updateResourceConfig
+} from '../common/DashboardConfigUtils';
 import CustomTab from './CustomTab';
 import { secondaryColor } from '../../services/Colors';
 import ReferenceTab from './ReferenceTab';
 
-function ResourceGeneral(props){
+function ResourceGeneral(props) {
   const [container, setContainer] = useState(null);
-  const deleted = useRef(false)
+  const deleted = useRef(false);
   const [loading, setLoading] = useState(true);
   const [resource, setResource] = useState([]);
   const [resourceConfig, setResourceConfig] = useState({});
   const [currentTab, setCurrentTab] = useState('General');
-  const [tabList, setTabList] = useState([])
+  const [tabList, setTabList] = useState([]);
   const [contentList, setContentList] = useState({});
   const [onEditTabTitle, setOnEditTabTitle] = useState('');
   const [onCustomResource, setOnCustomResource] = useState(false);
@@ -30,11 +39,11 @@ function ResourceGeneral(props){
 
   useEffect(() => {
     setOnCustomResource(() => {
-      if(params.resource && params.group){
+      if (params.resource && params.group) {
         return window.api.getCRDFromName(params.resource + '.' + params.group);
       }
-    })
-  }, [window.api.CRDs.current])
+    });
+  }, [window.api.CRDs.current]);
 
   useEffect(() => {
     loadResource();
@@ -43,64 +52,70 @@ function ResourceGeneral(props){
 
     /** When unmounting, eliminate every callback and watch */
     return () => {
-      window.api.DCArrayCallback.current = window.api.DCArrayCallback.current.filter(func => {
-        return func !== getDashConfig;
-      });
+      window.api.DCArrayCallback.current = window.api.DCArrayCallback.current.filter(
+        func => {
+          return func !== getDashConfig;
+        }
+      );
       window.api.abortWatch(params.resource);
-    }
-  }, [location])
+    };
+  }, [location]);
 
   useEffect(() => {
-    if(!loading && resource[0]){
+    if (!loading && resource[0]) {
       manageTabList();
       manageContentList();
     }
-  }, [loading, resource, resourceConfig])
+  }, [loading, resource, resourceConfig]);
 
   useEffect(() => {
-    if(onEditTabTitle !== ''){
-      let index = tabList.indexOf(tabList.find(tab => tab.key === onEditTabTitle));
+    if (onEditTabTitle !== '') {
+      let index = tabList.indexOf(
+        tabList.find(tab => tab.key === onEditTabTitle)
+      );
       const key = tabList[index].key;
       tabList[index] = {
         key: key,
         tab: (
           <div>
-            <PlusOutlined/>
-            <Input bordered={false} defaultValue={key} placeholder={key}
-                   size={'small'}
-                   role={'input'}
-                   onPressEnter={(e) =>
-                     updateConfigTabs(e.target.value, key)}
-                   onBlur={(e) =>
-                     updateConfigTabs(e.target.value, key)}
+            <PlusOutlined />
+            <Input
+              bordered={false}
+              defaultValue={key}
+              placeholder={key}
+              size={'small'}
+              role={'input'}
+              onPressEnter={e => updateConfigTabs(e.target.value, key)}
+              onBlur={e => updateConfigTabs(e.target.value, key)}
             />
           </div>
         )
       };
       setTabList([...tabList]);
     }
-  }, [onEditTabTitle])
+  }, [onEditTabTitle]);
 
   const updateResource = (name, namespace, item) => {
-    return window.api.updateGenericResource(location.pathname, item)
+    return window.api
+      .updateGenericResource(location.pathname, item)
       .catch(() => {
         message.error('Could not update the resource');
-      })
-  }
+      });
+  };
 
   const deleteResource = () => {
     return window.api.deleteGenericResource(location.pathname);
-  }
+  };
 
   const submit = item => {
     updateResource(item.metadata.name, item.metadata.namespace, item);
-  }
+  };
 
   const getDashConfig = () => {
     setResourceConfig(() => {
       return getResourceConfig(params, location);
     });
-  }
+  };
 
   const manageTabList = () => {
     let items = [
@@ -108,7 +123,8 @@ function ResourceGeneral(props){
         key: 'General',
         tab: (
           <span>
-            <InfoCircleOutlined />General
+            <InfoCircleOutlined />
+            General
           </span>
         )
       },
@@ -116,7 +132,8 @@ function ResourceGeneral(props){
         key: 'JSON',
         tab: (
           <span>
-            <CodeOutlined />JSON
+            <CodeOutlined />
+            JSON
           </span>
         )
       },
@@ -124,154 +141,168 @@ function ResourceGeneral(props){
         key: 'LinkedResources',
         tab: (
           <span>
-            <LinkOutlined />LinkedResources
+            <LinkOutlined />
+            LinkedResources
           </span>
         )
       }
-    ]
+    ];
 
-    if(resourceConfig.render && resourceConfig.render.tabs){
+    if (resourceConfig.render && resourceConfig.render.tabs) {
       resourceConfig.render.tabs.forEach(tab => {
         items.push({
           key: tab.tabTitle,
           tab: (
             <span onDoubleClick={() => setOnEditTabTitle(tab.tabTitle)}>
-              <PlusOutlined />{tab.tabTitle}
+              <PlusOutlined />
+              {tab.tabTitle}
             </span>
           )
-        })
-      })
+        });
+      });
     }
 
     setTabList([...items]);
-  }
+  };
 
   const manageContentList = () => {
     let items = {
       General: (
         <div>
-          <ResourceForm resource={JSON.parse(JSON.stringify(resource[0]))}
-                        updateFunc={updateResource} kind={resource[0].kind}
-                        CRD={onCustomResource}
-                        params={props._params ? params : null}
+          <ResourceForm
+            resource={JSON.parse(JSON.stringify(resource[0]))}
+            updateFunc={updateResource}
+            kind={resource[0].kind}
+            CRD={onCustomResource}
+            params={props._params ? params : null}
           />
         </div>
       ),
       JSON: (
         <div>
-          <Editor value={JSON.stringify(resource[0], null, 2)}
-                  onClick={submit}
+          <Editor
+            value={JSON.stringify(resource[0], null, 2)}
+            onClick={submit}
           />
         </div>
       ),
       LinkedResources: (
-        <div style={{padding: 12}}>
-          <ReferenceTab resource={resource[0]} kind={resource[0].kind}
-                        onCustomResource={onCustomResource}
+        <div style={{ padding: 12 }}>
+          <ReferenceTab
+            resource={resource[0]}
+            kind={resource[0].kind}
+            onCustomResource={onCustomResource}
           />
         </div>
       )
-    }
+    };
 
-    if(resourceConfig.render && resourceConfig.render.tabs){
+    if (resourceConfig.render && resourceConfig.render.tabs) {
       resourceConfig.render.tabs.forEach(tab => {
         items[tab.tabTitle] = (
-          <CustomTab content={tab.tabContent} resource={resource[0]} tabTitle={tab.tabTitle}
-                     onCustomResource={onCustomResource} {...props}
+          <CustomTab
+            content={tab.tabContent}
+            resource={resource[0]}
+            tabTitle={tab.tabTitle}
+            onCustomResource={onCustomResource}
+            {...props}
           />
-        )
-      })
+        );
+      });
     }
 
-    setContentList({...items});
-  }
+    setContentList({ ...items });
+  };
 
   const loadResource = () => {
     /** Get the resource */
-    window.api.getGenericResource(!props.onCustomView ? location.pathname : props.pathname).then(
-      res => {
+    window.api
+      .getGenericResource(
+        !props.onCustomView ? location.pathname : props.pathname
+      )
+      .then(res => {
         let resArray = [];
         resArray.push(res);
         setResource(resArray);
         /** Start a watch for this resource */
-        if(!props.onCustomView)
+        if (!props.onCustomView)
           window.api.watchResource(
             location.pathname.split('/')[1],
-            (params.group ? params.group : undefined),
-            (params.namespace ? params.namespace : undefined),
+            params.group ? params.group : undefined,
+            params.namespace ? params.namespace : undefined,
             params.version,
             params.resource,
             params.resourceName,
             notifyEvent
-          )
+          );
         setLoading(false);
-      }
-    ).catch(error => {
-      console.log(error);
-      deleted.current = true;
-      setLoading(false);
-    });
-  }
+      })
+      .catch(error => {
+        console.log(error);
+        deleted.current = true;
+        setLoading(false);
+      });
+  };
 
   const updateConfigTabs = (name, prevValue) => {
     setOnEditTabTitle('');
 
     /** If nothing has changed, exit from the editing mode */
-    if(name === prevValue){
+    if (name === prevValue) {
       manageTabList();
       return;
     }
 
     let tempResourceConfig = resourceConfig;
 
-    if(!_.isEmpty(tempResourceConfig)){
-
-      if(!tempResourceConfig.render) tempResourceConfig.render = {};
-      if(!tempResourceConfig.render.tabs) tempResourceConfig.render.tabs = [];
+    if (!_.isEmpty(tempResourceConfig)) {
+      if (!tempResourceConfig.render) tempResourceConfig.render = {};
+      if (!tempResourceConfig.render.tabs) tempResourceConfig.render.tabs = [];
 
       /** If there is a tab render for this parameter, update it */
       let index = tempResourceConfig.render.tabs.indexOf(
-        tempResourceConfig.render.tabs.find(tab =>
-          tab.tabTitle === prevValue
-        )
+        tempResourceConfig.render.tabs.find(tab => tab.tabTitle === prevValue)
       );
 
-      if(index !== -1){
+      if (index !== -1) {
         /** Delete tab if no name */
-        if(name === '')
-          delete tempResourceConfig.render.tabs[index];
-        else
-          tempResourceConfig.render.tabs[index].tabTitle = name;
+        if (name === '') delete tempResourceConfig.render.tabs[index];
+        else tempResourceConfig.render.tabs[index].tabTitle = name;
       } else
         tempResourceConfig.render.tabs.push({
           tabTitle: name,
           tabContent: []
-        })
+        });
     } else {
-      tempResourceConfig = createNewConfig(params, {kind: resource[0].kind}, location);
+      tempResourceConfig = createNewConfig(
+        params,
+        { kind: resource[0].kind },
+        location
+      );
 
       /** The resource doesn't have a config, create one */
       tempResourceConfig.render.tabs.push({
         tabTitle: name,
         tabContent: []
-      })
+      });
     }
 
     updateResourceConfig(tempResourceConfig, params, location);
 
-    if(name !== ''){
+    if (name !== '') {
       setCurrentTab(name);
       changeTabFlag.current = false;
     }
-  }
+  };
 
   const addTab = () => {
-    const key = 'NewTab'
+    const key = 'NewTab';
     const newPane = {
       key: key,
       tab: (
         <span>
-          <PlusOutlined />{key}
+          <PlusOutlined />
+          {key}
         </span>
       )
     };
@@ -279,48 +310,58 @@ function ResourceGeneral(props){
     setContentList(prev => {
       return {
         ...prev,
-        [key]: (
-          <CustomTab content={[]} resource={resource[0]} tabTitle={key}/>
-        )
-      }
-    })
+        [key]: <CustomTab content={[]} resource={resource[0]} tabTitle={key} />
+      };
+    });
     setCurrentTab(key);
     updateConfigTabs(key);
-  }
+  };
 
-  const removeTab = (targetKey) => {
+  const removeTab = targetKey => {
     setTabList(prev => {
       return prev.filter(tab => tab.key !== targetKey);
     });
-    if(currentTab === targetKey)
-      setCurrentTab('General');
+    if (currentTab === targetKey) setCurrentTab('General');
     updateConfigTabs('', targetKey);
-  }
+  };
 
   const onEditTab = (targetKey, action) => {
-    if(action === 'add'){
+    if (action === 'add') {
       addTab();
     } else {
       removeTab(targetKey);
     }
-  }
+  };
 
   const notifyEvent = (type, object) => {
     resourceNotifyEvent(setResource, type, object);
-  }
+  };
 
-  return(
+  return (
     <div>
       <Alert.ErrorBoundary>
-      {loading ? <LoadingIndicator /> : (
-        resource[0] ? (
-          <div aria-label={'crd'} key={resource[0].metadata.name} ref={setContainer}
-               style={{height: props._params ? '80%' :
-                   (window.api.dashConfigs.current.spec && window.api.dashConfigs.current.spec.footer && window.api.dashConfigs.current.spec.footer.enabled) ?
-                     'calc(91vh - 50px)' : '91vh',
-                 overflow: 'auto', marginLeft: -20, marginRight: -20, marginTop: -20}}
+        {loading ? (
+          <LoadingIndicator />
+        ) : resource[0] ? (
+          <div
+            aria-label={'crd'}
+            key={resource[0].metadata.name}
+            ref={setContainer}
+            style={{
+              height: props._params
+                ? '80%'
+                : window.api.dashConfigs.current.spec &&
+                  window.api.dashConfigs.current.spec.footer &&
+                  window.api.dashConfigs.current.spec.footer.enabled
+                ? 'calc(91vh - 50px)'
+                : '91vh',
+              overflow: 'auto',
+              marginLeft: -20,
+              marginRight: -20,
+              marginTop: -20
+            }}
           >
-            <div style={{marginLeft: 20, marginRight: 20}}>
+            <div style={{ marginLeft: 20, marginRight: 20 }}>
               {!props.onRef ? (
                 <div>
                   <Affix target={() => container}>
@@ -336,22 +377,31 @@ function ResourceGeneral(props){
                       updateFunc={updateResource}
                     />
                   </Affix>
-                </div> ) :
-              null}
-              <Card bodyStyle={{paddingTop: 0, paddingLeft: 0, paddingRight: 0, paddingBottom: 0}}
-                    headStyle={{marginLeft: -12, marginRight: -12}}
-                    tabList={tabList}
-                    tabProps={{
-                      onEdit: onEditTab,
-                      type: 'editable-card',
-                      size: 'small',
-                      animated: true
-                    }}
-                    size={'small'}
-                    activeTabKey={currentTab}
-                    onTabChange={key => {if(changeTabFlag.current) setCurrentTab(key); else changeTabFlag.current = true}}
-                    style={{overflow: 'hidden'}}
-                    bordered={false}
+                </div>
+              ) : null}
+              <Card
+                bodyStyle={{
+                  paddingTop: 0,
+                  paddingLeft: 0,
+                  paddingRight: 0,
+                  paddingBottom: 0
+                }}
+                headStyle={{ marginLeft: -12, marginRight: -12 }}
+                tabList={tabList}
+                tabProps={{
+                  onEdit: onEditTab,
+                  type: 'editable-card',
+                  size: 'small',
+                  animated: true
+                }}
+                size={'small'}
+                activeTabKey={currentTab}
+                onTabChange={key => {
+                  if (changeTabFlag.current) setCurrentTab(key);
+                  else changeTabFlag.current = true;
+                }}
+                style={{ overflow: 'hidden' }}
+                bordered={false}
               >
                 {contentList[currentTab]}
               </Card>
@@ -364,11 +414,10 @@ function ResourceGeneral(props){
             type="warning"
             showIcon
           />
-        )
-      )}
+        )}
       </Alert.ErrorBoundary>
     </div>
-  )
+  );
 }
 
 export default ResourceGeneral;

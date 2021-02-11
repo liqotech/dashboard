@@ -1,8 +1,8 @@
-import React, { Component } from "react";
-import defaultsDeep from "lodash/fp/defaultsDeep";
-import isEqual from "lodash/isEqual";
-import differenceWith from "lodash/differenceWith";
-import vis from "vis-network";
+import React, { Component } from 'react';
+import defaultsDeep from 'lodash/fp/defaultsDeep';
+import isEqual from 'lodash/isEqual';
+import differenceWith from 'lodash/differenceWith';
+import vis from 'vis-network';
 
 class Graph extends Component {
   constructor(props) {
@@ -24,7 +24,7 @@ class Graph extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    console.log('lol')
+    console.log('lol');
     let nodesChange = !isEqual(this.props.graph.nodes, nextProps.graph.nodes);
     let edgesChange = !isEqual(this.props.graph.edges, nextProps.graph.edges);
     let optionsChange = !isEqual(this.props.options, nextProps.options);
@@ -32,8 +32,16 @@ class Graph extends Component {
 
     if (nodesChange) {
       const idIsEqual = (n1, n2) => n1.id === n2.id;
-      const nodesRemoved = differenceWith(this.props.graph.nodes, nextProps.graph.nodes, idIsEqual);
-      const nodesAdded = differenceWith(nextProps.graph.nodes, this.props.graph.nodes, idIsEqual);
+      const nodesRemoved = differenceWith(
+        this.props.graph.nodes,
+        nextProps.graph.nodes,
+        idIsEqual
+      );
+      const nodesAdded = differenceWith(
+        nextProps.graph.nodes,
+        this.props.graph.nodes,
+        idIsEqual
+      );
       const nodesChanged = differenceWith(
         differenceWith(nextProps.graph.nodes, this.props.graph.nodes, isEqual),
         nodesAdded
@@ -42,8 +50,16 @@ class Graph extends Component {
     }
 
     if (edgesChange) {
-      const edgesRemoved = differenceWith(this.props.graph.edges, nextProps.graph.edges, isEqual);
-      const edgesAdded = differenceWith(nextProps.graph.edges, this.props.graph.edges, isEqual);
+      const edgesRemoved = differenceWith(
+        this.props.graph.edges,
+        nextProps.graph.edges,
+        isEqual
+      );
+      const edgesAdded = differenceWith(
+        nextProps.graph.edges,
+        this.props.graph.edges,
+        isEqual
+      );
       const edgesChanged = differenceWith(
         differenceWith(nextProps.graph.edges, this.props.graph.edges, isEqual),
         edgesAdded
@@ -57,10 +73,12 @@ class Graph extends Component {
 
     if (eventsChange) {
       let events = this.props.events || {};
-      for (let eventName of Object.keys(events)) this.Network.off(eventName, events[eventName]);
+      for (let eventName of Object.keys(events))
+        this.Network.off(eventName, events[eventName]);
 
       events = nextProps.events || {};
-      for (let eventName of Object.keys(events)) this.Network.on(eventName, events[eventName]);
+      for (let eventName of Object.keys(events))
+        this.Network.on(eventName, events[eventName]);
     }
 
     return false;
@@ -90,7 +108,7 @@ class Graph extends Component {
       autoResize: false,
       edges: {
         smooth: false,
-        color: "#000000",
+        color: '#000000',
         width: 0.5,
         arrows: {
           to: {
@@ -136,7 +154,7 @@ class Graph extends Component {
     const { identifier } = this.state;
     const { style } = this.props;
     return React.createElement(
-      "div",
+      'div',
       {
         id: identifier,
         ref: this.container,

@@ -6,7 +6,6 @@ import React from 'react';
  */
 
 export default function Authenticator() {
-
   let manager = null;
 
   if (window.OIDC_CLIENT_ID === 'undefined') {
@@ -25,7 +24,7 @@ export default function Authenticator() {
     window.OIDC_REDIRECT_URI = OIDC_REDIRECT_URI;
   }
 
-  if(window.OIDC_PROVIDER_URL) {
+  if (window.OIDC_PROVIDER_URL) {
     manager = new UserManager({
       automaticSilentRenew: true,
       response_type: 'code',
@@ -46,32 +45,33 @@ export default function Authenticator() {
    * @return {Promise<void>}
    */
   const login = () => {
-    if(manager)
-      return manager.signinRedirect();
-  }
+    if (manager) return manager.signinRedirect();
+  };
 
   /**
    * Function to process response from the authN endpoint
    * @return {Promise<User>}
    */
   const completeLogin = () => {
-    if(manager)
-      return manager.signinRedirectCallback().catch(error => console.log(error));
-  }
+    if (manager)
+      return manager
+        .signinRedirectCallback()
+        .catch(error => console.log(error));
+  };
 
   /**
    * Function to logout
    * @return {Promise<void>}
    */
   const logout = () => {
-    if(manager)
+    if (manager)
       return manager.signoutRedirect().catch(error => console.log(error));
-  }
+  };
 
-  return{
+  return {
     manager,
     login,
     completeLogin,
     logout
-  }
+  };
 }

@@ -10,18 +10,22 @@ import { mockCRDAndViewsExtended, setToken } from './RTLUtils';
 fetchMock.enableMocks();
 
 describe('Footer', () => {
-  test('Footer is present', async () => {
-    mockCRDAndViewsExtended();
-    setToken();
+  test(
+    'Footer is present',
+    async () => {
+      mockCRDAndViewsExtended();
+      setToken();
 
-    localStorage.setItem('theme', 'dark');
+      localStorage.setItem('theme', 'dark');
 
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    expect(await screen.findByText(/Proudly/i));
-  }, testTimeout)
-})
+      expect(await screen.findByText(/Proudly/i));
+    },
+    testTimeout
+  );
+});

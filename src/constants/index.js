@@ -16,7 +16,7 @@ export const DashboardConfigCRD = {
       plural: 'dashboardconfigs'
     }
   }
-}
+};
 export const CustomViewCRD = {
   metadata: {
     name: 'views.dashboard.liqo.io'
@@ -29,7 +29,7 @@ export const CustomViewCRD = {
       plural: 'views'
     }
   }
-}
+};
 export const defaultConfig = {
   apiVersion: TEMPLATE_GROUP + '/' + VERSION,
   kind: 'DashboardConfig',
@@ -43,6 +43,6 @@ export const defaultConfig = {
       namespaceSelector: true,
       resourceSearch: true
     },
-    resources: [],
+    resources: []
   }
-}
+};

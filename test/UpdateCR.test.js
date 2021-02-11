@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import ApiInterface from '../src/services/api/ApiInterface';
@@ -16,131 +16,172 @@ import Cookies from 'js-cookie';
 fetchMock.enableMocks();
 
 async function setup() {
-  fetch.mockImplementation((url) => {
+  fetch.mockImplementation(url => {
     if (url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
+      return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)));
     } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-    } else if (url === 'http://localhost:3001/clustercustomobject/liqodashtests') {
-      return Promise.resolve(new Response(JSON.stringify({ body: LiqoDashMockResponse })))
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ViewMockResponse }))
+      );
+    } else if (
+      url === 'http://localhost:3001/clustercustomobject/liqodashtests'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: LiqoDashMockResponse }))
+      );
     }
-  })
+  });
 
-  window.api = ApiInterface({id_token: 'test'});
+  window.api = ApiInterface({ id_token: 'test' });
   await window.api.getCRDs().then(async () => {
-
     let crd = await api.getCRDFromKind('LiqoDashTest');
     let cr = await api.getCustomResourcesAllNamespaces(crd);
 
     render(
-      <UpdateCR CR={cr.body.items[0]}
-                CRD={crd}
-                group={crd.spec.group}
-                version={crd.spec.version}
-                plural={crd.spec.names.plural}
-                showUpdate={true}
+      <UpdateCR
+        CR={cr.body.items[0]}
+        CRD={crd}
+        group={crd.spec.group}
+        version={crd.spec.version}
+        plural={crd.spec.names.plural}
+        showUpdate={true}
       />
-    )
+    );
   });
 }
 
-beforeEach(() => { localStorage.setItem('theme', 'dark');
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
 describe('UpdateCR', () => {
-  test('CR drawer is present and text-editor is shown', async () => {
-    await setup();
+  test(
+    'CR drawer is present and text-editor is shown',
+    async () => {
+      await setup();
 
-    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    expect(await screen.findByText('Form Wizard')).toBeInTheDocument();
+      expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+      expect(await screen.findByText('Form Wizard')).toBeInTheDocument();
 
-    expect(screen.getByText('Submit')).toBeInTheDocument();
-  }, testTimeout)
+      expect(screen.getByText('Submit')).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  test('CR is updated', async () => {
-    await setup_resource();
+  test(
+    'CR is updated',
+    async () => {
+      await setup_resource();
 
-    userEvent.click(screen.getAllByLabelText('edit')[1]);
-    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    userEvent.click(screen.getByText('JSON/YAML'));
-    const _JSON = await screen.findAllByText('JSON');
-    userEvent.click(_JSON[2]);
+      userEvent.click(screen.getAllByLabelText('edit')[1]);
+      expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+      userEvent.click(screen.getByText('JSON/YAML'));
+      const _JSON = await screen.findAllByText('JSON');
+      userEvent.click(_JSON[2]);
 
-    await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashUpdatedMockResponse));
+      await userEvent.type(
+        screen.getByLabelText('editor'),
+        JSON.stringify(LiqoDashUpdatedMockResponse)
+      );
 
-    userEvent.click(screen.getByRole('button', {name: 'Save'}));
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-    const test = await screen.findByText('test-1');
+      const test = await screen.findByText('test-1');
 
-    expect(test).toBeInTheDocument();
+      expect(test).toBeInTheDocument();
 
-    const switcher = await screen.findAllByRole('switch');
+      const switcher = await screen.findAllByRole('switch');
 
-    userEvent.click(switcher[1]);
+      userEvent.click(switcher[1]);
 
-    userEvent.click(test);
+      userEvent.click(test);
 
-    userEvent.click(await screen.findByText('Spec'));
+      userEvent.click(await screen.findByText('Spec'));
 
-    const items = await screen.findAllByText('Item');
-    userEvent.click(items[0]);
+      const items = await screen.findAllByText('Item');
+      userEvent.click(items[0]);
 
-    expect(await screen.findAllByText('Cost')).toHaveLength(4);
-    expect(screen.getAllByText('Name')).toHaveLength(4);
+      expect(await screen.findAllByText('Cost')).toHaveLength(4);
+      expect(screen.getAllByText('Name')).toHaveLength(4);
 
-    const textboxes = await screen.findAllByRole('textbox');
-    expect(textboxes[4]).toHaveAttribute('value', '13');
-    expect(textboxes[5]).toHaveAttribute('value', 'green');
-    expect(textboxes[2]).toHaveAttribute('value', '15');
-    expect(textboxes[3]).toHaveAttribute('value', 'purple');
-  }, testTimeout)
+      const textboxes = await screen.findAllByRole('textbox');
+      expect(textboxes[4]).toHaveAttribute('value', '13');
+      expect(textboxes[5]).toHaveAttribute('value', 'green');
+      expect(textboxes[2]).toHaveAttribute('value', '15');
+      expect(textboxes[3]).toHaveAttribute('value', 'purple');
+    },
+    testTimeout
+  );
 
-  test('Editor throws error when not valid body (YAML)', async () => {
-    await setup_resource();
+  test(
+    'Editor throws error when not valid body (YAML)',
+    async () => {
+      await setup_resource();
 
-    userEvent.click(screen.getAllByLabelText('edit')[1]);
-    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    userEvent.click(screen.getByText('JSON/YAML'));
-    const YAML = await screen.findAllByText('YAML');
-    userEvent.click(YAML[0]);
+      userEvent.click(screen.getAllByLabelText('edit')[1]);
+      expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+      userEvent.click(screen.getByText('JSON/YAML'));
+      const YAML = await screen.findAllByText('YAML');
+      userEvent.click(YAML[0]);
 
-    await userEvent.type(screen.getByLabelText('editor'), 'item: [cost: 11:: _name: green]');
+      await userEvent.type(
+        screen.getByLabelText('editor'),
+        'item: [cost: 11:: _name: green]'
+      );
 
-    userEvent.click(screen.getByRole('button', {name: 'Save'}));
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-    expect(await screen.findByText('YAML not valid')).toBeInTheDocument();
-  }, testTimeout)
+      expect(await screen.findByText('YAML not valid')).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  test('Editor throws error when not valid body (JSON)', async () => {
-    await setup_resource();
+  test(
+    'Editor throws error when not valid body (JSON)',
+    async () => {
+      await setup_resource();
 
-    userEvent.click(screen.getAllByLabelText('edit')[1]);
-    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    userEvent.click(screen.getByText('JSON/YAML'));
-    const _JSON = await screen.findAllByText('JSON');
-    userEvent.click(_JSON[2]);
+      userEvent.click(screen.getAllByLabelText('edit')[1]);
+      expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+      userEvent.click(screen.getByText('JSON/YAML'));
+      const _JSON = await screen.findAllByText('JSON');
+      userEvent.click(_JSON[2]);
 
-    await userEvent.type(screen.getByLabelText('editor'), '{"item": [{"cost": 11 "name": "green"}]}');
+      await userEvent.type(
+        screen.getByLabelText('editor'),
+        '{"item": [{"cost": 11 "name": "green"}]}'
+      );
 
-    userEvent.click(screen.getByRole('button', {name: 'Save'}));
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-    expect(await screen.findByText('JSON not valid')).toBeInTheDocument();
-  }, testTimeout)
+      expect(await screen.findByText('JSON not valid')).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  test('Error notification when 409', async () => {
-    await setup_resource('409', 'PUT');
+  test(
+    'Error notification when 409',
+    async () => {
+      await setup_resource('409', 'PUT');
 
-    userEvent.click(screen.getAllByLabelText('edit')[1]);
-    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    userEvent.click(screen.getByText('JSON/YAML'));
-    const _JSON = await screen.findAllByText('JSON');
-    userEvent.click(_JSON[2]);
+      userEvent.click(screen.getAllByLabelText('edit')[1]);
+      expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+      userEvent.click(screen.getByText('JSON/YAML'));
+      const _JSON = await screen.findAllByText('JSON');
+      userEvent.click(_JSON[2]);
 
-    await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashUpdatedMockResponse));
+      await userEvent.type(
+        screen.getByLabelText('editor'),
+        JSON.stringify(LiqoDashUpdatedMockResponse)
+      );
 
-    userEvent.click(screen.getByRole('button', {name: 'Save'}));
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-    expect(await screen.findByText('Could not update the resource')).toBeInTheDocument();
-  }, testTimeout)
-})
+      expect(
+        await screen.findByText('Could not update the resource')
+      ).toBeInTheDocument();
+    },
+    testTimeout
+  );
+});

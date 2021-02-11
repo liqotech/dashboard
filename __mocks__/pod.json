@@ -60,9 +60,7 @@
     "serviceAccountName": "default",
     "serviceAccount": "default",
     "nodeName": "liqo-test",
-    "securityContext": {
-
-    },
+    "securityContext": {},
     "schedulerName": "default-scheduler",
     "tolerations": [
       {

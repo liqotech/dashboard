@@ -18,10 +18,7 @@
         "update",
         "watch"
       ],
-      "shortNames": [
-        "crd",
-        "crds"
-      ],
+      "shortNames": ["crd", "crds"],
       "storageVersionHash": "jfWCUB31mvA="
     },
     {
@@ -29,11 +26,7 @@
       "singularName": "",
       "namespaced": false,
       "kind": "CustomResourceDefinition",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     }
   ]
 }

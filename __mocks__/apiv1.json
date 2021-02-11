@@ -17,12 +17,8 @@
         "update",
         "watch"
       ],
-      "shortNames": [
-        "po"
-      ],
-      "categories": [
-        "all"
-      ]
+      "shortNames": ["po"],
+      "categories": ["all"]
     }
   ]
 }

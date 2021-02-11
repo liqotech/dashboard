@@ -9,7 +9,7 @@ import ViewMockResponse from '../__mocks__/views.json';
 import LiqoDashMockResponse from '../__mocks__/liqodashtest.json';
 import SchedNodesMockResponse from '../__mocks__/schedulingnodes.json';
 import PieMockResponse from '../__mocks__/piecharts.json';
-import Error409 from '../__mocks__/409.json'
+import Error409 from '../__mocks__/409.json';
 import userEvent from '@testing-library/user-event';
 import { mockCRDAndViewsExtended, setToken } from './RTLUtils';
 import DesignEditorCRD from '../src/editors/CRD/DesignEditorCRD';
@@ -22,83 +22,104 @@ import App from '../src/app/App';
 fetchMock.enableMocks();
 
 async function setup(noCR, updateCRDError, createCRError) {
-  fetch.mockResponse((req) => {
+  fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
+      return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)));
     } else if (req.url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/liqodashtests') {
-      if(req.method === 'GET')
-        return Promise.resolve(new Response(JSON.stringify({ body: LiqoDashMockResponse })))
-      else if(req.method === 'PUT'){
-        if(updateCRDError)
-          return Promise.reject(Error409.body);
-        else
-          return Promise.resolve();
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ViewMockResponse }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/liqodashtests'
+    ) {
+      if (req.method === 'GET')
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: LiqoDashMockResponse }))
+        );
+      else if (req.method === 'PUT') {
+        if (updateCRDError) return Promise.reject(Error409.body);
+        else return Promise.resolve();
       }
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/piecharts') {
-      if(req.method === 'GET')
-        return Promise.resolve(new Response(JSON.stringify({ body: PieMockResponse })))
-      else if(req.method === 'POST') {
-        if (createCRError)
-          return Promise.reject(Error409.body);
-        else
-          return Promise.resolve();
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/piecharts'
+    ) {
+      if (req.method === 'GET')
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: PieMockResponse }))
+        );
+      else if (req.method === 'POST') {
+        if (createCRError) return Promise.reject(Error409.body);
+        else return Promise.resolve();
       }
     }
-  })
+  });
 
-  window.api = ApiInterface({id_token: 'test'});
+  window.api = ApiInterface({ id_token: 'test' });
   window.api.getCRDs().then(async () => {
-
     let crd = await window.api.getCRDFromKind('LiqoDashTest');
 
     render(
       <MemoryRouter>
-        <DesignEditorCRD CR={noCR ? [] : LiqoDashMockResponse.items}
-                         CRD={crd} showEditor={true}
+        <DesignEditorCRD
+          CR={noCR ? [] : LiqoDashMockResponse.items}
+          CRD={crd}
+          showEditor={true}
         />
       </MemoryRouter>
-    )
+    );
   });
 }
 
 async function setup_graphs() {
-  fetch.mockImplementation((url) => {
+  fetch.mockImplementation(url => {
     if (url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockLong)))
+      return Promise.resolve(new Response(JSON.stringify(CRDmockLong)));
     } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-    } else if (url === 'http://localhost:3001/clustercustomobject/schedulingnodes') {
-      return Promise.resolve(new Response(JSON.stringify({ body: SchedNodesMockResponse })))
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ViewMockResponse }))
+      );
+    } else if (
+      url === 'http://localhost:3001/clustercustomobject/schedulingnodes'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: SchedNodesMockResponse }))
+      );
     } else if (url === 'http://localhost:3001/clustercustomobject/graphs') {
-      return Promise.resolve(new Response(JSON.stringify({body: GraphMockResponse })))
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: GraphMockResponse }))
+      );
     }
-  })
+  });
 
-  window.api = ApiInterface({id_token: 'test'});
+  window.api = ApiInterface({ id_token: 'test' });
   window.api.getCRDs().then(async () => {
-
     let crd = await window.api.getCRDFromKind('SchedulingNode');
 
     render(
       <MemoryRouter>
-        <DesignEditorCRD CR={SchedNodesMockResponse.items}
-                         CRD={crd} showEditor={true}
+        <DesignEditorCRD
+          CR={SchedNodesMockResponse.items}
+          CRD={crd}
+          showEditor={true}
         />
       </MemoryRouter>
-    )
+    );
   });
 }
 
-beforeEach(() => { localStorage.setItem('theme', 'dark');
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
-async function setup_resources(){
+async function setup_resources() {
   mockCRDAndViewsExtended();
   setToken();
-  window.history.pushState({}, 'Page Title', '/customresources/liqodashtests.dashboard.liqo.io');
+  window.history.pushState(
+    {},
+    'Page Title',
+    '/customresources/liqodashtests.dashboard.liqo.io'
+  );
 
   render(
     <MemoryRouter>
@@ -107,197 +128,259 @@ async function setup_resources(){
   );
 }
 
-async function fillFields(noMetadata){
-  const name = screen.getAllByRole('textbox', {name: ''})[0];
-  const namespace = screen.getAllByRole('textbox', {name: ''})[1];
-  const labels = screen.getAllByRole('textbox', {name: ''})[2];
-  const values = screen.getAllByRole('textbox', {name: ''})[3];
+async function fillFields(noMetadata) {
+  const name = screen.getAllByRole('textbox', { name: '' })[0];
+  const namespace = screen.getAllByRole('textbox', { name: '' })[1];
+  const labels = screen.getAllByRole('textbox', { name: '' })[2];
+  const values = screen.getAllByRole('textbox', { name: '' })[3];
 
   expect(name).toBeInTheDocument();
   expect(namespace).toBeInTheDocument();
   expect(labels).toBeInTheDocument();
   expect(values).toBeInTheDocument();
 
-  if(!noMetadata){
+  if (!noMetadata) {
     await userEvent.type(name, 'test-2');
     await userEvent.type(namespace, 'test-ns');
   }
   await userEvent.type(labels, 'item.name');
   await userEvent.type(values, 'item.cost');
 
-  const submit = screen.getByRole('button', {name: 'Submit'});
+  const submit = screen.getByRole('button', { name: 'Submit' });
   userEvent.click(submit);
 }
 
 describe('DesignEditorCRD', () => {
-  test('Design editor show all general information', async () => {
-    await setup();
+  test(
+    'Design editor show all general information',
+    async () => {
+      await setup();
+
+      expect(await screen.findByText('Template')).toBeInTheDocument();
+      expect(screen.getByText('Form')).toBeInTheDocument();
+      expect(screen.getByText('Preview')).toBeInTheDocument();
+      expect(screen.getByRole('tabpanel')).toHaveAttribute('tabindex', '0');
+
+      expect(screen.getByRole('button', { name: 'Save it' })).toHaveAttribute(
+        'disabled',
+        ''
+      );
+      expect(
+        screen
+          .getByLabelText('steps')
+          .querySelector(
+            `[class="ant-steps-item ant-steps-item-process ant-steps-item-active"]`
+          )
+      );
+
+      expect(screen.getByText('Select design')).toBeInTheDocument();
+      expect(screen.getByText('Submit values')).toBeInTheDocument();
+      expect(
+        screen
+          .getByLabelText('steps')
+          .querySelector(`[class="ant-steps-item ant-steps-item-wait"]`)
+      ).toBeInTheDocument();
+    },
+    testTimeout
+  );
+
+  test(
+    'Design editor form and preview show correct information when manually selected',
+    async () => {
+      await setup();
+
+      const form = await screen.findByText('Form');
+      userEvent.click(form);
+      expect(await screen.findByText(/selected/i));
+
+      const preview = screen.getByText('Preview');
+      userEvent.click(preview);
+      expect(await screen.findByText(/submitted/i));
+    },
+    testTimeout
+  );
+
+  test(
+    'Design editor template tab show all information',
+    async () => {
+      await setup();
+
+      await screen.findByText('Template');
 
-    expect(await screen.findByText('Template')).toBeInTheDocument();
-    expect(screen.getByText('Form')).toBeInTheDocument();
-    expect(screen.getByText('Preview')).toBeInTheDocument();
-    expect(screen.getByRole('tabpanel')).toHaveAttribute('tabindex', '0');
+      expect(screen.getByText('PieChart')).toBeInTheDocument();
+      expect(screen.getByText('Default')).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    expect(screen.getByRole('button', {name: 'Save it'})).toHaveAttribute('disabled', "");
-    expect(screen.getByLabelText('steps').querySelector(`[class="ant-steps-item ant-steps-item-process ant-steps-item-active"]`));
+  test(
+    'Design editor template with graphs',
+    async () => {
+      await setup_graphs();
 
-    expect(screen.getByText('Select design')).toBeInTheDocument();
-    expect(screen.getByText('Submit values')).toBeInTheDocument();
-    expect(screen.getByLabelText('steps').querySelector(`[class="ant-steps-item ant-steps-item-wait"]`)).toBeInTheDocument();
-  }, testTimeout)
+      await screen.findByText('Template');
 
-  test('Design editor form and preview show correct information when manually selected', async () => {
-    await setup();
+      userEvent.click(screen.getByText('Graph'));
 
-    const form = await screen.findByText('Form');
-    userEvent.click(form);
-    expect(await screen.findByText(/selected/i));
+      expect(await screen.findByText('Metadata')).toBeInTheDocument();
 
-    const preview = screen.getByText('Preview');
-    userEvent.click(preview);
-    expect(await screen.findByText(/submitted/i));
-  }, testTimeout)
+      userEvent.click(screen.getByText('General'));
 
-  test('Design editor template tab show all information', async () => {
-    await setup();
+      const name = screen.getAllByRole('textbox', { name: '' })[0];
+      const namespace = screen.getAllByRole('textbox', { name: '' })[1];
+      const node = screen.getAllByRole('textbox', { name: '' })[2];
 
-    await screen.findByText('Template');
+      expect(name).toBeInTheDocument();
+      expect(namespace).toBeInTheDocument();
+      expect(node).toBeInTheDocument();
 
-    expect(screen.getByText('PieChart')).toBeInTheDocument();
-    expect(screen.getByText('Default')).toBeInTheDocument();
-  }, testTimeout)
+      await userEvent.type(name, 'test-2');
+      await userEvent.type(namespace, 'test-ns');
+      await userEvent.type(node, 'nodeName');
 
-  test('Design editor template with graphs', async () => {
-    await setup_graphs();
+      const submit = screen.getByRole('button', { name: 'Submit' });
+      userEvent.click(submit);
+    },
+    testTimeout
+  );
 
-    await screen.findByText('Template');
+  test(
+    'Design editor tabs change properly',
+    async () => {
+      await setup();
 
-    userEvent.click(screen.getByText('Graph'));
+      await screen.findByText('Template');
 
-    expect(await screen.findByText('Metadata')).toBeInTheDocument();
+      userEvent.click(screen.getByText('PieChart'));
 
-    userEvent.click(screen.getByText('General'));
+      expect(await screen.findByText('Metadata')).toBeInTheDocument();
 
-    const name = screen.getAllByRole('textbox', {name: ''})[0];
-    const namespace = screen.getAllByRole('textbox', {name: ''})[1];
-    const node = screen.getAllByRole('textbox', {name: ''})[2];
+      await fillFields();
+    },
+    testTimeout
+  );
 
-    expect(name).toBeInTheDocument();
-    expect(namespace).toBeInTheDocument();
-    expect(node).toBeInTheDocument();
+  test(
+    'Design editor tabs change properly when no possible preview',
+    async () => {
+      await setup(true);
 
-    await userEvent.type(name, 'test-2');
-    await userEvent.type(namespace, 'test-ns');
-    await userEvent.type(node, 'nodeName');
+      await screen.findByText('Template');
 
-    const submit = screen.getByRole('button', {name: 'Submit'});
-    userEvent.click(submit);
-  }, testTimeout)
+      userEvent.click(screen.getByText('PieChart'));
 
-  test('Design editor tabs change properly', async () => {
-    await setup();
+      expect(await screen.findByText('Metadata')).toBeInTheDocument();
 
-    await screen.findByText('Template');
+      await fillFields();
+    },
+    testTimeout
+  );
 
-    userEvent.click(screen.getByText('PieChart'));
+  test(
+    'Form generator throws error when no valid values in required field',
+    async () => {
+      await setup();
 
-    expect(await screen.findByText('Metadata')).toBeInTheDocument();
+      await screen.findByText('Template');
 
-    await fillFields();
-  }, testTimeout)
+      userEvent.click(screen.getByText('PieChart'));
 
-  test('Design editor tabs change properly when no possible preview', async () => {
-    await setup(true);
+      expect(await screen.findByText('Metadata')).toBeInTheDocument();
 
-    await screen.findByText('Template');
+      await fillFields(true);
 
-    userEvent.click(screen.getByText('PieChart'));
+      expect(await screen.findByText(/Please/i));
+    },
+    testTimeout
+  );
 
-    expect(await screen.findByText('Metadata')).toBeInTheDocument();
+  test(
+    'Definition of a new template works',
+    async () => {
+      await setup_resources();
 
-    await fillFields();
-  }, testTimeout)
+      userEvent.click(await screen.findByLabelText('picture'));
 
-  test('Form generator throws error when no valid values in required field', async () => {
-    await setup();
+      await screen.findByText('Template');
 
-    await screen.findByText('Template');
+      userEvent.click(screen.getByText('HistoChart'));
 
-    userEvent.click(screen.getByText('PieChart'));
+      await fillFields();
 
-    expect(await screen.findByText('Metadata')).toBeInTheDocument();
+      expect(
+        await screen.findByText(/Showing preview for/i)
+      ).toBeInTheDocument();
 
-    await fillFields(true);
+      expect(await screen.findAllByLabelText('check')).toHaveLength(2);
 
-    expect(await screen.findByText(/Please/i));
-  }, testTimeout)
+      userEvent.click(screen.getByRole('button', { name: 'Save it' }));
 
-  test('Definition of a new template works', async () => {
-    await setup_resources();
+      expect(await screen.findByText('CRD modified')).toBeInTheDocument();
 
-    userEvent.click(await screen.findByLabelText('picture'));
+      await userEvent.click(await screen.findByText('test-1'));
+    },
+    testTimeout
+  );
 
-    await screen.findByText('Template');
+  test(
+    'Default template overrides old template',
+    async () => {
+      await setup_resources();
 
-    userEvent.click(screen.getByText('HistoChart'));
+      userEvent.click(await screen.findByLabelText('picture'));
 
-    await fillFields();
+      await screen.findByText('Template');
 
-    expect(await screen.findByText(/Showing preview for/i)).toBeInTheDocument();
+      userEvent.click(screen.getByText('Default'));
 
-    expect(await screen.findAllByLabelText('check')).toHaveLength(2);
+      userEvent.click(screen.getByRole('button', { name: 'Save it' }));
 
-    userEvent.click(screen.getByRole('button', {name: 'Save it'}));
+      await userEvent.click(await screen.findByText('test-1'));
+      userEvent.click(await screen.findByText('Spec'));
+      expect(await screen.findByLabelText('form_spec')).toBeInTheDocument();
 
-    expect(await screen.findByText('CRD modified')).toBeInTheDocument();
+      expect(await screen.queryAllByText('Item')).toHaveLength(2);
+    },
+    testTimeout
+  );
 
-    await userEvent.click(await screen.findByText('test-1'));
-  }, testTimeout)
+  test(
+    'Design editor error on creating template',
+    async () => {
+      await setup(false, false, true);
 
-  test('Default template overrides old template', async () => {
-    await setup_resources();
+      await screen.findByText('Template');
 
-    userEvent.click(await screen.findByLabelText('picture'));
+      userEvent.click(screen.getByText('PieChart'));
 
-    await screen.findByText('Template');
+      expect(await screen.findByText('Metadata')).toBeInTheDocument();
 
-    userEvent.click(screen.getByText('Default'));
+      await fillFields();
 
-    userEvent.click(screen.getByRole('button', {name: 'Save it'}));
+      userEvent.click(screen.getByRole('button', { name: 'Save it' }));
 
+      expect(
+        await screen.findByText('Could not create the resource')
+      ).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    await userEvent.click(await screen.findByText('test-1'));
-    userEvent.click(await screen.findByText('Spec'));
-    expect(await screen.findByLabelText('form_spec')).toBeInTheDocument();
+  test(
+    'Design editor error on updating CRD',
+    async () => {
+      await setup(false, true);
 
-    expect(await screen.queryAllByText('Item')).toHaveLength(2);
-  }, testTimeout)
+      await screen.findByText('Template');
 
-  test('Design editor error on creating template', async () => {
-    await setup(false, false, true);
+      userEvent.click(screen.getByText('Default'));
 
-    await screen.findByText('Template');
+      userEvent.click(screen.getByRole('button', { name: 'Save it' }));
 
-    userEvent.click(screen.getByText('PieChart'));
-
-    expect(await screen.findByText('Metadata')).toBeInTheDocument();
-
-    await fillFields();
-
-    userEvent.click(screen.getByRole('button', {name: 'Save it'}));
-
-    expect(await screen.findByText('Could not create the resource')).toBeInTheDocument();
-  }, testTimeout)
-
-  test('Design editor error on updating CRD', async () => {
-    await setup(false, true);
-
-    await screen.findByText('Template');
-
-    userEvent.click(screen.getByText('Default'));
-
-    userEvent.click(screen.getByRole('button', {name: 'Save it'}));
-
-    expect(await screen.findByText('Could not update the CRD')).toBeInTheDocument();
-  }, testTimeout)
-})
+      expect(
+        await screen.findByText('Could not update the CRD')
+      ).toBeInTheDocument();
+    },
+    testTimeout
+  );
+});

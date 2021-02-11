@@ -13,52 +13,63 @@ import App from '../src/app/App';
 
 fetchMock.enableMocks();
 
-beforeEach(() => { localStorage.setItem('theme', 'dark');
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
 describe('Login', () => {
-  test('Login when no CRDs return error', async () => {
-    fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition') {
-        return Promise.reject(Error401.body)
-      } else if (url === 'http://localhost:3001/nodes') {
-        return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
-      }
-    })
+  test(
+    'Login when no CRDs return error',
+    async () => {
+      fetch.mockImplementation(url => {
+        if (url === 'http://localhost:3001/customresourcedefinition') {
+          return Promise.reject(Error401.body);
+        } else if (url === 'http://localhost:3001/nodes') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: NodesMockResponse }))
+          );
+        }
+      });
 
-    setup_login();
+      setup_login();
 
-    /** Input mock password */
-    const tokenInput = screen.getByLabelText('lab');
-    await userEvent.type(tokenInput, token);
+      /** Input mock password */
+      const tokenInput = screen.getByLabelText('lab');
+      await userEvent.type(tokenInput, token);
 
-    /** Click on login button */
-    const submitButton = screen.getByRole('button');
-    userEvent.click(submitButton);
-  }, testTimeout)
+      /** Click on login button */
+      const submitButton = screen.getByRole('button');
+      userEvent.click(submitButton);
+    },
+    testTimeout
+  );
 
-  test('Login wrong token error', async () => {
-    fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/nodes') {
-        return Promise.reject(Error401.body)
-      }
-    })
+  test(
+    'Login wrong token error',
+    async () => {
+      fetch.mockImplementation(url => {
+        if (url === 'http://localhost:3001/nodes') {
+          return Promise.reject(Error401.body);
+        }
+      });
 
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    /** Input mock password */
-    const tokenInput = screen.getByLabelText('lab');
-    await userEvent.type(tokenInput, 'password');
+      /** Input mock password */
+      const tokenInput = screen.getByLabelText('lab');
+      await userEvent.type(tokenInput, 'password');
 
-    /** Click on login button */
-    const submitButton = screen.getByRole('button');
-    userEvent.click(submitButton);
+      /** Click on login button */
+      const submitButton = screen.getByRole('button');
+      userEvent.click(submitButton);
 
-    expect(await screen.findByText(/not valid/i)).toBeInTheDocument();
-  }, testTimeout)
-})
+      expect(await screen.findByText(/not valid/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
+});

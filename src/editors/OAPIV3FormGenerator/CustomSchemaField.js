@@ -1,24 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 const COMPONENT_TYPES = {
-  array: "ArrayField",
-  boolean: "BooleanField",
-  integer: "NumberField",
-  number: "NumberField",
-  object: "ObjectField",
-  string: "StringField",
-  null: "NullField",
+  array: 'ArrayField',
+  boolean: 'BooleanField',
+  integer: 'NumberField',
+  number: 'NumberField',
+  object: 'ObjectField',
+  string: 'StringField',
+  null: 'NullField'
 };
 
 let utils = require('@rjsf/core/lib/utils');
 
 function getFieldComponent(schema, uiSchema, idSchema, fields) {
-  const field = uiSchema["ui:field"];
+  const field = uiSchema['ui:field'];
 
-  if (typeof field === "function") {
+  if (typeof field === 'function') {
     return field;
   }
-  if (typeof field === "string" && field in fields) {
+  if (typeof field === 'string' && field in fields) {
     return fields[field];
   }
 
@@ -33,16 +33,16 @@ function getFieldComponent(schema, uiSchema, idSchema, fields) {
   return componentName in fields
     ? fields[componentName]
     : () => {
-      const { UnsupportedField } = fields;
+        const { UnsupportedField } = fields;
 
-      return (
-        <UnsupportedField
-          schema={schema}
-          idSchema={idSchema}
-          reason={`Unknown field type ${schema.type}`}
-        />
-      );
-    };
+        return (
+          <UnsupportedField
+            schema={schema}
+            idSchema={idSchema}
+            reason={`Unknown field type ${schema.type}`}
+          />
+        );
+      };
 }
 
 function SchemaFieldRender(props, _disabled, onDisableChange) {
@@ -56,11 +56,12 @@ function SchemaFieldRender(props, _disabled, onDisableChange) {
     onDropPropertyClick,
     required,
     registry = utils.getDefaultRegistry(),
-    wasPropertyKeyModified = false,
+    wasPropertyKeyModified = false
   } = props;
   const { rootSchema, fields, formContext } = registry;
   const FieldTemplate =
-    uiSchema["ui:FieldTemplate"] || registry.FieldTemplate /*|| DefaultTemplate*/;
+    uiSchema['ui:FieldTemplate'] ||
+    registry.FieldTemplate; /*|| DefaultTemplate*/
   let idSchema = props.idSchema;
   const schema = utils.retrieveSchema(props.schema, rootSchema, formData);
   idSchema = utils.mergeObjects(
@@ -69,14 +70,14 @@ function SchemaFieldRender(props, _disabled, onDisableChange) {
   );
   const FieldComponent = getFieldComponent(schema, uiSchema, idSchema, fields);
   const { DescriptionField } = fields;
-  const disabled = Boolean(props.disabled || uiSchema["ui:disabled"]);
+  const disabled = Boolean(props.disabled || uiSchema['ui:disabled']);
   const readonly = Boolean(
     props.readonly ||
-    uiSchema["ui:readonly"] ||
-    props.schema.readOnly ||
-    schema.readOnly
+      uiSchema['ui:readonly'] ||
+      props.schema.readOnly ||
+      schema.readOnly
   );
-  const autofocus = Boolean(props.autofocus || uiSchema["ui:autofocus"]);
+  const autofocus = Boolean(props.autofocus || uiSchema['ui:autofocus']);
   if (Object.keys(schema).length === 0) {
     return null;
   }
@@ -109,30 +110,30 @@ function SchemaFieldRender(props, _disabled, onDisableChange) {
   if (wasPropertyKeyModified) {
     label = name;
   } else {
-    label = uiSchema["ui:title"] || props.schema.title || schema.title || name;
+    label = uiSchema['ui:title'] || props.schema.title || schema.title || name;
   }
 
   const description =
-    uiSchema["ui:description"] ||
+    uiSchema['ui:description'] ||
     props.schema.description ||
     schema.description;
   const errors = __errors;
-  const help = uiSchema["ui:help"];
-  const hidden = uiSchema["ui:widget"] === "hidden";
+  const help = uiSchema['ui:help'];
+  const hidden = uiSchema['ui:widget'] === 'hidden';
   const classNames = [
-    "form-group",
-    "field",
+    'form-group',
+    'field',
     `field-${type}`,
-    errors && errors.length > 0 ? "field-error has-error has-danger" : "",
-    uiSchema.classNames,
+    errors && errors.length > 0 ? 'field-error has-error has-danger' : '',
+    uiSchema.classNames
   ]
-    .join(" ")
+    .join(' ')
     .trim();
 
   const fieldProps = {
     description: (
       <DescriptionField
-        id={id + "__description"}
+        id={id + '__description'}
         description={description}
         formContext={formContext}
       />
@@ -154,7 +155,7 @@ function SchemaFieldRender(props, _disabled, onDisableChange) {
     fields,
     schema,
     uiSchema,
-    registry,
+    registry
   };
 
   const _AnyOfField = registry.fields.AnyOfField;
@@ -211,20 +212,19 @@ function SchemaFieldRender(props, _disabled, onDisableChange) {
 }
 
 function CustomSchemaField(props) {
-
   const [disabled, setDisabled] = useState(true);
   const originalValue = useRef('');
 
   useEffect(() => {
-    if(props.schema.type !== 'object' && props.schema.type !== 'array'){
+    if (props.schema.type !== 'object' && props.schema.type !== 'array') {
       originalValue.current = props.formData;
     }
-  }, [])
+  }, []);
 
   const onDisableChange = () => {
     setDisabled(prev => !prev);
     props.onChange(originalValue.current);
-  }
+  };
 
   return SchemaFieldRender(props, disabled, onDisableChange);
 }
@@ -235,7 +235,7 @@ CustomSchemaField.defaultProps = {
   idSchema: {},
   disabled: false,
   readonly: false,
-  autofocus: false,
+  autofocus: false
 };
 
 export default CustomSchemaField;

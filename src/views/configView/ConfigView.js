@@ -1,5 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Badge, Button, Card, Layout, message, Space, Tabs, Typography } from 'antd';
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Layout,
+  message,
+  Space,
+  Tabs,
+  Typography
+} from 'antd';
 import { withTheme } from '@rjsf/core';
 import { Theme as AntDTheme } from '@rjsf/antd';
 import Utils from '../../services/Utils';
@@ -20,25 +30,27 @@ function ConfigView() {
   const util = Utils();
 
   useEffect(() => {
-    if(CRD){
-      window.api.getCustomResourcesAllNamespaces(CRD).then( res => {
-        setPrevConfig(res.body.items[0]);
-        setLoading(false);
-        currentConfig.current = Object.keys(res.body.items[0].spec)[0];
-      }).catch(error => {
-        console.log(error);
-        setLoading(false);
-      })
+    if (CRD) {
+      window.api
+        .getCustomResourcesAllNamespaces(CRD)
+        .then(res => {
+          setPrevConfig(res.body.items[0]);
+          setLoading(false);
+          currentConfig.current = Object.keys(res.body.items[0].spec)[0];
+        })
+        .catch(error => {
+          console.log(error);
+          setLoading(false);
+        });
     } else {
       setLoading(false);
     }
-  }, [])
-
+  }, []);
 
   const onSubmit = value => {
     let item = { spec: {} };
 
-    if(currentConfig.current){
+    if (currentConfig.current) {
       item.spec[currentConfig.current] = value.formData;
     }
 
@@ -52,30 +64,36 @@ function ConfigView() {
     );
 
     promise
-      .then((res) => {
+      .then(res => {
         setPrevConfig(res.body);
         message.success('Configuration updated');
       })
-      .catch((error) => {
-        console.log(error)
+      .catch(error => {
+        console.log(error);
         message.error('Could not update the configuration');
       });
-  }
+  };
 
   const configs = [];
 
-  if(prevConfig && CRD){
-    const schema = util.OAPIV3toJSONSchema(CRD.spec.validation.openAPIV3Schema).properties.spec.properties;
-    Object.keys(CRD.spec.validation.openAPIV3Schema.properties.spec.properties).forEach(config => {
+  if (prevConfig && CRD) {
+    const schema = util.OAPIV3toJSONSchema(CRD.spec.validation.openAPIV3Schema)
+      .properties.spec.properties;
+    Object.keys(
+      CRD.spec.validation.openAPIV3Schema.properties.spec.properties
+    ).forEach(config => {
       const sub_schema = schema[config];
       configs.push(
-        <Tabs.TabPane tab={
-          <span>
-            <ToolOutlined />
-            {splitCamelCaseAndUp(config)}
-          </span>
-        } key={config}>
-          <div style={{paddingLeft: 10}}>
+        <Tabs.TabPane
+          tab={
+            <span>
+              <ToolOutlined />
+              {splitCamelCaseAndUp(config)}
+            </span>
+          }
+          key={config}
+        >
+          <div style={{ paddingLeft: 10 }}>
             <Form
               fields={fields}
               formData={prevConfig.spec[config]}
@@ -84,36 +102,49 @@ function ConfigView() {
               widgets={widgets}
               onSubmit={onSubmit}
             >
-              <Button type="primary" htmlType={'submit'} style={{marginTop: 10}}>Save configuration</Button>
+              <Button
+                type="primary"
+                htmlType={'submit'}
+                style={{ marginTop: 10 }}
+              >
+                Save configuration
+              </Button>
             </Form>
           </div>
         </Tabs.TabPane>
-      )
-    })
+      );
+    });
   }
 
-  return(
+  return (
     <Card>
-      <div style={{marginBottom: 20}}>
+      <div style={{ marginBottom: 20 }}>
         <div>
           <Space align="center">
-            <Badge color='#1890FF' />
-            <Typography.Title level={2} style={{marginTop: 15}}>
+            <Badge color="#1890FF" />
+            <Typography.Title level={2} style={{ marginTop: 15 }}>
               Liqo configuration
             </Typography.Title>
           </Space>
         </div>
         <div>
-          <Typography.Text type="secondary" style={{marginBottom: 20, marginLeft: 25}}>
+          <Typography.Text
+            type="secondary"
+            style={{ marginBottom: 20, marginLeft: 25 }}
+          >
             Choose the best configuration for your system
           </Typography.Text>
         </div>
       </div>
       <div>
-        { !loading ? (
+        {!loading ? (
           CRD ? (
             prevConfig ? (
-              <Tabs onChange={(key) => {currentConfig.current = key}}>
+              <Tabs
+                onChange={key => {
+                  currentConfig.current = key;
+                }}
+              >
                 {configs}
               </Tabs>
             ) : (
@@ -122,15 +153,19 @@ function ConfigView() {
                 description="No configuration file has been found."
                 type="error"
                 showIcon
-              />)
+              />
+            )
           ) : (
             <Alert
               message="Error"
               description="No configuration CRD has been found."
               type="error"
               showIcon
-            />)
-        ) : <LoadingIndicator/>}
+            />
+          )
+        ) : (
+          <LoadingIndicator />
+        )}
       </div>
     </Card>
   );

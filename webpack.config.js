@@ -1,11 +1,13 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
-const fs = require("fs");
+const fs = require('fs');
 const webpack = require('webpack');
 const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
 const AntDesignThemePlugin = require('antd-theme-webpack-plugin');
 const { getLessVars } = require('antd-theme-generator');
-const themeVariables = getLessVars(path.join(__dirname, './src/styles/variables.less'));
+const themeVariables = getLessVars(
+  path.join(__dirname, './src/styles/variables.less')
+);
 const lightVars = { ...getLessVars('./src/themes/light-theme.less') };
 fs.writeFileSync('./src/themes/dark.json', JSON.stringify(themeVariables));
 fs.writeFileSync('./src/themes/light.json', JSON.stringify(lightVars));
@@ -14,12 +16,10 @@ const options = {
   antDir: path.join(__dirname, './node_modules/antd'),
   stylesDir: path.join(__dirname, './src/styles'),
   varFile: path.join(__dirname, './src/styles/variables.less'),
-  themeVariables: Array.from(new Set([
-    ...Object.keys(themeVariables)
-  ])),
+  themeVariables: Array.from(new Set([...Object.keys(themeVariables)])),
   generateOnce: false,
   indexFileName: 'index.html'
-}
+};
 
 const themePlugin = new AntDesignThemePlugin(options);
 

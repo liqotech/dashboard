@@ -5,7 +5,7 @@
     "metadata": {},
     "status": "Failure",
     "message": "NotFound",
-    "reason":  "NotFound",
+    "reason": "NotFound",
     "code": 404,
     "response": {
       "_fetchResponse": {

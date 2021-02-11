@@ -5,7 +5,7 @@
     "metadata": {},
     "status": "Failure",
     "message": "Forbidden",
-    "reason":  "Forbidden",
+    "reason": "Forbidden",
     "code": 403,
     "response": {
       "_fetchResponse": {

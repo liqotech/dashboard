@@ -1,7 +1,12 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
-import { alwaysPresentGET, metricsPODs, mockCRDAndViewsExtended, setToken } from './RTLUtils';
+import {
+  alwaysPresentGET,
+  metricsPODs,
+  mockCRDAndViewsExtended,
+  setToken
+} from './RTLUtils';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import CRDmockResponse from '../__mocks__/crd_fetch.json';
@@ -31,7 +36,7 @@ async function setup() {
     <MemoryRouter>
       <App />
     </MemoryRouter>
-  )
+  );
 }
 
 beforeEach(() => {
@@ -41,46 +46,75 @@ beforeEach(() => {
   Cookies.remove('token');
 });
 
-function mocks(){
-  fetch.mockImplementation((url) => {
+function mocks() {
+  fetch.mockImplementation(url => {
     if (url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-    } else if (url === 'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)));
+    } else if (
+      url ===
+      'http://localhost:/apiserver/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
+    ) {
+      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)));
     } else if (url === 'http://localhost:3001/namespaces') {
-      return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
-    } else if (url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
-      return Promise.resolve(new Response(JSON.stringify({body: FCMockResponse})));
-    } else if (url === 'http://localhost:3001/clustercustomobject/advertisements') {
-      return Promise.resolve(new Response(JSON.stringify({body: AdvMockResponse})));
-    } else if (url === 'http://localhost:3001/clustercustomobject/peeringrequests') {
-      return Promise.resolve(new Response(JSON.stringify({body: PRMockResponse})));
-    } else if (url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: NamespaceResponse }))
+      );
+    } else if (
+      url === 'http://localhost:3001/clustercustomobject/foreignclusters'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: FCMockResponse }))
+      );
+    } else if (
+      url === 'http://localhost:3001/clustercustomobject/advertisements'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: AdvMockResponse }))
+      );
+    } else if (
+      url === 'http://localhost:3001/clustercustomobject/peeringrequests'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: PRMockResponse }))
+      );
+    } else if (
+      url === 'http://localhost:3001/clustercustomobject/clusterconfigs'
+    ) {
       return Promise.reject(Error404.body);
     } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ViewMockResponse }))
+      );
     } else if (url === 'http://localhost:3001/pod') {
-      return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: PodsMockResponse }))
+      );
     } else if (url === 'http://localhost:3001/nodes') {
-      return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: NodesMockResponse }))
+      );
     } else if (url === 'http://localhost:3001/metrics/nodes') {
-      return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+      return Promise.resolve(
+        new Response(JSON.stringify(NodesMetricsMockResponse))
+      );
     } else if (url === 'http://localhost:3001/configmaps/liqo') {
-      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
-    } else if(alwaysPresentGET(url)){
-      return alwaysPresentGET(url)
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: CMMockResponse }))
+      );
+    } else if (alwaysPresentGET(url)) {
+      return alwaysPresentGET(url);
     } else {
-      return metricsPODs({url : url});
+      return metricsPODs({ url: url });
     }
-  })
+  });
 }
 
 describe('App', () => {
   test('Token wrong format', async () => {
-    Cookies.set('token', 'token')
+    Cookies.set('token', 'token');
     window.OIDC_PROVIDER_URL = 'test-url';
     window.OIDC_CLIENT_ID = 'test-id';
-    window.api = ApiInterface({id_token: 'test'});
+    window.api = ApiInterface({ id_token: 'test' });
     window.history.pushState({}, 'Page Title', '/callback');
 
     render(
@@ -88,33 +122,45 @@ describe('App', () => {
         <App />
       </MemoryRouter>
     );
-  })
+  });
 
-  test('Login with OIDC', async () => {
-    mocks();
+  test(
+    'Login with OIDC',
+    async () => {
+      mocks();
 
-    await setup();
+      await setup();
 
-    /** Assert that a success notification has spawned */
-    //expect(await screen.findByText(/custom views/i)).toBeInTheDocument();
-    await userEvent.click(screen.getByLabelText('logout'));
-  }, testTimeout)
+      /** Assert that a success notification has spawned */
+      //expect(await screen.findByText(/custom views/i)).toBeInTheDocument();
+      await userEvent.click(screen.getByLabelText('logout'));
+    },
+    testTimeout
+  );
 
-  test('Login with OIDC error', async () => {
-    mocks();
+  test(
+    'Login with OIDC error',
+    async () => {
+      mocks();
 
-    window.error = true;
+      window.error = true;
 
-    await setup();
-    await userEvent.click(screen.getByLabelText('logout'));
+      await setup();
+      await userEvent.click(screen.getByLabelText('logout'));
 
-    window.error = false;
-  }, testTimeout)
+      window.error = false;
+    },
+    testTimeout
+  );
 
   test('Login with path', async () => {
     mocks();
     setToken();
-    window.history.pushState({}, 'Page Title', '/apis/apiextensions.k8s.io/v1/customresourcedefinitions');
+    window.history.pushState(
+      {},
+      'Page Title',
+      '/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
+    );
 
     render(
       <MemoryRouter>
@@ -123,7 +169,7 @@ describe('App', () => {
     );
 
     expect(await screen.findByText('Name'));
-  })
+  });
 
   test('Plugin loader works', async () => {
     mocks();
@@ -135,7 +181,7 @@ describe('App', () => {
         <App />
       </MemoryRouter>
     );
-  })
+  });
 
   test('Access /login path when already logged redirect to /', async () => {
     mockCRDAndViewsExtended();
@@ -149,7 +195,7 @@ describe('App', () => {
     );
 
     expect(await screen.findByText('Available Peers'));
-  })
+  });
 
   test('Access /login path when not logged redirect to callback func', async () => {
     mockCRDAndViewsExtended();
@@ -162,7 +208,7 @@ describe('App', () => {
         <App />
       </MemoryRouter>
     );
-  })
+  });
 
   test('Access /error path when already logged redirect to /', async () => {
     mockCRDAndViewsExtended();
@@ -176,7 +222,7 @@ describe('App', () => {
     );
 
     expect(await screen.findByText('Available Peers'));
-  })
+  });
 
   test('Access /callback path when already logged redirect to /', async () => {
     window.OIDC_PROVIDER_URL = 'test-url';
@@ -192,7 +238,7 @@ describe('App', () => {
     );
 
     expect(await screen.findByText('Available Peers'));
-  })
+  });
 
   test('Access an unknown route redirect to 404', async () => {
     mockCRDAndViewsExtended();
@@ -206,13 +252,13 @@ describe('App', () => {
     );
 
     expect(await screen.findByText('404'));
-  })
+  });
 
   test('/callback', async () => {
     mockCRDAndViewsExtended();
     window.OIDC_PROVIDER_URL = 'test-url';
     window.OIDC_CLIENT_ID = 'test-id';
-    window.api = ApiInterface({id_token: 'test'});
+    window.api = ApiInterface({ id_token: 'test' });
     window.history.pushState({}, 'Page Title', '/callback');
 
     render(
@@ -220,5 +266,5 @@ describe('App', () => {
         <App />
       </MemoryRouter>
     );
-  })
-})
+  });
+});
