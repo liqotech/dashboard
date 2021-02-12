@@ -30,7 +30,7 @@ function LiqoHeader(props) {
         setClusterID(res.body.items[0].data['cluster-id']);
       })
       .catch(error => {
-        console.log(error);
+        console.error(error);
       });
   }, []);
 

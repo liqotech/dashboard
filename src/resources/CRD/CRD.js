@@ -159,7 +159,7 @@ function CRD(props) {
           /** See if there is a template for the prev */
           findTemplate(prev);
         })
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
       return prev;
     });
   };
@@ -354,7 +354,7 @@ function CRD(props) {
 
           setTemplate(CR);
         })
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
     } else {
       setTemplate(null);
     }

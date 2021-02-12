@@ -107,7 +107,7 @@ function App(props) {
 
       /** Get the CRDs at the start of the app */
       _api.getCRDs().catch(error => {
-        console.log(error);
+        console.error(error);
       });
     } catch (error) {
       tokenLogout();

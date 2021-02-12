@@ -190,7 +190,7 @@ function DesignEditorCRD(props) {
           message.success('New Resource created');
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           message.error('Could not create the resource');
         })
         .then(() => {
@@ -204,7 +204,7 @@ function DesignEditorCRD(props) {
               props.setShowEditor(false);
             })
             .catch(error => {
-              console.log(error);
+              console.error(error);
               message.error('Could not update the resource');
             });
         });
@@ -220,7 +220,7 @@ function DesignEditorCRD(props) {
           props.setShowEditor(false);
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           message.error('Could not update the CRD');
         });
     }

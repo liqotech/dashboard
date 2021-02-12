@@ -81,7 +81,7 @@ function FormViewer(props) {
     setShowButton(false);
 
     promise.catch(error => {
-      console.log(error);
+      console.error(error);
       message.error('Could not update the resource');
     });
   };

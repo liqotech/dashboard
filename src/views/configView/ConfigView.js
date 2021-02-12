@@ -39,7 +39,7 @@ function ConfigView() {
           currentConfig.current = Object.keys(res.body.items[0].spec)[0];
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           setLoading(false);
         });
     } else {
@@ -69,7 +69,7 @@ function ConfigView() {
         message.success('Configuration updated');
       })
       .catch(error => {
-        console.log(error);
+        console.error(error);
         message.error('Could not update the configuration');
       });
   };

@@ -56,7 +56,7 @@ export default function Authenticator() {
     if (manager)
       return manager
         .signinRedirectCallback()
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
   };
 
   /**
@@ -65,7 +65,7 @@ export default function Authenticator() {
    */
   const logout = () => {
     if (manager)
-      return manager.signoutRedirect().catch(error => console.log(error));
+      return manager.signoutRedirect().catch(error => console.error(error));
   };
 
   return {

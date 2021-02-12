@@ -84,7 +84,7 @@ export default function CustomViewButton(props) {
         message.success('Resource updated');
       })
       .catch(error => {
-        console.log(error);
+        console.error(error);
         message.error('Could not update the resource');
       });
   };

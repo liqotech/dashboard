@@ -71,7 +71,7 @@ function Home() {
         loadCRD('ClusterConfig');
       })
       .catch(error => {
-        console.log(error);
+        console.error(error);
       });
   }, []);
 
@@ -152,7 +152,7 @@ function Home() {
           );
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           setLoading(false);
         });
     } else {

@@ -77,7 +77,7 @@ function ResourceList(props) {
           loadResourceList();
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           params.namespace = undefined;
           loadResourceList();
         });

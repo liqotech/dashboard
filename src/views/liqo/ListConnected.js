@@ -60,14 +60,14 @@ function ListConnected(props) {
                 );
               })
               .catch(error => {
-                console.log(error);
+                console.error(error);
               });
           })
         );
         setOutgoingPods(_outgoingPods);
         setLoadingClient(false);
       })
-      .catch(error => console.log(error));
+      .catch(error => console.error(error));
   };
 
   /**
@@ -84,7 +84,7 @@ function ListConnected(props) {
         setLoadingServer(false);
       })
       .catch(error => {
-        console.log(error);
+        console.error(error);
         setLoadingServer(false);
       });
   };

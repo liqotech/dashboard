@@ -91,5 +91,5 @@ export function updateResourceConfig(tempResourceConfig, params, location) {
       window.api.dashConfigs.current.metadata.name,
       window.api.dashConfigs.current
     )
-    .catch(error => console.log(error));
+    .catch(error => console.error(error));
 }

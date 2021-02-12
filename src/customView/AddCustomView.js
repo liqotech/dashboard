@@ -63,7 +63,7 @@ function AddCustomView() {
           setShowAddCV(false);
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           message.error('Could not create custom view');
         });
     }

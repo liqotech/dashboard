@@ -46,7 +46,7 @@ export default function FavouriteButton(props) {
     }
     return window.api
       .updateGenericResource(resource.metadata.selfLink, resource)
-      .catch(error => console.log(error));
+      .catch(error => console.error(error));
   };
 
   return (
