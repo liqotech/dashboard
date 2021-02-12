@@ -1,14 +1,8 @@
 .login-container {
-  max-width: 30vw;
+  max-width: 500px;
   margin: 50px auto 0;
   padding: 40px;
   text-align: center;
-}
-
-.login-container .title {
-  font-size: 50px;
-  letter-spacing: 10px;
-  margin-bottom: 50px;
 }
 
 .login-form-button {

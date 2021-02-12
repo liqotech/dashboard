@@ -87,13 +87,13 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      title: 'LiqoDash',
+      title: process.env.LIQO_DASH_PAGE_TITLE || 'LiqoDash',
       meta: {
         viewport: 'width=device-width, initial-scale=1',
         'theme-color': '#000000',
         description: 'Liqo dashboard'
       },
-      favicon: 'src/assets/logo_4.png'
+      favicon: process.env.LIQO_DASH_FAVICON_PATH || 'src/assets/logo_4.png'
     }),
     themePlugin,
     new AntdDayjsWebpackPlugin(),
