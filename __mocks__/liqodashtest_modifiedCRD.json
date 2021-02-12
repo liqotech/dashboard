@@ -36,7 +36,19 @@
               "item": {
                 "description": "Collection of items",
                 "type": "array",
-                "items": {"type":"object","properties":{"cost":{"description":"Cost of the item","type":"integer"},"name":{"description":"Name of the item","type":"string"}}}
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "cost": {
+                      "description": "Cost of the item",
+                      "type": "integer"
+                    },
+                    "name": {
+                      "description": "Name of the item",
+                      "type": "string"
+                    }
+                  }
+                }
               }
             }
           }

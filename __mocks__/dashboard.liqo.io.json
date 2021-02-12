@@ -24,11 +24,7 @@
       "singularName": "",
       "namespaced": false,
       "kind": "DashboardConfig",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     },
     {
       "name": "views",
@@ -51,11 +47,7 @@
       "singularName": "",
       "namespaced": true,
       "kind": "View",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     },
     {
       "name": "liqodashtests",

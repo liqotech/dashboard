@@ -15,18 +15,17 @@ const handleSearch = (selectedKeys, confirm, dataIndex) => {
 
 const handleReset = clearFilters => {
   clearFilters();
-  searchText = '' ;
+  searchText = '';
 };
 
-export const ResizableTitle = (props) => {
+export const ResizableTitle = props => {
   const { onResize, width, ...restProps } = props;
 
   restProps.title = '';
 
-  if(!onResize)
-    return <th {...restProps} />
+  if (!onResize) return <th {...restProps} />;
 
-  if(!width)
+  if (!width)
     return (
       <Measure
         bounds
@@ -34,11 +33,9 @@ export const ResizableTitle = (props) => {
           onResize(null, {}, contentRect.bounds);
         }}
       >
-        {({ measureRef }) => (
-          <th ref={measureRef} {...restProps} />
-        )}
+        {({ measureRef }) => <th ref={measureRef} {...restProps} />}
       </Measure>
-    )
+    );
 
   return (
     <Resizable
@@ -48,7 +45,7 @@ export const ResizableTitle = (props) => {
       handle={
         <span
           className="react-resizable-handle"
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
           }}
         />
@@ -62,21 +59,25 @@ export const ResizableTitle = (props) => {
 };
 
 const handleResize = (column, setColumns) => (e, { size }, bounds) => {
-  if(!size && bounds)
-    size = bounds;
+  if (!size && bounds) size = bounds;
 
   setColumns(prev => {
     let index = prev.indexOf(prev.find(item => item.key === column.key));
     prev[index] = {
       ...prev[index],
       width: size.width
-    }
+    };
     return [...prev];
-  })
+  });
 };
 
 export const getColumnSearchProps = (dataIndex, renderFunc, setColumns) => ({
-  filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => {
+  filterDropdown: ({
+    setSelectedKeys,
+    selectedKeys,
+    confirm,
+    clearFilters
+  }) => {
     return (
       <div style={{ padding: 8 }}>
         <Input
@@ -85,7 +86,9 @@ export const getColumnSearchProps = (dataIndex, renderFunc, setColumns) => ({
           }}
           placeholder={`Search ${dataIndex}`}
           value={selectedKeys[0]}
-          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onChange={e =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
           onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
           style={{ width: 188, marginBottom: 8, display: 'block' }}
         />
@@ -99,31 +102,41 @@ export const getColumnSearchProps = (dataIndex, renderFunc, setColumns) => ({
           >
             Search
           </Button>
-          <Button onClick={() => handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+          <Button
+            onClick={() => handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
             Reset
           </Button>
         </Space>
       </div>
-    )
+    );
   },
-  filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+  filterIcon: filtered => (
+    <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+  ),
   onFilter: (value, record) =>
-    record[dataIndex] ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()) : '',
+    record[dataIndex]
+      ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+      : '',
   onFilterDropdownVisibleChange: visible => {
     if (visible) {
       setTimeout(() => searchText.select());
     }
   },
-  onHeaderCell: setColumns ? (column) => ({
-    width: column.width,
-    onResize: handleResize(column, setColumns)
-  }) : null,
+  onHeaderCell: setColumns
+    ? column => ({
+        width: column.width,
+        onResize: handleResize(column, setColumns)
+      })
+    : null,
   render: (text, record) => {
     return {
       children: renderFunc(text, record, dataIndex),
       props: {
         title: ''
       }
-    }
+    };
   }
 });

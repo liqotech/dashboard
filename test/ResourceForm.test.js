@@ -14,56 +14,65 @@ fetchMock.enableMocks();
 
 async function setup() {
   setToken();
-  window.history.pushState({}, 'Page Title', '/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9');
+  window.history.pushState(
+    {},
+    'Page Title',
+    '/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'
+  );
 
   return render(
     <MemoryRouter>
       <App />
     </MemoryRouter>
-  )
+  );
 }
 
-beforeEach(() => { localStorage.setItem('theme', 'dark');
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
-function mocks(){
+function mocks() {
   fetch.mockResponse(req => {
-    if(generalMocks(req.url))
-      return generalMocks(req.url);
-  })
+    if (generalMocks(req.url)) return generalMocks(req.url);
+  });
 }
 
 describe('ResourceForm', () => {
-  test('Search property works', async () => {
-    mocks();
+  test(
+    'Search property works',
+    async () => {
+      mocks();
 
-    await setup();
+      await setup();
 
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
 
-    let select = await screen.findAllByLabelText('select-k8s');
-    userEvent.click(select[1]);
+      let select = await screen.findAllByLabelText('select-k8s');
+      userEvent.click(select[1]);
 
-    await userEvent.type(select[1], 'labels');
+      await userEvent.type(select[1], 'labels');
 
-    let labels = await screen.findAllByText('labels');
+      let labels = await screen.findAllByText('labels');
 
-    fireEvent.mouseOver(labels[0]);
-    fireEvent.click(labels[0]);
+      fireEvent.mouseOver(labels[0]);
+      fireEvent.click(labels[0]);
 
-    expect(await screen.findByText('Metadata > Labels')).toBeInTheDocument();
-    userEvent.click(await screen.findByText('Metadata > Labels'));
+      expect(await screen.findByText('Metadata > Labels')).toBeInTheDocument();
+      userEvent.click(await screen.findByText('Metadata > Labels'));
 
-    const edit = await screen.findAllByLabelText('edit');
-    userEvent.click(edit[0]);
+      const edit = await screen.findAllByLabelText('edit');
+      userEvent.click(edit[0]);
 
-    let textboxes = await screen.findAllByRole('textbox');
+      let textboxes = await screen.findAllByRole('textbox');
 
-    await userEvent.type(textboxes[1], '2');
+      await userEvent.type(textboxes[1], '2');
 
-    userEvent.click(await screen.findByText('Save changes'));
-
-  }, testTimeout)
-})
+      userEvent.click(await screen.findByText('Save changes'));
+    },
+    testTimeout
+  );
+});

@@ -9,9 +9,9 @@ function HistoChart(props) {
   const data = [];
   const values = utils.index(props.CR, props.template.spec.values);
   const labels = utils.index(props.CR, props.template.spec.labels);
-  if (values && labels){
-    for(let i = 0; i < values.length; i++) {
-      if(values[i] !== undefined && labels[i] !== undefined){
+  if (values && labels) {
+    for (let i = 0; i < values.length; i++) {
+      if (values[i] !== undefined && labels[i] !== undefined) {
         data.push({
           value: values[i],
           label: labels[i]
@@ -20,13 +20,11 @@ function HistoChart(props) {
     }
   }
 
-  if(data.length !== 0){
+  if (data.length !== 0) {
     return (
       <div>
-        <Chart  height={400} data={data} autoFit>
-          <Interval
-            position="label*value"
-          />
+        <Chart height={400} data={data} autoFit>
+          <Interval position="label*value" />
         </Chart>
       </div>
     );
@@ -38,9 +36,8 @@ function HistoChart(props) {
         type="error"
         showIcon
       />
-    )
+    );
   }
-
 }
 
 export default HistoChart;

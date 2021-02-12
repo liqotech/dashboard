@@ -4,11 +4,11 @@ import { colorsBasic } from '../../services/Colors';
 
 /** Return the right color from the percentage given */
 export function getColor(percent, allocatable) {
-  if(percent < 70) {
+  if (percent < 70) {
     return colorsBasic[allocatable];
   } else if (percent >= 70 && percent < 90) {
     return colorsBasic[31 + allocatable];
-  } else if (percent >=90) {
+  } else if (percent >= 90) {
     return colorsBasic[33 + allocatable];
   }
 }
@@ -22,21 +22,23 @@ export function getColor(percent, allocatable) {
  * the advertisement is Refused or is not Accepted)
  */
 export function checkAdvertisement(advertisements, advertisement) {
-  let adv = advertisements.find(adv => {return adv.metadata.name === advertisement.name});
-  if(adv){
-    if(adv.status){
-      if(adv.status.advertisementStatus === 'Accepted'){
-        return {adv: true}
-      } else if(adv.status.advertisementStatus === 'Refused'){
-        return {adv: false, reason: 'Advertisement Refused'}
+  let adv = advertisements.find(adv => {
+    return adv.metadata.name === advertisement.name;
+  });
+  if (adv) {
+    if (adv.status) {
+      if (adv.status.advertisementStatus === 'Accepted') {
+        return { adv: true };
+      } else if (adv.status.advertisementStatus === 'Refused') {
+        return { adv: false, reason: 'Advertisement Refused' };
       } else {
-        return {adv: false, reason: 'Adv. not accepted yet'}
+        return { adv: false, reason: 'Adv. not accepted yet' };
       }
     } else {
-      return {adv: false, reason: 'Adv. status not defined'}
+      return { adv: false, reason: 'Adv. status not defined' };
     }
   } else {
-    return {adv: false, reason: 'Advertisement not present'}
+    return { adv: false, reason: 'Advertisement not present' };
   }
 }
 
@@ -45,17 +47,24 @@ export function checkAdvertisement(advertisements, advertisement) {
  * if there is one
  */
 export function checkPeeringRequest(peeringRequests, peeringRequest) {
-  let pr = peeringRequests.find(pr => {return pr.metadata.name === peeringRequest.name});
+  let pr = peeringRequests.find(pr => {
+    return pr.metadata.name === peeringRequest.name;
+  });
 
-  if(pr)
-    return true;
+  if (pr) return true;
 }
 
 /** Updates the peering status: CR foreign cluster's joined true or false */
-export function updatePeeringStatus(props, loading, setLoading, messageOK, messageError) {
+export function updatePeeringStatus(
+  props,
+  loading,
+  setLoading,
+  messageOK,
+  messageError
+) {
   let item = {
     spec: props.foreignCluster.spec
-  }
+  };
 
   setLoading(prev => !prev);
 
@@ -82,7 +91,7 @@ export function updatePeeringStatus(props, loading, setLoading, messageOK, messa
 
 export function addZero(i) {
   if (i < 10) {
-    i = "0" + i;
+    i = '0' + i;
   }
   return i;
 }
@@ -90,26 +99,24 @@ export function addZero(i) {
 export function convertRAM(string) {
   let unit = string.slice(-2);
 
-  if(unit === 'Ki'){
+  if (unit === 'Ki') {
     return parseFloat(string) * Math.pow(10, 3);
-  } else if(unit === 'Mi'){
+  } else if (unit === 'Mi') {
     return parseFloat(string) * Math.pow(10, 6);
-  } else if (unit === 'Gi'){
+  } else if (unit === 'Gi') {
     return parseFloat(string) * Math.pow(10, 9);
-  } else
-    return parseFloat(string);
+  } else return parseFloat(string);
 }
 
 export function convertCPU(string) {
   let unit = string.slice(-1);
-  if(unit === 'k'){
+  if (unit === 'k') {
     return parseFloat(string) * Math.pow(10, 3);
-  } else if(unit === 'm'){
+  } else if (unit === 'm') {
     return parseFloat(string) * Math.pow(10, 6);
-  } else if (unit === 'g'){
+  } else if (unit === 'g') {
     return parseFloat(string) * Math.pow(10, 9);
-  } else if (unit === 'n'){
+  } else if (unit === 'n') {
     return parseFloat(string);
-  } else
-    return parseFloat(string) * Math.pow(10, 9);
+  } else return parseFloat(string) * Math.pow(10, 9);
 }

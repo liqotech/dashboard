@@ -5,7 +5,7 @@ import 'ace-builds/src-noconflict/mode-markdown';
 import 'ace-builds/src-noconflict/theme-monokai';
 import { useLocation } from 'react-router-dom';
 
-export default function Logs(){
+export default function Logs() {
   const [log, setLog] = useState('');
 
   let location = useLocation();
@@ -13,10 +13,10 @@ export default function Logs(){
   useEffect(() => {
     window.api.getPodLogs(location.pathname).then(res => {
       setLog(res);
-    })
-  }, [])
+    });
+  }, []);
 
-  return(
+  return (
     <div aria-label={'log-editor'}>
       <AceEditor
         mode={'markdown'}
@@ -31,5 +31,5 @@ export default function Logs(){
         width={'auto'}
       />
     </div>
-  )
+  );
 }

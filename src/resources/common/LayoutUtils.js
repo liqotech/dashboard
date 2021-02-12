@@ -1,4 +1,4 @@
-function deleteUnused(item){
+function deleteUnused(item) {
   delete item.isDraggable;
   delete item.moved;
   delete item.static;
@@ -15,14 +15,14 @@ export const pruneLayouts = l => {
   Object.keys(l).forEach(br => {
     l[br].forEach(item => {
       deleteUnused(item);
-    })
-  })
+    });
+  });
   return l;
-}
+};
 
 export const pruneLayout = l => {
   l.forEach(item => {
     deleteUnused(item);
-  })
+  });
   return l;
-}
+};

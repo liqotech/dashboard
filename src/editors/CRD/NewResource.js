@@ -5,27 +5,24 @@ import Editor from '../Editor';
 import NewFromFile from './NewFromFile';
 
 function NewResource(props) {
-
   const onClick = item => {
-
-    if(!item || !item.metadata || item.metadata.name === ''){
+    if (!item || !item.metadata || item.metadata.name === '') {
       message.error('Errors in the custom resource definition');
       return;
     }
 
     submit(item);
-  }
+  };
 
   const submit = item => {
     let promise;
     let namespace;
 
-    if(item.metadata.namespace) {
+    if (item.metadata.namespace) {
       namespace = item.metadata.namespace;
     }
 
-    if(props.resource){
-
+    if (props.resource) {
       if (props.resource.spec.scope === 'Namespaced' && !namespace) {
         namespace = 'default';
       }
@@ -49,28 +46,36 @@ function NewResource(props) {
       .catch(() => {
         message.error('Could not create the resource');
       });
-  }
+  };
 
   return (
     <Drawer
       title={
-        <Badge status="processing"
-               text={"Create a new " + props.kind + " resource"}
+        <Badge
+          status="processing"
+          text={'Create a new ' + props.kind + ' resource'}
         />
       }
       placement={'right'}
       visible={props.showCreate}
-      onClose={() => {props.setShowCreate(false)}}
+      onClose={() => {
+        props.setShowCreate(false);
+      }}
       width={window.innerWidth > 1400 ? 1200 : window.innerWidth - 200}
       destroyOnClose
     >
       <Tabs defaultActiveKey="2">
         <Tabs.TabPane tab="JSON/YAML" key="1">
-          <Editor onClick={onClick} placeholder={'Create a new ' + props.kind} />
+          <Editor
+            onClick={onClick}
+            placeholder={'Create a new ' + props.kind}
+          />
         </Tabs.TabPane>
-        { props.resource && props.resource.spec.validation && props.resource.spec.validation.openAPIV3Schema ? (
+        {props.resource &&
+        props.resource.spec.validation &&
+        props.resource.spec.validation.openAPIV3Schema ? (
           <Tabs.TabPane tab="Form Wizard" key="2">
-            <FormGenerator CRD={props.resource} submit={submit}/>
+            <FormGenerator CRD={props.resource} submit={submit} />
           </Tabs.TabPane>
         ) : null}
         <Tabs.TabPane tab="Import File" key="3">

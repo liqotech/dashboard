@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import ApiInterface from '../src/services/api/ApiInterface';
@@ -18,14 +18,22 @@ fetchMock.enableMocks();
 function mockFetch(error) {
   fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
-    } else if (req.url === 'https://kubernetesjsonschema.dev/master/_definitions.json'){
-      return Promise.resolve(new Response(JSON.stringify(K8sSchemaDefinitions)))
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/advertisements') {
+      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)));
+    } else if (
+      req.url === 'https://kubernetesjsonschema.dev/master/_definitions.json'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify(K8sSchemaDefinitions))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/advertisements'
+    ) {
       if (req.method === 'GET') {
         let advertisement = AdvMockResponse;
         advertisement.items[0].metadata.namespace = 'test';
-        return Promise.resolve(new Response(JSON.stringify({ body: advertisement })))
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: advertisement }))
+        );
       } else if (req.method === 'PUT') {
         if (error) {
           return Promise.reject(Error409.body);
@@ -33,27 +41,26 @@ function mockFetch(error) {
           let ClusterConfigMockResponseMod = ClusterConfigMockResponse.items[0];
           ClusterConfigMockResponseMod.resourceVersion++;
           ClusterConfigMockResponseMod.spec.advertisementConfig.autoAccept = false;
-          return Promise.resolve(new Response(JSON.stringify({ body: ClusterConfigMockResponseMod })))
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: ClusterConfigMockResponseMod }))
+          );
         }
       }
     }
-  })
+  });
 }
 
 async function setup() {
-  window.api = ApiInterface({id_token: 'test'});
+  window.api = ApiInterface({ id_token: 'test' });
   window.api.getCRDs().then(async () => {
-
     let adv_crd = await window.api.getCRDFromKind('Advertisement');
     let adv = await window.api.getCustomResourcesAllNamespaces(adv_crd);
 
     render(
       <MemoryRouter>
-        <CR cr={adv.body.items[0]}
-            crd={adv_crd}
-        />
+        <CR cr={adv.body.items[0]} crd={adv_crd} />
       </MemoryRouter>
-    )
+    );
   });
 }
 
@@ -68,81 +75,95 @@ async function edit() {
 
   userEvent.click(screen.getByLabelText('close'));
 
-  expect(await screen.findByText('Discard changes?'))
+  expect(await screen.findByText('Discard changes?'));
 }
 
 async function check() {
   expect(await screen.findByLabelText('cr')).toBeInTheDocument();
-  expect(screen.getByText('advertisement-8d73c01a-f23a-45dc-822b-7d3232683f53')).toBeInTheDocument();
+  expect(
+    screen.getByText('advertisement-8d73c01a-f23a-45dc-822b-7d3232683f53')
+  ).toBeInTheDocument();
   expect(screen.getByLabelText('edit')).toBeInTheDocument();
   expect(screen.getByLabelText('delete')).toBeInTheDocument();
   expect(screen.getByText('JSON')).toBeInTheDocument();
 }
 
 describe('FormViewer', () => {
-  test('FormViewer shows every information and do not changes parameters', async () => {
-    mockFetch();
+  test(
+    'FormViewer shows every information and do not changes parameters',
+    async () => {
+      mockFetch();
 
-    await setup();
-    await check();
+      await setup();
+      await check();
 
-    userEvent.click(screen.getByText(/advertisement-/i));
-    userEvent.click(await screen.findByText('Spec'));
-    userEvent.click(await screen.findByText('General'));
-    userEvent.click(await screen.findByText('Network'));
+      userEvent.click(screen.getByText(/advertisement-/i));
+      userEvent.click(await screen.findByText('Spec'));
+      userEvent.click(await screen.findByText('General'));
+      userEvent.click(await screen.findByText('Network'));
 
-    await edit();
+      await edit();
 
-    userEvent.click(await screen.findByText('Yes'));
-  }, testTimeout)
+      userEvent.click(await screen.findByText('Yes'));
+    },
+    testTimeout
+  );
 
-  test('FormViewer shows every information and changes parameters', async () => {
-    mockFetch();
+  test(
+    'FormViewer shows every information and changes parameters',
+    async () => {
+      mockFetch();
 
-    await setup();
-    await check();
+      await setup();
+      await check();
 
-    userEvent.click(screen.getByText(/advertisement-/i));
-    userEvent.click(await screen.findByText('Spec'));
-    userEvent.click(await screen.findByText('General'));
-    userEvent.click(await screen.findByText('Limit Range'));
-    userEvent.click(await screen.findByText('Limits'));
-    let general = await screen.findAllByText('General');
-    userEvent.click(general[1]);
-    userEvent.click(await screen.findByText('Max'));
+      userEvent.click(screen.getByText(/advertisement-/i));
+      userEvent.click(await screen.findByText('Spec'));
+      userEvent.click(await screen.findByText('General'));
+      userEvent.click(await screen.findByText('Limit Range'));
+      userEvent.click(await screen.findByText('Limits'));
+      let general = await screen.findAllByText('General');
+      userEvent.click(general[1]);
+      userEvent.click(await screen.findByText('Max'));
 
-    await edit();
+      await edit();
 
-    userEvent.click(await screen.findByText('No'));
+      userEvent.click(await screen.findByText('No'));
 
-    expect(screen.getByText('Save changes')).toBeInTheDocument();
+      expect(screen.getByText('Save changes')).toBeInTheDocument();
 
-    userEvent.click(screen.getByText('Save changes'));
-  }, testTimeout)
+      userEvent.click(screen.getByText('Save changes'));
+    },
+    testTimeout
+  );
 
-  test('FormViewer changes parameters with errors', async () => {
-    mockFetch(true);
+  test(
+    'FormViewer changes parameters with errors',
+    async () => {
+      mockFetch(true);
 
-    await setup();
-    await check();
+      await setup();
+      await check();
 
-    userEvent.click(screen.getByText(/advertisement-/i));
-    userEvent.click(await screen.findByText('Spec'));
-    userEvent.click(await screen.findByText('General'));
-    userEvent.click(await screen.findByText('Limit Range'));
-    userEvent.click(await screen.findByText('Limits'));
-    let general = await screen.findAllByText('General');
-    userEvent.click(general[1]);
-    userEvent.click(await screen.findByText('Max'));
+      userEvent.click(screen.getByText(/advertisement-/i));
+      userEvent.click(await screen.findByText('Spec'));
+      userEvent.click(await screen.findByText('General'));
+      userEvent.click(await screen.findByText('Limit Range'));
+      userEvent.click(await screen.findByText('Limits'));
+      let general = await screen.findAllByText('General');
+      userEvent.click(general[1]);
+      userEvent.click(await screen.findByText('Max'));
 
-    await edit();
+      await edit();
 
-    userEvent.click(await screen.findByText('No'));
+      userEvent.click(await screen.findByText('No'));
 
-    expect(screen.getByText('Save changes')).toBeInTheDocument();
+      expect(screen.getByText('Save changes')).toBeInTheDocument();
 
-    userEvent.click(screen.getByText('Save changes'));
+      userEvent.click(screen.getByText('Save changes'));
 
-    expect(await screen.findByText(/Could not update the resource/i))
-  }, testTimeout)
-})
+      expect(await screen.findByText(/Could not update the resource/i));
+    },
+    testTimeout
+  );
+});

@@ -1,11 +1,22 @@
-import { ApiextensionsV1beta1Api, Config, CoreV1Api, ApisApi, CustomObjectsApi, watch } from '@kubernetes/client-node';
+import {
+  ApiextensionsV1beta1Api,
+  Config,
+  CoreV1Api,
+  ApisApi,
+  CustomObjectsApi,
+  watch
+} from '@kubernetes/client-node';
 
 /**
  * Class to manage all the interaction with the cluster
  */
 
 export default function ApiManager(user) {
-  const config = new Config(window.APISERVER_URL, user.id_token, user.token_type);
+  const config = new Config(
+    window.APISERVER_URL,
+    user.id_token,
+    user.token_type
+  );
   const apiExt = config.makeApiClient(ApiextensionsV1beta1Api);
   const apiCRD = config.makeApiClient(CustomObjectsApi);
   const apiCore = config.makeApiClient(CoreV1Api);
@@ -13,9 +24,9 @@ export default function ApiManager(user) {
   /** used to change the content-type of a PATCH request */
   const options = {
     headers: {
-      "Content-Type": "application/merge-patch+json"
+      'Content-Type': 'application/merge-patch+json'
     }
-  }
+  };
 
   /**
    * Function called to retrieve all CRDs in the cluster and all the custom resources associated with these CRDs
@@ -23,7 +34,7 @@ export default function ApiManager(user) {
    */
   const getCRDs = () => {
     return apiExt.listCustomResourceDefinition();
-  }
+  };
 
   /**
    * Function called to retrieve all custom resource of a CRD in a namespace
@@ -39,7 +50,7 @@ export default function ApiManager(user) {
       namespace,
       item.spec.names.plural
     );
-  }
+  };
 
   /**
    * Function called to retrieve all custom resource of a CRD in all namespaces
@@ -51,9 +62,9 @@ export default function ApiManager(user) {
     return apiCRD.listClusterCustomObject(
       item.spec.group,
       item.spec.version,
-      item.spec.names.plural,
+      item.spec.names.plural
     );
-  }
+  };
 
   /**
    *
@@ -65,7 +76,7 @@ export default function ApiManager(user) {
    * @returns a promise
    */
   const deleteCustomResource = (group, version, namespace, plural, name) => {
-    if(namespace){
+    if (namespace) {
       return apiCRD.deleteNamespacedCustomObject(
         group,
         version,
@@ -73,17 +84,11 @@ export default function ApiManager(user) {
         plural,
         name,
         {}
-      )
+      );
     } else {
-      return apiCRD.deleteClusterCustomObject(
-        group,
-        version,
-        plural,
-        name,
-        {}
-      )
+      return apiCRD.deleteClusterCustomObject(group, version, plural, name, {});
     }
-  }
+  };
 
   /**
    * Function that create a new custom resource
@@ -96,23 +101,18 @@ export default function ApiManager(user) {
    * @returns a promise
    */
   const createCustomResource = (group, version, namespace, plural, item) => {
-    if(namespace !== '' && namespace){
+    if (namespace !== '' && namespace) {
       return apiCRD.createNamespacedCustomObject(
         group,
         version,
         namespace,
         plural,
         item
-      )
+      );
     } else {
-      return apiCRD.createClusterCustomObject(
-        group,
-        version,
-        plural,
-        item
-      )
+      return apiCRD.createClusterCustomObject(group, version, plural, item);
     }
-  }
+  };
 
   /**
    * Function that update a custom resource
@@ -125,8 +125,15 @@ export default function ApiManager(user) {
    * @param item is the CR
    * @returns a promise
    */
-  const updateCustomResource = (group, version, namespace, plural, name, item) => {
-    if(namespace){
+  const updateCustomResource = (
+    group,
+    version,
+    namespace,
+    plural,
+    name,
+    item
+  ) => {
+    if (namespace) {
       return apiCRD.patchNamespacedCustomObject(
         group,
         version,
@@ -135,7 +142,7 @@ export default function ApiManager(user) {
         name,
         item,
         options
-      )
+      );
     } else {
       return apiCRD.patchClusterCustomObject(
         group,
@@ -144,9 +151,9 @@ export default function ApiManager(user) {
         name,
         item,
         options
-      )
+      );
     }
-  }
+  };
 
   /**
    * Function that update a CR
@@ -162,8 +169,8 @@ export default function ApiManager(user) {
       undefined,
       undefined,
       options
-    )
-  }
+    );
+  };
 
   /** This watch only watches changes in the CRDs
    * (if a CRD has been added, deleted or modified)
@@ -173,36 +180,48 @@ export default function ApiManager(user) {
       config,
       path,
       queryParams,
-      function(type, object) {
+      function (type, object) {
         callback(type, object);
       },
       done,
       signal
     );
-  }
+  };
 
   /** gets all namespaces with label */
   const getNamespaces = label => {
-    return apiCore.listNamespace(undefined, undefined, undefined, undefined, label)
-  }
+    return apiCore.listNamespace(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      label
+    );
+  };
 
   /** gets all the pods with namespace (if specified) */
-  const getPODsAllNamespaces = (fieldSelector) => {
+  const getPODsAllNamespaces = fieldSelector => {
     return apiCore.listPodForAllNamespaces(undefined, fieldSelector);
-  }
+  };
 
   const getPODs = (namespace, fieldSelector) => {
-    return apiCore.listNamespacedPod(namespace, undefined, undefined, undefined, fieldSelector);
-  }
+    return apiCore.listNamespacedPod(
+      namespace,
+      undefined,
+      undefined,
+      undefined,
+      fieldSelector
+    );
+  };
 
   /** gets the list of all the nodes in cluster */
   const getNodes = () => {
     return apiCore.listNode();
-  }
+  };
 
   const fetchMetrics = path => {
     let headers = new Headers();
-    headers.append("Authorization", "Bearer " + user.id_token);
+    headers.append('Authorization', 'Bearer ' + user.id_token);
 
     let requestOptions = {
       method: 'GET',
@@ -217,23 +236,29 @@ export default function ApiManager(user) {
         return Promise.reject(res.status);
       }
     });
-  }
+  };
 
   const getConfigMaps = (namespace, fieldSelector) => {
-    return apiCore.listNamespacedConfigMap(namespace, undefined, undefined, undefined, fieldSelector);
-  }
+    return apiCore.listNamespacedConfigMap(
+      namespace,
+      undefined,
+      undefined,
+      undefined,
+      fieldSelector
+    );
+  };
 
   const getApis = () => {
     return apiApis.getAPIVersions();
-  }
+  };
 
   const fetchRaw = (path, method, item) => {
     let headers = new Headers();
-    headers.append("Authorization", "Bearer " + user.id_token);
-    if(method === 'PATCH')
-      headers.append("Content-Type", "application/merge-patch+json");
-    else if(method === 'POST')
-      headers.append("Content-Type", "application/json");
+    headers.append('Authorization', 'Bearer ' + user.id_token);
+    if (method === 'PATCH')
+      headers.append('Content-Type', 'application/merge-patch+json');
+    else if (method === 'POST')
+      headers.append('Content-Type', 'application/json');
 
     let requestOptions = {
       method: method,
@@ -249,11 +274,11 @@ export default function ApiManager(user) {
         return Promise.reject(res.status);
       }
     });
-  }
+  };
 
-  const logFunction = (path) => {
+  const logFunction = path => {
     let headers = new Headers();
-    headers.append("Authorization", "Bearer " + user.id_token);
+    headers.append('Authorization', 'Bearer ' + user.id_token);
 
     let requestOptions = {
       method: 'GET',
@@ -261,17 +286,16 @@ export default function ApiManager(user) {
       redirect: 'follow'
     };
 
-    return fetch(path, requestOptions)
-      .then(res => {
-        if (res.ok) {
-          return res.text();
-        } else {
-          return Promise.reject(res.status);
-        }
-      });
-  }
+    return fetch(path, requestOptions).then(res => {
+      if (res.ok) {
+        return res.text();
+      } else {
+        return Promise.reject(res.status);
+      }
+    });
+  };
 
-  return{
+  return {
     getCRDs,
     getCustomResources,
     getCustomResourcesAllNamespaces,
@@ -289,6 +313,5 @@ export default function ApiManager(user) {
     getApis,
     fetchRaw,
     logFunction
-  }
-
+  };
 }

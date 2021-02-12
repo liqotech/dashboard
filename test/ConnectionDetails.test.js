@@ -26,65 +26,102 @@ import NamespaceResponse from '../__mocks__/namespaces.json';
 fetchMock.enableMocks();
 
 async function setup() {
-  window.api = ApiInterface({id_token: 'test'});
+  window.api = ApiInterface({ id_token: 'test' });
   window.api.getCRDs().then(async () => {
     render(
       <MemoryRouter>
         <Home />
       </MemoryRouter>
-    )
+    );
   });
 }
 
-function mocks(advertisement, foreignCluster, peeringRequest, error, podsError) {
-  fetch.mockResponse((req) => {
+function mocks(
+  advertisement,
+  foreignCluster,
+  peeringRequest,
+  error,
+  podsError
+) {
+  fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)));
     } else if (req.url === 'http://localhost:3001/namespaces') {
-      return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: NamespaceResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
-      if(req.method === 'GET')
-        return Promise.resolve(new Response(JSON.stringify({ body: foreignCluster })));
-      else{
-        if(!error){
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ViewMockResponse }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/foreignclusters'
+    ) {
+      if (req.method === 'GET')
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: foreignCluster }))
+        );
+      else {
+        if (!error) {
           foreignCluster = foreignCluster.items[0];
           foreignCluster.metadata.resourceVersion++;
           foreignCluster.spec.join = false;
-          return Promise.resolve(new Response(JSON.stringify({ body: foreignCluster })));
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: foreignCluster }))
+          );
         } else {
           return Promise.reject(Error409.body);
         }
       }
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/advertisements') {
-      return Promise.resolve(new Response(JSON.stringify({ body: advertisement })));
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/peeringrequests') {
-      return Promise.resolve(new Response(JSON.stringify({ body: peeringRequest })));
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
-      return Promise.resolve(new Response(JSON.stringify({ body: ConfigMockResponse })));
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/advertisements'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: advertisement }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/peeringrequests'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: peeringRequest }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ConfigMockResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/pod') {
-      if(podsError)
-        return Promise.reject(Error409.body);
+      if (podsError) return Promise.reject(Error409.body);
       else
-        return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: PodsMockResponse }))
+        );
     } else if (req.url === 'http://localhost:3001/nodes') {
-      return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: NodesMockResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/metrics/nodes') {
-      return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+      return Promise.resolve(
+        new Response(JSON.stringify(NodesMetricsMockResponse))
+      );
     } else if (req.url === 'http://localhost:3001/configmaps/liqo') {
-      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: CMMockResponse }))
+      );
     } else {
       return metricsPODs(req);
     }
-  })
+  });
 }
 
 async function OKCheck() {
   await setup();
 
   expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
-  expect(await screen.findByText('No peer available at the moment')).toBeInTheDocument();
+  expect(
+    await screen.findByText('No peer available at the moment')
+  ).toBeInTheDocument();
 
   userEvent.click(screen.getByLabelText('ellipsis'));
 
@@ -97,7 +134,7 @@ async function OKCheck() {
   userEvent.click(home[1]);
 }
 
-async function sort(){
+async function sort() {
   expect(screen.getAllByText(/hello/i)).toHaveLength(2);
 
   userEvent.click(screen.getAllByLabelText('search')[0]);
@@ -108,77 +145,102 @@ async function sort(){
 }
 
 describe('ConnectionDetails', () => {
+  test(
+    'Detail button works (out and in)',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
 
-  test('Detail button works (out and in)', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
+      await OKCheck();
+    },
+    testTimeout
+  );
 
-    await OKCheck();
-  }, testTimeout)
+  test(
+    'Detail button works (only out)',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponseNoIn, PRMockResponse);
 
-  test('Detail button works (only out)', async () => {
-    mocks(AdvMockResponse, FCMockResponseNoIn, PRMockResponse);
+      await setup();
 
-    await setup();
+      expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
+      expect(
+        await screen.findByText('No peer available at the moment')
+      ).toBeInTheDocument();
 
-    expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
-    expect(await screen.findByText('No peer available at the moment')).toBeInTheDocument();
+      userEvent.click(screen.getByLabelText('ellipsis'));
 
-    userEvent.click(screen.getByLabelText('ellipsis'));
+      userEvent.click(await screen.findByLabelText('snippets'));
 
-    userEvent.click(await screen.findByLabelText('snippets'));
+      expect(await screen.findByText('General')).toBeInTheDocument();
 
-    expect(await screen.findByText('General')).toBeInTheDocument();
+      userEvent.click(await screen.findByText('Foreign'));
 
-    userEvent.click(await screen.findByText('Foreign'));
+      expect(await screen.findAllByText(/POD/i)).toHaveLength(2);
+    },
+    testTimeout
+  );
 
-    expect(await screen.findAllByText(/POD/i)).toHaveLength(2);
-  }, testTimeout)
+  test(
+    'Detail button works (only in)',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponseNoOut, PRMockResponse);
 
-  test('Detail button works (only in)', async () => {
-    mocks(AdvMockResponse, FCMockResponseNoOut, PRMockResponse);
+      await OKCheck();
+    },
+    testTimeout
+  );
 
-    await OKCheck();
-  }, testTimeout)
+  test(
+    'Search pods works (click)',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
 
-  test('Search pods works (click)', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
+      await OKCheck();
 
-    await OKCheck();
+      await sort();
 
-    await sort();
+      const searchButton = await screen.findByText('Search');
 
-    const searchButton = await screen.findByText('Search');
+      userEvent.click(searchButton);
 
-    userEvent.click(searchButton);
+      expect(screen.getAllByText(/hello/i)).toHaveLength(1);
+    },
+    testTimeout
+  );
 
-    expect(screen.getAllByText(/hello/i)).toHaveLength(1);
-  }, testTimeout)
+  test(
+    'Search pods works (enter)',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
 
-  test('Search pods works (enter)', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
+      await OKCheck();
 
-    await OKCheck();
+      await sort();
 
-    await sort();
+      await userEvent.type(screen.getByRole('textbox'), '{enter}');
 
-    await userEvent.type(screen.getByRole('textbox'), '{enter}');
+      expect(screen.getAllByText(/hello/i)).toHaveLength(1);
+    },
+    testTimeout
+  );
 
-    expect(screen.getAllByText(/hello/i)).toHaveLength(1);
-  }, testTimeout)
+  test(
+    'Search reset pods works',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
 
-  test('Search reset pods works', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
+      await OKCheck();
 
-    await OKCheck();
+      await sort();
 
-    await sort();
+      const resetButton = await screen.findByText('Reset');
 
-    const resetButton = await screen.findByText('Reset');
+      userEvent.click(resetButton);
 
-    userEvent.click(resetButton);
-
-    expect(screen.getAllByText(/hello/i)).toHaveLength(2);
-  }, testTimeout)
+      expect(screen.getAllByText(/hello/i)).toHaveLength(2);
+    },
+    testTimeout
+  );
 
   test('Sorting pods works and close modal', async () => {
     mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
@@ -198,5 +260,5 @@ describe('ConnectionDetails', () => {
     }, 1500);
 
     userEvent.click(await screen.findByLabelText('plus'));
-  }, 60000)
-})
+  }, 60000);
+});

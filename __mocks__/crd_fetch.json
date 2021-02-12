@@ -21,9 +21,7 @@
         "names": {
           "plural": "advertisements",
           "singular": "advertisement",
-          "shortNames": [
-            "adv"
-          ],
+          "shortNames": ["adv"],
           "kind": "Advertisement",
           "listKind": "AdvertisementList"
         },
@@ -63,9 +61,7 @@
                     "items": {
                       "description": "Describe a container image",
                       "type": "object",
-                      "required": [
-                        "names"
-                      ],
+                      "required": ["names"],
                       "properties": {
                         "names": {
                           "description": "Names by which this image is known. e.g. [\"k8s.gcr.io/hyperkube:v1.0.7\", \"dockerhub.io/google_containers/hyperkube:v1.0.7\"]",
@@ -119,9 +115,7 @@
                   "limitRange": {
                     "description": "LimitRangeSpec defines a min/max usage limit for resources that match on kind.",
                     "type": "object",
-                    "required": [
-                      "limits"
-                    ],
+                    "required": ["limits"],
                     "properties": {
                       "limits": {
                         "description": "Limits is the list of LimitRangeItem objects that are enforced.",
@@ -240,11 +234,7 @@
                   },
                   "network": {
                     "type": "object",
-                    "required": [
-                      "gatewayIP",
-                      "gatewayPrivateIP",
-                      "podCIDR"
-                    ],
+                    "required": ["gatewayIP", "gatewayPrivateIP", "podCIDR"],
                     "properties": {
                       "gatewayIP": {
                         "type": "string"
@@ -315,10 +305,7 @@
                             "items": {
                               "description": "A scoped-resource selector requirement is a selector that contains values, a scope name, and an operator that relates the scope name and values.",
                               "type": "object",
-                              "required": [
-                                "operator",
-                                "scopeName"
-                              ],
+                              "required": ["operator", "scopeName"],
                               "properties": {
                                 "operator": {
                                   "description": "Represents a scope's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist.",
@@ -385,10 +372,7 @@
                   "tunnelEndpointKey": {
                     "description": "the tunnelEndpoint associated with the foreign cluster",
                     "type": "object",
-                    "required": [
-                      "name",
-                      "namespace"
-                    ],
+                    "required": ["name", "namespace"],
                     "properties": {
                       "name": {
                         "type": "string"
@@ -435,15 +419,11 @@
         "acceptedNames": {
           "plural": "advertisements",
           "singular": "advertisement",
-          "shortNames": [
-            "adv"
-          ],
+          "shortNames": ["adv"],
           "kind": "Advertisement",
           "listKind": "AdvertisementList"
         },
-        "storedVersions": [
-          "v1"
-        ]
+        "storedVersions": ["v1"]
       }
     },
     {
@@ -521,7 +501,19 @@
                   "item": {
                     "description": "Collection of items",
                     "type": "array",
-                    "items": {"type":"object","properties":{"cost":{"description":"Cost of the item","type":"integer"},"name":{"description":"Name of the item","type":"string"}}}
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "cost": {
+                          "description": "Cost of the item",
+                          "type": "integer"
+                        },
+                        "name": {
+                          "description": "Name of the item",
+                          "type": "string"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -546,9 +538,7 @@
         "names": {
           "plural": "piecharts",
           "singular": "piechart",
-          "shortNames": [
-            "pies"
-          ],
+          "shortNames": ["pies"],
           "kind": "PieChart",
           "listKind": "PieChartList"
         },
@@ -570,10 +560,7 @@
               },
               "spec": {
                 "type": "object",
-                "required": [
-                  "values",
-                  "labels"
-                ],
+                "required": ["values", "labels"],
                 "properties": {
                   "labels": {
                     "description": "Path to the labels to use",
@@ -749,19 +736,20 @@
                     "description": "Collection of CR template views",
                     "type": "array",
                     "items": {
-                      "type":"object",
-                      "properties":{
-                        "crdName":{
-                          "description":"The kind of a CRD we want to put in the view",
-                          "type":"string"
+                      "type": "object",
+                      "properties": {
+                        "crdName": {
+                          "description": "The kind of a CRD we want to put in the view",
+                          "type": "string"
                         },
-                        "crdAltName":{
-                          "description":"The name showed in the custom view for this CRD",
-                          "type":"string"
+                        "crdAltName": {
+                          "description": "The name showed in the custom view for this CRD",
+                          "type": "string"
                         },
-                        "template":{
-                          "description":"The path of a type template CRD custom resource (if default use the template in the CRD)",
-                          "type":"string"}
+                        "template": {
+                          "description": "The path of a type template CRD custom resource (if default use the template in the CRD)",
+                          "type": "string"
+                        }
                       }
                     }
                   }
@@ -785,9 +773,7 @@
           "singular": "histochart",
           "kind": "HistoChart",
           "listKind": "HistoChartList",
-          "shortNames": [
-            "histos"
-          ]
+          "shortNames": ["histos"]
         },
         "validation": {
           "openAPIV3Schema": {
@@ -814,10 +800,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "values",
-                  "labels"
-                ],
+                "required": ["values", "labels"],
                 "type": "object"
               }
             },
@@ -859,11 +842,7 @@
               },
               "spec": {
                 "type": "object",
-                "required": [
-                  "join",
-                  "discoveryType",
-                  "allowUntrustedCA"
-                ],
+                "required": ["join", "discoveryType", "allowUntrustedCA"],
                 "properties": {
                   "allowUntrustedCA": {
                     "description": "This remote cluster allows untrusted incoming connections. Clients that contact it can not authenticate remote API server",
@@ -889,12 +868,7 @@
                   },
                   "discoveryType": {
                     "type": "string",
-                    "enum": [
-                      "LAN",
-                      "WAN",
-                      "Manual",
-                      "IncomingPeering"
-                    ]
+                    "enum": ["LAN", "WAN", "Manual", "IncomingPeering"]
                   },
                   "join": {
                     "description": "Enable join process to foreign cluster",
@@ -994,9 +968,7 @@
               },
               "spec": {
                 "type": "object",
-                "required": [
-                  "clusterID"
-                ],
+                "required": ["clusterID"],
                 "properties": {
                   "clusterID": {
                     "description": "Cluster ID",
@@ -1013,9 +985,7 @@
                   "originClusterSets": {
                     "description": "Sets of origin cluster on join",
                     "type": "object",
-                    "required": [
-                      "allowUntrustedCA"
-                    ],
+                    "required": ["allowUntrustedCA"],
                     "properties": {
                       "allowUntrustedCA": {
                         "description": "This cluster allows untrusted incoming connections. Clients that contact it can not authenticate remote API server",
@@ -1044,8 +1014,7 @@
           }
         ]
       },
-      "status": {
-      }
+      "status": {}
     },
     {
       "metadata": {
@@ -1093,9 +1062,7 @@
                 "properties": {
                   "advertisementConfig": {
                     "type": "object",
-                    "required": [
-                      "autoAccept"
-                    ],
+                    "required": ["autoAccept"],
                     "properties": {
                       "autoAccept": {
                         "type": "boolean"
@@ -1176,10 +1143,7 @@
                   },
                   "liqonetConfig": {
                     "type": "object",
-                    "required": [
-                      "gatewayPrivateIP",
-                      "reservedSubnets"
-                    ],
+                    "required": ["gatewayPrivateIP", "reservedSubnets"],
                     "properties": {
                       "gatewayPrivateIP": {
                         "type": "string"
@@ -1193,12 +1157,7 @@
                       },
                       "vxlanNetConfig": {
                         "type": "object",
-                        "required": [
-                          "DeviceName",
-                          "Network",
-                          "Port",
-                          "Vni"
-                        ],
+                        "required": ["DeviceName", "Network", "Port", "Vni"],
                         "properties": {
                           "DeviceName": {
                             "type": "string"
@@ -1263,9 +1222,7 @@
           "kind": "ClusterConfig",
           "listKind": "ClusterConfigList"
         },
-        "storedVersions": [
-          "v1"
-        ]
+        "storedVersions": ["v1"]
       }
     },
     {
@@ -1280,9 +1237,7 @@
         "names": {
           "plural": "searchdomains",
           "singular": "searchdomain",
-          "shortNames": [
-            "sd"
-          ],
+          "shortNames": ["sd"],
           "kind": "SearchDomain",
           "listKind": "SearchDomainList"
         },
@@ -1302,10 +1257,7 @@
                 "type": "object"
               },
               "spec": {
-                "required": [
-                  "domain",
-                  "autojoin"
-                ],
+                "required": ["domain", "autojoin"],
                 "properties": {
                   "autojoin": {
                     "description": "Enable join process for retrieved clusters",

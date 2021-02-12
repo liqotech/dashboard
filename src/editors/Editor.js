@@ -8,8 +8,8 @@ import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/theme-dawn';
 import 'ace-builds/src-noconflict/theme-monokai';
 
-export default function Editor(props){
-  const initValue = {metadata: {name: ''}};
+export default function Editor(props) {
+  const initValue = { metadata: { name: '' } };
   const [value, setValue] = useState(JSON.stringify(initValue, null, 2));
   const [valueYAML, setValueYAML] = useState(YAML.stringify(initValue));
   const [currentTab, setCurrentTab] = useState('YAML');
@@ -17,65 +17,75 @@ export default function Editor(props){
   const onClick = () => {
     let item;
 
-    if(currentTab === 'YAML'){
+    if (currentTab === 'YAML') {
       try {
         item = YAML.parse(valueYAML);
-      } catch(error){
+      } catch (error) {
         message.error('YAML not valid');
         return;
       }
     } else {
       try {
         item = JSON.parse(value);
-      } catch(error){
+      } catch (error) {
         message.error('JSON not valid');
         return;
       }
     }
 
     props.onClick(item);
-  }
+  };
 
   useEffect(() => {
     setValue(props.value ? props.value : JSON.stringify(initValue, null, 2));
-    setValueYAML(props.value ? YAML.stringify(JSON.parse(props.value)) : YAML.stringify(initValue));
-  }, [props.value])
+    setValueYAML(
+      props.value
+        ? YAML.stringify(JSON.parse(props.value))
+        : YAML.stringify(initValue)
+    );
+  }, [props.value]);
 
-  const onChange = (value) => {
-    if(currentTab === 'YAML') {
+  const onChange = value => {
+    if (currentTab === 'YAML') {
       setValueYAML(value);
-      try{
+      try {
         setValue(JSON.stringify(YAML.parse(value), null, 2));
-      }catch{}
+      } catch {}
     } else {
       setValue(value);
-      try{
+      try {
         setValueYAML(YAML.stringify(JSON.parse(value)));
-      }catch{}
+      } catch {}
     }
-  }
+  };
 
   return (
     <div>
-      <Card tabList={[{
-              key: 'YAML',
-              tab: 'YAML'
-            }, {
-              key: 'JSON',
-              tab: 'JSON'
-            }]}
-            tabProps={{
-              size: 'small',
-            }}
-            size={'small'}
-            type={'inner'}
-            activeTabKey={currentTab}
-            onTabChange={key => {setCurrentTab(key)}}
-            style={{overflow: 'hidden'}}
+      <Card
+        tabList={[
+          {
+            key: 'YAML',
+            tab: 'YAML'
+          },
+          {
+            key: 'JSON',
+            tab: 'JSON'
+          }
+        ]}
+        tabProps={{
+          size: 'small'
+        }}
+        size={'small'}
+        type={'inner'}
+        activeTabKey={currentTab}
+        onTabChange={key => {
+          setCurrentTab(key);
+        }}
+        style={{ overflow: 'hidden' }}
       >
         <AceEditor
           mode={currentTab === 'YAML' ? 'yaml' : 'json'}
-          theme={localStorage.getItem("theme") !== 'light' ? 'monokai' : 'dawn'}
+          theme={localStorage.getItem('theme') !== 'light' ? 'monokai' : 'dawn'}
           fontSize={16}
           value={currentTab === 'YAML' ? valueYAML : value}
           readOnly={!props.onClick}
@@ -91,11 +101,13 @@ export default function Editor(props){
           }}
         />
         {props.onClick ? (
-          <div style={{marginTop: 20}}>
-            <Button type={'primary'} onClick={onClick} style={{width: "20%"}}>Save</Button>
+          <div style={{ marginTop: 20 }}>
+            <Button type={'primary'} onClick={onClick} style={{ width: '20%' }}>
+              Save
+            </Button>
           </div>
         ) : null}
       </Card>
     </div>
-  )
+  );
 }

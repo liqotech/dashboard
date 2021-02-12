@@ -1,7 +1,7 @@
 .graph-network {
-    background-color: rgb(240, 242, 245);
+  background-color: rgb(240, 242, 245);
 }
 
 .graph-network:focus {
-    border-color: aqua;
+  border-color: aqua;
 }

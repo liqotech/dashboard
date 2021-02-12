@@ -1,65 +1,75 @@
 .sidebar {
-    height: calc(100vh - 46px);
-    margin-bottom: 46px;
-    position: sticky;
-    overflow-y: auto;
-    overflow-x: hidden;
-    left: 0;
-    top: 0;
-    z-index: 11;
-    box-shadow: 0 0 0 0 #303030;
+  height: calc(100vh - 46px);
+  margin-bottom: 46px;
+  position: sticky;
+  overflow-y: auto;
+  overflow-x: hidden;
+  left: 0;
+  top: 0;
+  z-index: 11;
+  box-shadow: 0 0 0 0 #303030;
 }
 
 .image {
-    height: 40px;
-    width: 40px;
-    margin: 10px 16px 16px 14px;
-    float: left;
+  height: 40px;
+  width: 40px;
+  margin: 10px 16px 16px 14px;
+  float: left;
 }
 
 .app-title {
-    float: left;
+  float: left;
 }
 
 .app-title a {
-    text-decoration: none;
-    line-height: 64px;
-    font-size: 21px;
-    display: inline-block;
+  text-decoration: none;
+  line-height: 64px;
+  font-size: 21px;
+  display: inline-block;
 }
 
 .app-title a:hover {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 .title {
-    margin: 16px 16px 16px 0;
+  margin: 16px 16px 16px 0;
 }
 
 @media (max-width: 768px) {
-    .app-title a {
-        font-size: 20px;
-    }
+  .app-title a {
+    font-size: 20px;
+  }
 }
 
 .ant-menu .ant-menu-submenu .ant-menu-submenu-title {
-    padding-left: 16px !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
+  padding-left: 16px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .ant-menu .ant-menu-submenu .ant-menu-item {
-    padding-left: 24px !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
+  padding-left: 24px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
-.ant-menu-vertical .ant-menu-item:not(:last-child), .ant-menu-vertical-left .ant-menu-item:not(:last-child), .ant-menu-vertical-right .ant-menu-item:not(:last-child), .ant-menu-inline .ant-menu-item:not(:last-child){
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
+.ant-menu-vertical .ant-menu-item:not(:last-child),
+.ant-menu-vertical-left .ant-menu-item:not(:last-child),
+.ant-menu-vertical-right .ant-menu-item:not(:last-child),
+.ant-menu-inline .ant-menu-item:not(:last-child) {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
-.ant-menu-vertical .ant-menu-item, .ant-menu-vertical-left .ant-menu-item, .ant-menu-vertical-right .ant-menu-item, .ant-menu-inline .ant-menu-item, .ant-menu-vertical .ant-menu-submenu-title, .ant-menu-vertical-left .ant-menu-submenu-title, .ant-menu-vertical-right .ant-menu-submenu-title, .ant-menu-inline .ant-menu-submenu-title{
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
+.ant-menu-vertical .ant-menu-item,
+.ant-menu-vertical-left .ant-menu-item,
+.ant-menu-vertical-right .ant-menu-item,
+.ant-menu-inline .ant-menu-item,
+.ant-menu-vertical .ant-menu-submenu-title,
+.ant-menu-vertical-left .ant-menu-submenu-title,
+.ant-menu-vertical-right .ant-menu-submenu-title,
+.ant-menu-inline .ant-menu-submenu-title {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }

@@ -22,9 +22,7 @@
       },
       "spec": {
         "podCIDR": "10.244.0.0/24",
-        "podCIDRs": [
-          "10.244.0.0/24"
-        ]
+        "podCIDRs": ["10.244.0.0/24"]
       },
       "status": {
         "capacity": {
@@ -59,9 +57,7 @@
       },
       "spec": {
         "podCIDR": "10.244.0.0/24",
-        "podCIDRs": [
-          "10.244.0.0/24"
-        ]
+        "podCIDRs": ["10.244.0.0/24"]
       },
       "status": {
         "capacity": {

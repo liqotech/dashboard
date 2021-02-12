@@ -22,7 +22,7 @@
           }
         ]
       },
-      "status":  {
+      "status": {
         "mockStatus": true
       }
     },

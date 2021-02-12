@@ -17,78 +17,94 @@ beforeEach(() => {
 });
 
 describe('Header', () => {
+  test(
+    'Header main menus item and search bar are showed and working, ' +
+      'logout works',
+    async () => {
+      mockCRDAndViewsExtended();
+      await loginTest();
 
-  test('Header main menus item and search bar are showed and working, ' +
-    'logout works', async () => {
-    mockCRDAndViewsExtended();
-    await loginTest();
+      expect(await screen.findAllByLabelText('question-circle')).toHaveLength(
+        3
+      );
+      expect(await screen.findByLabelText('logout')).toBeInTheDocument();
 
-    expect(await screen.findAllByLabelText('question-circle')).toHaveLength(3);
-    expect(await screen.findByLabelText('logout')).toBeInTheDocument();
+      await screen.findByLabelText('autocompletesearch');
 
-    await screen.findByLabelText('autocompletesearch');
+      window.api.autoCompleteCallback.current[0]();
 
-    window.api.autoCompleteCallback.current[0]();
+      await userEvent.type(screen.getAllByRole('combobox')[0], 'liqodashtest');
+      let test = await screen.findByText('liqodashtests');
+      fireEvent.mouseOver(test);
+      fireEvent.click(test);
+      expect(await screen.findByText('apis')).toBeInTheDocument();
+      expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
+      expect(await screen.findByText('test-1')).toBeInTheDocument();
 
-    await userEvent.type(screen.getAllByRole('combobox')[0], 'liqodashtest');
-    let test = await screen.findByText('liqodashtests');
-    fireEvent.mouseOver(test);
-    fireEvent.click(test);
-    expect(await screen.findByText('apis')).toBeInTheDocument();
-    expect(await screen.findByText('LiqoDashTest')).toBeInTheDocument();
-    expect(await screen.findByText('test-1')).toBeInTheDocument();
+      const logout = await screen.findByLabelText('logout');
+      userEvent.click(logout);
+      expect(screen.getByText('Liqo Login'));
+    },
+    testTimeout
+  );
 
-    const logout = await screen.findByLabelText('logout');
-    userEvent.click(logout);
-    expect(screen.getByText('Liqo Login'));
+  test(
+    'Header info',
+    async () => {
+      mockCRDAndViewsExtended();
+      await loginTest();
 
-  }, testTimeout)
+      let question = await screen.findAllByLabelText('question-circle');
+      userEvent.click(question[0]);
 
-  test('Header info', async () => {
-    mockCRDAndViewsExtended();
-    await loginTest();
+      expect(
+        await screen.findByText('LiqoDash Information')
+      ).toBeInTheDocument();
 
-    let question = await screen.findAllByLabelText('question-circle');
-    userEvent.click(question[0]);
+      await act(async () => {
+        let close = await screen.findAllByLabelText('close');
+        userEvent.click(close[0]);
+        userEvent.click(close[1]);
+        await new Promise(r => setTimeout(r, 500));
+      });
+    },
+    testTimeout
+  );
 
-    expect(await screen.findByText('LiqoDash Information')).toBeInTheDocument();
+  test(
+    'Toggle dark/light',
+    async () => {
+      window.api = ApiInterface({ id_token: 'test' });
+      setToken();
+      window.api.dashConfigs.current = DashboardConfig.items[0];
+      window.less = {
+        modifyVars: async () => {
+          return Promise.resolve();
+        }
+      };
 
-    await act(async () => {
-      let close = await screen.findAllByLabelText('close');
-      userEvent.click(close[0]);
-      userEvent.click(close[1]);
-      await new Promise((r) => setTimeout(r, 500));
-    })
+      render(
+        <MemoryRouter>
+          <AppHeader />
+        </MemoryRouter>
+      );
 
-  }, testTimeout)
+      const switcher = await screen.findByRole('switch');
 
-  test('Toggle dark/light', async () => {
-    window.api = ApiInterface({id_token: 'test'});
-    setToken();
-    window.api.dashConfigs.current = DashboardConfig.items[0];
-    window.less = {modifyVars: async () => {return Promise.resolve()}}
+      await act(async () => {
+        userEvent.click(switcher);
+        await new Promise(r => setTimeout(r, 500));
+      });
 
-    render(
-      <MemoryRouter>
-        <AppHeader />
-      </MemoryRouter>
-    )
+      await act(async () => {
+        userEvent.click(switcher);
+        await new Promise(r => setTimeout(r, 500));
+      });
 
-    const switcher = await screen.findByRole('switch');
+      userEvent.click(await screen.findByLabelText('crown'));
 
-    await act(async () => {
-      userEvent.click(switcher)
-      await new Promise((r) => setTimeout(r, 500));
-    })
-
-    await act(async () => {
-      userEvent.click(switcher)
-      await new Promise((r) => setTimeout(r, 500));
-    })
-
-    userEvent.click(await screen.findByLabelText('crown'))
-
-    userEvent.click(await screen.findByLabelText('folder'))
-
-  }, testTimeout)
-})
+      userEvent.click(await screen.findByLabelText('folder'));
+    },
+    testTimeout
+  );
+});

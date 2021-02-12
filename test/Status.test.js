@@ -30,51 +30,85 @@ async function setup() {
       <MemoryRouter>
         <Home />
       </MemoryRouter>
-    )
+    );
   });
 }
 
-function mocks(advertisement, foreignCluster, peeringRequest, error, errorMetrics) {
-  fetch.mockResponse((req) => {
+function mocks(
+  advertisement,
+  foreignCluster,
+  peeringRequest,
+  error,
+  errorMetrics
+) {
+  fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
+      return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)));
     } else if (req.url === 'http://localhost:3001/namespaces') {
-      return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: NamespaceResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
-      return Promise.resolve(new Response(JSON.stringify({ body: foreignCluster })));
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/advertisements') {
-      return Promise.resolve(new Response(JSON.stringify({ body: advertisement })));
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/peeringrequests') {
-      return Promise.resolve(new Response(JSON.stringify({ body: peeringRequest })));
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
-      return Promise.resolve(new Response(JSON.stringify({ body: ConfigMockResponse })));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ViewMockResponse }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/foreignclusters'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: foreignCluster }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/advertisements'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: advertisement }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/peeringrequests'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: peeringRequest }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ConfigMockResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/nodes') {
-      if(!error)
-        return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
-      else
-        return Promise.reject({ body: Error409 });
+      if (!error)
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: NodesMockResponse }))
+        );
+      else return Promise.reject({ body: Error409 });
     } else if (req.url === 'http://localhost:3001/metrics/nodes') {
-      if(!errorMetrics)
-        return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
-      else
-        return Promise.reject(404);
+      if (!errorMetrics)
+        return Promise.resolve(
+          new Response(JSON.stringify(NodesMetricsMockResponse))
+        );
+      else return Promise.reject(404);
     } else if (req.url === 'http://localhost:3001/pod') {
-      return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: PodsMockResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/configmaps/liqo') {
-      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: CMMockResponse }))
+      );
     } else {
       return metricsPODs(req);
     }
-  })
+  });
 }
 
 async function OKCheck() {
   await setup();
 
   expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
-  expect(await screen.findByText('No peer available at the moment')).toBeInTheDocument();
+  expect(
+    await screen.findByText('No peer available at the moment')
+  ).toBeInTheDocument();
   expect(await screen.findByText('Home')).toBeInTheDocument();
   expect(await screen.findByText(/Foreign/i)).toBeInTheDocument();
 
@@ -89,24 +123,38 @@ describe('Status', () => {
     await OKCheck();
 
     await act(async () => {
-      await new Promise((r) => setTimeout(r, 31000));
-    })
-  }, 60000)
+      await new Promise(r => setTimeout(r, 31000));
+    });
+  }, 60000);
 
-  test('404 on node metrics', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, true);
+  test(
+    '404 on node metrics',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, true);
 
-    await OKCheck();
+      await OKCheck();
 
-    expect(await screen.findAllByLabelText('exclamation-circle')).toHaveLength(2);
-  }, testTimeout)
+      expect(
+        await screen.findAllByLabelText('exclamation-circle')
+      ).toHaveLength(2);
+    },
+    testTimeout
+  );
 
-  test('Line chart NaN data', async () => {
-    render(
-      <MemoryRouter>
-        <LineChart data={[{"resource": "CPU", "date": "00:00:00", "value": NaN },
-          {"resource": "RAM", "date": "00:00:00", "value": NaN }]} />
-      </MemoryRouter>
-    )
-  }, testTimeout)
-})
+  test(
+    'Line chart NaN data',
+    async () => {
+      render(
+        <MemoryRouter>
+          <LineChart
+            data={[
+              { resource: 'CPU', date: '00:00:00', value: NaN },
+              { resource: 'RAM', date: '00:00:00', value: NaN }
+            ]}
+          />
+        </MemoryRouter>
+      );
+    },
+    testTimeout
+  );
+});

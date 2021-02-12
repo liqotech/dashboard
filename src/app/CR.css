@@ -1,54 +1,54 @@
 .crd-choices {
-    margin-top: 5px;
-    margin-bottom: 15px;
+  margin-top: 5px;
+  margin-bottom: 15px;
 }
 
 .rep-container {
-    margin: auto;
+  margin: auto;
 }
 
 .cr-header {
-    border: 1px solid rgb(235, 237, 240);
+  border: 1px solid rgb(235, 237, 240);
 }
 
-.cr-header .ant-page-header-heading-left{
-    width: 60%;
+.cr-header .ant-page-header-heading-left {
+  width: 60%;
 }
 
 .ant-collapse .ant-collapse-item .ant-collapse-header {
-    position: relative !important;
-    padding: 8px 16px 8px 40px !important;
-    line-height: 1.5715 !important;
-    cursor: pointer !important;
-    -webkit-transition: all 0.3s !important;
-    transition: all 0.3s !important;
+  position: relative !important;
+  padding: 8px 16px 8px 40px !important;
+  line-height: 1.5715 !important;
+  cursor: pointer !important;
+  -webkit-transition: all 0.3s !important;
+  transition: all 0.3s !important;
 }
 
 .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-arrow {
-    padding: 6px 16px 6px 0 !important;
-    top: inherit !important;
+  padding: 6px 16px 6px 0 !important;
+  top: inherit !important;
 }
 
 .ant-collapse-content .ant-collapse-content-box {
-    padding: 8px 12px !important;
+  padding: 8px 12px !important;
 }
 
 .react-resizable {
-    position: relative;
-    background-clip: padding-box;
+  position: relative;
+  background-clip: padding-box;
 }
 
 .react-resizable-handle {
-    position: absolute;
-    width: 10px;
-    height: 100%;
-    bottom: 0;
-    right: -5px;
-    cursor: col-resize;
-    z-index: 1;
+  position: absolute;
+  width: 10px;
+  height: 100%;
+  bottom: 0;
+  right: -5px;
+  cursor: col-resize;
+  z-index: 1;
 }
 
 .dragHandler:hover {
-    cursor: move;
-    background-color: #ccc;
+  cursor: move;
+  background-color: #ccc;
 }

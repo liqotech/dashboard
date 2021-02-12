@@ -15,92 +15,123 @@ fetchMock.enableMocks();
 
 async function setup() {
   setToken();
-  window.history.pushState({}, 'Page Title', '/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9');
+  window.history.pushState(
+    {},
+    'Page Title',
+    '/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'
+  );
 
   return render(
     <MemoryRouter>
       <App />
     </MemoryRouter>
-  )
+  );
 }
 
-beforeEach(() => { localStorage.setItem('theme', 'dark');
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
-function mocks(error){
+function mocks(error) {
   fetch.mockResponse(req => {
-    if(req.method === 'DELETE' && req.url === 'http://localhost/apiserver/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'){
-      if(!error)
-        return Promise.resolve(new Response(JSON.stringify('')));
-      else
-        return Promise.reject();
-    }
-    else if(generalMocks(req.url))
-      return generalMocks(req.url);
-  })
+    if (
+      req.method === 'DELETE' &&
+      req.url ===
+        'http://localhost/apiserver/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'
+    ) {
+      if (!error) return Promise.resolve(new Response(JSON.stringify('')));
+      else return Promise.reject();
+    } else if (generalMocks(req.url)) return generalMocks(req.url);
+  });
 }
 
 describe('ResourceHeader', () => {
-  test('Header delete resource', async () => {
-    mocks();
+  test(
+    'Header delete resource',
+    async () => {
+      mocks();
 
-    await setup();
+      await setup();
 
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
-    expect(await screen.findByText('DELETE')).toBeInTheDocument();
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
+      expect(await screen.findByText('DELETE')).toBeInTheDocument();
 
-    userEvent.click(await screen.findByLabelText('delete'));
-    userEvent.click(await screen.findByText('Yes'));
+      userEvent.click(await screen.findByLabelText('delete'));
+      userEvent.click(await screen.findByText('Yes'));
 
-    expect(await screen.findByText('Pod terminating...')).toBeInTheDocument();
+      expect(await screen.findByText('Pod terminating...')).toBeInTheDocument();
 
-    await new Promise((r) => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 1000));
 
-    await act(async () => {
-      window.api.apiManager.current.sendDeletedSignal('pods', PodMockResponse);
-    })
+      await act(async () => {
+        window.api.apiManager.current.sendDeletedSignal(
+          'pods',
+          PodMockResponse
+        );
+      });
 
-    expect(await screen.findByText('Resource could not be found')).toBeInTheDocument();
+      expect(
+        await screen.findByText('Resource could not be found')
+      ).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  }, testTimeout)
+  test(
+    'Error on delete resource',
+    async () => {
+      mocks(true);
 
-  test('Error on delete resource', async () => {
-    mocks(true);
+      await setup();
 
-    await setup();
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
+      expect(await screen.findByText('DELETE')).toBeInTheDocument();
 
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
-    expect(await screen.findByText('DELETE')).toBeInTheDocument();
+      userEvent.click(await screen.findByLabelText('delete'));
+      userEvent.click(await screen.findByText('Yes'));
 
-    userEvent.click(await screen.findByLabelText('delete'));
-    userEvent.click(await screen.findByText('Yes'));
+      expect(await screen.findByText(/could not/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    expect(await screen.findByText(/could not/i)).toBeInTheDocument();
+  test(
+    'Header click on group',
+    async () => {
+      mocks();
 
-  }, testTimeout)
+      setToken();
+      window.history.pushState(
+        {},
+        'Page Title',
+        '/apis/apiextensions.k8s.io/v1/customresourcedefinitions'
+      );
 
-  test('Header click on group', async () => {
-    mocks();
+      render(
+        <MemoryRouter>
+          <App />
+        </MemoryRouter>
+      );
 
-    setToken();
-    window.history.pushState({}, 'Page Title', '/apis/apiextensions.k8s.io/v1/customresourcedefinitions');
+      expect(
+        await screen.findByText('apiextensions.k8s.io')
+      ).toBeInTheDocument();
 
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    )
+      await act(async () => {
+        userEvent.click(await screen.findByText('apiextensions.k8s.io'));
+      });
 
-    expect(await screen.findByText('apiextensions.k8s.io')).toBeInTheDocument();
-
-    await act(async () => {
-      userEvent.click(await screen.findByText('apiextensions.k8s.io'));
-    })
-
-    expect(await screen.findByText('customresourcedefinitions')).toBeInTheDocument();
-
-  }, testTimeout)
-})
+      expect(
+        await screen.findByText('customresourcedefinitions')
+      ).toBeInTheDocument();
+    },
+    testTimeout
+  );
+});

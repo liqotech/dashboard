@@ -26,100 +26,156 @@ fetchMock.enableMocks();
 let counter = 0;
 
 async function setup() {
-  window.api = ApiInterface({id_token: 'test'});
+  window.api = ApiInterface({ id_token: 'test' });
   window.api.getCRDs().then(async () => {
     render(
       <MemoryRouter>
         <Home />
       </MemoryRouter>
-    )
+    );
   });
 }
 
-function mocks(advertisement, foreignCluster, peeringRequest, error, errorPod, errorNodes, addPod, noPods) {
-  fetch.mockResponse((req) => {
+function mocks(
+  advertisement,
+  foreignCluster,
+  peeringRequest,
+  error,
+  errorPod,
+  errorNodes,
+  addPod,
+  noPods
+) {
+  fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
+      return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)));
     } else if (req.url === 'http://localhost:3001/namespaces') {
-      return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: NamespaceResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
-      if(req.method === 'GET')
-        return Promise.resolve(new Response(JSON.stringify({ body: foreignCluster })));
-      else{
-        if(!error){
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ViewMockResponse }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/foreignclusters'
+    ) {
+      if (req.method === 'GET')
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: foreignCluster }))
+        );
+      else {
+        if (!error) {
           foreignCluster = foreignCluster.items[0];
           foreignCluster.metadata.resourceVersion++;
           foreignCluster.spec.join = false;
-          return Promise.resolve(new Response(JSON.stringify({ body: foreignCluster })));
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: foreignCluster }))
+          );
         } else {
           return Promise.reject(Error409.body);
         }
       }
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/advertisements') {
-      return Promise.resolve(new Response(JSON.stringify({ body: advertisement })));
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/peeringrequests') {
-      return Promise.resolve(new Response(JSON.stringify({ body: peeringRequest })));
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
-      return Promise.resolve(new Response(JSON.stringify({ body: ConfigMockResponse })));
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/advertisements'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: advertisement }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/peeringrequests'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: peeringRequest }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ConfigMockResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/pod') {
-      if(errorPod)
-        return Promise.reject(Error409.body);
-      else if(addPod){
-        if(counter === 0) {
+      if (errorPod) return Promise.reject(Error409.body);
+      else if (addPod) {
+        if (counter === 0) {
           counter++;
-          return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: PodsMockResponse }))
+          );
         } else {
           let pods = PodsMockResponse;
           let pod = JSON.parse(JSON.stringify(pods.items[3]));
-          pod.metadata.name = 'hello-world-deployment-6756549f5-x66v8'
-          if(pods.items.length < 5)
-            pods.items.push(pod);
-          if(noPods)
-            return Promise.resolve(new Response(JSON.stringify({body: { items: [] } })));
+          pod.metadata.name = 'hello-world-deployment-6756549f5-x66v8';
+          if (pods.items.length < 5) pods.items.push(pod);
+          if (noPods)
+            return Promise.resolve(
+              new Response(JSON.stringify({ body: { items: [] } }))
+            );
           else
-            return Promise.resolve(new Response(JSON.stringify({body: pods})));
+            return Promise.resolve(
+              new Response(JSON.stringify({ body: pods }))
+            );
         }
       } else
-        return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: PodsMockResponse }))
+        );
     } else if (req.url === 'http://localhost:3001/nodes') {
-      if(errorNodes)
-        return Promise.reject(Error409.body);
+      if (errorNodes) return Promise.reject(Error409.body);
       else
-        return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: NodesMockResponse }))
+        );
     } else if (req.url === 'http://localhost:3001/metrics/nodes') {
-      return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+      return Promise.resolve(
+        new Response(JSON.stringify(NodesMetricsMockResponse))
+      );
     } else if (req.url === 'http://localhost:3001/configmaps/liqo') {
-      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: CMMockResponse }))
+      );
     } else {
       return metricsPODs(req);
     }
-  })
+  });
 }
 
 async function OKCheck() {
   await setup();
 
   expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
-  expect(await screen.findByText('No peer available at the moment')).toBeInTheDocument();
+  expect(
+    await screen.findByText('No peer available at the moment')
+  ).toBeInTheDocument();
 }
 
 describe('ConnectedList', () => {
-  test('Error on getting pod', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, true);
+  test(
+    'Error on getting pod',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, true);
 
-    await OKCheck();
-  }, testTimeout);
+      await OKCheck();
+    },
+    testTimeout
+  );
 
   test('Pods are refreshed every 30 seconds', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, false, false, true);
+    mocks(
+      AdvMockResponse,
+      FCMockResponse,
+      PRMockResponse,
+      false,
+      false,
+      false,
+      true
+    );
 
     await OKCheck();
 
     await act(async () => {
-      await new Promise((r) => setTimeout(r, 31000));
-    })
+      await new Promise(r => setTimeout(r, 31000));
+    });
 
     userEvent.click(screen.getByLabelText('ellipsis'));
 
@@ -138,38 +194,52 @@ describe('ConnectedList', () => {
     expect(await screen.findAllByText(/hello-world/i)).toHaveLength(3);
 
     counter = 0;
-
-  }, 60000)
+  }, 60000);
 
   test('Show no metrics when there are no pods', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse, false, false, false, true, true);
+    mocks(
+      AdvMockResponse,
+      FCMockResponse,
+      PRMockResponse,
+      false,
+      false,
+      false,
+      true,
+      true
+    );
 
     await OKCheck();
 
     await act(async () => {
-      await new Promise((r) => setTimeout(r, 31000));
-    })
+      await new Promise(r => setTimeout(r, 31000));
+    });
 
     expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
 
     counter = 0;
-  }, 60000)
+  }, 60000);
 
-  test('Disconnection error from dropdown show', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
+  test(
+    'Disconnection error from dropdown show',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
 
-    await OKCheck();
+      await OKCheck();
 
-    userEvent.click(screen.getByLabelText('ellipsis'));
+      userEvent.click(screen.getByLabelText('ellipsis'));
 
-    expect(screen.getByLabelText('snippets')).toBeInTheDocument();
+      expect(screen.getByLabelText('snippets')).toBeInTheDocument();
 
-    const disconnect = await screen.findAllByLabelText('close');
+      const disconnect = await screen.findAllByLabelText('close');
 
-    userEvent.click(disconnect[0]);
-    userEvent.click(disconnect[1]);
+      userEvent.click(disconnect[0]);
+      userEvent.click(disconnect[1]);
 
-    expect(await screen.findByText(/Could not disconnect/i)).toBeInTheDocument();
-    expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
-  }, testTimeout)
-})
+      expect(
+        await screen.findByText(/Could not disconnect/i)
+      ).toBeInTheDocument();
+      expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
+    },
+    testTimeout
+  );
+});

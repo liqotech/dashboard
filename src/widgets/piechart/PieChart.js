@@ -25,10 +25,10 @@ function PieChart(props) {
     }
   }
 
-  if(data.length !== 0){
+  if (data.length !== 0) {
     return (
       <div>
-        <Chart  height={400} data={data} autoFit>
+        <Chart height={400} data={data} autoFit>
           <Coordinate type="theta" radius={0.75} />
           <Tooltip showTitle={false} />
           <Axis visible={false} />
@@ -38,13 +38,16 @@ function PieChart(props) {
             color="label"
             style={{
               lineWidth: 2,
-              stroke: '#fff',
+              stroke: '#fff'
             }}
-            label={['*', {
-              content: (data) => {
-                return data.value;
-              },
-            }]}
+            label={[
+              '*',
+              {
+                content: data => {
+                  return data.value;
+                }
+              }
+            ]}
           />
         </Chart>
       </div>
@@ -57,9 +60,8 @@ function PieChart(props) {
         type="error"
         showIcon
       />
-    )
+    );
   }
-
 }
 
 export default PieChart;

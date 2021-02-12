@@ -25,11 +25,7 @@
       "singularName": "",
       "namespaced": false,
       "kind": "Advertisement",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     }
   ]
 }

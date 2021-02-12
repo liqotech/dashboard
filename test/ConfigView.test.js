@@ -19,22 +19,40 @@ import { testTimeout } from '../src/constants';
 import CMMockResponse from '../__mocks__/configmap_clusterID.json';
 import Cookies from 'js-cookie';
 
-function mocks(error, get){
+function mocks(error, get) {
   fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)))
+      return Promise.resolve(new Response(JSON.stringify(CRDmockResponse)));
     } else if (req.url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
-      return Promise.resolve(new Response(JSON.stringify({body: FCMockResponse})));
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/advertisements') {
-      return Promise.resolve(new Response(JSON.stringify({body: AdvMockResponse})));
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/peeringrequests') {
-      return Promise.resolve(new Response(JSON.stringify({body: PRMockResponse})));
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ViewMockResponse }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/foreignclusters'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: FCMockResponse }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/advertisements'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: AdvMockResponse }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/peeringrequests'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: PRMockResponse }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs'
+    ) {
       if (req.method === 'GET') {
-        if(!get)
-          return Promise.resolve(new Response(JSON.stringify({ body: ClusterConfigMockResponse })))
+        if (!get)
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: ClusterConfigMockResponse }))
+          );
         else return Promise.reject(Error409.body);
       } else if (req.method === 'PUT') {
         if (error) {
@@ -45,23 +63,33 @@ function mocks(error, get){
           let ClusterConfigMockResponseMod = ClusterConfigMockResponse.items[0];
           ClusterConfigMockResponseMod.resourceVersion++;
           ClusterConfigMockResponseMod.spec.advertisementConfig.autoAccept = false;
-          return Promise.resolve(new Response(JSON.stringify({ body: ClusterConfigMockResponseMod })))
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: ClusterConfigMockResponseMod }))
+          );
         }
       }
     } else if (req.url === 'http://localhost:3001/nodes') {
-      return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: NodesMockResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/metrics/nodes') {
-      return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+      return Promise.resolve(
+        new Response(JSON.stringify(NodesMetricsMockResponse))
+      );
     } else if (req.url === 'http://localhost:3001/pod') {
-      return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: PodsMockResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/configmaps/liqo') {
-      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
-    } else if(alwaysPresentGET(req.url)){
-      return alwaysPresentGET(req.url)
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: CMMockResponse }))
+      );
+    } else if (alwaysPresentGET(req.url)) {
+      return alwaysPresentGET(req.url);
     } else {
       return metricsPODs(req);
     }
-  })
+  });
 }
 
 async function setup_with_error(error) {
@@ -73,21 +101,19 @@ async function setup_with_error(error) {
   userEvent.click(configview);
 
   expect(await screen.findByText('Liqo configuration'));
-
 }
 
 async function setup_from_ConfigView(error) {
-  window.api = ApiInterface({id_token: 'test'});
+  window.api = ApiInterface({ id_token: 'test' });
   window.api.getCRDs().then(() => {
-
-    if(error) window.api.CRDs.current = [];
+    if (error) window.api.CRDs.current = [];
 
     render(
       <MemoryRouter>
         <ConfigView />
       </MemoryRouter>
-    )
-  })
+    );
+  });
 }
 
 beforeEach(() => {
@@ -96,66 +122,85 @@ beforeEach(() => {
 });
 
 describe('ConfigView', () => {
-  test('ConfigView with no Config CRD', async () => {
-    mocks();
-    await setup_from_ConfigView(true);
+  test(
+    'ConfigView with no Config CRD',
+    async () => {
+      mocks();
+      await setup_from_ConfigView(true);
 
-    expect(await screen.findByText('No configuration CRD has been found.'))
-  }, testTimeout)
+      expect(await screen.findByText('No configuration CRD has been found.'));
+    },
+    testTimeout
+  );
 
-  test('Sidebar redirect works and general information are displayed', async () => {
-    await setup_with_error();
+  test(
+    'Sidebar redirect works and general information are displayed',
+    async () => {
+      await setup_with_error();
 
-    expect(screen.getByText(/Choose the best/i));
-    expect(screen.getByText('Advertisement Config'));
-    expect(screen.getByText('Discovery Config'));
-    userEvent.click(screen.getByText('Liqonet Config'));
+      expect(screen.getByText(/Choose the best/i));
+      expect(screen.getByText('Advertisement Config'));
+      expect(screen.getByText('Discovery Config'));
+      userEvent.click(screen.getByText('Liqonet Config'));
 
-    userEvent.click(await screen.findByText('General'));
-    userEvent.click(await screen.findByText('Reserved Subnets'));
-  }, testTimeout)
+      userEvent.click(await screen.findByText('General'));
+      userEvent.click(await screen.findByText('Reserved Subnets'));
+    },
+    testTimeout
+  );
 
-  test('ConfigView with error on Config CR', async () => {
-    mocks('409', true);
-    await setup_from_ConfigView();
+  test(
+    'ConfigView with error on Config CR',
+    async () => {
+      mocks('409', true);
+      await setup_from_ConfigView();
 
-    expect(await screen.findByText('No configuration file has been found.'))
-  }, testTimeout)
+      expect(await screen.findByText('No configuration file has been found.'));
+    },
+    testTimeout
+  );
 
-  test('Error notification when config not updated', async () => {
-    await setup_with_error('409');
+  test(
+    'Error notification when config not updated',
+    async () => {
+      await setup_with_error('409');
 
-    let switchButton = screen.getAllByRole('switch');
+      let switchButton = screen.getAllByRole('switch');
 
-    userEvent.click(switchButton[1]);
-    userEvent.click(screen.getByText('Save configuration'));
+      userEvent.click(switchButton[1]);
+      userEvent.click(screen.getByText('Save configuration'));
 
-    expect(await screen.findByText('Could not update the configuration'))
-  }, testTimeout)
+      expect(await screen.findByText('Could not update the configuration'));
+    },
+    testTimeout
+  );
 
-  test('Config update works', async () => {
-    await setup_with_error();
+  test(
+    'Config update works',
+    async () => {
+      await setup_with_error();
 
-    let switchButton = screen.getAllByRole('switch');
+      let switchButton = screen.getAllByRole('switch');
 
-    expect(switchButton[1]).toHaveAttribute('aria-checked', 'true');
-    userEvent.click(switchButton[1]);
+      expect(switchButton[1]).toHaveAttribute('aria-checked', 'true');
+      userEvent.click(switchButton[1]);
 
-    let textbox = screen.getAllByRole('textbox');
+      let textbox = screen.getAllByRole('textbox');
 
-    await userEvent.type(textbox[0], '0');
+      await userEvent.type(textbox[0], '0');
 
-    textbox[1].setSelectionRange(0, 2);
+      textbox[1].setSelectionRange(0, 2);
 
-    await userEvent.type(textbox[1], '{backspace}50');
+      await userEvent.type(textbox[1], '{backspace}50');
 
-    userEvent.click(screen.getByText('Save configuration'));
+      userEvent.click(screen.getByText('Save configuration'));
 
-    expect(await screen.findByText(/updated/i));
+      expect(await screen.findByText(/updated/i));
 
-    switchButton = screen.getAllByRole('switch');
+      switchButton = screen.getAllByRole('switch');
 
-    expect(switchButton[1]).toHaveAttribute('aria-checked', 'false');
-
-  }, testTimeout)
-})
+      expect(switchButton[1]).toHaveAttribute('aria-checked', 'false');
+    },
+    testTimeout
+  );
+});

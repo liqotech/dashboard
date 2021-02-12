@@ -3,7 +3,13 @@ import _ from 'lodash';
 import '@testing-library/jest-dom/extend-expect';
 import fetchMock from 'jest-fetch-mock';
 import { generalMocks, setToken } from './RTLUtils';
-import { act, findByText, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  findByText,
+  fireEvent,
+  render,
+  screen
+} from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../src/app/App';
 import { testTimeout } from '../src/constants';
@@ -16,285 +22,336 @@ fetchMock.enableMocks();
 
 async function setup() {
   setToken();
-  window.history.pushState({}, 'Page Title', '/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9');
+  window.history.pushState(
+    {},
+    'Page Title',
+    '/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'
+  );
 
   return render(
     <MemoryRouter>
       <App />
     </MemoryRouter>
-  )
+  );
 }
 
-beforeEach(() => { localStorage.setItem('theme', 'dark');
-  if(window.api && !_.isEmpty(window.api.dashConfigs.current)) {
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
+  if (window.api && !_.isEmpty(window.api.dashConfigs.current)) {
     window.api.dashConfigs.current = {};
   }
   Cookies.remove('token');
 });
 
-function mocks(error){
+function mocks(error) {
   fetch.mockResponse(req => {
-    if (req.url === 'http://localhost:3001/clustercustomobject/dashboardconfigs') {
+    if (
+      req.url === 'http://localhost:3001/clustercustomobject/dashboardconfigs'
+    ) {
       let dashconf = JSON.parse(JSON.stringify(DashboardConfig));
-      if(window.api && !_.isEmpty(window.api.dashConfigs.current)) {
+      if (window.api && !_.isEmpty(window.api.dashConfigs.current)) {
         window.api.dashConfigs.current.metadata.resourceVersion++;
-        if(window.api.dashConfigs.current.spec.resources){
+        if (window.api.dashConfigs.current.spec.resources) {
           window.api.dashConfigs.current.spec.resources.forEach(item => {
-            if(item.render && item.render.columns){
-              item.render.columns = item.render.columns.filter(col => col !== null);
+            if (item.render && item.render.columns) {
+              item.render.columns = item.render.columns.filter(
+                col => col !== null
+              );
             }
-            if(item.render && item.render.tabs){
+            if (item.render && item.render.tabs) {
               item.render.tabs = item.render.tabs.filter(tab => tab !== null);
             }
             return item;
-          })
+          });
         }
         dashconf.items = [window.api.dashConfigs.current];
       }
-      return Promise.resolve(new Response(JSON.stringify({body: dashconf})));
-    }
-    else if(generalMocks(req.url))
-      return generalMocks(req.url);
-  })
+      return Promise.resolve(new Response(JSON.stringify({ body: dashconf })));
+    } else if (generalMocks(req.url)) return generalMocks(req.url);
+  });
 }
 
 describe('CustomTabs', () => {
-  test('CustomTabs change tab name, add tab and remove tab works', async () => {
-    mocks();
+  test(
+    'CustomTabs change tab name, add tab and remove tab works',
+    async () => {
+      mocks();
 
-    await setup();
+      await setup();
 
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
-    expect(await screen.findByText('NewTab')).toBeInTheDocument();
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
+      expect(await screen.findByText('NewTab')).toBeInTheDocument();
 
-    userEvent.click(await screen.findByText('NewTab'));
+      userEvent.click(await screen.findByText('NewTab'));
 
-    expect(await screen.findByText('Deployments')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment')).toBeInTheDocument();
-    expect(await screen.findByText('Containers')).toBeInTheDocument();
+      expect(await screen.findByText('Deployments')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment')
+      ).toBeInTheDocument();
+      expect(await screen.findByText('Containers')).toBeInTheDocument();
 
-    userEvent.dblClick(await screen.findByText('NewTab'));
-    userEvent.click(await screen.findByRole('input'));
-    await act(async () => {
-      await userEvent.type(await screen.findByRole('input'), '2{enter}');
-    })
+      userEvent.dblClick(await screen.findByText('NewTab'));
+      userEvent.click(await screen.findByRole('input'));
+      await act(async () => {
+        await userEvent.type(await screen.findByRole('input'), '2{enter}');
+      });
 
-    expect(await screen.findByText('NewTab2')).toBeInTheDocument();
+      expect(await screen.findByText('NewTab2')).toBeInTheDocument();
 
-    let plus = await screen.findAllByLabelText('plus');
+      let plus = await screen.findAllByLabelText('plus');
 
-    userEvent.click(plus[2]);
-    expect(await screen.findByText('NewTab')).toBeInTheDocument();
+      userEvent.click(plus[2]);
+      expect(await screen.findByText('NewTab')).toBeInTheDocument();
 
-    let close = await screen.findAllByLabelText('close');
+      let close = await screen.findAllByLabelText('close');
 
-    await act(async () => {
-      userEvent.click(close[4]);
-    })
+      await act(async () => {
+        userEvent.click(close[4]);
+      });
 
-    expect(await screen.queryByText('NewTab')).not.toBeInTheDocument();
-  }, testTimeout)
+      expect(await screen.queryByText('NewTab')).not.toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  test('Add list, add parameter, delete parameter', async () => {
-    mocks();
+  test(
+    'Add list, add parameter, delete parameter',
+    async () => {
+      mocks();
 
-    await setup();
+      await setup();
 
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
-    expect(await screen.findByText('NewTab')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
+      expect(await screen.findByText('NewTab')).toBeInTheDocument();
 
-    userEvent.click(await screen.findByText('NewTab'));
+      userEvent.click(await screen.findByText('NewTab'));
 
-    expect(await screen.findByText('Deployments')).toBeInTheDocument();
+      expect(await screen.findByText('Deployments')).toBeInTheDocument();
 
-    await act(async () => {
-      fireEvent.contextMenu(screen.getByText('Deployments'));
-    })
-    const add = await screen.findByText('Add List');
+      await act(async () => {
+        fireEvent.contextMenu(screen.getByText('Deployments'));
+      });
+      const add = await screen.findByText('Add List');
 
-    await act(async () => {
-      await fireEvent.mouseOver(add);
-      await fireEvent.click(add);
-      await new Promise((r) => setTimeout(r, 500));
-    })
+      await act(async () => {
+        await fireEvent.mouseOver(add);
+        await fireEvent.click(add);
+        await new Promise(r => setTimeout(r, 500));
+      });
 
-    expect(screen.findByText(/new list/i));
+      expect(screen.findByText(/new list/i));
 
-    await new Promise((r) => setTimeout(r, 500));
+      await new Promise(r => setTimeout(r, 500));
 
-    let select = await screen.findAllByLabelText('select-k8s');
-    await act(async () => {
-      userEvent.click(select[1]);
-      await userEvent.type(select[1], 'resourcev');
-      await new Promise((r) => setTimeout(r, 500));
-    })
-
-    let resourceVersion = await screen.findAllByText('resourceVersion');
-
-    fireEvent.mouseOver(resourceVersion[0]);
-    await act(async () => {
-      fireEvent.click(resourceVersion[0]);
-      await new Promise((r) => setTimeout(r, 500));
-    })
-
-    expect(await screen.findByText('Resource Version')).toBeInTheDocument();
-
-    let edit = await screen.findAllByLabelText('edit');
-
-    await act(async () => {
-      userEvent.click(edit[2]);
-      await new Promise((r) => setTimeout(r, 500));
-    })
-
-   let del = await screen.findAllByLabelText('delete');
-
-    await act(async () => {
-      userEvent.click(del[1]);
-      await new Promise((r) => setTimeout(r, 500));
-    })
-
-    expect(await screen.queryByText('Resource Version')).not.toBeInTheDocument();
-
-  }, testTimeout)
-
-  test('Add table', async () => {
-    mocks();
-
-    await setup();
-
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
-    expect(await screen.findByText('NewTab')).toBeInTheDocument();
-
-    userEvent.click(await screen.findByText('NewTab'));
-
-    expect(await screen.findByText('Deployments')).toBeInTheDocument();
-
-    let close = await screen.findAllByLabelText('close');
-
-    await act(async () => {
-      userEvent.click(close[5]);
-      await new Promise((r) => setTimeout(r, 500));
-    })
-
-    await act(async () => {
-      fireEvent.contextMenu(screen.getByText('Deployments'));
-    })
-    const add = await screen.findByText('Add Table');
-
-    await act(async () => {
-      await fireEvent.mouseOver(add);
-      await fireEvent.click(add);
-      await new Promise((r) => setTimeout(r, 500));
-    })
-
-    expect(screen.findByText(/new table/i));
-
-    await new Promise((r) => setTimeout(r, 500));
-
-    await act(async () => {
       let select = await screen.findAllByLabelText('select-k8s');
-      userEvent.click(select[1]);
-      await userEvent.type(select[1], 'container');
-      await new Promise((r) => setTimeout(r, 500));
-    })
+      await act(async () => {
+        userEvent.click(select[1]);
+        await userEvent.type(select[1], 'resourcev');
+        await new Promise(r => setTimeout(r, 500));
+      });
 
-    let containers = await screen.findAllByText('containers');
+      let resourceVersion = await screen.findAllByText('resourceVersion');
 
-    fireEvent.mouseOver(containers[0]);
-    await act(async () => {
-      fireEvent.click(containers[0]);
-      await new Promise((r) => setTimeout(r, 500));
-    })
+      fireEvent.mouseOver(resourceVersion[0]);
+      await act(async () => {
+        fireEvent.click(resourceVersion[0]);
+        await new Promise(r => setTimeout(r, 500));
+      });
 
-    expect(await screen.findByText('image')).toBeInTheDocument();
+      expect(await screen.findByText('Resource Version')).toBeInTheDocument();
 
-  }, testTimeout)
+      let edit = await screen.findAllByLabelText('edit');
 
-  test('Add deployment', async () => {
-    mocks();
+      await act(async () => {
+        userEvent.click(edit[2]);
+        await new Promise(r => setTimeout(r, 500));
+      });
 
-    await setup();
+      let del = await screen.findAllByLabelText('delete');
 
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
-    expect(await screen.findByText('NewTab')).toBeInTheDocument();
+      await act(async () => {
+        userEvent.click(del[1]);
+        await new Promise(r => setTimeout(r, 500));
+      });
 
-    userEvent.click(await screen.findByText('NewTab'));
+      expect(
+        await screen.queryByText('Resource Version')
+      ).not.toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    expect(await screen.findByText('Deployments')).toBeInTheDocument();
+  test(
+    'Add table',
+    async () => {
+      mocks();
 
-    let deployment = DeploymentMock.items[0];
+      await setup();
 
-    window.api.apiManager.current.sendAddedSignal('deployments', deployment);
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
+      expect(await screen.findByText('NewTab')).toBeInTheDocument();
 
+      userEvent.click(await screen.findByText('NewTab'));
 
-  }, testTimeout)
+      expect(await screen.findByText('Deployments')).toBeInTheDocument();
 
-  test('Add new tab when resource not yet in configuration', async () => {
-    fetch.mockResponse(req => {
-      if(generalMocks(req.url))
-        return generalMocks(req.url);
-    })
+      let close = await screen.findAllByLabelText('close');
 
-    await setup();
+      await act(async () => {
+        userEvent.click(close[5]);
+        await new Promise(r => setTimeout(r, 500));
+      });
 
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
+      await act(async () => {
+        fireEvent.contextMenu(screen.getByText('Deployments'));
+      });
+      const add = await screen.findByText('Add Table');
 
-    let plus = await screen.findAllByLabelText('plus');
+      await act(async () => {
+        await fireEvent.mouseOver(add);
+        await fireEvent.click(add);
+        await new Promise(r => setTimeout(r, 500));
+      });
 
-    userEvent.click(plus[1]);
-    expect(await screen.findByText('NewTab')).toBeInTheDocument();
+      expect(screen.findByText(/new table/i));
 
-  }, testTimeout)
+      await new Promise(r => setTimeout(r, 500));
 
-  test('CustomTabs change tab name with blur', async () => {
-    mocks();
+      await act(async () => {
+        let select = await screen.findAllByLabelText('select-k8s');
+        userEvent.click(select[1]);
+        await userEvent.type(select[1], 'container');
+        await new Promise(r => setTimeout(r, 500));
+      });
 
-    await setup();
+      let containers = await screen.findAllByText('containers');
 
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
-    expect(await screen.findByText('NewTab')).toBeInTheDocument();
+      fireEvent.mouseOver(containers[0]);
+      await act(async () => {
+        fireEvent.click(containers[0]);
+        await new Promise(r => setTimeout(r, 500));
+      });
 
-    userEvent.click(await screen.findByText('NewTab'));
+      expect(await screen.findByText('image')).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    expect(await screen.findByText('Deployments')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment')).toBeInTheDocument();
-    expect(await screen.findByText('Containers')).toBeInTheDocument();
+  test(
+    'Add deployment',
+    async () => {
+      mocks();
 
-    userEvent.dblClick(await screen.findByText('NewTab'));
-    userEvent.click(await screen.findByRole('input'));
-    await act(async () => {
-      await userEvent.type(await screen.findByRole('input'), '2');
-      userEvent.click(await screen.findByText('Containers'));
-    })
+      await setup();
 
-    expect(await screen.findByText('NewTab2')).toBeInTheDocument();
-  }, testTimeout)
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
+      expect(await screen.findByText('NewTab')).toBeInTheDocument();
 
-  test('CustomTabs change tab name with the same name', async () => {
-    mocks();
+      userEvent.click(await screen.findByText('NewTab'));
 
-    await setup();
+      expect(await screen.findByText('Deployments')).toBeInTheDocument();
 
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
-    expect(await screen.findByText('NewTab')).toBeInTheDocument();
+      let deployment = DeploymentMock.items[0];
 
-    userEvent.click(await screen.findByText('NewTab'));
+      window.api.apiManager.current.sendAddedSignal('deployments', deployment);
+    },
+    testTimeout
+  );
 
-    expect(await screen.findByText('Deployments')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment')).toBeInTheDocument();
-    expect(await screen.findByText('Containers')).toBeInTheDocument();
+  test(
+    'Add new tab when resource not yet in configuration',
+    async () => {
+      fetch.mockResponse(req => {
+        if (generalMocks(req.url)) return generalMocks(req.url);
+      });
 
-    userEvent.dblClick(await screen.findByText('NewTab'));
-    userEvent.click(await screen.findByRole('input'));
-    await act(async () => {
-      userEvent.click(await screen.findByText('Containers'));
-    })
+      await setup();
 
-    expect(await screen.findByText('NewTab')).toBeInTheDocument();
-  }, testTimeout)
-})
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
+
+      let plus = await screen.findAllByLabelText('plus');
+
+      userEvent.click(plus[1]);
+      expect(await screen.findByText('NewTab')).toBeInTheDocument();
+    },
+    testTimeout
+  );
+
+  test(
+    'CustomTabs change tab name with blur',
+    async () => {
+      mocks();
+
+      await setup();
+
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
+      expect(await screen.findByText('NewTab')).toBeInTheDocument();
+
+      userEvent.click(await screen.findByText('NewTab'));
+
+      expect(await screen.findByText('Deployments')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment')
+      ).toBeInTheDocument();
+      expect(await screen.findByText('Containers')).toBeInTheDocument();
+
+      userEvent.dblClick(await screen.findByText('NewTab'));
+      userEvent.click(await screen.findByRole('input'));
+      await act(async () => {
+        await userEvent.type(await screen.findByRole('input'), '2');
+        userEvent.click(await screen.findByText('Containers'));
+      });
+
+      expect(await screen.findByText('NewTab2')).toBeInTheDocument();
+    },
+    testTimeout
+  );
+
+  test(
+    'CustomTabs change tab name with the same name',
+    async () => {
+      mocks();
+
+      await setup();
+
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
+      expect(await screen.findByText('NewTab')).toBeInTheDocument();
+
+      userEvent.click(await screen.findByText('NewTab'));
+
+      expect(await screen.findByText('Deployments')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment')
+      ).toBeInTheDocument();
+      expect(await screen.findByText('Containers')).toBeInTheDocument();
+
+      userEvent.dblClick(await screen.findByText('NewTab'));
+      userEvent.click(await screen.findByRole('input'));
+      await act(async () => {
+        userEvent.click(await screen.findByText('Containers'));
+      });
+
+      expect(await screen.findByText('NewTab')).toBeInTheDocument();
+    },
+    testTimeout
+  );
+});

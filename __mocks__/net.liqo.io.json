@@ -25,11 +25,7 @@
       "singularName": "",
       "namespaced": false,
       "kind": "NetworkConfig",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     },
     {
       "name": "tunnelendpoints",
@@ -53,11 +49,7 @@
       "singularName": "",
       "namespaced": false,
       "kind": "TunnelEndpoint",
-      "verbs": [
-        "get",
-        "patch",
-        "update"
-      ]
+      "verbs": ["get", "patch", "update"]
     }
   ]
 }

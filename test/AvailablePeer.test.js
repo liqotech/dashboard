@@ -29,73 +29,111 @@ import NamespaceResponse from '../__mocks__/namespaces.json';
 fetchMock.enableMocks();
 
 async function setup() {
-  window.api = ApiInterface({id_token: 'test'});
+  window.api = ApiInterface({ id_token: 'test' });
   window.api.getCRDs().then(async () => {
     render(
       <MemoryRouter>
         <Home />
       </MemoryRouter>
-    )
+    );
   });
 }
 
 function mocks(advertisement, foreignCluster, peeringRequest, error) {
-  fetch.mockResponse((req) => {
+  fetch.mockResponse(req => {
     if (req.url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
+      return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)));
     } else if (req.url === 'http://localhost:3001/namespaces') {
-      return Promise.resolve(new Response(JSON.stringify({ body: NamespaceResponse })))
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: NamespaceResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({ body: ViewMockResponse })))
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/foreignclusters') {
-      if(req.method === 'GET')
-        return Promise.resolve(new Response(JSON.stringify({ body: foreignCluster })));
-      else{
-        if(!error){
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ViewMockResponse }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/foreignclusters'
+    ) {
+      if (req.method === 'GET')
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: foreignCluster }))
+        );
+      else {
+        if (!error) {
           let foreignCluster = FCMockResponseNoIn.items[0];
           foreignCluster.metadata.resourceVersion++;
-          return Promise.resolve(new Response(JSON.stringify({ body: foreignCluster })));
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: foreignCluster }))
+          );
         } else {
           return Promise.reject(Error409.body);
         }
       }
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/searchdomains') {
-      if(req.method === 'GET')
-        return Promise.resolve(new Response(JSON.stringify({ body: SDMockResponse })));
-      else{
-        if(!error){
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/searchdomains'
+    ) {
+      if (req.method === 'GET')
+        return Promise.resolve(
+          new Response(JSON.stringify({ body: SDMockResponse }))
+        );
+      else {
+        if (!error) {
           let searchDomain = SDMockResponse.items[0];
           searchDomain.metadata.resourceVersion++;
-          return Promise.resolve(new Response(JSON.stringify({ body: searchDomain })));
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: searchDomain }))
+          );
         } else {
           return Promise.reject(Error409.body);
         }
       }
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/advertisements') {
-      return Promise.resolve(new Response(JSON.stringify({ body: advertisement })));
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/peeringrequests') {
-      return Promise.resolve(new Response(JSON.stringify({ body: peeringRequest })));
-    } else if (req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs') {
-      return Promise.resolve(new Response(JSON.stringify({ body: ConfigMockResponse })));
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/advertisements'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: advertisement }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/peeringrequests'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: peeringRequest }))
+      );
+    } else if (
+      req.url === 'http://localhost:3001/clustercustomobject/clusterconfigs'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ConfigMockResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/pod') {
-      return Promise.resolve(new Response(JSON.stringify({body: PodsMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: PodsMockResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/nodes') {
-      return Promise.resolve(new Response(JSON.stringify({body: NodesMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: NodesMockResponse }))
+      );
     } else if (req.url === 'http://localhost:3001/metrics/nodes') {
-      return Promise.resolve(new Response(JSON.stringify(NodesMetricsMockResponse)));
+      return Promise.resolve(
+        new Response(JSON.stringify(NodesMetricsMockResponse))
+      );
     } else if (req.url === 'http://localhost:3001/configmaps/liqo') {
-      return Promise.resolve(new Response(JSON.stringify({body: CMMockResponse})));
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: CMMockResponse }))
+      );
     } else {
       return metricsPODs(req);
     }
-  })
+  });
 }
 
 async function OKCheck() {
   await setup();
 
   expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
-  expect(await screen.findByText('No peer connected at the moment')).toBeInTheDocument();
+  expect(
+    await screen.findByText('No peer connected at the moment')
+  ).toBeInTheDocument();
 }
 
 async function addPeer() {
@@ -114,139 +152,182 @@ async function addPeer() {
 }
 
 describe('AvailablePeer', () => {
-  test('List of available peers shows', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
+  test(
+    'List of available peers shows',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
 
-    await OKCheck();
+      await OKCheck();
 
-    userEvent.click(screen.getByLabelText('dropdown-available'));
-  }, testTimeout)
+      userEvent.click(screen.getByLabelText('dropdown-available'));
+    },
+    testTimeout
+  );
 
-  test('List of available peers shows (with refused adv)', async () => {
-    mocks(AdvMockResponseRefused, FCMockResponseJoin, {items: []});
+  test(
+    'List of available peers shows (with refused adv)',
+    async () => {
+      mocks(AdvMockResponseRefused, FCMockResponseJoin, { items: [] });
 
-    await OKCheck();
+      await OKCheck();
 
-    userEvent.click(screen.getByLabelText('dropdown-available'));
-  }, testTimeout)
+      userEvent.click(screen.getByLabelText('dropdown-available'));
+    },
+    testTimeout
+  );
 
-  test('Add manual peer works', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
+  test(
+    'Add manual peer works',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
 
-    await OKCheck();
+      await OKCheck();
 
-    await addPeer();
+      await addPeer();
 
-    expect(await screen.findByText(/Peer Added/i)).toBeInTheDocument();
-  }, testTimeout)
+      expect(await screen.findByText(/Peer Added/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  test('Add manual peer with error shows notification', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
+  test(
+    'Add manual peer with error shows notification',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
 
-    await OKCheck();
+      await OKCheck();
 
-    await addPeer();
+      await addPeer();
 
-    expect(await screen.findByText(/Could not add peer/i)).toBeInTheDocument();
-  }, testTimeout)
+      expect(
+        await screen.findByText(/Could not add peer/i)
+      ).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  test('Modal opens when click on search for domain', async () => {
-    mocks(AdvMockResponse, FCMockResponseJoin, PRMockResponse);
-    await setup();
+  test(
+    'Modal opens when click on search for domain',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponseJoin, PRMockResponse);
+      await setup();
 
-    expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
-    expect(await screen.findByText(/No peer available/i)).toBeInTheDocument();
+      expect(await screen.findByText('Cluster-Test')).toBeInTheDocument();
+      expect(await screen.findByText(/No peer available/i)).toBeInTheDocument();
 
-    userEvent.click(await screen.findByText(/search/i));
-  }, testTimeout)
+      userEvent.click(await screen.findByText(/search/i));
+    },
+    testTimeout
+  );
 
-  test('Connect with a cluster', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
-    await OKCheck();
+  test(
+    'Connect with a cluster',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
+      await OKCheck();
 
-    userEvent.click(screen.getByText('Cluster-Test'));
+      userEvent.click(screen.getByText('Cluster-Test'));
 
-    expect(await screen.findByText('Connect')).toBeInTheDocument();
+      expect(await screen.findByText('Connect')).toBeInTheDocument();
 
-    userEvent.click(screen.getByText('Connect'));
+      userEvent.click(screen.getByText('Connect'));
 
-    expect(await screen.findByText(/No peer available/i)).toBeInTheDocument();
-  }, testTimeout)
+      expect(await screen.findByText(/No peer available/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  test('Connect with a cluster from dropdown', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
-    await OKCheck();
+  test(
+    'Connect with a cluster from dropdown',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponse, PRMockResponse);
+      await OKCheck();
 
-    userEvent.click(screen.getByLabelText('ellipsis'));
+      userEvent.click(screen.getByLabelText('ellipsis'));
 
-    await act(async () => {
-      userEvent.click(await screen.findByLabelText('link'));
-    })
+      await act(async () => {
+        userEvent.click(await screen.findByLabelText('link'));
+      });
 
-    expect(await screen.findByText(/No peer available/i)).toBeInTheDocument();
+      expect(await screen.findByText(/No peer available/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  }, testTimeout)
+  test(
+    'Connect through WAN',
+    async () => {
+      let fcRes = FCMockResponse;
+      fcRes.items[0].spec.discoveryType = 'WAN';
 
-  test('Connect through WAN', async () => {
-    let fcRes = FCMockResponse;
-    fcRes.items[0].spec.discoveryType = 'WAN';
+      mocks(AdvMockResponse, fcRes, PRMockResponse);
+      await OKCheck();
 
-    mocks(AdvMockResponse, fcRes, PRMockResponse);
-    await OKCheck();
+      userEvent.click(screen.getByLabelText('cluster'));
 
-    userEvent.click(screen.getByLabelText('cluster'));
+      expect(await screen.findByText(/No peer available/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    expect(await screen.findByText(/No peer available/i)).toBeInTheDocument();
-  }, testTimeout)
+  test(
+    'Connect with a cluster then disconnect',
+    async () => {
+      mocks(AdvMockResponseNotAccepted, FCMockResponse, PRMockResponse);
+      await OKCheck();
 
-  test('Connect with a cluster then disconnect', async () => {
-    mocks(AdvMockResponseNotAccepted, FCMockResponse, PRMockResponse);
-    await OKCheck();
+      userEvent.click(screen.getByText('Cluster-Test'));
 
-    userEvent.click(screen.getByText('Cluster-Test'));
+      expect(await screen.findByText('Connect')).toBeInTheDocument();
 
-    expect(await screen.findByText('Connect')).toBeInTheDocument();
+      userEvent.click(screen.getByText('Connect'));
 
-    userEvent.click(screen.getByText('Connect'));
+      expect(await screen.findByText(/No peer connected/i)).toBeInTheDocument();
 
-    expect(await screen.findByText(/No peer connected/i)).toBeInTheDocument();
+      userEvent.click(await screen.findByText('Stop Connecting'));
 
-    userEvent.click(await screen.findByText('Stop Connecting'));
+      expect(await screen.findByText('Connect')).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    expect(await screen.findByText('Connect')).toBeInTheDocument();
-  }, testTimeout)
+  test(
+    'Connect with a cluster then disconnect from dropdown',
+    async () => {
+      mocks(AdvMockResponseNotAccepted, FCMockResponse, PRMockResponse);
+      await OKCheck();
 
-  test('Connect with a cluster then disconnect from dropdown', async () => {
-    mocks(AdvMockResponseNotAccepted, FCMockResponse, PRMockResponse);
-    await OKCheck();
+      userEvent.click(screen.getByLabelText('ellipsis'));
 
-    userEvent.click(screen.getByLabelText('ellipsis'));
+      await act(async () => {
+        userEvent.click(await screen.findByLabelText('link'));
+      });
 
-    await act(async () => {
-      userEvent.click(await screen.findByLabelText('link'));
-    })
+      userEvent.click(screen.getByLabelText('ellipsis'));
 
-    userEvent.click(screen.getByLabelText('ellipsis'));
+      await act(async () => {
+        userEvent.click(await screen.findByLabelText('link'));
+      });
+    },
+    testTimeout
+  );
 
-    await act(async () => {
-      userEvent.click(await screen.findByLabelText('link'));
-    })
+  test(
+    'Connect with a cluster with error',
+    async () => {
+      mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
+      await OKCheck();
 
-  }, testTimeout)
+      userEvent.click(screen.getAllByText('Cluster-Test')[0]);
 
-  test('Connect with a cluster with error', async () => {
-    mocks(AdvMockResponse, FCMockResponse, PRMockResponse, true);
-    await OKCheck();
+      expect(await screen.findByText('Connect')).toBeInTheDocument();
 
-    userEvent.click(screen.getAllByText('Cluster-Test')[0]);
+      userEvent.click(screen.getByText('Connect'));
 
-    expect(await screen.findByText('Connect')).toBeInTheDocument();
+      expect(await screen.findByText(/No peer connected/i)).toBeInTheDocument();
 
-    userEvent.click(screen.getByText('Connect'));
-
-    expect(await screen.findByText(/No peer connected/i)).toBeInTheDocument();
-
-    userEvent.click(screen.getAllByText('Cluster-Test')[0]);
-  }, testTimeout)
-
-})
+      userEvent.click(screen.getAllByText('Cluster-Test')[0]);
+    },
+    testTimeout
+  );
+});

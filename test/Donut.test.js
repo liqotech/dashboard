@@ -9,11 +9,15 @@ import { testTimeout } from '../src/constants';
 fetchMock.enableMocks();
 
 describe('Donut', () => {
-  test('Line chart NaN data', async () => {
-    render(
-      <MemoryRouter>
-        <Donut data={[{"resource": "CPU", "date": "00:00:00", "value": "14" }]} />
-      </MemoryRouter>
-    )
-  }, testTimeout)
-})
+  test(
+    'Line chart NaN data',
+    async () => {
+      render(
+        <MemoryRouter>
+          <Donut data={[{ resource: 'CPU', date: '00:00:00', value: '14' }]} />
+        </MemoryRouter>
+      );
+    },
+    testTimeout
+  );
+});

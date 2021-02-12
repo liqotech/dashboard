@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Drawer, Button, Tooltip, Col, Badge, Typography, Row, Space, Popover, Popconfirm } from 'antd';
+import {
+  Drawer,
+  Button,
+  Tooltip,
+  Col,
+  Badge,
+  Typography,
+  Row,
+  Space,
+  Popover,
+  Popconfirm
+} from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import dark from '../themes/dark.json';
 import light from '../themes/light.json';
@@ -8,62 +19,71 @@ import ColorPicker from './ColorPicker';
 import { handleSave } from '../services/SaveUtils';
 import ThemeUploader from './ThemeUploader';
 
-export default function ThemeModifier(props){
+export default function ThemeModifier(props) {
   const [visible, setVisible] = useState(false);
   const [items, setItems] = useState([]);
 
   const changeTheme = (key, color) => {
-    let theme = {...JSON.parse(localStorage.getItem('theme')), [key]: color};
-    window.less.modifyVars(theme)
-      .then(() => {
-        localStorage.setItem('theme', JSON.stringify(theme));
-      });
-  }
+    let theme = { ...JSON.parse(localStorage.getItem('theme')), [key]: color };
+    window.less.modifyVars(theme).then(() => {
+      localStorage.setItem('theme', JSON.stringify(theme));
+    });
+  };
 
   const changeItems = theme => {
     setItems([]);
     _.keys(dark).forEach(key => {
-      setItems(prev => [...prev, (
+      setItems(prev => [
+        ...prev,
         <div key={key}>
           <Row align="middle" gutter={[20, 0]}>
             <Col span={20}>
-              <Badge status="default"/>
+              <Badge status="default" />
               <Typography.Text strong>{key}</Typography.Text>
             </Col>
             <Col>
-              <ColorPicker parameter={key} color={theme[key]} updateFunc={changeTheme} />
+              <ColorPicker
+                parameter={key}
+                color={theme[key]}
+                updateFunc={changeTheme}
+              />
             </Col>
           </Row>
         </div>
-      )]);
-    })
-  }
+      ]);
+    });
+  };
 
   const setTheme = () => {
-    if(localStorage.getItem('theme') === 'dark' || !localStorage.getItem('theme'))
+    if (
+      localStorage.getItem('theme') === 'dark' ||
+      !localStorage.getItem('theme')
+    )
       localStorage.setItem('theme', JSON.stringify(dark));
-    else if(localStorage.getItem('theme') === 'light')
+    else if (localStorage.getItem('theme') === 'light')
       localStorage.setItem('theme', JSON.stringify(light));
 
     let theme = JSON.parse(localStorage.getItem('theme'));
 
     changeItems(theme);
-  }
+  };
 
   useEffect(() => {
     setTheme();
-  }, [visible])
+  }, [visible]);
 
   const resetTheme = () => {
-    window.less.modifyVars(dark)
+    window.less
+      .modifyVars(dark)
       .then(() => localStorage.setItem('theme', 'dark'));
-  }
+  };
 
-  return(
+  return (
     <div>
-      <Tooltip title={'Modify theme'} >
-        <SettingOutlined onClick={() => setVisible(prev => !prev)}
-                         style={{fontSize: 20, paddingLeft: 20, paddingRight: 10}}
+      <Tooltip title={'Modify theme'}>
+        <SettingOutlined
+          onClick={() => setVisible(prev => !prev)}
+          style={{ fontSize: 20, paddingLeft: 20, paddingRight: 10 }}
         />
         {props.showDescription ? 'Modify Theme' : null}
       </Tooltip>
@@ -76,29 +96,30 @@ export default function ThemeModifier(props){
         footer={
           <Row>
             <Col span={8}>
-              <Popover trigger={'click'}
-                       content={<ThemeUploader changeItems={changeItems}/>}
+              <Popover
+                trigger={'click'}
+                content={<ThemeUploader changeItems={changeItems} />}
               >
-                <Button>
-                  Import Theme
-                </Button>
+                <Button>Import Theme</Button>
               </Popover>
             </Col>
             <Col span={16}>
               <div
                 style={{
-                  textAlign: 'right',
+                  textAlign: 'right'
                 }}
               >
-                <Popconfirm title={'Reset theme?'}
-                            onConfirm={resetTheme}
-                >
-                  <Button style={{marginRight: 8}}>
-                    Reset
-                  </Button>
+                <Popconfirm title={'Reset theme?'} onConfirm={resetTheme}>
+                  <Button style={{ marginRight: 8 }}>Reset</Button>
                 </Popconfirm>
-                <Button type="primary"
-                        onClick={() => handleSave(localStorage.getItem('theme'), 'liqodash-custom-theme')}
+                <Button
+                  type="primary"
+                  onClick={() =>
+                    handleSave(
+                      localStorage.getItem('theme'),
+                      'liqodash-custom-theme'
+                    )
+                  }
                 >
                   Export
                 </Button>
@@ -107,10 +128,10 @@ export default function ThemeModifier(props){
           </Row>
         }
       >
-        <Space direction={'vertical'} size={'small'} style={{width: '100%'}}>
+        <Space direction={'vertical'} size={'small'} style={{ width: '100%' }}>
           {items}
         </Space>
       </Drawer>
     </div>
-  )
+  );
 }

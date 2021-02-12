@@ -14,111 +14,143 @@ fetchMock.enableMocks();
 
 async function setup() {
   setToken();
-  window.history.pushState({}, 'Page Title', '/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9');
+  window.history.pushState(
+    {},
+    'Page Title',
+    '/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'
+  );
 
   return render(
     <MemoryRouter>
       <App />
     </MemoryRouter>
-  )
+  );
 }
 
-beforeEach(() => { localStorage.setItem('theme', 'dark');
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
-function mocks(error){
+function mocks(error) {
   fetch.mockResponse(req => {
-    if((req.method === 'DELETE' || req.method === 'PATCH') && req.url === 'http://localhost/apiserver/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'){
-      if(!error)
-        return Promise.resolve(new Response(JSON.stringify('')));
-      else
-        return Promise.reject();
-    }
-    else if(generalMocks(req.url))
-      return generalMocks(req.url);
-  })
+    if (
+      (req.method === 'DELETE' || req.method === 'PATCH') &&
+      req.url ===
+        'http://localhost/apiserver/api/v1/namespaces/test/pods/hello-world-deployment-6756549f5-x66v9'
+    ) {
+      if (!error) return Promise.resolve(new Response(JSON.stringify('')));
+      else return Promise.reject();
+    } else if (generalMocks(req.url)) return generalMocks(req.url);
+  });
 }
 
 describe('ResourceHeader', () => {
-  test('Header delete resource', async () => {
-    mocks();
+  test(
+    'Header delete resource',
+    async () => {
+      mocks();
 
-    await setup();
+      await setup();
 
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
-    expect(await screen.findByText('DELETE')).toBeInTheDocument();
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
+      expect(await screen.findByText('DELETE')).toBeInTheDocument();
 
-    userEvent.click(await screen.findByLabelText('delete'));
-    userEvent.click(await screen.findByText('Yes'));
+      userEvent.click(await screen.findByLabelText('delete'));
+      userEvent.click(await screen.findByText('Yes'));
 
-    expect(await screen.findByText('Pod terminating...')).toBeInTheDocument();
+      expect(await screen.findByText('Pod terminating...')).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-  }, testTimeout)
+  test(
+    'Error on delete resource',
+    async () => {
+      mocks(true);
 
-  test('Error on delete resource', async () => {
-    mocks(true);
+      await setup();
 
-    await setup();
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
+      expect(await screen.findByText('DELETE')).toBeInTheDocument();
 
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
-    expect(await screen.findByText('DELETE')).toBeInTheDocument();
+      userEvent.click(await screen.findByLabelText('delete'));
+      userEvent.click(await screen.findByText('Yes'));
 
-    userEvent.click(await screen.findByLabelText('delete'));
-    userEvent.click(await screen.findByText('Yes'));
+      expect(await screen.findByText(/could not/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    expect(await screen.findByText(/could not/i)).toBeInTheDocument();
+  test(
+    'Update resource',
+    async () => {
+      mocks();
 
-  }, testTimeout)
+      await setup();
 
-  test('Update resource', async () => {
-    mocks();
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
 
-    await setup();
+      userEvent.click(await screen.findByText('JSON'));
 
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
+      let res = PodMockResponse;
+      res.metadata.namespace = 'testV2';
+      res.metadata.resourceVersion += 1;
 
-    userEvent.click(await screen.findByText('JSON'));
+      await userEvent.type(
+        screen.getByLabelText('editor'),
+        JSON.stringify(res)
+      );
 
-    let res = PodMockResponse;
-    res.metadata.namespace = 'testV2';
-    res.metadata.resourceVersion += 1;
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-    await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(res));
+      userEvent.click(await screen.findByText('General'));
 
-    userEvent.click(screen.getByRole('button', {name: 'Save'}));
+      let gen = await screen.findAllByText('General');
+      userEvent.click(gen[1]);
 
-    userEvent.click(await screen.findByText('General'));
+      const textboxes = await screen.findAllByRole('textbox');
 
-    let gen = await screen.findAllByText('General');
-    userEvent.click(gen[1]);
+      expect(textboxes[2]).toHaveAttribute('value', 'testV2');
+    },
+    testTimeout
+  );
 
-    const textboxes = await screen.findAllByRole('textbox');
+  test(
+    'Error on update resource',
+    async () => {
+      mocks(true);
 
-    expect(textboxes[2]).toHaveAttribute('value', 'testV2');
+      await setup();
 
-  }, testTimeout)
+      expect(await screen.findByText('pods')).toBeInTheDocument();
+      expect(
+        await screen.findByText('hello-world-deployment-6756549f5-x66v9')
+      ).toBeInTheDocument();
 
-  test('Error on update resource', async () => {
-    mocks(true);
+      userEvent.click(await screen.findByText('JSON'));
 
-    await setup();
+      let res = PodMockResponse;
+      res.metadata.name += '2';
 
-    expect(await screen.findByText('pods')).toBeInTheDocument();
-    expect(await screen.findByText('hello-world-deployment-6756549f5-x66v9')).toBeInTheDocument();
+      await userEvent.type(
+        screen.getByLabelText('editor'),
+        JSON.stringify(res)
+      );
 
-    userEvent.click(await screen.findByText('JSON'));
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-    let res = PodMockResponse;
-    res.metadata.name += '2'
-
-    await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(res));
-
-    userEvent.click(screen.getByRole('button', {name: 'Save'}));
-
-    expect(await screen.findByText(/could not/i)).toBeInTheDocument();
-  }, testTimeout)
-})
+      expect(await screen.findByText(/could not/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
+});

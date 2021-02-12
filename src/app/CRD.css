@@ -1,28 +1,29 @@
 .crd-content {
-    margin-bottom: 30px;
-    padding: 20px 15px 20px 15px;
-    letter-spacing: .01em;
-    box-shadow: 0 2px 2px 0 #ececec, 0 0 0 1px #ececec;
-    background: white;
+  margin-bottom: 30px;
+  padding: 20px 15px 20px 15px;
+  letter-spacing: 0.01em;
+  box-shadow: 0 2px 2px 0 #ececec, 0 0 0 1px #ececec;
+  background: white;
 }
 
 .crd-choices {
-    margin-top: 5px;
-    margin-bottom: 15px;
+  margin-top: 5px;
+  margin-bottom: 15px;
 }
 
 .ant-typography ul,
 .ant-typography ol {
-    margin: 0 0 0 0 !important;;
-    padding: 0 !important;;
+  margin: 0 0 0 0 !important;
+  padding: 0 !important;
 }
 
-.ant-typography ul li, .ant-typography ol li {
-    margin: 0 0 0 10px !important;
-    padding: 0 0 0 4px !important;
+.ant-typography ul li,
+.ant-typography ol li {
+  margin: 0 0 0 10px !important;
+  padding: 0 0 0 4px !important;
 }
 
 .crd-container {
-    overflow: hidden;
-    width: 100%;
+  overflow: hidden;
+  width: 100%;
 }

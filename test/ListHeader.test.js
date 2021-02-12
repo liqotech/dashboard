@@ -20,66 +20,79 @@ async function setup() {
     <MemoryRouter>
       <App />
     </MemoryRouter>
-  )
+  );
 }
 
-beforeEach(() => { localStorage.setItem('theme', 'dark');
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
-function mocks(){
-  fetch.mockImplementation((url) => {
-    if(generalMocks(url))
-      return generalMocks(url);
-  })
+function mocks() {
+  fetch.mockImplementation(url => {
+    if (generalMocks(url)) return generalMocks(url);
+  });
 }
 
 describe('ListHeader', () => {
-  test('Header list add pod', async () => {
-    mocks();
+  test(
+    'Header list add pod',
+    async () => {
+      mocks();
 
-    await setup();
+      await setup();
 
-    expect(await screen.findByText('Pod')).toBeInTheDocument();
+      expect(await screen.findByText('Pod')).toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('plus'));
+      userEvent.click(screen.getByLabelText('plus'));
 
-    expect(await screen.findByText(/create a new pod resource/i)).toBeInTheDocument();
+      expect(
+        await screen.findByText(/create a new pod resource/i)
+      ).toBeInTheDocument();
 
-    let res = PodMockResponse;
-    res.metadata.name += '2'
+      let res = PodMockResponse;
+      res.metadata.name += '2';
 
-    await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(res));
+      await userEvent.type(
+        screen.getByLabelText('editor'),
+        JSON.stringify(res)
+      );
 
-    userEvent.click(screen.getByRole('button', {name: 'Save'}));
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-    expect(await screen.findAllByRole('row')).toHaveLength(4);
-  }, testTimeout)
+      expect(await screen.findAllByRole('row')).toHaveLength(4);
+    },
+    testTimeout
+  );
 
-  test('Change namespace change resources', async () => {
-    mocks();
+  test(
+    'Change namespace change resources',
+    async () => {
+      mocks();
 
-    await setup();
+      await setup();
 
-    expect(await screen.findByText('Pod')).toBeInTheDocument();
-    expect(await screen.findAllByRole('row')).toHaveLength(4);
+      expect(await screen.findByText('Pod')).toBeInTheDocument();
+      expect(await screen.findAllByRole('row')).toHaveLength(4);
 
-    const ns = screen.getByText('all namespaces');
-    userEvent.click(ns);
+      const ns = screen.getByText('all namespaces');
+      userEvent.click(ns);
 
-    const ns_liqo = await screen.findByText('liqo');
-    const ns_default = await screen.findAllByText('default');
+      const ns_liqo = await screen.findByText('liqo');
+      const ns_default = await screen.findAllByText('default');
 
-    expect(ns_liqo).toBeInTheDocument();
-    expect(ns_default[1]).toBeInTheDocument();
+      expect(ns_liqo).toBeInTheDocument();
+      expect(ns_default[1]).toBeInTheDocument();
 
-    await act(async () => {
-      fireEvent.mouseOver(ns_liqo);
-      fireEvent.click(ns_liqo);
+      await act(async () => {
+        fireEvent.mouseOver(ns_liqo);
+        fireEvent.click(ns_liqo);
 
-      await new Promise((r) => setTimeout(r, 1000));
-    })
+        await new Promise(r => setTimeout(r, 1000));
+      });
 
-    expect(await screen.findByText(/no data/i)).toBeInTheDocument();
-  }, testTimeout)
-})
+      expect(await screen.findByText(/no data/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
+});

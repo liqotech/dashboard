@@ -16,31 +16,31 @@ import { MemoryRouter } from 'react-router-dom';
 import App from '../src/app/App';
 
 async function setup() {
-  fetch.mockImplementation((url) => {
+  fetch.mockImplementation(url => {
     if (url === 'http://localhost:3001/customresourcedefinition') {
-      return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
+      return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)));
     } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-      return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-    } else if (url === 'http://localhost:3001/clustercustomobject/liqodashtests') {
-      return Promise.resolve(new Response(JSON.stringify({ body: LiqoDashMockResponse })))
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: ViewMockResponse }))
+      );
+    } else if (
+      url === 'http://localhost:3001/clustercustomobject/liqodashtests'
+    ) {
+      return Promise.resolve(
+        new Response(JSON.stringify({ body: LiqoDashMockResponse }))
+      );
     }
-  })
+  });
 
-  window.api = ApiInterface({id_token: 'test'});
+  window.api = ApiInterface({ id_token: 'test' });
   window.api.getCRDs().then(async () => {
-
     let liqo_crd = await window.api.getCRDFromKind('LiqoDashTest');
 
-    render(
-      <NewResource resource={liqo_crd}
-                   showCreate={true}
-      />
-    )
+    render(<NewResource resource={liqo_crd} showCreate={true} />);
   });
 }
 
-async function check_new_CR(){
-
+async function check_new_CR() {
   const test = await screen.findByText('test-3');
 
   expect(screen.getAllByLabelText('cr')).toHaveLength(3);
@@ -66,14 +66,19 @@ async function check_new_CR(){
   expect(textboxes[3]).toHaveAttribute('value', 'orange');
 }
 
-beforeEach(() => { localStorage.setItem('theme', 'dark');
+beforeEach(() => {
+  localStorage.setItem('theme', 'dark');
   Cookies.remove('token');
 });
 
-async function setup_resources(error, method, crd){
+async function setup_resources(error, method, crd) {
   mockCRDAndViewsExtended(error, method, crd);
   setToken();
-  window.history.pushState({}, 'Page Title', '/customresources/liqodashtests.dashboard.liqo.io');
+  window.history.pushState(
+    {},
+    'Page Title',
+    '/customresources/liqodashtests.dashboard.liqo.io'
+  );
 
   render(
     <MemoryRouter>
@@ -85,217 +90,277 @@ async function setup_resources(error, method, crd){
 }
 
 describe('NewResource', () => {
-  test('CR drawer is present and form wizard is the first tab selected', async () => {
-    await setup();
+  test(
+    'CR drawer is present and form wizard is the first tab selected',
+    async () => {
+      await setup();
+
+      expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+      expect(screen.getByText('Form Wizard')).toBeInTheDocument();
+
+      expect(screen.getByText('Submit'));
+    },
+    testTimeout
+  );
+
+  test(
+    'CR form generator tab is not present when no schema',
+    async () => {
+      fetch.mockImplementation(url => {
+        if (url === 'http://localhost:3001/customresourcedefinition') {
+          return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)));
+        } else if (url === 'http://localhost:3001/clustercustomobject/views') {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: ViewMockResponse }))
+          );
+        } else if (
+          url ===
+          'http://localhost:3001/clustercustomobject/noannnoresnoschemas'
+        ) {
+          return Promise.resolve(
+            new Response(JSON.stringify({ body: NoAnnNoResNoSch }))
+          );
+        }
+      });
+
+      window.api = ApiInterface({ id_token: 'test' });
+      window.api.getCRDs().then(async () => {
+        let noschema_crd = await window.api.getCRDFromKind(
+          'NoAnnNoResNoSchema'
+        );
+
+        render(<NewResource resource={noschema_crd} showCreate={true} />);
+      });
+
+      expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+      expect(screen.queryByText('Form Wizard')).not.toBeInTheDocument();
+    },
+    testTimeout
+  );
+
+  test(
+    'CR second tab show the form generator properly',
+    async () => {
+      await setup();
+
+      userEvent.click(await screen.findByText('Form Wizard'));
+
+      expect(await screen.findByText('Metadata'));
+
+      expect(screen.getByText('Submit')).toBeInTheDocument();
+
+      expect(screen.getByText('Item')).toBeInTheDocument();
+      userEvent.click(screen.getByText('Item'));
+
+      const button = screen.getByText('Add Item');
+      userEvent.click(button);
+
+      expect(await screen.findByText('Cost')).toBeInTheDocument();
+      expect(await screen.findAllByText('Name')).toHaveLength(2);
+    },
+    testTimeout
+  );
+
+  test(
+    'Error message if no value inserted',
+    async () => {
+      await setup();
+
+      expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+      userEvent.click(screen.getByText('JSON/YAML'));
+
+      userEvent.click(screen.getByText('Save'));
+
+      expect(await screen.findByText(/errors/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
+
+  test(
+    'Error message if no name in form generator',
+    async () => {
+      await setup();
+
+      userEvent.click(await screen.findByText('Form Wizard'));
+
+      expect(await screen.findByText('Metadata'));
+      userEvent.click(screen.getByText('Submit'));
+
+      expect(await screen.findByText(/Please/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
 
-    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    expect(screen.getByText('Form Wizard')).toBeInTheDocument();
+  test(
+    'Error message when wrong metadata',
+    async () => {
+      await setup();
 
-    expect(screen.getByText('Submit'));
-  }, testTimeout)
+      expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+      userEvent.click(screen.getByText('JSON/YAML'));
+      const _JSON = await screen.findAllByText('JSON');
+      userEvent.click(_JSON[0]);
 
-  test('CR form generator tab is not present when no schema', async () => {
-    fetch.mockImplementation((url) => {
-      if (url === 'http://localhost:3001/customresourcedefinition') {
-        return Promise.resolve(new Response(JSON.stringify(CRDmockEmpty)))
-      } else if (url === 'http://localhost:3001/clustercustomobject/views') {
-        return Promise.resolve(new Response(JSON.stringify({body: ViewMockResponse})))
-      } else if (url === 'http://localhost:3001/clustercustomobject/noannnoresnoschemas') {
-        return Promise.resolve(new Response(JSON.stringify({ body: NoAnnNoResNoSch })))
-      }
-    })
+      await userEvent.type(
+        screen.getByLabelText('editor'),
+        '{"name": "test", "namespace": "test"}'
+      );
 
-    window.api = ApiInterface({id_token: 'test'});
-    window.api.getCRDs().then(async () => {
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-      let noschema_crd = await window.api.getCRDFromKind('NoAnnNoResNoSchema');
+      expect(await screen.findAllByText(/errors/i)).toHaveLength(2);
+    },
+    testTimeout
+  );
 
-      render(
-        <NewResource resource={noschema_crd}
-                     showCreate={true}
-        />
-      )
-    });
+  test(
+    'Error message when wrong input (YAML)',
+    async () => {
+      await setup();
 
-    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    expect(screen.queryByText('Form Wizard')).not.toBeInTheDocument();
-  }, testTimeout)
+      expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+      userEvent.click(screen.getByText('JSON/YAML'));
+      const _JSON = await screen.findAllByText('JSON');
+      userEvent.click(_JSON[0]);
 
-  test('CR second tab show the form generator properly', async () => {
-    await setup();
+      await userEvent.type(
+        screen.getByLabelText('editor'),
+        'name: "test", {"namespace" test'
+      );
 
-    userEvent.click(await screen.findByText('Form Wizard'));
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-    expect(await screen.findByText('Metadata'));
+      expect(await screen.findAllByText(/not valid/i)).toHaveLength(1);
+    },
+    testTimeout
+  );
 
-    expect(screen.getByText('Submit')).toBeInTheDocument();
+  test(
+    'Correct creation of a CR from editor',
+    async () => {
+      await setup_resources();
 
-    expect(screen.getByText('Item')).toBeInTheDocument();
-    userEvent.click(screen.getByText('Item'));
+      userEvent.click(screen.getByLabelText('plus'));
+      expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+      userEvent.click(screen.getByText('JSON/YAML'));
+      const _JSON = await screen.findAllByText('JSON');
+      userEvent.click(_JSON[2]);
 
-    const button = screen.getByText('Add Item');
-    userEvent.click(button);
+      await userEvent.type(
+        screen.getByLabelText('editor'),
+        JSON.stringify(LiqoDashNewMockResponse)
+      );
 
-    expect(await screen.findByText('Cost')).toBeInTheDocument();
-    expect(await screen.findAllByText('Name')).toHaveLength(2);
-  }, testTimeout)
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-  test('Error message if no value inserted', async () => {
-    await setup();
+      await check_new_CR();
+    },
+    testTimeout
+  );
 
-    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    userEvent.click(screen.getByText('JSON/YAML'));
+  test(
+    'Correct creation of a CR from form',
+    async () => {
+      await setup_resources();
 
-    userEvent.click(screen.getByText('Save'));
+      userEvent.click(screen.getByLabelText('plus'));
 
-    expect(await screen.findByText(/errors/i)).toBeInTheDocument();
-  }, testTimeout)
+      const form = await screen.findByText('Form Wizard');
+      userEvent.click(form);
 
-  test('Error message if no name in form generator', async () => {
-    await setup();
+      let textbox = await screen.findAllByRole('textbox', { name: '' });
 
-    userEvent.click(await screen.findByText('Form Wizard'));
+      expect(textbox).toHaveLength(2);
 
-    expect(await screen.findByText('Metadata'));
-    userEvent.click(screen.getByText('Submit'));
+      await userEvent.type(textbox[0], 'test');
+      await userEvent.type(textbox[1], 'test-ns');
 
-    expect(await screen.findByText(/Please/i)).toBeInTheDocument();
-  }, testTimeout)
+      userEvent.click(await screen.findByText('Item'));
 
-  test('Error message when wrong metadata', async () => {
-    await setup();
+      userEvent.click(await screen.findByText('Add Item'));
 
-    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    userEvent.click(screen.getByText('JSON/YAML'));
-    const _JSON = await screen.findAllByText('JSON');
-    userEvent.click(_JSON[0]);
+      await screen.findByText('Cost');
 
-    await userEvent.type(screen.getByLabelText('editor'), '{"name": "test", "namespace": "test"}');
+      textbox = await screen.findAllByRole('textbox', { name: '' });
 
-    userEvent.click(screen.getByRole('button', {name: 'Save'}));
+      await userEvent.type(textbox[2], '1');
+      await userEvent.type(textbox[3], 'cyan');
 
-    expect(await screen.findAllByText(/errors/i)).toHaveLength(2);
-  }, testTimeout)
+      userEvent.click(await screen.findByText('Add Item'));
 
-  test('Error message when wrong input (YAML)', async () => {
-    await setup();
+      textbox = await screen.findAllByRole('textbox', { name: '' });
 
-    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    userEvent.click(screen.getByText('JSON/YAML'));
-    const _JSON = await screen.findAllByText('JSON');
-    userEvent.click(_JSON[0]);
+      await userEvent.type(textbox[4], '2');
+      await userEvent.type(textbox[5], 'orange');
 
-    await userEvent.type(screen.getByLabelText('editor'), 'name: "test", {"namespace" test');
+      userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    userEvent.click(screen.getByRole('button', {name: 'Save'}));
+      await check_new_CR();
+    },
+    testTimeout
+  );
 
-    expect(await screen.findAllByText(/not valid/i)).toHaveLength(1);
-  }, testTimeout)
+  test(
+    'Correct creation of a CR from form without namespace',
+    async () => {
+      await setup_resources();
 
-  test('Correct creation of a CR from editor', async () => {
-    await setup_resources();
+      userEvent.click(screen.getByLabelText('plus'));
 
-    userEvent.click(screen.getByLabelText('plus'));
-    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    userEvent.click(screen.getByText('JSON/YAML'));
-    const _JSON = await screen.findAllByText('JSON');
-    userEvent.click(_JSON[2]);
+      const form = await screen.findByText('Form Wizard');
+      userEvent.click(form);
 
-    await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashNewMockResponse));
+      let textbox = await screen.findAllByRole('textbox', { name: '' });
 
-    userEvent.click(screen.getByRole('button', {name: 'Save'}));
+      expect(textbox).toHaveLength(2);
 
-    await check_new_CR();
-  }, testTimeout)
+      await userEvent.type(textbox[0], 'test');
 
-  test('Correct creation of a CR from form', async () => {
-    await setup_resources();
+      userEvent.click(await screen.findByText('Item'));
 
-    userEvent.click(screen.getByLabelText('plus'));
+      userEvent.click(await screen.findByText('Add Item'));
 
-    const form = await screen.findByText('Form Wizard');
-    userEvent.click(form);
+      await screen.findByText('Cost');
 
-    let textbox = await screen.findAllByRole('textbox', {name: ''});
+      textbox = await screen.findAllByRole('textbox', { name: '' });
 
-    expect(textbox).toHaveLength(2);
+      await userEvent.type(textbox[2], '1');
+      await userEvent.type(textbox[3], 'cyan');
 
-    await userEvent.type(textbox[0], 'test');
-    await userEvent.type(textbox[1], 'test-ns');
+      userEvent.click(await screen.findByText('Add Item'));
 
-    userEvent.click(await screen.findByText('Item'));
+      textbox = await screen.findAllByRole('textbox', { name: '' });
 
-    userEvent.click(await screen.findByText('Add Item'));
+      await userEvent.type(textbox[4], '2');
+      await userEvent.type(textbox[5], 'orange');
 
-    await screen.findByText('Cost');
+      userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-    textbox = await screen.findAllByRole('textbox', {name: ''});
+      await check_new_CR();
+    },
+    testTimeout
+  );
 
-    await userEvent.type(textbox[2], '1');
-    await userEvent.type(textbox[3], 'cyan');
+  test(
+    'Error notification when 409',
+    async () => {
+      await setup_resources('409', 'POST');
 
-    userEvent.click(await screen.findByText('Add Item'));
+      userEvent.click(screen.getByLabelText('plus'));
+      expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
+      userEvent.click(screen.getByText('JSON/YAML'));
+      const _JSON = await screen.findAllByText('JSON');
+      userEvent.click(_JSON[2]);
 
-    textbox = await screen.findAllByRole('textbox', {name: ''});
+      await userEvent.type(
+        screen.getByLabelText('editor'),
+        JSON.stringify(LiqoDashNewMockResponse)
+      );
 
-    await userEvent.type(textbox[4], '2');
-    await userEvent.type(textbox[5], 'orange');
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-    userEvent.click(screen.getByRole('button', {name: 'Submit'}));
-
-    await check_new_CR();
-  }, testTimeout)
-
-  test('Correct creation of a CR from form without namespace', async () => {
-    await setup_resources();
-
-    userEvent.click(screen.getByLabelText('plus'));
-
-    const form = await screen.findByText('Form Wizard');
-    userEvent.click(form);
-
-    let textbox = await screen.findAllByRole('textbox', {name: ''});
-
-    expect(textbox).toHaveLength(2);
-
-    await userEvent.type(textbox[0], 'test');
-
-    userEvent.click(await screen.findByText('Item'));
-
-    userEvent.click(await screen.findByText('Add Item'));
-
-    await screen.findByText('Cost');
-
-    textbox = await screen.findAllByRole('textbox', {name: ''});
-
-    await userEvent.type(textbox[2], '1');
-    await userEvent.type(textbox[3], 'cyan');
-
-    userEvent.click(await screen.findByText('Add Item'));
-
-    textbox = await screen.findAllByRole('textbox', {name: ''});
-
-    await userEvent.type(textbox[4], '2');
-    await userEvent.type(textbox[5], 'orange');
-
-    userEvent.click(screen.getByRole('button', {name: 'Submit'}));
-
-    await check_new_CR();
-  }, testTimeout)
-
-  test('Error notification when 409', async () => {
-    await setup_resources('409', 'POST');
-
-    userEvent.click(screen.getByLabelText('plus'));
-    expect(await screen.findByText('JSON/YAML')).toBeInTheDocument();
-    userEvent.click(screen.getByText('JSON/YAML'));
-    const _JSON = await screen.findAllByText('JSON');
-    userEvent.click(_JSON[2]);
-
-    await userEvent.type(screen.getByLabelText('editor'), JSON.stringify(LiqoDashNewMockResponse));
-
-    userEvent.click(screen.getByRole('button', {name: 'Save'}));
-
-    expect(await screen.findByText(/Could not/i)).toBeInTheDocument();
-  }, testTimeout)
-})
+      expect(await screen.findByText(/Could not/i)).toBeInTheDocument();
+    },
+    testTimeout
+  );
+});
