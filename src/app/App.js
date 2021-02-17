@@ -26,13 +26,21 @@ function CallBackHandler(props) {
 
 function App(props) {
   /** Set the URL to which we make the call to the proxy */
-  window.APISERVER_URL =
-    window.location.protocol +
-    '//' +
-    window.location.hostname +
-    ':' +
-    window.location.port +
-    '/apiserver';
+
+  if (window.APISERVER_URL !== undefined && APISERVER_URL !== undefined) {
+    window.APISERVER_URL = APISERVER_URL;
+  } else if (
+    window.APISERVER_URL === 'undefined' ||
+    window.APISERVER_URL === undefined
+  ) {
+    window.APISERVER_URL =
+      window.location.protocol +
+      '//' +
+      window.location.hostname +
+      ':' +
+      window.location.port +
+      '/apiserver';
+  }
 
   const initialPath = useRef(
     window.location.pathname.replace(process.env.PUBLIC_PATH, '')
@@ -103,7 +111,7 @@ function App(props) {
       );
       setApi(_api);
       message.success('Successfully logged in');
-      Utils().setCookie(token);
+      Utils().setCookie(token, window.location.hostname === 'localhost');
 
       /** Get the CRDs at the start of the app */
       _api.getCRDs().catch(error => {
@@ -126,7 +134,10 @@ function App(props) {
         .then(user => {
           Utils().removeCookie();
           window.api = ApiInterface(user, tokenLogout);
-          Utils().setCookie(user.id_token);
+          Utils().setCookie(
+            user.id_token,
+            window.location.hostname === 'localhost'
+          );
         })
         .catch(() => tokenLogout());
     });

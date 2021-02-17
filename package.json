@@ -5,7 +5,7 @@
     "build": "webpack -p --config webpack.config.js --display-error-details",
     "prettify-all": "node_modules/.bin/prettier --write **/*.{js,json,css}",
     "lint-check": "node_modules/.bin/prettier --check **/*.{js,json,css}",
-    "test": "jest --coverage --silent",
+    "test": "jest --coverage --silent --bail",
     "postinstall": "husky install"
   },
   "devDependencies": {

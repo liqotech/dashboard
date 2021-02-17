@@ -1,6 +1,7 @@
 #!/bin/bash -eu
 
 cat << EOF >/usr/share/nginx/html/config.js
+window.APISERVER_URL="${APISERVER_URL:-undefined}";
 window.OIDC_PROVIDER_URL="${OIDC_PROVIDER_URL:-undefined}";
 window.OIDC_CLIENT_ID="${OIDC_CLIENT_ID:-undefined}";
 window.OIDC_CLIENT_SECRET="${OIDC_CLIENT_SECRET:-undefined}";

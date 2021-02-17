@@ -128,3 +128,14 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: jest.fn()
   }))
 });
+
+Object.defineProperty(window, 'APISERVER_URL', {
+  writable: true,
+  value: (window.APISERVER_URL =
+    window.location.protocol +
+    '//' +
+    window.location.hostname +
+    ':' +
+    window.location.port +
+    '/apiserver')
+});
