@@ -5,7 +5,8 @@
     "build": "webpack -p --config webpack.config.js --display-error-details",
     "prettify-all": "node_modules/.bin/prettier --write **/*.{js,json,css}",
     "lint-check": "node_modules/.bin/prettier --check **/*.{js,json,css}",
-    "test": "jest --coverage --silent"
+    "test": "jest --coverage --silent --bail",
+    "postinstall": "husky install"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
@@ -26,11 +27,13 @@
     "css-loader": "^5.0.1",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^4.5.1",
+    "husky": "^5.0.9",
     "identity-obj-proxy": "^3.0.0",
     "jest-canvas-mock": "^2.3.0",
     "jest-fetch-mock": "^3.0.3",
     "jest-localstorage-mock": "^2.4.6",
     "less-loader": "6.2.0",
+    "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.0",
@@ -85,5 +88,10 @@
     "singleQuote": true,
     "arrowParens": "avoid",
     "endOfLine": "lf"
+  },
+  "lint-staged": {
+    "*.{js,json,css}": [
+      "prettier --write"
+    ]
   }
 }

@@ -224,7 +224,7 @@ export default function DraggableLayout(props) {
         .then(res => {
           props.customView.metadata = res.body.metadata;
         })
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
     }
   };
 

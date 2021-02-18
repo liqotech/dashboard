@@ -39,11 +39,11 @@ export function ResourceAutocomplete(props) {
                   else return prev;
                 });
               })
-              .catch(error => console.log(error));
+              .catch(error => console.error(error));
           });
         });
       })
-      .catch(error => console.log(error));
+      .catch(error => console.error(error));
 
     window.api
       .getGenericResource('/api/v1')
@@ -68,7 +68,7 @@ export function ResourceAutocomplete(props) {
           else return prev;
         });
       })
-      .catch(error => console.log(error));
+      .catch(error => console.error(error));
   };
 
   useEffect(() => {

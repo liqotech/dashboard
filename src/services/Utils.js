@@ -231,9 +231,9 @@ export default function Utils() {
     }
   }
 
-  function setCookie(token) {
+  function setCookie(token, isOnLocal) {
     let counter = 0;
-    let props = { secure: true, sameSite: 'strict' };
+    let props = isOnLocal === true ? {} : { secure: true, sameSite: 'strict' };
 
     token.match(/(.|[\r\n]){1,4000}/g).forEach(chunk => {
       if (counter === 0) Cookies.set('token', chunk, props);

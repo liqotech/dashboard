@@ -247,13 +247,13 @@ export default function ReferenceTab(props) {
                           .then(__res => {
                             setLabels(__res);
                           })
-                          .catch(error => console.log(error));
+                          .catch(error => console.error(error));
                     });
                   });
               }
             });
           })
-          .catch(error => console.log(error));
+          .catch(error => console.error(error));
 
         window.api
           .getGenericResource('/api/v1')
@@ -272,10 +272,10 @@ export default function ReferenceTab(props) {
                     setLoading(true);
                     setLabels(__res);
                   })
-                  .catch(error => console.log(error));
+                  .catch(error => console.error(error));
             });
           })
-          .catch(error => console.log(error));
+          .catch(error => console.error(error));
       }
     }
   }

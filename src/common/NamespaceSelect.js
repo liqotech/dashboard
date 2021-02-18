@@ -47,7 +47,7 @@ export default function NamespaceSelect(props) {
           window.api.NSArrayCallback.current.push(handleExternalChangeNS);
         }
       })
-      .catch(error => console.log(error));
+      .catch(error => console.error(error));
   }, []);
 
   const handleExternalChangeNS = () => {

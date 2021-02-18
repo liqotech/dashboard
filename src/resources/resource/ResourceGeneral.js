@@ -238,7 +238,7 @@ function ResourceGeneral(props) {
         setLoading(false);
       })
       .catch(error => {
-        console.log(error);
+        console.error(error);
         deleted.current = true;
         setLoading(false);
       });

@@ -1,0 +1,5 @@
+#!/bin/sh
+# THIS FILE NEEDS TO BE IN VERSION CONTROL BECAUSE IT TELLS WHAT TO DO DURING THE PRE-COMMIT HOOK
+. "$(dirname "$0")/_/husky.sh"
+
+npx --no-install lint-staged

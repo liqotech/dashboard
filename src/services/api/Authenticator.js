@@ -8,19 +8,35 @@ import React from 'react';
 export default function Authenticator() {
   let manager = null;
 
-  if (window.OIDC_CLIENT_ID === 'undefined') {
+  if (
+    (window.OIDC_CLIENT_ID === undefined ||
+      window.OIDC_CLIENT_ID === 'undefined') &&
+    OIDC_CLIENT_ID !== undefined
+  ) {
     window.OIDC_CLIENT_ID = OIDC_CLIENT_ID;
   }
 
-  if (window.OIDC_PROVIDER_URL === 'undefined') {
+  if (
+    (window.OIDC_PROVIDER_URL === undefined ||
+      window.OIDC_PROVIDER_URL === 'undefined') &&
+    OIDC_PROVIDER_URL !== undefined
+  ) {
     window.OIDC_PROVIDER_URL = OIDC_PROVIDER_URL;
   }
 
-  if (window.OIDC_CLIENT_SECRET === 'undefined') {
+  if (
+    (window.OIDC_CLIENT_SECRET === undefined ||
+      window.OIDC_CLIENT_SECRET === 'undefined') &&
+    OIDC_CLIENT_SECRET !== undefined
+  ) {
     window.OIDC_CLIENT_SECRET = OIDC_CLIENT_SECRET;
   }
 
-  if (window.OIDC_REDIRECT_URI === 'undefined') {
+  if (
+    (window.OIDC_REDIRECT_URI === undefined ||
+      window.OIDC_REDIRECT_URI === 'undefined') &&
+    OIDC_REDIRECT_URI !== undefined
+  ) {
     window.OIDC_REDIRECT_URI = OIDC_REDIRECT_URI;
   }
 
@@ -56,7 +72,7 @@ export default function Authenticator() {
     if (manager)
       return manager
         .signinRedirectCallback()
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
   };
 
   /**
@@ -65,7 +81,7 @@ export default function Authenticator() {
    */
   const logout = () => {
     if (manager)
-      return manager.signoutRedirect().catch(error => console.log(error));
+      return manager.signoutRedirect().catch(error => console.error(error));
   };
 
   return {

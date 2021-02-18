@@ -176,7 +176,7 @@ export default function ApiInterface(_user, tokenLogout) {
                 /** update CDs in the views */
                 manageCallbackDCs();
               })
-              .catch(error => console.log(error));
+              .catch(error => console.error(error));
           }
         });
     }
@@ -703,7 +703,7 @@ export default function ApiInterface(_user, tokenLogout) {
   const getKubernetesJSONSchema = () => {
     return fetch('https://kubernetesjsonschema.dev/master/_definitions.json')
       .then(r => r.json())
-      .catch(error => console.log(error));
+      .catch(error => console.error(error));
   };
 
   /**
@@ -745,7 +745,7 @@ export default function ApiInterface(_user, tokenLogout) {
           if (setLoading) setLoading(false);
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           if (setLoading) setLoading(false);
         });
     } else {

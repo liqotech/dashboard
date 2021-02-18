@@ -38,7 +38,7 @@ function ListAvailable(props) {
         message.success('Peer added');
       })
       .catch(error => {
-        console.log(error);
+        console.error(error);
         message.error('Could not add peer');
       });
   };

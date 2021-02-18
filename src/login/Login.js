@@ -18,8 +18,14 @@ function Login(props) {
 
   return (
     <div className={'login-container'}>
-      <Card bordered={false}>
-        <Typography.Title style={{ marginBottom: 50, fontSize: 50 }}>
+      <Card bordered={false} bodyStyle={{ padding: '24px 12px' }}>
+        <Typography.Title
+          style={{
+            marginBottom: 50,
+            fontSize: 35,
+            width: '100%'
+          }}
+        >
           Liqo<span style={{ fontStyle: 'italic' }}>Dash</span> Login
         </Typography.Title>
         <Form onFinish={onFinish} className="login-form">
